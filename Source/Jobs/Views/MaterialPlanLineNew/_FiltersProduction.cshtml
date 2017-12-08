@@ -1,0 +1,155 @@
+﻿@model Model.ViewModel.MaterialPlanLineForProductionFilterViewModel
+@using Core.Common
+
+<div class="modal-content">
+    <div class="modal-header" style="border-bottom: 1px solid #8E8888">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"> <span class="glyphicon glyphicon-remove"></span></button>
+        <h3>
+            <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-file black"></span> Filters</span>
+        </h3>
+    </div>
+    <div>
+        @using (Html.BeginForm("_FilterPostProduction", "MaterialPlanLineNew", FormMethod.Post, new { enctype = "multipart/form-data", id = "modform" }))
+        {
+
+
+            <div class="form-horizontal modal-body">
+                @Html.AntiForgeryToken()
+                @Html.HiddenFor(model => model.MaterialPlanHeaderId)
+                @Html.HiddenFor(m => m.DocTypeId)
+
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.DocDate, "Up To Date", new { @class = "control-label col-xs-4" })
+                            <div class="col-xs-7">
+                                @Html.TextBoxFor(model => model.DocDate,"{0:dd/MMM/yyyy}", new { @class = " datepicker form-control col-xs-7 required" })
+                                @Html.ValidationMessageFor(model => model.DocDate, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>  
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.ProdOrderHeaderId, "Production Order", new { @class = "control-label col-xs-4" })
+                            <div class="col-xs-7">
+                                @Html.TextBoxFor(model => model.ProdOrderHeaderId, new { @class = "form-control col-xs-7 required" })
+                                @Html.ValidationMessageFor(model => model.ProdOrderHeaderId, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>  
+                  
+                  
+                </div>
+                <div class="row">          
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.ProductId, (Model.DocumentTypeSettings.ProductCaption ?? "Product"), new { @class = "control-label col-md-4 col-sm-2 " })
+                            <div class="col-xs-7">
+                                @Html.TextBoxFor(model => model.ProductId, new { @class = "form-control col-xs-7 required" })
+                                @Html.ValidationMessageFor(model => model.ProductId, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>      
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.ProcessId, "Process", new { @class = "control-label col-xs-4 " })
+                            <div class="col-xs-7">
+                                @Html.TextBoxFor(model => model.ProcessId, new { @class = "form-control col-xs-7 required" })
+                                @Html.ValidationMessageFor(model => model.ProcessId, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>         
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.ProductGroupId, (Model.DocumentTypeSettings.ProductGroupCaption ?? "Product Group"), new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-xs-7">
+                                @Html.TextBoxFor(model => model.ProductGroupId, new { @class = "form-control col-xs-7 required" })
+                                @Html.ValidationMessageFor(model => model.ProductGroupId, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>        
+                </div>
+
+                
+                <div class="modal-footer " style="padding: 19px 20px 0 20px; border-top:1px solid #8E8888">
+                    <button class="btn custom" name="Command:Edit" type="submit" id="submit" disabled="disabled"><h2 style="margin:0px" title="Proceed"><span class="glyphicon glyphicon-arrow-right black"></span> </h2></button>
+                </div>
+
+            </div>
+
+        }
+    </div>
+</div>
+
+
+<script type="text/javascript">
+
+
+    $(document).ready(function () {
+        $("#ProductId").select2("focus");
+        var DocID = $('#MaterialPlanHeaderId', '.modal-body').val();
+
+        CustomSelectFunction($("#ProcessId"), '/ComboHelpList/GetProcess', '/ComboHelpList/SetSingleProcess', ' ', true, 0);
+        //CustomSelectFunction($("#ProductId"), '/ComboHelpList/GetProducts', '/ComboHelpList/SetProducts', 'Enter Product Name', true, 0);
+        CustomSelectFunction($("#ProductId"), '/MaterialPlanLineNew/GetCustomProducts', '/ComboHelpList/SetProducts', ' ', false, 0, DocID);
+        //CustomSelectFunction($("#ProdOrderHeaderId"), '/ComboHelpList/GetProdOrders', '/ComboHelpList/SetProdOrders', 'Enter Production order Name', true, 0);
+        //CustomSelectFunction($("#ProductGroupId"), '/ComboHelpList/GetProductGroup', '/ComboHelpList/SetProductGroup', 'Enter Product Name', true, 0);
+        CustomSelectFunction($("#ProductGroupId"), '/MaterialPlanLineNew/GetCustomProductGroups', '/ComboHelpList/SetProductGroup', ' ', false, 0, DocID);
+        CustomSelectFunction($("#Dimension1Id"), '/ComboHelpList/GetDimension1', '/ComboHelpList/SetSingleDimension1', ' ', false, 1);
+        CustomSelectFunction($("#Dimension2Id"), '/ComboHelpList/GetDimension2', '/ComboHelpList/SetSingleDimension2', ' ', false, 1);
+        CustomSelectFunction($("#Dimension3Id"), '/ComboHelpList/GetDimension3', '/ComboHelpList/SetSingleDimension3', ' ', false, 1);
+        CustomSelectFunction($("#Dimension4Id"), '/ComboHelpList/GetDimension4', '/ComboHelpList/SetSingleDimension4', ' ', false, 1);
+
+
+
+
+        $('.datepicker').datepicker({
+            format: 'dd/MM/yyyy',
+            "setDate": new Date(),
+            "autoclose": true
+
+        })
+
+        
+        var DocHEaderID = $('#MaterialPlanHeaderId', '.modal-body').val();
+        var URL = '/MaterialPlanLineNew/GetProdOrders/' + DocHEaderID;
+        $("#ProdOrderHeaderId").select2({
+            minimumInputLength: 0,
+            multiple:true,
+            ajax: {
+                url: URL,
+                dataType: 'json',
+                type: "GET",
+                quietMillis: 50,
+                data: function (term) {
+                    return {
+                        term: term,
+                    };
+                },
+                results: function (data) {
+                    return {
+                        results: $.map(data, function (item) {
+                            return {
+                                text: item.DocNo,
+                                id: item.ProdOrderHeaderId
+                            }
+                        })
+                    };
+                }
+            },
+            
+
+        });
+
+        $('input:text').change(function () {
+            if ($(this).val() != "") {
+                $('#submit').removeAttr("disabled");
+            }
+            else
+                $('#submit').attr("disabled", "disabled");
+        })
+
+        
+    });
+</script>

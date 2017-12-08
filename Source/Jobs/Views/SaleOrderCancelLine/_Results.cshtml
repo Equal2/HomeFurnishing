@@ -1,0 +1,462 @@
+﻿@model Model.ViewModels.SaleOrderCancelMasterDetailModel
+@using Core.Common
+
+<style type="text/css">
+    #tbody {
+        height: 250px;
+        overflow-y: scroll;
+        width: 100%;
+    }
+
+    tbody td {
+        padding: 2px 2px 2px 2px;
+    }
+
+    .textRight {
+        text-align: right;
+    }
+    /*th div{
+        position:absolute;
+    }*/
+</style>
+
+<div class="modal-content">
+    <div class="modal-header" style="border-bottom: 1px solid #8E8888">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"> <span class="glyphicon glyphicon-remove"></span></button>
+        <h3>
+            <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-file black"></span> Cancel Orders & Quantities</span>
+        </h3>
+    </div>
+    <div>
+        @using (Html.BeginForm("_ResultsPost", "SaleOrderCancelLine", FormMethod.Post, new { enctype = "multipart/form-data", id = "modform" }))
+        {
+            @Html.ValidationLog((string)TempData["CSEXCL"])
+            @Html.AntiForgeryToken()
+
+            <div class="form-horizontal modal-body">
+
+                <div style="padding-right:15px">
+                    <div class="row">
+                        <div class="form-horizontal">
+                            @Html.ValidationSummary(true)
+
+
+                            <div class="panel panel-default" id="grid">
+                                <div class="panel-heading headrow" style="background-image: -webkit-linear-gradient(top, #428bca 0%, #428bca 100%);color:white">
+                                    <div class="row grid-head">
+                                        <div class="block text-left" style="width:5%">
+                                            Srl.
+                                        </div>
+                                        <div class="block" style="width:92%">
+                                            <div class="row">
+                                                @*ProductInfo*@
+                                                <div class="block" style="width:25%">
+                                                    SaleOrder
+
+                                                </div>
+                                                <div class="block" style="width:25%">
+                                                    Product
+                                                </div>
+                                                @*Qty*@
+                                                <div class="block text-right" style="width:15%">
+                                                    <a href="#" id="ToCancel" style="color:white">Balance Qty</a>                                                    
+                                                </div>
+                                                <div class="block text-right" style="width:15%">
+                                                    Cancel Qty
+                                                </div>
+                                                <div class="block" style="width:20%">
+                                                    Remark
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+                                </div>
+                                <div class="panel-info" id="gbody" style="max-height:250px;overflow-y:scroll">
+                                    @{
+            decimal OrderQty = 0;
+            decimal CancelQty = 0;
+            int MaxUnitDecPlaces = 0;
+                                    }
+
+                                    @for (int i = 0; i < Model.SaleOrderCancelViewModels.Count(); i++)
+                                    {
+
+
+                                        <div class='row crow grid-body' style='margin-left:0px;margin-right:0px'>
+
+                                            @Html.HiddenFor(m => m.SaleOrderCancelViewModels[i].SaleOrderCancelHeaderId)
+                                            @Html.HiddenFor(m => m.SaleOrderCancelViewModels[i].DocNo)
+                                            @Html.HiddenFor(m => m.SaleOrderCancelViewModels[i].BuyerName)
+                                            @Html.HiddenFor(m => m.SaleOrderCancelViewModels[i].SaleOrderLineId)
+                                            @Html.HiddenFor(m => m.SaleOrderCancelViewModels[i].ProductName)
+                                            @Html.HiddenFor(m => m.SaleOrderCancelViewModels[i].ProductId)
+                                            @Html.HiddenFor(m => m.SaleOrderCancelViewModels[i].BalanceQty)
+                                            @Html.HiddenFor(m => m.SaleOrderCancelViewModels[i].unitDecimalPlaces, new { @class="UDec"})
+
+                                            @if (MaxUnitDecPlaces < Model.SaleOrderCancelViewModels[i].unitDecimalPlaces)
+                                            {
+                                                MaxUnitDecPlaces = Model.SaleOrderCancelViewModels[i].unitDecimalPlaces;
+                                            }
+                                            @{OrderQty += Model.SaleOrderCancelViewModels[i].BalanceQty;}
+
+
+                                            <div class='block row-index' style='width:5%'>
+                                                @(i + 1)
+                                                <input type='hidden' class='id' value="@Model.SaleOrderCancelViewModels[i].SaleOrderCancelHeaderId" />
+                                            </div>
+                                            <div class='block pull-middle' style='width:94%'>
+                                                <div class='row'>
+                                                    <div class='block' style='width:25%'>
+                                                        <strong>@Model.SaleOrderCancelViewModels[i].DocNo</strong>                                                        
+                                                    </div>
+                                                    <div class="block" style='width:25%'>
+                                                        @Model.SaleOrderCancelViewModels[i].ProductName
+                                                        @{
+                                              var Dim1 = (string.IsNullOrEmpty(Model.SaleOrderCancelViewModels[i].Dimension1Name)) ? "" : Model.SaleOrderCancelViewModels[i].Dimension1Name + ",";
+                                              var Dim2 = (string.IsNullOrEmpty(Model.SaleOrderCancelViewModels[i].Dimension2Name)) ? "" : Model.SaleOrderCancelViewModels[i].Dimension2Name;
+                                                        }
+                                                        <div>
+                                                            @Dim1 @Dim2
+                                                        </div>
+                                                    </div>
+                                                    <div class='block text-right' style='width:15%'>
+                                                        <a href="#" class="ToCancel" style="color:black">
+                                                            <span class="BalanceQty"> @string.Format("{" + "0:0.".PadRight(@Model.SaleOrderCancelViewModels[i].unitDecimalPlaces + 4, '0') + "}", Model.SaleOrderCancelViewModels[i].BalanceQty)</span><br /><div>
+                                                            </div>
+                                                        </a>
+                                                    </div>
+                                                   
+                                                    <div class='block text-right' style='width:15%'>
+                                                        @Html.TextBoxFor(m => Model.SaleOrderCancelViewModels[i].Qty, new { @class = "form-control text-right CancelQty" })
+                                                        @Html.ValidationMessageFor(m => Model.SaleOrderCancelViewModels[i].Qty, "", new { @class = "text-danger" })     
+                                                        @{CancelQty += Model.SaleOrderCancelViewModels[i].Qty;}                                                   
+                                                    </div>
+
+                                                    <div class='block' style='width:20%'>
+                                                        @Html.TextBoxFor(m => Model.SaleOrderCancelViewModels[i].LineRemark, new { @class = "form-control" })
+                                                        @Html.ValidationMessageFor(m => Model.SaleOrderCancelViewModels[i].LineRemark, "", new { @class = "text-danger" })                                                        
+                                                    </div>
+
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                        <hr style='margin-top:0px;margin-bottom:0px' />
+                                    }
+                                </div>
+                            </div>
+
+
+
+                            <div class="row grid-head">
+                                <div class="block text-left" style="width:5%">
+
+                                </div>
+                                <div class="block" style="width:92%">
+                                    <div class="row">
+                                        @*ProductInfo*@
+                                        <div class="block text-left" style="width:5%">
+
+                                        </div>
+                                        <div class="block" style="width:92%">
+                                            <div class="row">
+                                                @*ProductInfo*@
+                                                <div class='block' style='width:25%'>
+                                                    <strong>Total</strong>
+                                                </div>
+                                                <div class='block text-center' style='width:25%'>
+
+                                                </div>                                            
+                                                @*Qty*@
+                                                <div class='block text-right' style='width:15%'>
+                                                    <strong>@string.Format("{" + "0:0.".PadRight(MaxUnitDecPlaces + 4, '0') + "}", OrderQty)</strong>
+                                                </div>
+                                                <div class='block text-right' style='width:15%'>
+                                                    <strong><span id="TotCancelQty">@string.Format("{" + "0:0.".PadRight(MaxUnitDecPlaces + 4, '0') + "}",CancelQty)</span></strong>
+                                                </div>
+
+                                                <div class='block text-right' style='width:20%'>
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                            @*<table class="table" style="width:100%">
+                                <thead>
+                                    <tr style="color:black">
+                                        <th style="width:5%;padding-left:0px">
+                                            <div>
+                                                Sr.
+                                            </div>
+                                        </th>
+                                        <th style="width: 20%; padding-left: 0px">
+                                            <div>
+                                                Sale Order
+                                            </div>
+                                        </th>
+                                        <th style="width: 25%; padding-left: 0px">
+                                            <div>
+                                                Product
+                                            </div>
+                                        </th>
+                                        <th style="width: 15%; padding-left: 0px">
+                                            <div>
+                                                Balance Qty
+                                            </div>
+                                        </th>
+                                        <th style="width: 15%; text-align: right; padding-right: 15px">
+                                            <div>
+                                                Cancel Qty
+                                            </div>
+                                        </th>
+                                        <th style="width: 20%; padding-left: 0px">
+                                            <div>
+                                                Remark
+                                            </div>
+                                        </th>
+                                    </tr>
+                                </thead>
+                            </table>
+                            <div id="tbody">
+                                <div class="tbody">
+                                    <table>
+                                        <tbody>
+
+
+
+
+                                            @for (int i = 0; i < Model.SaleOrderCancelViewModels.Count(); i++)
+                                            {
+                                                @Html.HiddenFor(m => m.SaleOrderCancelViewModels[i].SaleOrderCancelHeaderId)
+                                                @Html.HiddenFor(m => m.SaleOrderCancelViewModels[i].DocNo)
+                                                @Html.HiddenFor(m => m.SaleOrderCancelViewModels[i].BuyerName)
+                                                @Html.HiddenFor(m => m.SaleOrderCancelViewModels[i].SaleOrderLineId)
+                                                @Html.HiddenFor(m => m.SaleOrderCancelViewModels[i].ProductName)
+                                                @Html.HiddenFor(m => m.SaleOrderCancelViewModels[i].ProductId)
+                                                @Html.HiddenFor(m => m.SaleOrderCancelViewModels[i].BalanceQty)
+                                                <tr>
+                                                    <td style="width:5%">
+                                                        @(i + 1)
+                                                    </td>
+                                                    <td style="width:20%">
+                                                        @Html.TextBoxFor(m => m.SaleOrderCancelViewModels[i].DocNo, new { @class = "form-control", @disabled = "disabled" })
+                                                    </td>
+                                                    <td style="width:25%">
+                                                        @Html.TextBoxFor(m => m.SaleOrderCancelViewModels[i].ProductName, new { @class = "form-control", @disabled = "disabled" })
+                                                    </td>
+                                                    <td style="width:15%">
+                                                        @Html.TextBoxFor(m => Model.SaleOrderCancelViewModels[i].BalanceQty, new { @class = "form-control", @disabled = "disabled" })
+                                                    </td>
+                                                    <td style="width:15%">
+                                                        @Html.TextBoxFor(m => m.SaleOrderCancelViewModels[i].Qty, new { @class = "form-control textRight" })
+                                                        @Html.ValidationMessageFor(m => m.SaleOrderCancelViewModels[i].Qty)
+                                                    </td>
+                                                    <td style="width:20%">
+                                                        @Html.TextBoxFor(m => m.SaleOrderCancelViewModels[i].LineRemark, new { @class = "form-control" })
+                                                        @Html.ValidationMessageFor(m => m.SaleOrderCancelViewModels[i].LineRemark)
+                                                    </td>
+
+                                                </tr>
+
+                                            }
+
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>*@
+
+
+
+
+
+
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer " style="padding: 19px 20px 0 20px; border-top:1px solid #8E8888">
+                    <button class="btn custom" name="Command:Edit" type="submit"><h2 style="margin:0px" id="submit" title="Proceed"><span class="glyphicon glyphicon-floppy-disk black black"></span> </h2></button>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+
+<script type="text/javascript">
+
+    var reset = false;
+    var IsSaved = false;
+    var ValidationCount = 0;
+
+    $('#modform').bind('submit', function (event) {
+
+        if (!IsSaved) {
+            if (!ValidateData()) {
+                return false;
+            }
+            IsSaved = true;
+            $('button:submit').attr('disabled', 'disabled');
+            return IsSaved;
+        }
+        else {
+            return false;
+        }
+
+
+    });
+
+    function ValidateData() {
+        var ValidationMessage = "";
+        //Client Side Validaion.....
+        return (ValidationMessage == "");
+    }
+
+
+    $('input.CancelQty').change(function () {
+
+        var $div = $(this).closest('div.row');
+        var OrderQty = parseFloat($div.find('span.BalanceQty').text()) || 0;
+
+        var CancelQty = parseFloat($div.find('input.CancelQty').val()) || 0;
+
+        var bal = (CancelQty) - (OrderQty);
+
+        if (bal > 0) {
+            if (!$('#modform').find('.modal-body #errormsg').length) {
+                $('#modform').find('#submit').attr('disabled', 'disabled');
+                $('#modform').find('.modal-body').prepend("<div class='alert alert-danger'><span id=errormsg >Qty exceeding Order Qty</span></div>")
+            }
+            else {
+                $('#modform').find('#errormsg').text("Qty exceeding Order Qty");
+            }
+        }
+        else {
+            $('#modform').find('#submit:disabled').removeAttr('disabled');
+            if ($('#modform').find('.modal-body #errormsg').length) {
+                $('#modform').find('#errormsg').parent().remove();
+            }
+        }
+        CalculateTotal();
+
+    })
+
+    function CalculateTotal() {
+        var Order = 0;
+        var maxDeclaces = 0;
+        $('.row.crow.grid-body', '.modal-body').each(function () {
+
+            if ($(this).find('input.CancelQty').val()) {
+                Order += parseFloat($(this).find('input.CancelQty').val());
+                var $Hidiv = $(this).closest('div.row.crow');
+                var unitDecPlaces = parseFloat($Hidiv.find('.UDec').val()) || 0;
+                if (unitDecPlaces > maxDeclaces)
+                    maxDeclaces = unitDecPlaces;
+            }
+
+        })
+        $('#TotCancelQty', '.modal-body').text(Order.toFixed(maxDeclaces));
+    }
+
+
+    $('.ToCancel').click(function () {
+
+        var $Hidiv = $(this).closest('div.row.crow');
+
+        var unitDecPlaces = parseFloat($Hidiv.find('.UDec').val()) || 0;
+
+        var $div = $(this).closest('div.row');
+
+        var OrderQty = parseFloat($div.find('span.BalanceQty').text()) || 0;
+
+        if ($div.find('input.CancelQty').val() && $div.find('input.CancelQty').val() > 0) {
+            $div.find('input.CancelQty').val(0);
+        }
+
+        else {
+            $div.find('input.CancelQty').val(OrderQty.toFixed(unitDecPlaces));
+        }
+
+
+
+
+        CalculateTotal();
+
+    })
+
+    $('#ToCancel').click(function () {
+        if (reset) {
+            $('div.row.crow', "#gbody.panel-info").each(function (index) {
+
+
+                var $Hidiv = $(this);
+
+                var unitDecPlaces = parseFloat($Hidiv.find('.UDec').val()) || 0;
+
+                var OrderQty = parseFloat($Hidiv.find('span.BalanceQty').text()) || 0;
+
+                $Hidiv.find('input.CancelQty').val(OrderQty.toFixed(unitDecPlaces));
+
+
+            })
+            CalculateTotal();
+            reset = false;
+        }
+        else if (!reset) {
+            $('div.row.crow', "#gbody.panel-info").each(function (index) {
+
+                var $Hidiv = $(this);
+
+                $Hidiv.find('input.CancelQty').val(0);
+
+            })
+            CalculateTotal();
+            reset = true;
+        }
+    })
+
+
+
+</script>

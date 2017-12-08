@@ -1,0 +1,44 @@
+﻿@model Surya.India.Model.Models.DocumentCategory
+
+@{
+    ViewBag.Title = "Delete";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div>
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h4>
+                <span style="font-family: Calibri,sans-serif,Verdana"> Delete Document Category.</span>
+            </h4>
+        </div>
+        <div class="panel-info" style="padding-left:15px">
+            
+            <dl class="dl-horizontal" style="padding-top:15px">
+                <dt>
+                    @Html.DisplayNameFor(model => model.DocumentCategoryName)
+                </dt>
+
+                <dd>
+                    @Html.DisplayFor(model => model.DocumentCategoryName)
+                </dd>
+              
+
+            </dl>
+            <hr />
+            @using (Html.BeginForm())
+            {
+                @Html.AntiForgeryToken()
+
+                <div class="form-actions no-color">
+                    <input type="submit" value="Delete" class="btn btn-primary btn-sm CurveBorder height" style=" border-color: #606264" /> 
+                    <span style="font-family: Calibri,sans-serif,Verdana;font-size:large">
+                        @Html.ActionLink("Back to List", "Index", null, new { @class = "btn btn-primary btn-sm col-md-offset-1 CurveBorder ActionLinkPadding CustomCss height" })
+
+                    </span>
+                   
+                </div>
+            }
+        </div>
+    </div>
+</div>

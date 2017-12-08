@@ -1,0 +1,163 @@
+﻿@model MDashBoard.Models.SubProductionDataset
+
+<style type="text/css">
+    .cusleftnormal {
+        border-bottom-left-radius: 0pc !important;
+        border-top-left-radius: 0px !important;
+    }
+
+    .cusrightnormal {
+        border-bottom-right-radius: 0px !important;
+        border-top-right-radius: 0px !important;
+    }
+</style>
+
+
+@{
+    int I = DateTime.Now.Month;
+    string fromdate;
+    if (I < 4)
+    {
+        fromdate = "01/Apr/" + DateTime.Now.AddYears(-1).Year.ToString();
+    }
+    else
+    {
+        fromdate = "01/Apr/" + DateTime.Now.Year.ToString();
+    }
+
+}
+
+@{
+    double? TotalProduction;    
+    TotalProduction =Model.Name.Sum(m => m.Qty); 
+  }
+
+
+
+@functions
+{
+   
+ public string SpanColor(double? Value,double? Total)
+    {
+     string Color = null;
+     double? divided=0;
+     divided = (Value / Total) * 100;
+         
+     if (divided > 0 && divided <= 25)
+     {
+         Color ="bg-red";
+     }
+     else if (divided > 25 && divided <= 50)
+     {
+         Color = "bg-yellow";
+     }
+     else if (divided > 50 && divided <= 75)
+     {
+         Color = "bg-blue";
+     }
+     else if (divided > 75 && divided <= 100)
+     {
+         Color = "bg-green";
+     }
+   return Color; 
+ } 
+
+}
+
+@{
+    string Mindate = "";
+    string Maxdate = "";
+    Mindate = Model.MinMaxDate.FirstOrDefault().MinDate;
+    Maxdate = Model.MinMaxDate.FirstOrDefault().MaxDate;
+}
+
+<div class="modal-content">
+    <div class="modal-header" style="border-bottom: 1px solid #8E8888; padding-top: 8px; padding-bottom: 8px;">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"> <span class="glyphicon glyphicon-remove"></span> 
+         </button>
+        
+        <div class="ion ion-person" style="font-size:3.2em;width:auto;height:auto;float:left;">
+        </div>
+        <div>
+            <span class="info-box-number">@ViewBag.Title &nbsp;&nbsp;&nbsp;&nbsp;(@string.Format("{0:0}", TotalProduction).ToString() Sq.Yard)</span>
+            <span class="info-box-text">@Mindate &nbsp;To &nbsp; @Maxdate <a href="@ViewBag.Type" data-modal=""><span class="glyphicon glyphicon-backward" style="float:right;font-size:1.5em"></span></a></span>
+          </div>
+    </div>
+    <div class="modal-body">
+        <div class="row">
+            
+            <!-- /.col -->
+            <div class="col-md-12">
+                <!-- Widget: user widget style 1 -->
+                <div class="box box-widget widget-user-2">
+                    <!-- Add the bg color to the header using any of the bg-* classes -->
+                    <div class="widget-user-header @ViewBag.Color" style="padding-bottom: 3px;padding-top: 3px;">
+                        <div class="widget-user-image">
+                            <!-- <img class="img-circle" src="../dist/img/user7-128x128.jpg" alt="User Avatar">-->
+                            <div class="ion ion-person" style="font-size:3em;width:auto;height:auto;float:left;">
+                            </div>
+                        </div>
+                        <!-- /.widget-user-image
+        <h3 class="widget-user-username" style="font-weight:bold">Job Worker</h3>-->
+                        <h4><span class="text-bold">Job Worker</span></h4>
+                        <!-- <h5 class="widget-user-desc">Production &nbsp;(Sq.Yard)</h5>-->
+                    </div>
+                    <div class="box-footer no-padding">
+                        
+                            @foreach (var item in Model.Name.ToList())
+                            {
+                                <div class="box collapsed-box" style="margin-bottom: 0px;border-top-width: 0.5px;">
+                                    <div class="box-header">
+
+
+                                        <div class="row">
+                                            <div class="col-md-4 col-xs-4">@item.Name</div>
+                                            <div class="col-md-2 col-xs-2"><span class="badge @SpanColor(item.Qty, TotalProduction)">@string.Format("{0:0}", (item.Qty / TotalProduction) * 100).ToString()%</span></div>
+                                            <div class="col-md-3 col-xs-3" style="text-align:right">@string.Format("{0:0}", item.Qty).ToString()</div>
+                                            <div class="col-md-3 col-xs-3" style="text-align:right">
+                                                <div class="box-tools">
+                                                    <button type="button" class="btn btn-box-tool" data-widget="collapse">
+                                                        <i class="fa fa-plus"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+
+
+
+                                    </div>
+                                    <div class="box-body">
+                                        <div class="box-body table-responsive no-padding">
+                                            <table class="table table-hover">
+                                                <tr>
+                                                    <th>Date</th>
+                                                    <th>&nbsp;</th>
+                                                    <th>Qty</th>
+                                                </tr>
+                                                @foreach (var item2 in item.NameDetails)
+                                                {
+                                                    <tr>
+                                                        <td>@item2.DateTime</td>
+                                                        <td><span class="badge @SpanColor(item2.Qty, item.Qty)">@string.Format("{0:0}", (item2.Qty / item.Qty) * 100).ToString()%</span></td>
+                                                        <td>@string.Format("{0:0}", item2.Qty).ToString()</td>
+                                                    </tr>
+                                                }
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                            
+                                     
+                        </div>
+                </div>
+                <!-- /.widget-user -->
+            </div>
+
+            <!-- /.col -->
+            
+
+            <!-- /.col -->
+        </div>
+    </div>
+</div>

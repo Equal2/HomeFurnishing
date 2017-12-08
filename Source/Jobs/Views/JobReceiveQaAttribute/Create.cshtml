@@ -1,0 +1,949 @@
+﻿@model Model.ViewModel.JobReceiveQAAttributeViewModel
+@using Core.Common
+@{
+    ViewBag.Title = "Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<!-- modal placeholder-->
+<div id='myModal' class='modal fade in'>
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div id='myModalContent'></div>
+        </div>
+    </div>
+</div>
+
+@using (Html.BeginForm("Post", "JobReceiveQAAttribute", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+    
+    
+    @*@Html.HiddenFor(m => m.DocDate)
+    @Html.HiddenFor(m => m.DocNo)
+    @Html.HiddenFor(m => m.QAById)
+    @Html.HiddenFor(m => m.Remark)
+    @Html.HiddenFor(m => m.QAQty)
+    @Html.HiddenFor(m => m.InspectedQty)
+    @Html.HiddenFor(m => m.Qty)
+    @Html.HiddenFor(m => m.FailQty)
+    @Html.HiddenFor(m => m.UnitConversionMultiplier)
+    @Html.HiddenFor(m => m.DealQty)
+    @Html.HiddenFor(m => m.FailDealQty)
+    @Html.HiddenFor(m => m.Weight)
+    @Html.HiddenFor(m => m.PenaltyRate)
+    @Html.HiddenFor(m => m.PenaltyAmt)
+    @Html.HiddenFor(m => m.Marks)*@
+    
+    
+    @Html.HiddenFor(m => m.JobReceiveQASettings.ProcessId)
+    
+    @Html.HiddenFor(m => m.JobReceiveQALineId)
+    @Html.HiddenFor(m => m.JobReceiveQAHeaderId)
+    @Html.HiddenFor(m => m.DocTypeId)
+    @Html.HiddenFor(m => m.DivisionId)
+    @Html.HiddenFor(m => m.SiteId)
+    @Html.HiddenFor(m => m.ProcessId)
+    @Html.HiddenFor(m => m.UnitId)
+    @Html.HiddenFor(m => m.JobReceiveLineId)
+    @Html.HiddenFor(m => m.ProductUidId)
+    @Html.HiddenFor(m => m.UnitDecimalPlaces)
+    @Html.HiddenFor(m => m.DealUnitDecimalPlaces)
+    @Html.HiddenFor(m => m.DimensionUnitDecimalPlaces)
+
+    
+
+
+
+    <div class="panel panel-default">
+        <div class="panel-heading">
+
+            @CustomHelpers.RenderResHeaderInfo(ViewBag.transactionType, (int?)ViewBag.PendingToSubmit, (int?)ViewBag.PendingToReview, ViewBag.Name)
+
+            @*@if (ViewBag.transactionType == "submit" || ViewBag.transactionType == "submitContinue")
+            {<h3 style="border-bottom:0px solid #e1dada;padding-bottom:0px;">
+                <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"> <span class="glyphicon glyphicon-file black"></span>Submit @ViewBag.Name</span>
+                <button type="submit" name="Command:Submit" class="btn btn-primary right" id="SubmitContinue" style="margin-left:5px;">Submit & Next<span class='badge'>@(ViewBag.PendingToSubmit != 0 ? ViewBag.PendingToSubmit : "")</span></button>
+                <button type="submit" name="Command:Submit" class="btn btn-primary right">Submit</button>
+                <input type="hidden" id="IsContinue" name="IsContinue" value="" />
+            </h3>}
+            else if (ViewBag.transactionType == "review" || ViewBag.transactionType == "ReviewContinue")
+            {<h3 style="border-bottom:0px solid #e1dada;padding-bottom:0px;">
+                <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"> <span class="glyphicon glyphicon-file black"></span>Review @ViewBag.Name</span>
+                <button type="submit" name="Command:Review" class="btn btn-primary right" style="margin-left:5px" id="ReviewContinue">Review & Next<span class='badge'>@(ViewBag.PendingToReview != 0 ? ViewBag.PendingToReview : "")</span></button>
+                <button type="submit" class="btn btn-primary right" name="Command:Review">Review</button>
+                <input type="hidden" id="IsContinue" name="IsContinue" value="" />
+            </h3>}
+            else if (ViewBag.transactionType == "detail")
+            {
+                <h3>
+                    <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"> <span class="glyphicon glyphicon-file black"></span>@ViewBag.Name</span>
+                </h3>
+            }
+            else
+            {
+                <h3 style="border-bottom:0px solid #e1dada;padding-bottom:0px;">
+                    <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"> <span class="glyphicon glyphicon-file black"></span> @ViewBag.Name</span>
+                    <input type="submit" value="Save" class="btn btn-primary right" id="submit" style="width: 90px; background-color: #2980b9" />
+                </h3>
+                
+            }*@
+            @*@Html.ActionLink("For Receive", "_ForReceive", "JobReceiveQALine", new { id = @Model.JobReceiveQAHeaderId, sid = @Model.JobWorkerId }, new { data_modal = "", id = "btnCreateF", @class = "btn btn-primary borderradii", @title = "For Order", @data_toggle = "tooltip", @style = "background-color:#2980b9" })*@
+
+            <hr style="margin-top: 5px; margin-bottom: 5px; border-top: 1px solid #d8d5d5" />
+            @{
+                string EditAction = "";
+                if (Model.Status == (int)StatusConstants.Drafted || Model.Status == (int)StatusConstants.Import)
+                {
+                    EditAction = "Modify";
+                }
+                else if ((Model.Status == (int)StatusConstants.Submitted || Model.Status == (int)StatusConstants.Modified))
+                {
+                    EditAction = "ModifyAfter_Submit";
+                }
+                else
+                {
+                    EditAction = "DetailInformation";
+                }
+            }
+            <div class="panel-info">
+                <div class="btn-group">
+                    @*@Html.ActionLink(" ", "Create", "JobReceiveQAHeader", new { @id = ViewBag.id }, new { @class = "cbtn btn-circle glyphicon glyphicon-plus toolbar", @title = "Add New", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", EditAction, "JobReceiveQAHeader", new { @id = Model.JobReceiveQAHeaderId, IndexType = ViewBag.IndexStatus }, new { @class = "cbtn btn-circle glyphicon glyphicon-edit", @title = "Edit", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "GeneratePrints", "JobReceiveQAHeader", new { Ids = Model.JobReceiveQAHeaderId, DocTypeId = Model.DocTypeId }, new { @class = "cbtn btn-circle glyphicon glyphicon-print toolbar", @title = "Print", @data_toggle = "tooltip", @id = "PrintRecordC", target = "_blank" })
+                    @Html.ActionLink(" ", "PrevPage", "JobReceiveQAHeader", new { DocId = @Model.JobReceiveQAHeaderId, DocTypeId = Model.DocTypeId }, new { @class = "cbtn btn-circle glyphicon glyphicon-arrow-left toolbar", @title = "Prev Record", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "NextPage", "JobReceiveQAHeader", new { DocId = @Model.JobReceiveQAHeaderId, DocTypeId = Model.DocTypeId }, new { @class = "cbtn btn-circle glyphicon glyphicon-arrow-right toolbar", @title = "Next Record", @data_toggle = "tooltip" })*@
+                    @Html.ActionLink(" ", "Index", "JobReceiveQAAttribute", new { id = Model.DocTypeId }, new { @class = "cbtn btn-circle glyphicon glyphicon-list", @title = "List", @data_toggle = "tooltip" })
+                  </div>
+            </div>
+        </div>
+        <div class="panel-info" style="padding-left:15px">
+            <div class="form-horizontal">
+                @Html.ValidationSummary(true)
+
+                <div>
+                    <h4 class="col-md-12 black">
+                        <span class="glyphicon glyphicon-align-justify"></span>
+                        Document Details
+                    </h4>
+                    <div>
+                        <div>
+                            <div class="col-md-6">
+                                <div class="form-group" style="margin-top:15px">
+                                    @Html.LabelFor(model => model.DocDate, "QA Date", new { @class = "control-label col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextBoxFor(m => m.DocDate, "{0:dd/MMMM/yyyy}", new { @class = "datepickerWithNFD form-control required" })
+                                        @Html.ValidationMessageFor(model => model.DocDate, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group" style="margin-top:15px">
+                                    @Html.LabelFor(model => model.DocNo, "QA DocNo", new { @class = "control-label col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextBoxFor(m => m.DocNo, null, new { @class = "form-control required" })
+                                        @Html.ValidationMessageFor(m => m.DocNo, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.JobWorkerId, "Job Worker", new { @class = "control-label col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextBoxFor(m => m.JobWorkerId, new { @class = "form-control ", @readonly = "true" })
+                                        @Html.ValidationMessageFor(m => m.JobWorkerId, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.QAById, "QA By", new { @class = "control-label col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextBoxFor(m => m.QAById, new { @class = "form-control required" })
+                                        @Html.ValidationMessageFor(m => m.QAById, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                       
+                        <div>
+                            <div class="col-md-6" style="display:@(Model.JobReceiveQASettings.isVisibleProductUID?"":"none")">
+                                @Html.HiddenFor(m => m.JobReceiveQASettings.isVisibleProductUID)
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.ProductUidId, (Model.DocumentTypeSettings.ProductUidCaption ?? "Product Uid"), new { @class = "control-label col-md-4 col-sm-2" })
+                                    @Html.HiddenFor(m => m.DocumentTypeSettings.ProductUidCaption)
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextBoxFor(m => m.ProductUidName, new { @class = "form-control required", @readonly = "true" })
+                                        @Html.ValidationMessageFor(m => m.ProductUidName, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.ProductId, (Model.DocumentTypeSettings.ProductCaption ?? "Product"), new { @class = "control-label col-md-4 col-sm-2" })
+                                    @Html.HiddenFor(m => m.DocumentTypeSettings.ProductCaption)
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextBoxFor(m => m.ProductId, null, new { @class = "form-control", @readonly = "true" })
+                                        @Html.ValidationMessageFor(m => m.ProductId, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.QAQty, "QA-Qty", new { @class = "control-label col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextBoxFor(m => m.QAQty, new { @class = "form-control required", @readonly = "true" })
+                                        @Html.ValidationMessageFor(m => m.QAQty, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6" style="display:@(Model.JobReceiveQASettings.IsVisibleInspectedQty?"":"none")">
+                                @Html.HiddenFor(m => m.JobReceiveQASettings.IsVisibleInspectedQty)
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.InspectedQty, "Ins-Qty", new { @class = "control-label col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextBoxFor(m => m.InspectedQty, null, new { @class = "form-control", @readonly = "true" })
+                                        @Html.ValidationMessageFor(m => m.InspectedQty, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.Qty, "Pass Qty", new { @class = "control-label col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextBoxFor(m => m.Qty, new { @class = "form-control required" })
+                                        @Html.ValidationMessageFor(m => m.Qty, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div>
+                            <div class="col-md-6" style="display:@(Model.JobReceiveQASettings.isVisibleDealUnit?"":"none")">
+                                @Html.HiddenFor(m => m.JobReceiveQASettings.isVisibleDealUnit)
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.DealUnitId, (Model.DocumentTypeSettings.DealQtyCaption + " Unit & Multiplier" ?? "Deal Unit & Multiplier"), new { @class = "control-label col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10" style="padding:0px">
+                                        <div class="col-xs-7" style="padding-right:0px">
+                                            @Html.DropDownListFor(model => model.DealUnitId, new SelectList(ViewBag.DeliveryUnitList as System.Collections.IEnumerable, "UnitId", "UnitName"), new { @class = "form-control height cusrightnormal required"})
+                                            @Html.ValidationMessageFor(model => model.DealUnitId, "", new { @class = "text-danger" })
+                                        </div>
+                                        <div class="col-xs-5" style="padding-left:0px">
+                                            @Html.TextBoxFor(model => model.UnitConversionMultiplier, new { @class = "form-control cusleftnormal "})
+                                            @Html.ValidationMessageFor(model => model.UnitConversionMultiplier, "", new { @class = "text-danger" })
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6" style="display:@(Model.JobReceiveQASettings.isVisibleDealUnit?"":"none")">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.DealQty, (Model.DocumentTypeSettings.DealQtyCaption ?? "Deal Qty"), new { @class = "control-label col-md-4 col-sm-2" })
+                                    @Html.HiddenFor(m => m.DocumentTypeSettings.DealQtyCaption)
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextBoxFor(m => m.DealQty, null, new { @class = "form-control" })
+                                        @Html.ValidationMessageFor(m => m.DealQty, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="col-md-6" style="display:@(Model.JobReceiveQASettings.IsVisibleWeight?"":"none")">
+                                @Html.HiddenFor(m => m.JobReceiveQASettings.IsVisibleWeight)
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.Weight, (Model.DocumentTypeSettings.WeightCaption ?? "Weight"), new { @class = "control-label col-md-4 col-sm-2" })
+                                    @Html.HiddenFor(m => m.DocumentTypeSettings.WeightCaption)
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextBoxFor(m => m.Weight, null, new { @class = "form-control" })
+                                        @Html.ValidationMessageFor(m => m.Weight, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6" style="display:@(Model.JobReceiveQASettings.IsVisiblePenalty?"":"none")">
+                                @Html.HiddenFor(m => m.JobReceiveQASettings.IsVisiblePenalty)
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.PenaltyRate, "Penalty Rate", new { @class = "control-label col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextBoxFor(m => m.PenaltyRate, new { @class = "form-control " })
+                                        @Html.ValidationMessageFor(m => m.PenaltyRate, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="col-md-6" style="display:@(Model.JobReceiveQASettings.IsVisiblePenalty?"":"none")">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.PenaltyAmt, "Penalty Amt", new { @class = "control-label col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextBoxFor(m => m.PenaltyAmt, null, new { @class = "form-control" })
+                                        @Html.ValidationMessageFor(m => m.PenaltyAmt, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="col-md-6" style="display:@(Model.JobReceiveQASettings.isVisibleMarks?"":"none")">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.Marks, "Marks", new { @class = "control-label col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextBoxFor(m => m.Marks, new { @class = "form-control " })
+                                        @Html.ValidationMessageFor(m => m.Marks, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="col-md-6" style="display:@(Model.JobReceiveQASettings.IsVisibleLength?"":"none")">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.Length, "Length", new { @class = "control-label col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextBoxFor(m => m.Length, null, new { @class = "form-control " })
+                                        @Html.ValidationMessageFor(m => m.Length, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6" style="display:@(Model.JobReceiveQASettings.IsVisibleWidth?"":"none")">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.Width, "Width", new { @class = "control-label col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextBoxFor(m => m.Width, null, new { @class = "form-control " })
+                                        @Html.ValidationMessageFor(m => m.Width, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="col-md-6" style="display:@(Model.JobReceiveQASettings.IsVisibleHeight?"":"none")">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.Height, "Height", new { @class = "control-label col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextBoxFor(m => m.Height, null, new { @class = "form-control " })
+                                        @Html.ValidationMessageFor(m => m.Height, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.Remark, "Remark", new { @class = "control-label col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextBoxFor(m => m.Remark, new { @class = "form-control" })
+                                        @Html.ValidationMessageFor(m => m.Remark, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    @if (Model.QAGroupLine.Count > 0)
+                    {
+                        <h4 class="col-md-12 black">
+                            <span class="glyphicon glyphicon-align-justify"></span>
+                            QA Detail
+                        </h4>
+                    }
+
+                    <div>
+                        @if (Model.QAGroupLine != null)
+                        {
+                            for (int i = 0; i < Model.QAGroupLine.Count; i++)
+                            {
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        @Html.Label(Model.QAGroupLine[i].Name, new { @class = "control-label col-md-4 col-sm-2" })
+                                        @Html.HiddenFor(m => m.QAGroupLine[i].JobReceiveQAAttributeId)
+                                        @Html.HiddenFor(m => Model.QAGroupLine[i].Name)
+                                        @Html.HiddenFor(m => Model.QAGroupLine[i].QAGroupLineId)
+                                            @if (Model.QAGroupLine[i].DataType == "List")
+                                            {
+                                                List<SelectListItem> tem = new List<SelectListItem>();
+                                                foreach (string item in (Model.QAGroupLine[i].ListItem).Split(',').ToList())
+                                                {
+                                                    tem.Add(new SelectListItem { Text = item, Value = item, Selected = (Model.QAGroupLine[i].Value == item ? true : false) });
+                                                }
+
+
+                                                <div class="col-md-7 col-sm-10">
+                                                    @Html.DropDownListFor(m => Model.QAGroupLine[i].Value, new SelectList(tem as System.Collections.IEnumerable, "Value", "Text", Model.QAGroupLine[i].DefaultValue), new { @class = "form-control" })
+                                                    @*<input type="text" name="@(item.Name)s" value=@item.DefaultValue class="form-control col-xs-6" />*@
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <div class="col-md-7 col-sm-10">
+                                                    @Html.TextBoxFor(m => Model.QAGroupLine[i].Value, new { @class = "form-control col-xs-6" })
+                                                    @*<input type="text" name="@(item.Name)s" value=@item.DefaultValue class="form-control col-xs-6" />*@
+                                                </div>
+                                            }
+                                    </div>
+                                </div>
+                            
+                                <div class="col-md-6">
+                                        <div class="form-group">
+                                            @Html.Label(Model.QAGroupLine[i].Name + " Remark", new { @class = "control-label col-xs-4" })
+                                            <div class="col-md-7 col-sm-10">
+                                                @Html.TextBoxFor(m => Model.QAGroupLine[i].Remarks, new { @class = "form-control col-xs-6" })
+                                            </div>
+                                        </div>
+                                </div>
+                            }
+                        }
+                    </div>
+
+
+                </div>
+
+
+                <hr />
+                <div class="row">
+                    <h4 class="col-md-12 black" style="margin-top:15px">
+                        <span class="glyphicon glyphicon-shopping-cart"></span>
+                        Penalty Detail
+                    </h4>
+                </div>
+
+                <div class="panel-info">
+                    <h5 style="padding:5px 0 3px 0;margin:0px;font-weight:bold">
+                        <span class="glyphicon glyphicon-plus-sign"></span>
+                        @Html.ActionLink("Add New Row ", "_Create", "JobReceiveQAPenalty", new { id = @Model.JobReceiveQALineId }, new { data_modal = "", id = "btnCreate", @class = "toolbar", @title = "Add New", @data_toggle = "tooltip", @data_detailDisabled = "true" })
+                    </h5>
+                </div>
+                <div style="padding-right:15px">
+
+                    @*<table class="table table-hover ctable">
+                            <thead id="header">
+                            </thead>
+
+                            <tbody id="Result"></tbody>
+                        </table>*@
+
+                    <div class="panel panel-default" id="grid">
+                        <div class="panel-heading headrow" >
+                            <div class="row grid-head">
+                                <div class="block" style="width:5%">
+                                    Srl.
+                                </div>
+                                <div class="block" style="width:90%">
+                                    <div class="row">
+                                        @*ProductInfo*@
+                                        <div class="block" style="width:32%">
+                                            Reason
+                                        </div>
+                                        @*PopContext*@
+                                        <div class="block text-right" style="width:20%">
+                                            Amount
+                                        </div>
+                                        @*Qty*@
+                                        <div class="block" style="width:15%">
+                                            Remark
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="block" style="width:5%">
+
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="panel-info" id="gbody">
+
+
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+
+
+@if ((ViewBag.Mode == "Add") || (ViewBag.Mode == "Edit"))
+{
+
+    <script type="text/javascript">
+
+
+        //Reloading the table contents on modal hide
+        $('#myModal').on('hidden.bs.modal', function () {
+            LoadProducts();
+        });
+
+        $(document).ready(function(){
+            enableModalTransitions();
+        })
+
+    
+        
+        //Reloading the table contents on modal hide
+        $('#myModal').on('hidden.bs.modal', function () {
+            LoadProducts();
+            var id=@Model.JobReceiveQAHeaderId;
+        });
+
+
+
+        var IsSaved=false;
+        var ValidationCount=0;
+
+        $('form').submit(function(event){
+
+            if(!IsSaved)
+            {
+                if(!ValidateData())
+                {
+                    return false;
+                }
+                IsSaved=true;
+                return IsSaved;
+            }
+            else
+            {
+                return false;
+            }
+
+
+        });
+
+
+        function ValidateData() {
+            var DocId=@Model.JobReceiveQAHeaderId;
+            var TempValue;
+            var ValidationMessage="";
+
+
+
+            //Checking for dulicate key value
+            if(DocId<=0)
+            {
+                TempValue= $('#DocNo').DuplicateCheckForCreate({ name: 'JobReceiveQAHeaders', value: $('#DocNo').val(), doctype: $('#DocTypeId').val() });
+                if (TempValue){ ValidationMessage=$('#DocNo').val() + " already exist <br />";}
+            }
+            else
+            {
+                TempValue = $('#DocNo').DuplicateCheckForEdit({ name: 'JobReceiveQAHeaders', value: $('#DocNo').val(), doctype: $('#DocTypeId').val(),headerId:DocId });
+                if (TempValue) {ValidationMessage+=$('#DocNo').val() + " already exist <br />";}
+            }
+            if(TempValue)
+            {
+                if($('#validationerrormsg').length==0){
+                    $('.panel-info').filter(':eq(1)').before('<div class="alert alert-danger" role="alert" id="validationerrormsg">'+ValidationMessage+'</div>');}
+                else
+                {
+                    $('#validationerrormsg').html(ValidationMessage);
+                }
+            }
+
+            return  (ValidationMessage=="");
+
+        }
+
+
+
+
+
+    </script>
+
+
+}
+
+<script type="text/javascript">
+    $(document).ready(function () {
+
+        //Calling the function to load the table data/ Line information
+        LoadProducts();
+        RoundDimensions();
+
+        //Adding Hidden Input Fields
+        AddFields();
+
+    });
+
+
+    //CustomSelectFunction($("#ProcessId"), '/ComboHelpList/GetProcess', '/ComboHelpList/SetSingleProcess', ' ', false, 1);
+    CustomSelectFunction($("#QAById"), '/ComboHelpList/GetEmployeeWithProcess', '/ComboHelpList/SetSingleEmployee', ' ', false, 0, $('#ProcessId').val());
+    CustomSelectFunction($("#JobWorkerId"), '/ComboHelpList/GetJobWorkers', '/ComboHelpList/SetSingleJobWorker', ' ', false, 0, $('#ProcessId').val());
+    CustomSelectFunction($("#ProductId"), '/ComboHelpList/GetProducts', '/ComboHelpList/SetSingleProducts', 'Enter Product', false, 0);
+
+    var id=@Model.JobReceiveQALineId;
+    if(id==null||id==0)
+    {
+        $(document).find('a#btnCreate').removeAttr('href').removeAttr('data-modal');
+        $("#btnCreateF").attr('disabled','disabled');
+        $("#btnCreateFR").attr('disabled','disabled');
+    }
+    $("#QAById").select2('focus');
+
+
+
+    //Loading the Table data or Line Information
+    function LoadProducts() {
+        var DomainName='@System.Configuration.ConfigurationManager.AppSettings["AdminSetupDomain"]';
+        var SelectedRecord='@ViewBag.DocLineId';
+        var groupId=@Model.JobReceiveQALineId;
+        var status='@Model.Status';
+        var LineEditUrl;
+        var LineDeleteUrl;
+        if(status==StatusContstantsEnum.Drafted)
+        {
+            LineEditUrl="/JobReceiveQAPenalty/_ModifyLine/";
+            LineDeleteUrl="/JobReceiveQAPenalty/_DeleteLine/";
+        }
+        else if(status==StatusContstantsEnum.Submitted || status == StatusContstantsEnum.Modified )
+        {
+            LineEditUrl="/JobReceiveQAPenalty/_ModifyLineAfterSubmit/";
+            LineDeleteUrl="/JobReceiveQAPenalty/_DeleteLine_AfterSubmit/";
+        }
+        var link="/JobReceiveQAPenalty/Index/"+groupId;
+        var QtyCount=0;
+        var InspectedQtyCount=0;
+        var PenaltyCount=0;
+        var unit=true;
+        var prevunit;
+        var decimal=0;
+        var DealQty=0;
+        var AmountCount = 0;
+        $.ajax({
+            url: link,
+            type: "GET",
+            success: function (data) {
+                var row = ""
+                var srno=1;
+                if(data.length!=0)
+                {
+                    $('#JobWorkerId').attr('readonly','true');
+
+                    $.each(data, function (index, item) {
+
+                        row += " <div class='row crow grid-body' style='margin-left:0px;margin-right:0px'id='"+item.JobReceiveQAPenaltyId+"'>"
+                            +"      <div class='row-index block'  style='width:5%'>"+srno+"<input type='hidden' class='id' value='"+item.JobReceiveQAPenaltyId+"' /></div>"
+                            +"          <div class='block'  style='width:90%'>"
+                            +"              <div class='row'>"
+                            +"                   <div class='block' style='width:32%'>"+(item.ReasonName==null?" ":"<strong>"+item.ReasonName+"</strong>")
+                            +"                   </div>"
+                            +"                   <div class='text-right block'  style='width:20%'>"+(item.Amount==null?" ":item.Amount)+"<br />"
+                            +"                   </div>"
+                            +"                   <div class='block'  style='width:10%'>"+(item.Remark==null?" ":item.Remark)
+                            +"                   </div>"
+                            +"              </div>"
+                            +"          </div>"
+                            +"      <div class='block'  style='width:5%'>"
+                            +"          <a class='glyphicon glyphicon-trash icon-Cus-Size' data-modal data-detailDisabled='true' delete='' href='"+LineDeleteUrl+item.JobReceiveQAPenaltyId+"'></a>"
+                            +"          <a  edit='' href='"+LineEditUrl+item.JobReceiveQAPenaltyId+"'></a>"
+                            +"      </div>"
+                            +"  </div>"
+                            +"<hr style='margin-top:0px;margin-bottom:0px'/>";
+                        AmountCount+=item.Amount;                        
+                        
+                        
+                        srno++;
+
+                    });
+
+                    row+="<div class='row tfooter' style='padding-top:10px;margin-left:0px;margin-right:0px'>"
+                        +"  <div class='block' style='width:5%'>"
+                        +"  </div>"
+                        +"  <div class='block' style='width:90%'>"
+                        +"      <div class='row'> "
+                        +"          <div class='block'  style='width:32%'><strong>Total</strong></div>"
+                        +"          <div class='block text-right' style='width:20%'><strong>"
+                        +               (AmountCount.toFixed(decimal))+"</strong>"
+                        +"          </div>"
+                        +"          <div class='block text-right' style='width:10%'><strong>"
+                        +"          </strong></div>"
+                        +"      </div>"
+                        +"  </div>"
+                        +"  <div class='block'  style='width:5%'>"
+                        +"  </div>"
+                        +"</div>"
+                }
+                else
+                {
+
+                }
+                $("#gbody").html(row);
+                if(SelectedRecord && SelectedRecord!=0)
+                {
+                    var Id="#"+SelectedRecord
+                    NavigateToLineRecord(Id);}
+            },
+            error: function (result) {
+                alert("Error");
+            }
+        });
+    }
+
+</script>
+
+
+@if ((ViewBag.Mode != "Add") && (ViewBag.Mode != "Edit"))
+{
+    <script type="text/javascript">
+
+        $(document).ready(function(){
+            DisablePageNavigation();
+        })
+
+    </script>
+}
+
+@if ((Model.Status == (int)ActivityTypeContants.Modified || Model.Status == (int)ActivityTypeContants.Submitted)
+    && (ViewBag.transactionType == "submit" || ViewBag.transactionType == "submitContinue" || ViewBag.transactionType == "review" || ViewBag.transactionType == "ReviewContinue"))
+{
+    <script type="text/javascript">
+
+        $(document).ready(function(){
+            enableActivityLogReason();
+        })
+
+
+    </script>
+}
+@if (ViewBag.transactionType != null && (ViewBag.transactionType == "submitContinue" || ViewBag.transactionType == "ReviewContinue"))
+{
+    <script type="text/javascript">
+      
+        $(document).ready(function(){
+            CreateTrasitionEffect();
+        })
+
+    </script>
+}
+
+<script type="text/javascript">
+    var decimalplaces=0;
+    var dealunitdecimalplaces=0;
+
+    $('#QAQty').focusout(function(){
+        $(this).val((parseFloat($(this).val())).toFixed($('#UnitDecimalPlaces').val()));
+        $('#InspectedQty').val($(this).val());
+        $('#Qty').val($(this).val()).trigger('focusout');
+        return;
+    });
+
+    $('#Qty').focusout(function(){
+        $(this).val((parseFloat($(this).val())).toFixed($('#UnitDecimalPlaces').val()));
+        $('#PassQty').val($(this).val());
+        Calculation();
+        ValidateData();
+        return;
+    });
+
+
+    $('#DealQty,#Qty,#PenaltyRate,#QAQty').keyup(function(){
+        Calculation();
+    });
+
+    $("#DealUnitId").change(GetUnitConversionMultiplier);
+
+    $('#Length,#Width,#Height').keyup(function(){
+        GetUnitConversionMultiplier();
+        Calculation();
+    });
+
+    $('#Length,#Width,#Height').focusout(function(){
+        RoundDimensions();
+    });
+
+    function RoundDimensions()
+    {
+        if ($('#Length').val() != 0) 
+        {
+            $('#Length').val(parseFloat($('#Length').val()).toFixed($('#DimensionUnitDecimalPlaces').val()));
+        }
+
+        if ($('#Width').val() != 0) 
+        {
+            $('#Width').val(parseFloat($('#Width').val()).toFixed($('#DimensionUnitDecimalPlaces').val()));
+        }
+
+        if ($('#Height').val() != 0) 
+        {
+            $('#Height').val(parseFloat($('#Height').val()).toFixed($('#DimensionUnitDecimalPlaces').val()));
+        }
+    }
+
+    $('#InspectedQty,#Qty,#QAQty').focusout(function(){
+        ValidateData();
+    });
+
+    function Calculation()
+    {
+        //$('#FailQty').val(parseFloat($('#QAQty').val()-$('#Qty').val()).toFixed($('#DealUnitDecimalPlaces').val()));
+
+        if ($('#UnitConversionMultiplier').val() != 0) {
+            $('#DealQty').val(parseFloat($('#Qty').val() * $('#UnitConversionMultiplier').val()).toFixed($('#DealUnitDecimalPlaces').val()));
+        }
+
+        if($('#PenaltyRate').val() && $('#PenaltyRate').val() >0)
+            $('#PenaltyAmt').val(($('#PenaltyRate').val() * parseFloat(($('#QAQty').val()-$('#Qty').val()) * $('#UnitConversionMultiplier').val())).toFixed(2))
+
+
+    }
+
+    function ValidateData()
+    {
+
+        var ValidationMessage = "";
+
+        //Check that Pass Qty can not exceed Job Qty.
+        if (parseFloat($('#BalanceQty').val() - $('#QAQty').val()) < 0) {
+            ValidationMessage="QAQty exceeding Balance Qty";
+        }
+
+        //Check that Pass Qty can not exceed Job Qty.
+        if (parseFloat($('#QAQty').val() - $('#InspectedQty').val()) < 0) {
+            ValidationMessage="InspectionQty exceeding QA Qty";
+        }
+
+        //Check that Job Qty can not exceed Order Balance Qty.
+        if (($('#QAQty').val() - $('#Qty').val()) < 0) {
+            ValidationMessage="Qty exceeding QAQty";
+        }
+
+        if(!ValidationMessage=="")
+        {
+            $('#submit', '.modal-body').attr('disabled', 'disabled');
+            if (!$('#modform').find('.modal-body #errormsg').length) {
+                $('#modform').find('.modal-body').prepend("<div class='alert alert-danger'><span id=errormsg >"+ValidationMessage+"</span></div>")
+            }
+            else
+                $('#modform').find('.modal-body #errormsg').text(ValidationMessage);
+        }
+        else
+        {
+            $('#submit', '.modal-body').removeAttr('disabled');
+            $('#modform').find('#errormsg').parent().remove();
+        }
+
+        return(ValidationMessage=="");
+
+
+    }
+
+    var IsSaved=false;
+    var ValidationCount=0;
+
+    $('#modform').bind('submit',function(event){
+
+        if(!IsSaved)
+        {
+            Calculation();
+            if(!ValidateData())
+            {
+                return false;
+            }
+            IsSaved=true;
+            $('button:submit').attr('disabled','disabled');
+            return IsSaved;
+        }
+        else
+        {
+            return false;
+        }
+
+    });
+
+    var Length = @Model.Length;
+    var Width = @Model.Width;
+    function GetUnitConversionMultiplier() {
+        if ($("#Length").val() > 0 && $("#Width").val() > 0 && ($("#Length").val() != Length || $("#Width").val() != Width)) {
+                $.ajax({
+                    cache: false,
+                    type: "POST",
+                    async: false,
+                    url: "@(Url.Action("GetUnitConversionMultiplier"))",
+                    data: { ProductId: $("#ProductId").val(),Length: $("#Length").val(),Width: $("#Width").val(),Height: $("#Height").val(),ToUnitId: $("#DealUnitId").val()},
+                success: function (data) {
+                    if (data) {
+                        $('#UnitConversionMultiplier').val(0);
+                        $('#DealQty').val(data * $("#Qty").val());
+
+                    }
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    alert('Failed to retrieve product details.' + thrownError);
+                }
+            });
+            $('#DealUnitId').attr('readonly', 'true');
+            $('#UnitConversionMultiplier').attr('readonly', 'true');
+            $('#DealQty').attr('readonly', 'true');
+    }
+    else if ($("#UnitId").val() == $("#DealUnitId").val()) 
+    {
+        $("#UnitConversionMultiplier").val(1);
+        Calculation.call();
+        $('#DealUnitId').removeAttr('readonly');
+        $('#UnitConversionMultiplier').removeAttr('readonly');
+        $('#DealQty').removeAttr('readonly');
+    }
+    else 
+    {
+        $.ajax({
+            cache: false,
+            type: "POST",
+            url: "@(Url.Action("GetUnitConversionDetailJson"))",
+            data: { ProductId: $("#ProductId").val(), UnitId: $("#UnitId").val(), DeliveryUnitId: $("#DealUnitId").val(), JobReceiveLineId: $("#JobReceiveLineId").val() },
+
+        success: function (data) {
+            $("#UnitConversionMultiplier").val(data[0].Value);
+            Calculation.call();
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            alert('Failed to retrieve Unit conversion details.' + thrownError);
+        }
+        });
+        $('#DealUnitId').removeAttr('readonly');
+        $('#UnitConversionMultiplier').removeAttr('readonly');
+        $('#DealQty').removeAttr('readonly');
+    }
+    }
+
+    $("#ProductId").change(function(){
+        Validate_Product();
+    });
+
+    function Validate_Product() {
+        var ProcessProgress = $("#Product detail loading progress");
+        ProcessProgress.show();
+
+        $('button:submit').attr('disabled','disabled');
+
+        if ($("#ProductId").val() != 0 && $("#ProductId").val() != null && $("#ProductId").val() != "") {
+            $.ajax({
+                cache: false,
+                async: false,
+                type: "POST",
+                url: "@(Url.Action("GetProductDetailJson"))",
+                data: { ProductId: $("#ProductId").val() },
+                success: function (data) {
+                    $("#Length").val(data[0].Length);
+                    $("#Width").val(data[0].Width);
+                    $("#Height").val(data[0].Height);
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    alert('Failed to retrieve Product Detail.' + thrownError);
+                    ProcessProgress.hide();
+                }
+            });
+        }
+    }
+</script>

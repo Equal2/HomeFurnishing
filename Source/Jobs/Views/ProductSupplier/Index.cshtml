@@ -1,0 +1,47 @@
+﻿@model IEnumerable<Model.Models.ProductSupplier>
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@*@ViewBag.ProductTypeId*@
+
+@*<h2>Index</h2>
+    <h4>Product Supplier</h4>*@
+
+<span style="font-family: Calibri,sans-serif,Verdana;font-size:large">
+    @Html.ActionLink("Create New", "Create", new { Id = @ViewBag.ProductId })|@Html.ActionLink("Back to List", "Index", "Product", new { Id = @ViewBag.ProductTypeId }, null)
+
+</span>
+@*<p>
+    @Html.ActionLink("Create New", "Create", new { Id = @ViewBag.ProductId })
+    @Html.ActionLink("Back to List", "Index", "Product", new { Id = @ViewBag.ProductTypeId }, null)
+</p>*@
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h4>
+            <span style="font-family: Calibri,sans-serif,Verdana">Product Supplier Details.</span>
+        </h4>
+
+    </div>
+    <div class="panel-info" style="padding-left:5px;padding-top:2px">
+        @Html.Grid(Model).Columns(columns =>
+           {
+               columns.Add(foo => foo.ProductSupplierId, true);
+               columns.Add(foo => foo.Product.ProductName).Sortable(true).Titled("Product").Filterable(true).SetWidth(100).Css("modal-link");
+               columns.Add(foo => foo.Supplier.Name).Sortable(true).Titled("Supplier               ").Filterable(true).SetWidth(100).Css("modal-link");
+               columns.Add(m => m.LeadTime).Sortable(true).Titled("LeadTime").Filterable(true).SetWidth(60);
+               columns.Add(m => m.MinimumOrderQty).Sortable(true).Filterable(true).Titled("Min-Order").SetWidth(60);
+               columns.Add(m => m.MaximumOrderQty).Sortable(true).Filterable(true).Titled("Max-Order").SetWidth(60);
+               columns.Add(m => m.Cost).Sortable(true).Filterable(true).Titled("Cost").SetWidth(60);
+               //columns.Add().Encoded(false).Sanitized(false).RenderValueAs(m => @Html.ActionLink("Contacts", "Index", "PersonContact", new {id=m.SupplierId },null)).SetWidth(60);
+               columns.Add().Encoded(false).Sanitized(false).SetWidth(5).RenderValueAs(d => @Html.ActionLink(" ", "Edit", "ProductSupplier", new { id = d.ProductSupplierId }, new { @class = "rowEditBlue" }));
+               columns.Add().Encoded(false).Sanitized(false).SetWidth(5).RenderValueAs(d => @Html.ActionLink(" ", "Delete", "ProductSupplier", new { id = d.ProductSupplierId }, new { @class = "rowDeleteBlue" }));
+
+           }).WithPaging(25).EmptyText("No records found.")
+
+
+
+    </div>
+</div>

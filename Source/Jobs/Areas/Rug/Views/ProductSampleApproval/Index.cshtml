@@ -1,0 +1,63 @@
+﻿@model IEnumerable<Model.Models.ProductSampleApproval>
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<script src="~/Scripts/jquery.fancybox.js"></script>
+<link href="~/Content/jquery.fancybox.css" rel="stylesheet" />
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h4>
+            <span style="font-family: Calibri,sans-serif,Verdana">Pending Product Sample Mapping Index</span>
+        </h4>
+        @helper RenderImage(Model.Models.ProductSampleApproval h)
+{
+    byte[] photo = h.ProductSampleShipment.ProductSamplePhotoApproval.ProductSample.ProductPicture;
+
+    string imageSrc = null;
+    if (photo != null)
+    {
+        MemoryStream ms = new MemoryStream();
+        ms.Write(photo, 0, photo.Length); // strip out 78 byte OLE header (don't need to do this for normal images)
+        string imageBase64 = Convert.ToBase64String(ms.ToArray());
+        imageSrc = string.Format("data:image/gif;base64,{0}", imageBase64);
+    }
+    <a class="fancybox" rel="gallery1" href="@imageSrc" title="@h.ProductSampleShipment.ProductSamplePhotoApproval.ProductSample.SampleName">
+        <img src="@imageSrc" alt="" style="max-height:100px;max-width:100px" />
+    </a>
+}
+    </div>
+    <div class="panel-info" style="padding-left:5px;padding-top:2px">
+        @Html.Grid(Model).Columns(columns =>
+           {
+               
+               columns.Add(foo => foo.ProductSampleApprovalId, true);
+               columns.Add(m => m.ProductSampleShipment.ProductSamplePhotoApproval.ProductSample.ProductSampleId).Titled("Sample No").Sortable(true).Filterable(true);
+               columns.Add(m => m.ProductSampleShipment.ProductSamplePhotoApproval.ProductSample.SampleName).Titled("Sample Name").Sortable(true).Filterable(true);
+               columns.Add().Encoded(false).Sanitized(false).RenderValueAs(d => RenderImage(d)).Titled("Product Picture");
+               //columns.Add().Encoded(false).Sanitized(false).RenderValueAs(m => @<img class="thumb" src="data:image;base64,@System.Convert.ToBase64String(m.ProductSampleShipment.ProductSamplePhotoApproval.ProductSample.ProductPicture)" height="100" width="100" alt="PicTemp" />).Titled("Sample Picture");
+               columns.Add(m => m.ProductSampleShipment.ProductSamplePhotoApproval.ProductSample.Supplier.Name).Titled("Supplier Name").Sortable(true).Filterable(true);
+               columns.Add(m => m.CreatedDate).Titled("Approval Date");
+               columns.Add().Sanitized(false).Encoded(false).RenderValueAs(m => @Html.ActionLink("Map", "CreateMapping", new { productsampleapprovalid = m.ProductSampleApprovalId }));
+
+           }).WithPaging(25).EmptyText("No records found.")
+
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $(".fancybox").fancybox({
+            helpers: {
+                overlay: {
+                    css: {
+                        'background': 'rgba(58, 42, 45, 0.95)'
+                    }
+                }
+            }
+        });
+    });
+</script>

@@ -1,0 +1,1167 @@
+
+
+INSERT INTO dbo.PurchIndentDetail (DocId, Sr, Item, IndentQty, PurchIndent, PurchIndentSr, Remark)
+SELECT DISTINCT  L.PurchIndent AS DocId, L.PurchIndentSr AS Sr, L.Item, 0 AS IndentQty, L.PurchIndent, L.PurchIndentSr, '0 Qty Was Inserted Due To Indent Adjustement' AS Remark 
+--L.DocId, L.Sr, Pid.DocId, L.IndentQty, L.PurchIndent + Convert(NVARCHAR, L.PurchIndentSr) AS PurchIndentSr
+FROM PurchIndentDetail L
+LEFT JOIN PurchIndentDetail Pid ON L.PurchIndent = Pid.DocId AND L.PurchIndentSr = Pid.Sr
+WHERE L.DocId LIKE '%SOPAM%'
+AND Pid.DocId IS NULL
+
+
+
+INSERT INTO dbo.PurchIndent (DocId, V_Type, V_Prefix, V_Date, V_No, Div_Code, Site_Code, Department, EntryBy, EntryDate, EntryType, EntryStatus, ApproveBy, ApproveDate, Status, ManualRefNo)
+SELECT DISTINCT  L.DocId, Mp.V_Type, Mp.V_Prefix, Mp.V_Date, Mp.V_No, Mp.Div_Code, Mp.Site_Code, 'D10001' AS Department ,
+Mp.EntryBy, Mp.EntryDate, Mp.EntryType, Mp.EntryStatus, Mp.ApproveBy, Mp.ApproveDate, Mp.Status, Mp.ManualRefNo
+FROM PurchIndentDetail L 
+LEFT JOIN PurchIndent H ON L.DocId = H.DocID
+LEFT JOIN MaterialPlan Mp ON L.DocId = Mp.DocID
+WHERE H.DocID IS NULL
+
+
+
+INSERT INTO Web.Departments (DepartmentName, IsActive, CreatedBy, ModifiedBy, CreatedDate, ModifiedDate, OMSId)
+SELECT D.Description AS DepartmentName, 1 AS IsActive, D.EntryBy AS CreatedBy, D.EntryBy AS ModifiedBy,
+D.EntryDate AS CreatedDate, D.EntryDate AS ModifiedDate, 'Department-' + D.Code AS OMSId
+FROM Department D 
+
+
+
+UPDATE Department
+SET Department.OMSId = 'Department-' + COnvert(NVARCHAR,Web.Departments.DepartmentId)
+FROM Web.Departments
+WHERE 'Department-' +  Department.Code = Web.Departments.OMSId
+
+
+UPDATE PurchIndent SET Department = 'D10001' WHERE Department IS NULL
+
+
+
+
+INSERT INTO Web.PurchaseIndentHeaders (DocTypeId ,DocDate, DocNo, DivisionId, SiteId, Remark, Status, CreatedBy, CreatedDate, 
+ModifiedBy, ModifiedDate, DepartmentId, OMSId)
+SELECT WDt.DocumentTypeId AS DocTypeId, H.V_Date AS DocDate, H.ManualRefNo AS DocNo, Wd.DivisionId, Wsm.SiteId, 
+H.Remarks AS Remark, 5 AS Status, H.EntryBy AS CreatedBy,
+H.EntryDate AS CreatedDate, H.EntryBy AS ModifiedBy, H.EntryDate AS ModifiedDate, WDep.DepartmentId, 
+'Purchase Indent-' + H.DocID AS OMSId
+FROM PurchIndent H 
+LEFT JOIN Voucher_Type Vt ON H.V_Type = Vt.V_Type
+LEFT JOIN Division D ON H.Div_Code = D.Div_Code
+LEFT JOIN SiteMast Sm ON H.Site_Code = Sm.Code
+LEFT JOIN Department Dep ON H.Department = Dep.Code
+LEFT JOIN Web.DocumentTypes WDt ON Vt.OMSId = 'Document Type-' + Convert(NVARCHAR,WDt.DocumentTypeId)
+LEFT JOIN WEb.Divisions Wd ON D.OMSId = 'Division-' + COnvert(NVARCHAR, Wd.DivisionId)
+LEFT JOIN Web.Sites Wsm ON Sm.OMSId = 'Site-' +  COnvert(NVARCHAR, Wsm.SiteId)
+LEFT JOIN Web.Departments WDep ON Dep.OMSId = 'Department-' +  COnvert(NVARCHAR, WDEp.DepartmentId)
+WHERE H.V_Type  <> 'PINCL'
+AND H.DocId NOT IN ('D1 SOPAM 2013     568', 'D1 SOPAM 2014      46', 'D1 SOPAM 2014     164', 'D1 SOPAM 2014     166', 'D1 SOPAM 2014     173', 'D1 SOPAM 2014     174', 'K1 SOPAM 2014       6', 'R1 SOPAM 2013     311', 'R1 SOPAM 2013     318', 'R1 SOPAM 2013     319', 'R1 SOPAM 2013     320', 'R1 SOPAM 2013     321', 'R1 SOPAM 2013     327', 'R1 SOPAM 2013     328', 'R1 SOPAM 2013     329', 'R1 SOPAM 2013     330', 'R1 SOPAM 2013     331', 'R1 SOPAM 2013     332', 'R1 SOPAM 2013     333', 'R1 SOPAM 2013     334', 'R1 SOPAM 2013     336', 'R1 SOPAM 2013     337', 'R1 SOPAM 2013     338', 'R1 SOPAM 2013     339', 'R1 SOPAM 2013     340', 'R1 SOPAM 2013     341', 'R1 SOPAM 2013     342', 'R1 SOPAM 2013     343', 'R1 SOPAM 2013     344', 'R1 SOPAM 2013     345', 'R1 SOPAM 2013     346', 'R1 SOPAM 2013     347', 'R1 SOPAM 2013     348', 'R1 SOPAM 2013     349', 'R1 SOPAM 2013     350', 'R1 SOPAM 2013     351', 'R1 SOPAM 2013     352', 'R1 SOPAM 2013     388', 'R1 SOPAM 2013     389', 'R1 SOPAM 2013     391', 'R1 SOPAM 2013     392', 'R1 SOPAM 2013     393', 'R1 SOPAM 2013     394', 'R1 SOPAM 2013     486', 'R1 SOPAM 2013     490', 'R1 SOPAM 2013     491', 'R1 SOPAM 2013     498', 'R1 SOPAM 2013     499', 'R1 SOPAM 2013     500', 'R1 SOPAM 2013     501', 'R1 SOPAM 2013     502', 'R1 SOPAM 2013     503', 'R1 SOPAM 2013     504', 'R1 SOPAM 2013     505', 'R1 SOPAM 2013     506', 'R1 SOPAM 2013     507', 'R1 SOPAM 2013     508', 'R1 SOPAM 2013     530', 'R1 SOPAM 2013     531', 'R1 SOPAM 2013     532', 'R1 SOPAM 2013     533', 'R1 SOPAM 2013     534', 'R1 SOPAM 2013     537', 'R1 SOPAM 2013     549', 'R1 SOPAM 2013     550', 'R1 SOPAM 2013     604', 'R1 SOPAM 2013     605', 'R1 SOPAM 2013     606', 'R1 SOPAM 2013     607', 'R1 SOPAM 2013     642', 'R1 SOPAM 2013     653', 'R1 SOPAM 2014      19', 'R1 SOPAM 2014      26', 'R1 SOPAM 2014     113', 'R1 SOPAM 2014     139', 'R1 SOPAM 2014     140', 'R1 SOPAM 2014     143', 'R1 SOPAM 2014     144', 'R1 SOPAM 2014     148', 'R1 SOPAM 2014     161', 'R1 SOPAM 2014     167', 'R1 SOPAM 2014     179', 'R1 SOPAM 2014     189', 'R1 SOPAM 2014     190', 'R1 SOPAM 2014     195', 'S1 SOPAM 2013     713', 'S1 SOPAM 2013     714', 'S1 SOPAM 2013     715', 'S1 SOPAM 2013     716', 'S1 SOPAM 2013     717', 'S1 SOPAM 2013     719')
+
+
+
+
+UPDATE PurchIndent
+SET PurchIndent.OMSId = 'Purchase Indent-' + Convert(NVARCHAR,Web.PurchaseIndentHeaders.PurchaseIndentHeaderId)
+FROM Web.PurchaseIndentHeaders
+WHERE 'Purchase Indent-' +  PurchIndent.DocID = Web.PurchaseIndentHeaders.OMSId
+
+
+
+INSERT INTO Web.PurchaseIndentLines (PurchaseIndentHeaderId, MaterialPlanLineId, DueDate, Specification, ProductId, Dimension1Id, Dimension2Id, Qty, Remark, CreatedBy, ModifiedBy, CreatedDate, ModifiedDate, OMSId)
+SELECT WPi.PurchaseIndentHeaderId, NULL AS MaterialPlanLineId, L.RequireDate AS DueDate, L.Specification, 
+Wp.ProductId, NULL AS Dimension1Id, NULL AS Dimension2Id, L.IndentQty AS Qty, L.Remark, H.EntryBy AS CreatedBy, H.EntryBy AS ModifiedBy, 
+H.EntryDate AS CreatedDate, H.EntryDate AS ModifiedDate, 'Purchase Indent-' +  L.DocId + Convert(NVARCHAR,L.Sr) AS OMSId
+FROM PurchIndentDetail L 
+LEFT JOIN PurchIndent H ON L.DocId = H.DocID
+LEFT JOIN Item I ON L.Item = I.Code
+LEFT JOIN MaterialPlanDetail Mpd ON L.MaterialPlan = Mpd.DocId AND L.MaterialPlanSr = Mpd.Sr
+LEFT JOIN Dimension1 D1  ON L.Dimension1 = D1.Code
+LEFT JOIN Web.PurchaseIndentHeaders WPi ON H.OMSId = 'Purchase Indent-' + Convert(NVARCHAR,WPi.PurchaseIndentHeaderId)
+LEFT JOIN Web.Products Wp ON I.OMSId = 'Product-' + Convert(NVARCHAR,Wp.ProductId)
+LEFT JOIN Web.Dimension1 WD1 ON D1.OMSId = 'Dimension1-' + Convert(NVARCHAR,WD1.Dimension1Id)
+LEFT JOIN Web.MaterialPlanLines Wmp ON Mpd.OMSId = 'Material Plan-' +  Convert(NVARCHAR,WMp.MaterialPlanLineId)
+WHERE 1=1
+AND H.V_Type  <> 'PINCL'
+AND H.DocId NOT IN ('D1 SOPAM 2013     568', 'D1 SOPAM 2014      46', 'D1 SOPAM 2014     164', 'D1 SOPAM 2014     166', 'D1 SOPAM 2014     173', 'D1 SOPAM 2014     174', 'K1 SOPAM 2014       6', 'R1 SOPAM 2013     311', 'R1 SOPAM 2013     318', 'R1 SOPAM 2013     319', 'R1 SOPAM 2013     320', 'R1 SOPAM 2013     321', 'R1 SOPAM 2013     327', 'R1 SOPAM 2013     328', 'R1 SOPAM 2013     329', 'R1 SOPAM 2013     330', 'R1 SOPAM 2013     331', 'R1 SOPAM 2013     332', 'R1 SOPAM 2013     333', 'R1 SOPAM 2013     334', 'R1 SOPAM 2013     336', 'R1 SOPAM 2013     337', 'R1 SOPAM 2013     338', 'R1 SOPAM 2013     339', 'R1 SOPAM 2013     340', 'R1 SOPAM 2013     341', 'R1 SOPAM 2013     342', 'R1 SOPAM 2013     343', 'R1 SOPAM 2013     344', 'R1 SOPAM 2013     345', 'R1 SOPAM 2013     346', 'R1 SOPAM 2013     347', 'R1 SOPAM 2013     348', 'R1 SOPAM 2013     349', 'R1 SOPAM 2013     350', 'R1 SOPAM 2013     351', 'R1 SOPAM 2013     352', 'R1 SOPAM 2013     388', 'R1 SOPAM 2013     389', 'R1 SOPAM 2013     391', 'R1 SOPAM 2013     392', 'R1 SOPAM 2013     393', 'R1 SOPAM 2013     394', 'R1 SOPAM 2013     486', 'R1 SOPAM 2013     490', 'R1 SOPAM 2013     491', 'R1 SOPAM 2013     498', 'R1 SOPAM 2013     499', 'R1 SOPAM 2013     500', 'R1 SOPAM 2013     501', 'R1 SOPAM 2013     502', 'R1 SOPAM 2013     503', 'R1 SOPAM 2013     504', 'R1 SOPAM 2013     505', 'R1 SOPAM 2013     506', 'R1 SOPAM 2013     507', 'R1 SOPAM 2013     508', 'R1 SOPAM 2013     530', 'R1 SOPAM 2013     531', 'R1 SOPAM 2013     532', 'R1 SOPAM 2013     533', 'R1 SOPAM 2013     534', 'R1 SOPAM 2013     537', 'R1 SOPAM 2013     549', 'R1 SOPAM 2013     550', 'R1 SOPAM 2013     604', 'R1 SOPAM 2013     605', 'R1 SOPAM 2013     606', 'R1 SOPAM 2013     607', 'R1 SOPAM 2013     642', 'R1 SOPAM 2013     653', 'R1 SOPAM 2014      19', 'R1 SOPAM 2014      26', 'R1 SOPAM 2014     113', 'R1 SOPAM 2014     139', 'R1 SOPAM 2014     140', 'R1 SOPAM 2014     143', 'R1 SOPAM 2014     144', 'R1 SOPAM 2014     148', 'R1 SOPAM 2014     161', 'R1 SOPAM 2014     167', 'R1 SOPAM 2014     179', 'R1 SOPAM 2014     189', 'R1 SOPAM 2014     190', 'R1 SOPAM 2014     195', 'S1 SOPAM 2013     713', 'S1 SOPAM 2013     714', 'S1 SOPAM 2013     715', 'S1 SOPAM 2013     716', 'S1 SOPAM 2013     717', 'S1 SOPAM 2013     719')
+
+
+
+UPDATE PurchIndentDetail
+SET PurchIndentDetail.OMSId = 'Purchase Indent-' + Convert(NVARCHAR,Web.PurchaseIndentLines.PurchaseIndentLineId)
+FROM Web.PurchaseIndentLines
+WHERE 'Purchase Indent-' +  PurchIndentDetail.DocID + Convert(NVARCHAR,PurchIndentDetail.Sr) = Web.PurchaseIndentLines.OMSId
+
+
+
+
+
+
+INSERT INTO Web.PurchaseIndentCancelHeaders (DocTypeId, DocDate, DocNo, DivisionId, SiteId, Remark, Status, CreatedBy, CreatedDate, ModifiedBy, ModifiedDate, OMSId)
+SELECT WDt.DocumentTypeId AS DocTypeId, H.V_Date AS DocDate, H.ManualRefNo AS DocNo, Wd.DivisionId, Wsm.SiteId, 
+H.Remarks AS Remark, 5 AS Status, H.EntryBy AS CreatedBy,
+H.EntryDate AS CreatedDate, H.EntryBy AS ModifiedBy, H.EntryDate AS ModifiedDate,
+'Purchase Indent Cancel-' + H.DocID AS OMSId
+FROM PurchIndent H 
+LEFT JOIN Voucher_Type Vt ON H.V_Type = Vt.V_Type
+LEFT JOIN Division D ON H.Div_Code = D.Div_Code
+LEFT JOIN SiteMast Sm ON H.Site_Code = Sm.Code
+LEFT JOIN Web.DocumentTypes WDt ON Vt.OMSId = 'Document Type-' + Convert(NVARCHAR,WDt.DocumentTypeId)
+LEFT JOIN WEb.Divisions Wd ON D.OMSId = 'Division-' + COnvert(NVARCHAR, Wd.DivisionId)
+LEFT JOIN Web.Sites Wsm ON Sm.OMSId = 'Site-' +  COnvert(NVARCHAR, Wsm.SiteId)
+WHERE H.V_Type  = 'PINCL'
+OR  H.DocId IN ('D1 SOPAM 2013     568', 'D1 SOPAM 2014      46', 'D1 SOPAM 2014     164', 'D1 SOPAM 2014     166', 'D1 SOPAM 2014     173', 'D1 SOPAM 2014     174', 'K1 SOPAM 2014       6', 'R1 SOPAM 2013     311', 'R1 SOPAM 2013     318', 'R1 SOPAM 2013     319', 'R1 SOPAM 2013     320', 'R1 SOPAM 2013     321', 'R1 SOPAM 2013     327', 'R1 SOPAM 2013     328', 'R1 SOPAM 2013     329', 'R1 SOPAM 2013     330', 'R1 SOPAM 2013     331', 'R1 SOPAM 2013     332', 'R1 SOPAM 2013     333', 'R1 SOPAM 2013     334', 'R1 SOPAM 2013     336', 'R1 SOPAM 2013     337', 'R1 SOPAM 2013     338', 'R1 SOPAM 2013     339', 'R1 SOPAM 2013     340', 'R1 SOPAM 2013     341', 'R1 SOPAM 2013     342', 'R1 SOPAM 2013     343', 'R1 SOPAM 2013     344', 'R1 SOPAM 2013     345', 'R1 SOPAM 2013     346', 'R1 SOPAM 2013     347', 'R1 SOPAM 2013     348', 'R1 SOPAM 2013     349', 'R1 SOPAM 2013     350', 'R1 SOPAM 2013     351', 'R1 SOPAM 2013     352', 'R1 SOPAM 2013     388', 'R1 SOPAM 2013     389', 'R1 SOPAM 2013     391', 'R1 SOPAM 2013     392', 'R1 SOPAM 2013     393', 'R1 SOPAM 2013     394', 'R1 SOPAM 2013     486', 'R1 SOPAM 2013     490', 'R1 SOPAM 2013     491', 'R1 SOPAM 2013     498', 'R1 SOPAM 2013     499', 'R1 SOPAM 2013     500', 'R1 SOPAM 2013     501', 'R1 SOPAM 2013     502', 'R1 SOPAM 2013     503', 'R1 SOPAM 2013     504', 'R1 SOPAM 2013     505', 'R1 SOPAM 2013     506', 'R1 SOPAM 2013     507', 'R1 SOPAM 2013     508', 'R1 SOPAM 2013     530', 'R1 SOPAM 2013     531', 'R1 SOPAM 2013     532', 'R1 SOPAM 2013     533', 'R1 SOPAM 2013     534', 'R1 SOPAM 2013     537', 'R1 SOPAM 2013     549', 'R1 SOPAM 2013     550', 'R1 SOPAM 2013     604', 'R1 SOPAM 2013     605', 'R1 SOPAM 2013     606', 'R1 SOPAM 2013     607', 'R1 SOPAM 2013     642', 'R1 SOPAM 2013     653', 'R1 SOPAM 2014      19', 'R1 SOPAM 2014      26', 'R1 SOPAM 2014     113', 'R1 SOPAM 2014     139', 'R1 SOPAM 2014     140', 'R1 SOPAM 2014     143', 'R1 SOPAM 2014     144', 'R1 SOPAM 2014     148', 'R1 SOPAM 2014     161', 'R1 SOPAM 2014     167', 'R1 SOPAM 2014     179', 'R1 SOPAM 2014     189', 'R1 SOPAM 2014     190', 'R1 SOPAM 2014     195', 'S1 SOPAM 2013     713', 'S1 SOPAM 2013     714', 'S1 SOPAM 2013     715', 'S1 SOPAM 2013     716', 'S1 SOPAM 2013     717', 'S1 SOPAM 2013     719')
+
+
+
+
+UPDATE PurchIndent
+SET PurchIndent.OMSId = 'Purchase Indent Cancel-' + Convert(NVARCHAR,Web.PurchaseIndentCancelHeaders.PurchaseIndentCancelHeaderId)
+FROM Web.PurchaseIndentCancelHeaders
+WHERE 'Purchase Indent Cancel-' +  PurchIndent.DocID = Web.PurchaseIndentCancelHeaders.OMSId
+
+
+
+INSERT INTO Web.PurchaseIndentCancelLines (PurchaseIndentCancelHeaderId, PurchaseIndentLineId, Qty, Remark, CreatedBy, ModifiedBy, CreatedDate, ModifiedDate, OMSId)
+SELECT WPi.PurchaseIndentCancelHeaderId, Pil.PurchaseIndentLineId, Abs(L.IndentQty) AS Qty, L.Remark, H.EntryBy AS CreatedBy, H.EntryBy AS ModifiedBy, 
+H.EntryDate AS CreatedDate, H.EntryDate AS ModifiedDate, 'Purchase Indent Cancel-' +  L.DocId + Convert(NVARCHAR,L.Sr) AS OMSId
+FROM PurchIndentDetail L 
+LEFT JOIN PurchIndent H ON L.DocId = H.DocID
+LEFT JOIN PurchIndentDetail Pid ON L.PurchIndent = Pid.DocId AND L.PurchIndentSr = Pid.Sr
+LEFT JOIN Web.PurchaseIndentCancelHeaders WPi ON H.OMSId = 'Purchase Indent Cancel-' + Convert(NVARCHAR,WPi.PurchaseIndentCancelHeaderId)
+LEFT JOIN Web.PurchaseIndentLines Pil ON Pid.OMSId = 'Purchase Indent-' + Convert(NVARCHAR,Pil.PurchaseIndentLineId)
+WHERE H.V_Type  = 'PINCL'
+OR H.DocId IN ('D1 SOPAM 2013     568', 'D1 SOPAM 2014      46', 'D1 SOPAM 2014     164', 'D1 SOPAM 2014     166', 'D1 SOPAM 2014     173', 'D1 SOPAM 2014     174', 'K1 SOPAM 2014       6', 'R1 SOPAM 2013     311', 'R1 SOPAM 2013     318', 'R1 SOPAM 2013     319', 'R1 SOPAM 2013     320', 'R1 SOPAM 2013     321', 'R1 SOPAM 2013     327', 'R1 SOPAM 2013     328', 'R1 SOPAM 2013     329', 'R1 SOPAM 2013     330', 'R1 SOPAM 2013     331', 'R1 SOPAM 2013     332', 'R1 SOPAM 2013     333', 'R1 SOPAM 2013     334', 'R1 SOPAM 2013     336', 'R1 SOPAM 2013     337', 'R1 SOPAM 2013     338', 'R1 SOPAM 2013     339', 'R1 SOPAM 2013     340', 'R1 SOPAM 2013     341', 'R1 SOPAM 2013     342', 'R1 SOPAM 2013     343', 'R1 SOPAM 2013     344', 'R1 SOPAM 2013     345', 'R1 SOPAM 2013     346', 'R1 SOPAM 2013     347', 'R1 SOPAM 2013     348', 'R1 SOPAM 2013     349', 'R1 SOPAM 2013     350', 'R1 SOPAM 2013     351', 'R1 SOPAM 2013     352', 'R1 SOPAM 2013     388', 'R1 SOPAM 2013     389', 'R1 SOPAM 2013     391', 'R1 SOPAM 2013     392', 'R1 SOPAM 2013     393', 'R1 SOPAM 2013     394', 'R1 SOPAM 2013     486', 'R1 SOPAM 2013     490', 'R1 SOPAM 2013     491', 'R1 SOPAM 2013     498', 'R1 SOPAM 2013     499', 'R1 SOPAM 2013     500', 'R1 SOPAM 2013     501', 'R1 SOPAM 2013     502', 'R1 SOPAM 2013     503', 'R1 SOPAM 2013     504', 'R1 SOPAM 2013     505', 'R1 SOPAM 2013     506', 'R1 SOPAM 2013     507', 'R1 SOPAM 2013     508', 'R1 SOPAM 2013     530', 'R1 SOPAM 2013     531', 'R1 SOPAM 2013     532', 'R1 SOPAM 2013     533', 'R1 SOPAM 2013     534', 'R1 SOPAM 2013     537', 'R1 SOPAM 2013     549', 'R1 SOPAM 2013     550', 'R1 SOPAM 2013     604', 'R1 SOPAM 2013     605', 'R1 SOPAM 2013     606', 'R1 SOPAM 2013     607', 'R1 SOPAM 2013     642', 'R1 SOPAM 2013     653', 'R1 SOPAM 2014      19', 'R1 SOPAM 2014      26', 'R1 SOPAM 2014     113', 'R1 SOPAM 2014     139', 'R1 SOPAM 2014     140', 'R1 SOPAM 2014     143', 'R1 SOPAM 2014     144', 'R1 SOPAM 2014     148', 'R1 SOPAM 2014     161', 'R1 SOPAM 2014     167', 'R1 SOPAM 2014     179', 'R1 SOPAM 2014     189', 'R1 SOPAM 2014     190', 'R1 SOPAM 2014     195', 'S1 SOPAM 2013     713', 'S1 SOPAM 2013     714', 'S1 SOPAM 2013     715', 'S1 SOPAM 2013     716', 'S1 SOPAM 2013     717', 'S1 SOPAM 2013     719')
+
+
+UPDATE PurchIndentDetail
+SET PurchIndentDetail.OMSId = 'Purchase Indent Cancel-' + Convert(NVARCHAR,Web.PurchaseIndentCancelLines.PurchaseIndentCancelLineId)
+FROM Web.PurchaseIndentCancelLines
+WHERE 'Purchase Indent Cancel-' +  PurchIndentDetail.DocID + Convert(NVARCHAR,PurchIndentDetail.Sr) = Web.PurchaseIndentCancelLines.OMSId
+
+
+
+
+
+
+
+--DELETE FROM Web.PurchaseIndentLines 
+--DELETE FROM Web.PurchaseIndentHeaders
+--DELETE FROM Web.PurchaseIndentCancelLines
+--DELETE FROM Web.PurchaseIndentCancelHeaders
+
+
+
+
+
+
+
+
+
+
+
+
+
+INSERT INTO Web.People (Name, Suffix, Code, CreatedBy, ModifiedBy, CreatedDate, ModifiedDate)
+SELECT DispName, IsNUll(ManualCode,ROw_number() OVER (ORDER BY SubCode)) , IsNUll(ManualCode,ROw_number() OVER (ORDER BY SubCode)), EntryBy, EntryBy,  IsNull(EntryDate,getdate()) , IsNUll(EntryDate,Getdate())  FROM SubGroup 
+WHERE Nature = 'Supplier'
+AND OMSId IS NULL
+AND ManualCode  NOT IN ('Surya Carpet', '101013', '101010')
+AND DispName <> 'PAPPU TIWARI'
+
+
+
+
+
+
+INSERT INTO Web.People (Name, Suffix, Code, CreatedBy, ModifiedBy, CreatedDate, ModifiedDate)
+SELECT DispName, IsNUll(ManualCode,ROw_number() OVER (ORDER BY SubCode)) , IsNUll(ManualCode,ROw_number() OVER (ORDER BY SubCode)), EntryBy, EntryBy,  IsNull(EntryDate,getdate()) , IsNUll(EntryDate,Getdate())  FROM SubGroup 
+WHERE DispName IN ('Ansari Rug Bazar', 'Ansari Rug Bazar', 'Ashok Carpet Industries', 'Ashok Carpet Industries', 'Ashok Carpet Industries', 'Lifestyle Carpets India (Pvt) Ltd.', 'Lifestyle Carpets India (Pvt) Ltd.', 'Lifestyle Carpets India (Pvt) Ltd.', 'GLOBE ENTERPRISES', 'GLOBE ENTERPRISES', 'GLOBE ENTERPRISES', 'GLOBE ENTERPRISES', 'GLOBE ENTERPRISES')
+
+
+
+
+
+INSERT INTO Web.People (Name, Suffix, Code, CreatedBy, ModifiedBy, CreatedDate, ModifiedDate)
+SELECT DispName, IsNUll(ManualCode,ROw_number() OVER (ORDER BY SubCode)) , IsNUll(ManualCode,ROw_number() OVER (ORDER BY SubCode)), EntryBy, EntryBy,  IsNull(EntryDate,getdate()) , IsNUll(EntryDate,Getdate())  FROM SubGroup 
+WHERE DispName IN ('Cash A/c' )
+
+
+INSERT INTO Web.People (Name, Suffix, Code, CreatedBy, ModifiedBy, CreatedDate, ModifiedDate)
+SELECT DispName, IsNUll(ManualCode,ROw_number() OVER (ORDER BY SubCode)) , IsNUll(ManualCode,ROw_number() OVER (ORDER BY SubCode)), EntryBy, EntryBy,  IsNull(EntryDate,getdate()) , IsNUll(EntryDate,Getdate())  FROM SubGroup 
+WHERE DispName IN ('Cash A/c (Yogesh Dubey)' )
+
+
+
+UPDATE SubGroup 
+SET SubGroup.OMSId = 'Person-'  + Convert(NVARCHAR,Web.People.PersonId)
+FROM Web.People
+WHERE SubGroup.DispName = Web.People.Name
+AND SubGroup.OMSId IS NULL
+
+
+
+
+INSERT INTO Web.PurchaseOrderHeaders (DocTypeId, DocDate, DocNo, DivisionId, SiteId, SupplierId, DueDate, ShipMethodId, DeliveryTermsId, 
+TermsAndConditions, ShipAddress, Remark, CurrencyId, SalesTaxGroupPartyId, SupplierShipDate, SupplierRemark, CreditDays, ProgressPer, 
+isUninspected, Status, CreatedBy, CreatedDate, ModifiedBy, ModifiedDate, ApprovedBy, ApprovedDate, OMSId, Discriminator, 
+CalculateDiscountOnRate)
+SELECT WDt.DocumentTypeId AS DocTypeId, H.V_Date AS DocDate, H.ReferenceNo AS DocNo, Wd.DivisionId, Wsm.SiteId, P.PersonID AS SupplierId,
+IsNull(H.VendorDeliveryDate,H.V_Date) AS DueDate , 3 AS ShipMethodId, NULL AS DeliveryTermsId,
+H.TermsAndConditions AS TermsAndConditions, NULL AS ShipAddress, H.Remarks  AS Remark, IsNull(Cu.ID,3) AS CurrencyId, WPSt.SalesTaxGroupPartyId  AS SalesTaxGroupPartyId, 
+NULL AS SupplierShipDate, NULL AS SupplierRemark, NULL AS CreditDays, NULL AS ProgressPer, NULL AS isUninspected,
+5 AS Status, H.EntryBy AS CreatedBy,
+H.EntryDate AS CreatedDate, H.EntryBy AS ModifiedBy, H.EntryDate AS ModifiedDate, 
+NULL AS ApprovedBy, NULL AS ApprovedDate, 'Purchase Order-' + H.DocID AS OMSId, 'PurchaseOrderHeader' AS Discriminator, 0 AS CalculateDiscountOnRate
+FROM PurchOrder H 
+LEFT JOIN Voucher_Type Vt ON H.V_Type = Vt.V_Type
+LEFT JOIN Division D ON H.Div_Code = D.Div_Code
+LEFT JOIN SiteMast Sm ON H.Site_Code = Sm.Code
+LEFT JOIN SubGroup Sg ON H.Vendor = Sg.SubCode
+LEFT JOIN Currency C ON H.Currency  = C.Code
+LEFT JOIN PostingGroupSalesTaxParty PSt ON H.SalesTaxGroupParty =  PSt.Description
+LEFT JOIN Web.DocumentTypes WDt ON Vt.OMSId = 'Document Type-' + Convert(NVARCHAR,WDt.DocumentTypeId)
+LEFT JOIN WEb.Divisions Wd ON D.OMSId = 'Division-' + COnvert(NVARCHAR, Wd.DivisionId)
+LEFT JOIN Web.Sites Wsm ON Sm.OMSId = 'Site-' +  Convert(NVARCHAR, Wsm.SiteId)
+LEFT JOIN Web.People P ON Sg.OMSId = 'Person-' + Convert(NVARCHAR, P.PersonID)
+LEFT JOIN Web.Currencies Cu ON C.OMSId = 'Currency-' + Convert(NVARCHAR, Cu.ID) 
+LEFT JOIN Web.SalesTaxGroupParties WPSt ON Pst.OMSId = 'Sales Tax Group Party-' + Convert(NVARCHAR,WPSt.SalesTaxGroupPartyId)
+WHERE H.V_Type <> 'POCNL'
+
+
+
+
+UPDATE PurchOrder
+SET PurchOrder.OMSId = 'Purchase Order-' + Convert(NVARCHAR,Web.PurchaseOrderHeaders.PurchaseOrderHeaderId)
+FROM Web.PurchaseOrderHeaders
+WHERE 'Purchase Order-' +  PurchOrder.DocID = Web.PurchaseOrderHeaders.OMSId
+
+
+
+--Mark
+
+INSERT INTO Web.PurchaseOrderLines (PurchaseOrderHeaderId, PurchaseIndentLineId, ProductId, Dimension1Id, Dimension2Id, Specification, 
+Qty, ShipDate, LotNo, DueDate, UnitConversionMultiplier, DealUnitId, DealQty, Rate, Amount, Remark, CreatedBy, ModifiedBy, 
+CreatedDate, ModifiedDate, OMSId, Discriminator)
+SELECT WPo.PurchaseOrderHeaderId, WPil.PurchaseIndentLineId, Wp.ProductId, WD1.Dimension1Id, NULL AS Dimension2Id,
+L.Specification, L.Qty, NULL AS ShipDate, L.LotNo, NULL AS DueDate, 
+CASE WHEN IsNull(L.MeasurePerPcs,0) = 0 THEN 1 ELSE L.MeasurePerPcs END AS MeasurePerPcs,
+IsNull(WDu.UnitId,Wu.UnitId) AS DealUnitId, 
+CASE WHEN IsNull(L.TotalMeasure,0) = 0 THEN L.Qty ELSE L.TotalMeasure END AS TotalMeasure,
+L.Rate, L.Amount,
+L.Remark, H.EntryBy AS CreatedBy, H.EntryBy AS ModifiedBy, 
+H.EntryDate AS CreatedDate, H.EntryDate AS ModifiedDate, 
+'Purchase Order-' +  L.DocId + Convert(NVARCHAR,L.Sr) AS OMSId, 'PurchaseOrderLine' AS Discriminator
+FROM PurchOrderDetail L 
+LEFT JOIN PurchOrder H ON L.DocId = H.DocID
+LEFT JOIN Item I ON L.Item = I.Code
+LEFT JOIN RUG_YarnSKU Ys ON I.Code = Ys.Code
+LEFT JOIN RUG_Yarn Y ON Ys.Yarn = Y.Code
+LEFT JOIN Item I1 ON Y.Code = I1.Code
+LEFT JOIN PurchIndentDetail Pid ON L.PurchIndent = Pid.DocId AND L.PurchIndentSr = Pid.Sr
+LEFT JOIN RUG_SHADE D1 ON Ys.SHADE  = D1.Code
+LEFT JOIN Unit u ON L.Unit = u.Code
+LEFT JOIN Unit Du ON L.MeasureUnit = Du.Code
+LEFT JOIN Web.PurchaseOrderHeaders WPo ON H.OMSId = 'Purchase Order-' + Convert(NVARCHAR,WPo.PurchaseOrderHeaderId)
+LEFT JOIN Web.Products Wp ON IsNull(I.OMSId, I1.OMSId) = 'Product-' + Convert(NVARCHAR,Wp.ProductId)
+LEFT JOIN Web.Dimension1 WD1 ON D1.OMSId = 'Dimension1-' + Convert(NVARCHAR,WD1.Dimension1Id)
+LEFT JOIN Web.PurchaseIndentLines WPil ON Pid.OMSId = 'Purchase Indent-' +  Convert(NVARCHAR,WPil.PurchaseIndentLineId)
+LEFT JOIN Web.Units WDu ON Du.OMSId = 'Unit-' + Convert(NVARCHAR,WDu.UnitId)
+LEFT JOIN Web.Units Wu ON U.OMSId = 'Unit-' +  Convert(NVARCHAR,Wu.UnitId)
+WHERE 1=1
+AND H.V_Type  <> 'POCNL'
+
+
+
+
+
+
+
+INSERT INTO Web.PurchaseOrderCancelHeaders (DocTypeId, DocDate, DocNo, ReasonId, DivisionId, SiteId, SupplierId,
+Remark, Status, CreatedBy, CreatedDate, ModifiedBy, ModifiedDate, OMSId)
+SELECT WDt.DocumentTypeId AS DocTypeId, H.V_Date AS DocDate, H.ReferenceNo AS DocNo, 3 AS ReasonId, 
+Wd.DivisionId, Wsm.SiteId, P.PersonID AS SupplierId,
+IsNull(H.Remarks,'.')  AS Remark, 
+5 AS Status, H.EntryBy AS CreatedBy,
+H.EntryDate AS CreatedDate, H.EntryBy AS ModifiedBy, H.EntryDate AS ModifiedDate, 
+'Purchase Order Cancel-' + H.DocID AS OMSId
+FROM PurchOrder H 
+LEFT JOIN Voucher_Type Vt ON H.V_Type = Vt.V_Type
+LEFT JOIN Division D ON H.Div_Code = D.Div_Code
+LEFT JOIN SiteMast Sm ON H.Site_Code = Sm.Code
+LEFT JOIN SubGroup Sg ON H.Vendor = Sg.SubCode
+LEFT JOIN Currency C ON H.Currency  = C.Code
+LEFT JOIN Web.DocumentTypes WDt ON Vt.OMSId = 'Document Type-' + Convert(NVARCHAR,WDt.DocumentTypeId)
+LEFT JOIN WEb.Divisions Wd ON D.OMSId = 'Division-' + COnvert(NVARCHAR, Wd.DivisionId)
+LEFT JOIN Web.Sites Wsm ON Sm.OMSId = 'Site-' +  Convert(NVARCHAR, Wsm.SiteId)
+LEFT JOIN Web.People P ON Sg.OMSId = 'Person-' + Convert(NVARCHAR, P.PersonID)
+LEFT JOIN Web.Currencies Cu ON C.OMSId = 'Currency-' + Convert(NVARCHAR, Cu.ID) 
+WHERE H.V_Type IN ('WPOCN', 'YPOCN', 'CPOCN', 'POCNL', 'CPR', 'OPOCN')
+
+
+
+UPDATE PurchOrder
+SET PurchOrder.OMSId = 'Purchase Order Cancel-' + Convert(NVARCHAR,Web.PurchaseOrderCancelHeaders.PurchaseOrderCancelHeaderId)
+FROM Web.PurchaseOrderCancelHeaders
+WHERE 'Purchase Order Cancel-' +  PurchOrder.DocID = Web.PurchaseOrderCancelHeaders.OMSId
+
+
+UPDATE PurchOrderDetail
+SET PurchOrderDetail.OMSId = 'Purchase Order-' + Convert(NVARCHAR,Web.PurchaseOrderLines.PurchaseOrderLineId)
+FROM Web.PurchaseOrderLines
+WHERE 'Purchase Order-' +  PurchOrderDetail.DocID + Convert(NVARCHAR,PurchOrderDetail.Sr) = Web.PurchaseOrderLines.OMSId
+
+
+
+
+INSERT INTO Web.PurchaseOrderCancelLines (PurchaseOrderCancelHeaderId, PurchaseOrderLineId, Qty, Remark, CreatedBy, ModifiedBy, CreatedDate, ModifiedDate, OMSId)
+SELECT WPo.PurchaseOrderCancelHeaderId, 
+WPol.PurchaseOrderLineId, Abs(L.Qty), L.Remark, H.EntryBy AS CreatedBy, H.EntryBy AS ModifiedBy, 
+H.EntryDate AS CreatedDate, H.EntryDate AS ModifiedDate, 
+'Purchase Order Cancel-' +  L.DocId + Convert(NVARCHAR,L.Sr) AS OMSId
+FROM PurchOrderDetail L 
+LEFT JOIN PurchOrder H ON L.DocId = H.DocID
+LEFT JOIN PurchOrderDetail Pod ON L.PurchOrder = Pod.DocId AND L.PurchOrderSr = Pod.Sr
+LEFT JOIN Web.PurchaseOrderCancelHeaders WPo ON H.OMSId = 'Purchase Order Cancel-' + Convert(NVARCHAR,WPo.PurchaseOrderCancelHeaderId)
+LEFT JOIN Web.PurchaseOrderLines WPol ON Pod.OMSId = 'Purchase Order-' +  Convert(NVARCHAR,WPol.PurchaseOrderLineId)
+WHERE 1=1
+AND H.V_Type IN ('WPOCN', 'YPOCN', 'CPOCN', 'POCNL', 'CPR', 'OPOCN')
+
+
+
+
+UPDATE PurchOrderDetail
+SET PurchOrderDetail.OMSId = 'Purchase Order Cancel-' + Convert(NVARCHAR,Web.PurchaseOrderCancelLines.PurchaseOrderCancelLineId)
+FROM Web.PurchaseOrderCancelLines
+WHERE 'Purchase Order Cancel-' +  PurchOrderDetail.DocID + Convert(NVARCHAR,PurchOrderDetail.Sr) = Web.PurchaseOrderCancelLines.OMSId
+
+
+
+
+
+
+INSERT INTO Web.PurchaseGoodsReceiptHeaders (DocTypeId, DocDate, DocNo, DivisionId, SiteId, SupplierId, GodownId, SupplierDocNo, SupplierDocDate, 
+PurchaseWaybillId, GateInId, RoadPermitFormId, Status, Remark, CreatedBy, CreatedDate, ModifiedBy, ModifiedDate, OMSId, Discriminator)
+SELECT WDt.DocumentTypeId AS DocTypeId, H.V_Date AS DocDate, H.ReferenceNo AS DocNo, Wd.DivisionId, Wsm.SiteId, P.PersonID AS SupplierId,
+Wg.GodownId, H.VendorDocNo AS SupplierDocNo, H.VendorDocDate AS SupplierDocDate, NULL AS PurchaseWayBillId, NULL AS GateInId,
+NULL AS RoadPermitFormId, 5 AS Status, H.Remarks, H.EntryBy AS CreatedBy,
+IsNull(H.EntryDate, H.V_Date) AS CreatedDate, H.EntryBy AS ModifiedBy, IsNull(H.EntryDate, H.V_Date) AS ModifiedDate, 
+'Purchase Goods Receipt-' + H.DocID AS OMSId, 'Purchase Goods Receipt'
+FROM PurchChallan H 
+LEFT JOIN Voucher_Type Vt ON H.V_Type = Vt.V_Type
+LEFT JOIN Division D ON H.Div_Code = D.Div_Code
+LEFT JOIN SiteMast Sm ON H.Site_Code = Sm.Code
+LEFT JOIN SubGroup Sg ON H.Vendor = Sg.SubCode
+LEFT JOIN Godown G ON H.Godown = G.Code
+LEFT JOIN Web.DocumentTypes WDt ON Vt.OMSId = 'Document Type-' + Convert(NVARCHAR,WDt.DocumentTypeId)
+LEFT JOIN WEb.Divisions Wd ON D.OMSId = 'Division-' + COnvert(NVARCHAR, Wd.DivisionId)
+LEFT JOIN Web.Sites Wsm ON Sm.OMSId = 'Site-' +  Convert(NVARCHAR, Wsm.SiteId)
+LEFT JOIN Web.People P ON Sg.OMSId = 'Person-' + Convert(NVARCHAR, P.PersonID)
+LEFT JOIN Web.Godowns Wg ON G.OMSId = 'Godown-' + Convert(NVARCHAR, Wg.GodownId)
+WHERE DocId NOT IN ('D1   CPR 2014       2', 'D1   CPR 2014       2', 'D1   CPR 2014       2', 'M1 PCRET 2013       1', 'M1 PCRET 2013       1', 'M1 PCRET 2013       2', 'M1 PCRET 2014       1', 'M1 PCRET 2014       2', 'M1 PCRET 2014       3', 'M1 PCRET 2014       4', 'M1 PCRET 2014       4', 'MS PCRET 2014       1')
+
+UPDATE PurchChallan
+SET PurchChallan.OMSId = 'Purchase Goods Receipt-' + Convert(NVARCHAR,Web.PurchaseGoodsReceiptHeaders.PurchaseGoodsReceiptHeaderId)
+FROM Web.PurchaseGoodsReceiptHeaders
+WHERE 'Purchase Goods Receipt-' +  PurchChallan.DocID = Web.PurchaseGoodsReceiptHeaders.OMSId
+
+
+
+
+
+
+
+
+INSERT INTO Web.PurchaseGoodsReceiptLines (PurchaseGoodsReceiptHeaderId, PurchaseOrderLineId, ProductUidId, ProductId, 
+Dimension1Id, Dimension2Id, Qty, isUninspected, DealUnitId, DealQty, BaleNo, CreatedBy, ModifiedBy, CreatedDate, ModifiedDate, Remark, 
+Specification, OMSId, Discriminator, LotNo, UnitConversionMultiplier)
+SELECT  WPc.PurchaseGoodsReceiptHeaderId, WPol.PurchaseOrderLineId, NULL AS ProductUidId, Wp.ProductId, WD1.Dimension1Id, NULL AS Dimension2Id,
+L.Qty, 1 AS isUninspected, 
+IsNull(WDu.UnitId,Wu.UnitId) AS DealUnitId, 
+CASE WHEN IsNull(L.TotalMeasure,0) = 0 THEN L.Qty ELSE L.TotalMeasure END AS DealQty,
+L.BALENO,
+H.EntryBy AS CreatedBy, H.EntryBy AS ModifiedBy, 
+H.EntryDate AS CreatedDate, H.EntryDate AS ModifiedDate, L.Remark, L.Specification,
+'Purchase Goods Receipt-' +  L.DocId + Convert(NVARCHAR,L.Sr) AS OMSId, 'PurchaseGoodsReceiptLine' AS Discriminator,
+L.LotNo, 
+CASE WHEN IsNull(L.MeasurePerPcs,0) = 0 THEN 1 ELSE L.MeasurePerPcs END AS UnitConversionMultiplier
+FROM PurchChallanDetail L 
+LEFT JOIN PurchChallan H ON L.DocId = H.DocID
+LEFT JOIN Item I ON L.Item = I.Code
+LEFT JOIN RUG_YarnSKU Ys ON I.Code = Ys.Code
+LEFT JOIN RUG_Yarn Y ON Ys.Yarn = Y.Code
+LEFT JOIN Item I1 ON Y.Code = I1.Code
+LEFT JOIN PurchOrderDetail Pod ON L.PurchOrder = Pod.DocId AND L.PurchOrderSr = Pod.Sr
+LEFT JOIN RUG_SHADE D1 ON Ys.SHADE  = D1.Code
+LEFT JOIN Unit u ON L.Unit = u.Code
+LEFT JOIN Unit Du ON L.MeasureUnit = Du.Code
+LEFT JOIN Web.PurchaseGoodsReceiptHeaders WPc ON H.OMSId = 'Purchase Goods Receipt-' + Convert(NVARCHAR,WPc.PurchaseGoodsReceiptHeaderId)
+LEFT JOIN Web.Products Wp ON IsNull(I.OMSId, I1.OMSId) = 'Product-' + Convert(NVARCHAR,Wp.ProductId)
+LEFT JOIN Web.Dimension1 WD1 ON D1.OMSId = 'Dimension1-' + Convert(NVARCHAR,WD1.Dimension1Id)
+LEFT JOIN Web.PurchaseOrderLines WPol ON Pod.OMSId = 'Purchase Order-' +  Convert(NVARCHAR,WPol.PurchaseOrderLineId)
+LEFT JOIN Web.Units WDu ON Du.OMSId = 'Unit-' + Convert(NVARCHAR,WDu.UnitId)
+LEFT JOIN Web.Units Wu ON U.OMSId = 'Unit-' +  Convert(NVARCHAR,Wu.UnitId)
+WHERE L.Qty >= 0
+
+
+
+
+
+UPDATE PurchChallanDetail
+SET PurchChallanDetail.OMSId = 'Purchase Goods Receipt-' + Convert(NVARCHAR,Web.PurchaseGoodsReceiptLines.PurchaseGoodsReceiptLineId)
+FROM Web.PurchaseGoodsReceiptLines
+WHERE 'Purchase Goods Receipt-' +  PurchChallanDetail.DocID + Convert(NVARCHAR,PurchChallanDetail.Sr) = Web.PurchaseGoodsReceiptLines.OMSId
+
+
+
+
+
+INSERT INTO Web.PurchaseInvoiceHeaders (DocTypeId, DocDate, DocNo, DivisionId, SiteId, SupplierId, Remark, 
+CreatedBy, CreatedDate, ModifiedBy, ModifiedDate, OMSId, CurrencyId, SupplierDocNo, SupplierDocDate, CreditDays, SalesTaxGroupPartyId, TermsAndConditions, Status)
+SELECT WDt.DocumentTypeId AS DocTypeId, H.V_Date AS DocDate, H.ReferenceNo AS DocNo, Wd.DivisionId, Wsm.SiteId, P.PersonID AS SupplierId,
+H.Remarks, H.EntryBy AS CreatedBy,
+IsNull(H.EntryDate, H.V_Date) AS CreatedDate, H.EntryBy AS ModifiedBy, IsNull(H.EntryDate, H.V_Date) AS ModifiedDate,
+'Purchase Invoice-' + H.DocID AS OMSId, Wc.ID AS CurrencyId,
+H.VendorDocNo AS SupplierDocNo, IsNull(H.VendorDocDate,H.V_Date) AS SupplierDocDate, 
+0 AS CreditDays, WPSt.SalesTaxGroupPartyId  AS SalesTaxGroupPartyId, NULL AS TermsAndConditions,
+5 AS Status
+FROM PurchInvoice H 
+LEFT JOIN Voucher_Type Vt ON H.V_Type = Vt.V_Type
+LEFT JOIN Division D ON H.Div_Code = D.Div_Code
+LEFT JOIN SiteMast Sm ON H.Site_Code = Sm.Code
+LEFT JOIN SubGroup Sg ON H.Vendor = Sg.SubCode
+LEFT JOIN Godown G ON H.Godown = G.Code
+LEFT JOIN Currency C ON H.Currency = C.Code
+LEFT JOIN PostingGroupSalesTaxParty PSt ON H.SalesTaxGroupParty =  PSt.Description
+LEFT JOIN Web.DocumentTypes WDt ON Vt.OMSId = 'Document Type-' + Convert(NVARCHAR,WDt.DocumentTypeId)
+LEFT JOIN WEb.Divisions Wd ON D.OMSId = 'Division-' + COnvert(NVARCHAR, Wd.DivisionId)
+LEFT JOIN Web.Sites Wsm ON Sm.OMSId = 'Site-' +  Convert(NVARCHAR, Wsm.SiteId)
+LEFT JOIN Web.People P ON Sg.OMSId = 'Person-' + Convert(NVARCHAR, P.PersonID)
+LEFT JOIN Web.Godowns Wg ON G.OMSId = 'Godown-' + Convert(NVARCHAR, Wg.GodownId)
+LEFT JOIN Web.Currencies Wc ON C.OMSId = 'Currency-' + COnvert(NVARCHAR,Wc.ID)
+LEFT JOIN Web.SalesTaxGroupParties WPSt ON Pst.OMSId = 'Sales Tax Group Party-' + Convert(NVARCHAR,WPSt.SalesTaxGroupPartyId)
+WHERE DocId NOT IN ('D1   CPR 2014       2')
+
+
+
+
+
+UPDATE PurchInvoice
+SET PurchInvoice.OMSId = 'Purchase Invoice-' + Convert(NVARCHAR,Web.PurchaseInvoiceHeaders.PurchaseInvoiceHeaderId)
+FROM Web.PurchaseInvoiceHeaders
+WHERE 'Purchase Invoice-' +  PurchInvoice.DocID = Web.PurchaseInvoiceHeaders.OMSId
+
+
+--Mark
+
+INSERT INTO Web.PurchaseInvoiceLines (PurchaseInvoiceHeaderId, PurchaseGoodsReceiptLineId, Rate, Amount, Remark, 
+CreatedBy, ModifiedBy, CreatedDate, ModifiedDate, OMSId, DealUnitId, DealQty, UnitConversionMultiplier)
+SELECT  WPi.PurchaseInvoiceHeaderId, WPcl.PurchaseGoodsReceiptLineId, 
+L.Rate, L.Amount, L.Remark,
+H.EntryBy AS CreatedBy, H.EntryBy AS ModifiedBy, 
+H.EntryDate AS CreatedDate, H.EntryDate AS ModifiedDate,
+'Purchase Invoice-' +  L.DocId + Convert(NVARCHAR,L.Sr) AS OMSId,
+IsNull(WDu.UnitId,Wu.UnitId) AS DealUnitId, 
+CASE WHEN IsNull(L.TotalMeasure,0) = 0 THEN L.Qty ELSE L.TotalMeasure END AS DealQty,
+CASE WHEN IsNull(L.MeasurePerPcs,0) = 0 THEN 1 ELSE L.MeasurePerPcs END AS UnitConversionMultiplier
+FROM PurchInvoiceDetail L 
+LEFT JOIN PurchInvoice H ON L.DocId = H.DocID
+LEFT JOIN Item I ON L.Item = I.Code
+LEFT JOIN RUG_YarnSKU Ys ON I.Code = Ys.Code
+LEFT JOIN RUG_Yarn Y ON Ys.Yarn = Y.Code
+LEFT JOIN Item I1 ON Y.Code = I1.Code
+LEFT JOIN PurchChallanDetail Pcd ON L.PurchChallan = Pcd.DocId AND L.PurchChallanSr = Pcd.Sr
+LEFT JOIN RUG_SHADE D1 ON Ys.SHADE  = D1.Code
+LEFT JOIN Unit u ON L.Unit = u.Code
+LEFT JOIN Unit Du ON L.MeasureUnit = Du.Code
+LEFT JOIN Web.PurchaseInvoiceHeaders WPi ON H.OMSId = 'Purchase Invoice-' + Convert(NVARCHAR,WPi.PurchaseInvoiceHeaderId)
+LEFT JOIN Web.Products Wp ON IsNull(I.OMSId, I1.OMSId) = 'Product-' + Convert(NVARCHAR,Wp.ProductId)
+LEFT JOIN Web.Dimension1 WD1 ON D1.OMSId = 'Dimension1-' + Convert(NVARCHAR,WD1.Dimension1Id)
+LEFT JOIN Web.PurchaseGoodsReceiptLines WPcl ON Pcd.OMSId = 'Purchase Goods Receipt-' +  Convert(NVARCHAR,WPcl.PurchaseGoodsReceiptLineId)
+LEFT JOIN Web.Units WDu ON Du.OMSId = 'Unit-' + Convert(NVARCHAR,WDu.UnitId)
+LEFT JOIN Web.Units Wu ON U.OMSId = 'Unit-' +  Convert(NVARCHAR,Wu.UnitId)
+WHERE L.Qty >= 0
+
+
+
+UPDATE PurchInvoiceDetail
+SET PurchInvoiceDetail.OMSId = 'Purchase Invoice-' + Convert(NVARCHAR,Web.PurchaseInvoiceLines.PurchaseInvoiceLineId)
+FROM Web.PurchaseInvoiceLines
+WHERE 'Purchase Invoice-' +  PurchInvoiceDetail.DocID + Convert(NVARCHAR,PurchInvoiceDetail.Sr) = Web.PurchaseInvoiceLines.OMSId
+
+
+
+
+
+INSERT INTO Web.PurchaseInvoiceReturnHeaders (DocTypeId, DocDate, DocNo, ReasonId, DivisionId, SiteId, SupplierId, Remark, 
+Status, CreatedBy, ModifiedBy, CreatedDate, ModifiedDate, OMSId, CurrencyId, SalesTaxGroupPartyId)
+SELECT WDt.DocumentTypeId AS DocTypeId, H.V_Date AS DocDate, H.ReferenceNo AS DocNo, 4 AS ReasonId, Wd.DivisionId, Wsm.SiteId, 
+P.PersonID AS SupplierId,
+IsNull(H.Remarks,'.') AS Remark, 5 AS Status, IsNull(H.EntryBy,'sa') AS CreatedBy,IsNull(H.EntryBy,'sa') AS ModifiedBy, 
+IsNull(H.EntryDate, H.V_Date) AS CreatedDate, IsNull(H.EntryDate, H.V_Date) AS ModifiedDate,
+'Purchase Return-' + H.DocID AS OMSId, IsNull(Wc.ID,3) AS CurrencyId, WPSt.SalesTaxGroupPartyId  AS SalesTaxGroupPartyId
+FROM PurchChallan H 
+LEFT JOIN Voucher_Type Vt ON H.V_Type = Vt.V_Type
+LEFT JOIN Division D ON H.Div_Code = D.Div_Code
+LEFT JOIN SiteMast Sm ON H.Site_Code = Sm.Code
+LEFT JOIN SubGroup Sg ON H.Vendor = Sg.SubCode
+LEFT JOIN Godown G ON H.Godown = G.Code
+LEFT JOIN Currency C ON H.Currency = C.Code
+LEFT JOIN PostingGroupSalesTaxParty PSt ON H.SalesTaxGroupParty =  PSt.Description
+LEFT JOIN Web.DocumentTypes WDt ON Vt.OMSId = 'Document Type-' + Convert(NVARCHAR,WDt.DocumentTypeId)
+LEFT JOIN WEb.Divisions Wd ON D.OMSId = 'Division-' + COnvert(NVARCHAR, Wd.DivisionId)
+LEFT JOIN Web.Sites Wsm ON Sm.OMSId = 'Site-' +  Convert(NVARCHAR, Wsm.SiteId)
+LEFT JOIN Web.People P ON Sg.OMSId = 'Person-' + Convert(NVARCHAR, P.PersonID)
+LEFT JOIN Web.Godowns Wg ON G.OMSId = 'Godown-' + Convert(NVARCHAR, Wg.GodownId)
+LEFT JOIN Web.Currencies Wc ON C.OMSId = 'Currency-' + COnvert(NVARCHAR,Wc.ID)
+LEFT JOIN Web.SalesTaxGroupParties WPSt ON Pst.OMSId = 'Sales Tax Group Party-' + Convert(NVARCHAR,WPSt.SalesTaxGroupPartyId)
+WHERE DocId IN ('D1   CPR 2014       2', 'D1   CPR 2014       2', 'D1   CPR 2014       2', 'M1 PCRET 2013       1', 'M1 PCRET 2013       1', 'M1 PCRET 2013       2', 'M1 PCRET 2014       1', 'M1 PCRET 2014       2', 'M1 PCRET 2014       3', 'M1 PCRET 2014       4', 'M1 PCRET 2014       4', 'MS PCRET 2014       1')
+
+
+
+UPDATE PurchChallan
+SET PurchChallan.OMSId = 'Purchase Return-' + Convert(NVARCHAR,Web.PurchaseInvoiceReturnHeaders.PurchaseInvoiceReturnHeaderId)
+FROM Web.PurchaseInvoiceReturnHeaders
+WHERE 'Purchase Return-' +  PurchChallan.DocID = Web.PurchaseInvoiceReturnHeaders.OMSId
+
+
+
+
+INSERT INTO Web.PurchaseInvoiceReturnLines (PurchaseInvoiceReturnHeaderId, PurchaseInvoiceLineId, Qty, Remark, 
+CreatedBy, ModifiedBy, CreatedDate, ModifiedDate, OMSId, UnitConversionMultiplier, DealUnitId, DealQty, Rate, Amount)
+SELECT  WPi.PurchaseInvoiceReturnHeaderId, WPil.PurchaseInvoiceLineId,
+Abs(L.Qty) AS Qty, L.Remark,
+IsNull(H.EntryBy,'sa') AS CreatedBy, IsNull(H.EntryBy,'sa') AS ModifiedBy, 
+IsNull(H.EntryDate,H.V_Date) AS CreatedDate, IsNull(H.EntryDate,H.V_Date) AS ModifiedDate,
+'Purchase Return-' +  L.DocId + Convert(NVARCHAR,L.Sr) AS OMSId,
+CASE WHEN IsNull(L.MeasurePerPcs,0) = 0 THEN 1 ELSE L.MeasurePerPcs END AS UnitConversionMultiplier,
+IsNull(WDu.UnitId,Wu.UnitId) AS DealUnitId, 
+CASE WHEN IsNull(L.TotalMeasure,0) = 0 THEN L.Qty ELSE L.TotalMeasure END AS DealQty,
+L.Rate, L.Amount
+FROM PurchChallanDetail L 
+LEFT JOIN PurchChallan H ON L.DocId = H.DocID
+LEFT JOIN Item I ON L.Item = I.Code
+LEFT JOIN RUG_YarnSKU Ys ON I.Code = Ys.Code
+LEFT JOIN RUG_Yarn Y ON Ys.Yarn = Y.Code
+LEFT JOIN Item I1 ON Y.Code = I1.Code
+LEFT JOIN PurchChallanDetail Pcd ON L.PurchChallan = Pcd.DocId AND L.PurchChallanSr = Pcd.Sr
+LEFT JOIN RUG_SHADE D1 ON Ys.SHADE  = D1.Code
+LEFT JOIN Unit u ON L.Unit = u.Code
+LEFT JOIN Unit Du ON L.MeasureUnit = Du.Code
+LEFT JOIN Web.PurchaseInvoiceReturnHeaders WPi ON H.OMSId = 'Purchase Return-' + Convert(NVARCHAR,WPi.PurchaseInvoiceReturnHeaderId)
+LEFT JOIN Web.Products Wp ON IsNull(I.OMSId, I1.OMSId) = 'Product-' + Convert(NVARCHAR,Wp.ProductId)
+LEFT JOIN Web.Dimension1 WD1 ON D1.OMSId = 'Dimension1-' + Convert(NVARCHAR,WD1.Dimension1Id)
+LEFT JOIN Web.PurchaseGoodsReceiptLines WPcl ON Pcd.OMSId = 'Purchase Goods Receipt-' +  Convert(NVARCHAR,WPcl.PurchaseGoodsReceiptLineId)
+LEFT JOIN Web.PurchaseInvoiceLines WPil ON WPcl.PurchaseGoodsReceiptLineId = WPil.PurchaseGoodsReceiptLineId
+LEFT JOIN Web.Units WDu ON Du.OMSId = 'Unit-' + Convert(NVARCHAR,WDu.UnitId)
+LEFT JOIN Web.Units Wu ON U.OMSId = 'Unit-' +  Convert(NVARCHAR,Wu.UnitId)
+WHERE L.DocId IN ('D1   CPR 2014       2', 'D1   CPR 2014       2', 'D1   CPR 2014       2', 'M1 PCRET 2013       1', 'M1 PCRET 2013       1', 'M1 PCRET 2013       2', 'M1 PCRET 2014       1', 'M1 PCRET 2014       2', 'M1 PCRET 2014       3', 'M1 PCRET 2014       4', 'M1 PCRET 2014       4', 'MS PCRET 2014       1')
+AND WPil.PurchaseInvoiceLineId IS NOT NULL
+
+
+
+UPDATE PurchChallanDetail
+SET PurchChallanDetail.OMSId = 'Purchase Return-' + Convert(NVARCHAR,Web.PurchaseInvoiceReturnLines.PurchaseInvoiceReturnLineId)
+FROM Web.PurchaseInvoiceReturnLines
+WHERE 'Purchase Return-' +  PurchChallanDetail.DocID + Convert(NVARCHAR,PurchChallanDetail.Sr) = Web.PurchaseInvoiceReturnLines.OMSId
+
+
+
+INSERT INTO Web.Charges (ChargeName, IsActive, CreatedBy, ModifiedBy, CreatedDate, ModifiedDate, ChargeCode)
+SELECT Description AS ChargeName, 1 AS IsActive, PreparedBy AS CreatedBy, PreparedBy AS ModifiedBy, U_EntDt AS CreatedDate, 
+U_EntDt AS ModifiedDate, ManualCode AS ChargeCode
+FROM Charges
+
+
+
+
+UPDATE dbo.Charges
+SET dbo.Charges.OMSId = 'Charge-' + Convert(NVARCHAR,C.ChargeId)
+FROM (SELECT * FROM Web.Charges ) AS C 
+WHERE dbo.Charges.Description = C.ChargeName
+
+
+
+
+ALTER TABLE StructureDetail ADD AddDeduct BIT 
+ALTER TABLE StructureDetail ADD AffectCost BIT 
+ALTER TABLE StructureDetail ADD ChargeTypeName  NVARCHAR(50)
+ALTER TABLE StructureDetail ADD CalculateOnCharge NVARCHAR(50)
+ALTER TABLE StructureDetail ADD RateType TINYINT
+
+
+
+
+
+UPDATE dbo.StructureDetail
+SET AddDeduct = 1
+	, ChargeTypeName = 'Amount'
+	, CalculateOnCharge = NULL
+	, RateType = 3
+	, AffectCost = 1
+WHERE Code = 'PURCH_C' AND Sr = 10
+GO
+
+UPDATE dbo.StructureDetail
+SET AddDeduct = 1
+	, ChargeTypeName = NULL
+	, CalculateOnCharge = 'GAMT'
+	, RateType = 2
+	, AffectCost = 1
+WHERE Code = 'PURCH_C' AND Sr = 11
+GO
+
+UPDATE dbo.StructureDetail
+SET AddDeduct = 1
+	, ChargeTypeName = NULL
+	, CalculateOnCharge = 'BED'
+	, RateType = 2
+	, AffectCost = 1
+WHERE Code = 'PURCH_C' AND Sr = 12
+GO
+
+UPDATE dbo.StructureDetail
+SET AddDeduct = 1
+	, ChargeTypeName = NULL
+	, CalculateOnCharge = 'BED'
+	, RateType = 2
+	, AffectCost = 1
+WHERE Code = 'PURCH_C' AND Sr = 13
+GO
+
+UPDATE dbo.StructureDetail
+SET AddDeduct = NULL
+	, ChargeTypeName = NULL
+	, CalculateOnCharge = NULL
+	, RateType = 3
+	, AffectCost = NULL
+WHERE Code = 'PURCH_C' AND Sr = 14
+GO
+
+UPDATE dbo.StructureDetail
+SET AddDeduct = 1
+	, ChargeTypeName = 'Sales Tax'
+	, CalculateOnCharge = 'STTA'
+	, RateType = 2
+	, AffectCost = 1
+WHERE Code = 'PURCH_C' AND Sr = 50
+GO
+
+UPDATE dbo.StructureDetail
+SET AddDeduct = NULL
+	, ChargeTypeName = 'Sub Total'
+	, CalculateOnCharge = NULL
+	, RateType = 3
+	, AffectCost = 1
+WHERE Code = 'PURCH_C' AND Sr = 70
+GO
+
+UPDATE dbo.StructureDetail
+SET AddDeduct = 1
+	, ChargeTypeName = NULL
+	, CalculateOnCharge = 'STOT'
+	, RateType = 2
+	, AffectCost = 1
+WHERE Code = 'PURCH_C' AND Sr = 80
+GO
+
+UPDATE dbo.StructureDetail
+SET AddDeduct = 1
+	, ChargeTypeName = NULL
+	, CalculateOnCharge = 'STOT'
+	, RateType = 2
+	, AffectCost = 1
+WHERE Code = 'PURCH_C' AND Sr = 90
+GO
+
+UPDATE dbo.StructureDetail
+SET AddDeduct = 1
+	, ChargeTypeName = NULL
+	, CalculateOnCharge = 'STOT'
+	, RateType = 2
+	, AffectCost = 1
+WHERE Code = 'PURCH_C' AND Sr = 100
+GO
+
+UPDATE dbo.StructureDetail
+SET AddDeduct = 1
+	, ChargeTypeName = NULL
+	, CalculateOnCharge = 'STOT'
+	, RateType = 2
+	, AffectCost = 1
+WHERE Code = 'PURCH_C' AND Sr = 110
+GO
+
+UPDATE dbo.StructureDetail
+SET AddDeduct = 0
+	, ChargeTypeName = NULL
+	, CalculateOnCharge = 'STOT'
+	, RateType = 2
+	, AffectCost = 0
+WHERE Code = 'PURCH_C' AND Sr = 120
+GO
+
+UPDATE dbo.StructureDetail
+SET AddDeduct = NULL
+	, ChargeTypeName = 'Round Off'
+	, CalculateOnCharge = NULL
+	, RateType = 3
+	, AffectCost = 1
+WHERE Code = 'PURCH_C' AND Sr = 130
+GO
+
+UPDATE dbo.StructureDetail
+SET AddDeduct = NULL
+	, ChargeTypeName = NULL
+	, CalculateOnCharge = NULL
+	, RateType = 3
+	, AffectCost = 1
+WHERE Code = 'PURCH_C' AND Sr = 140
+GO
+
+UPDATE dbo.StructureDetail
+SET AddDeduct = NULL
+	, ChargeTypeName = NULL
+	, CalculateOnCharge = NULL
+	, RateType = 3
+	, AffectCost = NULL
+WHERE Code = 'PURCH_C' AND Sr = 150
+GO
+
+
+
+
+
+
+
+INSERT INTO Web.PurchaseOrderLineCharges (LineTableId, Sr, ChargeId, AddDeduct, AffectCost, ChargeTypeId, CalculateOnId, 
+LedgerAccountDrId, LedgerAccountCrId, CostCenterId, RateType, IncludedInBase, ParentChargeId, Rate, Amount, IsVisible)
+SELECT L.PurchaseOrderLineId AS LineTableId, Row_number() OVER (PARTITION BY L.PurchaseOrderLineId ORDER BY L.PurchaseOrderLineId) AS Sr,
+Wc.ChargeId, Sd.AddDeduct, IsNull(Sd.AffectCost,0) AS AffectCost, WCt.ChargeTypeId, Wc1.ChargeId AS CalculateOnId, NULL AS LedgerAccountDrId, 
+NULL AS LedgerAccountCrId, NULL AS CostCenterId, Sd.RateType AS RateTypeId, 0 AS IncludeInBase, NULL AS ParentChargeId, 
+CASE WHEN Sd.LinePerField = 'Discount_Pre_Tax_Per' THEN Pod.Discount_Pre_Tax_Per
+	 WHEN Sd.LinePerField = 'Other_Additions_Pre_Tax_Per' THEN Pod.Other_Additions_Pre_Tax_Per
+	 WHEN Sd.LinePerField = 'Sales_Tax_Per' THEN Pod.Sales_Tax_Per	
+	 WHEN Sd.LinePerField = 'Sales_Additional_Tax_Per' THEN Pod.Sales_Additional_Tax_Per END AS Rate,
+CASE WHEN Sd.LineAmtField = 'Discount_Pre_Tax' THEN Pod.Discount_Pre_Tax
+	 WHEN Sd.LineAmtField = 'Other_Additions_Pre_Tax' THEN Pod.Other_Additions_Pre_Tax
+	 WHEN Sd.LineAmtField = 'Sales_Tax_Taxable_Amt' THEN Pod.Sales_Tax_Taxable_Amt
+	 WHEN Sd.LineAmtField = 'Sales_Additional_Tax' THEN Pod.Sales_Additional_Tax END AS Amount,
+1 AS IsVisible
+FROM Web.PurchaseOrderHeaders H 
+LEFT JOIN Web.PurchaseOrderLines L ON H.PurchaseOrderHeaderId = L.PurchaseOrderHeaderId 
+LEFT JOIN PurchOrderDetail Pod ON 'Purchase Order-' + Convert(NVARCHAR,L.PurchaseOrderLineId) = Pod.OMSId
+LEFT JOIN PurchOrder Po ON POd.DocId = Po.DocID
+LEFT JOIN Structure S ON Po.Structure = S.Code
+LEFT JOIN StructureDetail Sd ON S.Code = Sd.Code
+LEFT JOIN Charges C ON Sd.Charges = C.Code
+LEFT JOIN Web.Charges Wc ON C.OMSId = 'Charge-' + Convert(NVARCHAR,Wc.ChargeId) 
+LEFT JOIN Web.ChargeTypes WCt ON Sd.ChargeTypeName = WCt.ChargeTypeName
+LEFT JOIN Web.Charges Wc1 ON  Sd.CalculateOnCharge = Wc1.ChargeCode
+WHERE Sd.LineItem = 1
+
+
+
+
+
+INSERT INTO Web.PurchaseOrderHeaderCharges (HeaderTableId, Sr, ChargeId, AddDeduct, AffectCost, ChargeTypeId, ProductChargeId, CalculateOnId, LedgerAccountDrId, LedgerAccountCrId, CostCenterId, 
+RateType, IncludedInBase, ParentChargeId, Rate, Amount, IsVisible)
+SELECT H.PurchaseOrderHeaderId AS HeaderTableId, Row_number() OVER (PARTITION BY H.PurchaseOrderHeaderId ORDER BY H.PurchaseOrderHeaderId) AS Sr,
+Wc.ChargeId, Sd.AddDeduct, IsNull(Sd.AffectCost,0) AS AffectCost, WCt.ChargeTypeId, Wc.ChargeId AS ProductChargeId, 
+Wc1.ChargeId AS CalculateOnId, NULL AS LedgerAccountDrId, 
+NULL AS LedgerAccountCrId, NULL AS CostCenterId, Sd.RateType AS RateTypeId, 0 AS IncludeInBase, NULL AS ParentChargeId, 
+CASE WHEN Sd.HeaderPerField = 'Basic_Excise_Duty_Per' THEN Po.Basic_Excise_Duty_Per
+	 WHEN Sd.HeaderPerField = 'Excise_ECess_Per' THEN Po.Excise_ECess_Per
+	 WHEN Sd.HeaderPerField = 'Excise_HECess_Per' THEN Po.Excise_HECess_Per
+	 WHEN Sd.HeaderPerField = 'Discount_Pre_Tax_Per' THEN Po.Discount_Pre_Tax_Per
+	 WHEN Sd.HeaderPerField = 'Other_Additions_Pre_Tax_Per' THEN Po.Other_Additions_Pre_Tax_Per
+	 WHEN Sd.HeaderPerField = 'Sales_Tax_Per' THEN Po.Sales_Tax_Per 
+	 WHEN Sd.HeaderPerField = 'Sales_Additional_Tax_Per' THEN Po.Sales_Additional_Tax_Per 
+	 WHEN Sd.HeaderPerField = 'Insurance_Per' THEN Po.Insurance_Per 
+	 WHEN Sd.HeaderPerField = 'Discount_Per' THEN Po.Discount_Per 
+	 END AS Rate,
+CASE WHEN Sd.LineAmtField = 'Gross_Amount' THEN Po.Gross_Amount
+	 WHEN Sd.LineAmtField = 'Basic_Excise_Duty' THEN Po.Basic_Excise_Duty
+	 WHEN Sd.LineAmtField = 'Excise_ECess' THEN Po.Excise_ECess
+	 WHEN Sd.LineAmtField = 'Excise_HECess' THEN Po.Excise_HECess
+	 WHEN Sd.LineAmtField = 'Total_Excise_Duty' THEN Po.Total_Excise_Duty
+	 WHEN Sd.LineAmtField = 'Discount_Pre_Tax' THEN Po.Discount_Pre_Tax
+	 WHEN Sd.LineAmtField = 'Other_Additions_Pre_Tax' THEN Po.Other_Additions_Pre_Tax
+	 WHEN Sd.LineAmtField = 'Sales_Tax_Taxable_Amt' THEN Po.Sales_Tax_Taxable_Amt
+	 WHEN Sd.LineAmtField = 'Sales_Additional_Tax' THEN Po.Sales_Additional_Tax 
+	 WHEN Sd.LineAmtField = 'Sub_Total' THEN Po.Sub_Total 
+	 WHEN Sd.LineAmtField = 'Insurance' THEN Po.Insurance 
+	 WHEN Sd.LineAmtField = 'Freight' THEN Po.Freight 
+	 WHEN Sd.LineAmtField = 'Handling_Charges' THEN Po.Handling_Charges 
+	 WHEN Sd.LineAmtField = 'Other_Charges' THEN Po.Other_Charges 
+	 WHEN Sd.LineAmtField = 'Discount' THEN Po.Discount 
+	 WHEN Sd.LineAmtField = 'Round_Off' THEN Po.Round_Off 
+	 WHEN Sd.LineAmtField = 'Net_Amount' THEN Po.Net_Amount 
+	 WHEN Sd.LineAmtField = 'Landed_Value' THEN Po.Landed_Value 
+	 END AS Amount,
+1 AS IsVisible
+FROM Web.PurchaseOrderHeaders H 
+LEFT JOIN PurchOrder Po ON 'Purchase Order-' + Convert(NVARCHAR,H.PurchaseOrderHeaderId) = Po.OMSId
+LEFT JOIN Structure S ON Po.Structure = S.Code
+LEFT JOIN StructureDetail Sd ON S.Code = Sd.Code
+LEFT JOIN Charges C ON Sd.Charges = C.Code
+LEFT JOIN Web.Charges Wc ON C.OMSId = 'Charge-' + Convert(NVARCHAR,Wc.ChargeId) 
+LEFT JOIN Web.ChargeTypes WCt ON Sd.ChargeTypeName = WCt.ChargeTypeName
+LEFT JOIN Web.Charges Wc1 ON  Sd.CalculateOnCharge = Wc1.ChargeCode
+
+
+
+
+
+
+INSERT INTO Web.UnitConversions (ProductId, FromQty, FromUnitId, ToQty, ToUnitId, CreatedBy, ModifiedBy, CreatedDate, ModifiedDate, UnitConversionForId)
+
+SELECT Rs.ProductId, 1 AS FromQty, 'PCS' AS FromUnitId, Rs.StandardSizeArea AS ToQty, 'FT2' AS ToUnitId, 
+P.CreatedBy, P.ModifiedBy, P.CreatedDate, P.ModifiedDate, 1 AS UnitConversionForId
+FROM Web.ViewRugSize Rs 
+LEFT JOIN Web.Products P ON Rs.ProductId = P.ProductId
+WHERE IsNull(Rs.StandardSizeArea,0) <> 0
+
+UNION ALL 
+
+SELECT Rs.ProductId, 1 AS FromQty, 'PCS' AS FromUnitId, 
+(SELECT *  FROM Web.FuncConvertSqFeetToSqYard(Rs.StandardSizeArea)) AS ToQty, 'YD2' AS ToUnitId, 
+P.CreatedBy, P.ModifiedBy, P.CreatedDate, P.ModifiedDate, 1 AS UnitConversionForId
+FROM Web.ViewRugSize Rs 
+LEFT JOIN Web.Products P ON Rs.ProductId = P.ProductId
+WHERE IsNull(Rs.StandardSizeArea,0) <> 0
+
+UNION ALL 
+
+SELECT Rs.ProductId, 1 AS FromQty, 'PCS' AS FromUnitId, 
+(SELECT *  FROM Web.FuncConvertSqFeetToSqYard(Rs.ManufaturingSizeArea)) AS ToQty, 'YD2' AS ToUnitId, 
+P.CreatedBy, P.ModifiedBy, P.CreatedDate, P.ModifiedDate, 5 AS UnitConversionForId
+FROM Web.ViewRugSize Rs 
+LEFT JOIN Web.Products P ON Rs.ProductId = P.ProductId
+WHERE IsNull(Rs.ManufaturingSizeArea,0) <> 0
+
+UNION ALL 
+
+SELECT Rs.ProductId, 1 AS FromQty, 'PCS' AS FromUnitId, 
+(SELECT *  FROM Web.FuncConvertSqFeetToSqYard(Rs.FinishingSizeArea)) AS ToQty, 'YD2' AS ToUnitId, 
+P.CreatedBy, P.ModifiedBy, P.CreatedDate, P.ModifiedDate, 4 AS UnitConversionForId
+FROM Web.ViewRugSize Rs 
+LEFT JOIN Web.Products P ON Rs.ProductId = P.ProductId
+WHERE IsNull(Rs.FinishingSizeArea,0) <> 0
+
+
+
+
+
+
+
+UPDATE PurchOrder SET Sub_Total2 =  IsNull(Sub_Total,0) + IsNull(Insurance,0) + IsNull(Freight,0) + IsNull(Handling_Charges,0) + IsNull(Other_Charges,0) - IsNull(Discount,0)
+UPDATE PurchInvoice SET Sub_Total2 =  IsNull(Sub_Total,0) + IsNull(Insurance,0) + IsNull(Freight,0) + IsNull(Handling_Charges,0) + IsNull(Other_Charges,0) - IsNull(Discount,0)
+UPDATE PurchChallan SET Sub_Total2 =  IsNull(Sub_Total,0) + IsNull(Insurance,0) + IsNull(Freight,0) + IsNull(Handling_Charges,0) + IsNull(Other_Charges,0) - IsNull(Discount,0)
+
+
+
+
+
+INSERT INTO Web.PurchaseOrderLineCharges (LineTableId, Sr, ChargeId, AddDeduct, AffectCost, ChargeTypeId, CalculateOnId, 
+LedgerAccountDrId, LedgerAccountCrId, CostCenterId, RateType, IncludedInBase, ParentChargeId, Rate, Amount, IsVisible)
+SELECT L.PurchaseOrderLineId AS LineTableId, Row_number() OVER (PARTITION BY L.PurchaseOrderLineId ORDER BY L.PurchaseOrderLineId) AS Sr,
+Wc.ChargeId, Sd.AddDeduct, IsNull(Sd.AffectCost,0) AS AffectCost, WCt.ChargeTypeId, Wc1.ChargeId AS CalculateOnId, NULL AS LedgerAccountDrId, 
+NULL AS LedgerAccountCrId, NULL AS CostCenterId, Sd.RateType AS RateTypeId, 0 AS IncludeInBase, NULL AS ParentChargeId, 
+CASE WHEN Sd.LinePerField = 'Discount_Pre_Tax_Per' THEN IsNull(Pod.Discount_Pre_Tax_Per,0)
+	 WHEN Sd.LinePerField = 'Other_Additions_Pre_Tax_Per' THEN IsNull(Pod.Other_Additions_Pre_Tax_Per,0)
+	 WHEN Sd.LinePerField = 'Sales_Tax_Per' THEN IsNull(Pod.Sales_Tax_Per,0)	
+	 WHEN Sd.LinePerField = 'Sales_Additional_Tax_Per' THEN IsNull(Pod.Sales_Additional_Tax_Per,0) 
+	 ELSE 0 END AS Rate,
+CASE WHEN Sd.LineAmtField = 'Discount_Pre_Tax' THEN IsNull(Pod.Discount_Pre_Tax,0)
+	 WHEN Sd.LineAmtField = 'Other_Additions_Pre_Tax' THEN IsNull(Pod.Other_Additions_Pre_Tax,0)
+	 WHEN Sd.LineAmtField = 'Sales_Tax_Taxable_Amt' THEN IsNull(Pod.Sales_Tax_Taxable_Amt,0)
+	 WHEN Sd.LineAmtField = 'Sales_Tax' THEN IsNull(Pod.Sales_Tax ,0)
+	 WHEN Sd.LineAmtField = 'Sales_Additional_Tax' THEN IsNull(Pod.Sales_Additional_Tax ,0)
+	 WHEN Sd.LineAmtField = 'Gross_Amount' THEN IsNull(Pod.Gross_Amount,0) 
+	 ELSE 0 END AS Amount,
+1 AS IsVisible
+FROM Web.PurchaseOrderHeaders H 
+LEFT JOIN Web.PurchaseOrderLines L ON H.PurchaseOrderHeaderId = L.PurchaseOrderHeaderId 
+LEFT JOIN PurchOrderDetail Pod ON 'Purchase Order-' + Convert(NVARCHAR,L.PurchaseOrderLineId) = Pod.OMSId
+LEFT JOIN PurchOrder Po ON POd.DocId = Po.DocID
+LEFT JOIN Structure S ON Po.Structure = S.Code
+LEFT JOIN StructureDetail Sd ON S.Code = Sd.Code
+LEFT JOIN Charges C ON Sd.Charges = C.Code
+LEFT JOIN Web.Charges Wc ON C.OMSId = 'Charge-' + Convert(NVARCHAR,Wc.ChargeId) 
+LEFT JOIN Web.ChargeTypes WCt ON Sd.ChargeTypeName = WCt.ChargeTypeName
+LEFT JOIN Web.Charges Wc1 ON  Sd.CalculateOnCharge = Wc1.ChargeCode
+WHERE (Sd.LineItem = 1 OR Sd.Charges =  'GAMT')
+--AND H.PurchaseOrderHeaderId = 15599
+ORDER BY L.PurchaseOrderLineId, Sd.Sr
+
+
+
+
+
+INSERT INTO Web.PurchaseOrderHeaderCharges (HeaderTableId, Sr, ChargeId, AddDeduct, AffectCost, ChargeTypeId, ProductChargeId, CalculateOnId, LedgerAccountDrId, LedgerAccountCrId, CostCenterId, 
+RateType, IncludedInBase, ParentChargeId, Rate, Amount, IsVisible)
+SELECT H.PurchaseOrderHeaderId AS HeaderTableId, Row_number() OVER (PARTITION BY H.PurchaseOrderHeaderId ORDER BY H.PurchaseOrderHeaderId) AS Sr,
+Wc.ChargeId, Sd.AddDeduct, IsNull(Sd.AffectCost,0) AS AffectCost, WCt.ChargeTypeId, 
+CASE WHEN Sd.LineItem = 1 THEN Wc.ChargeId ELSE NULL END AS ProductChargeId, 
+Wc1.ChargeId AS CalculateOnId, NULL AS LedgerAccountDrId, 
+NULL AS LedgerAccountCrId, NULL AS CostCenterId, 
+CASE WHEN Sd.LineItem = 1 THEN 3 ELSE Sd.RateType END AS RateTypeId, 
+0 AS IncludeInBase, 
+CASE WHEN (Sd.LineItem = 1 OR Sd.Charges =  'GAMT') THEN Wc.ChargeId ELSE NULL END AS ParentChargeId, 
+CASE WHEN Sd.HeaderPerField = 'Basic_Excise_Duty_Per' THEN IsNull(Po.Basic_Excise_Duty_Per,0)
+	 WHEN Sd.HeaderPerField = 'Excise_ECess_Per' THEN IsNull(Po.Excise_ECess_Per,0)
+	 WHEN Sd.HeaderPerField = 'Excise_HECess_Per' THEN IsNull(Po.Excise_HECess_Per,0)
+	 WHEN Sd.HeaderPerField = 'Discount_Pre_Tax_Per' THEN IsNull(Po.Discount_Pre_Tax_Per,0)
+	 WHEN Sd.HeaderPerField = 'Other_Additions_Pre_Tax_Per' THEN IsNull(Po.Other_Additions_Pre_Tax_Per,0)
+	 WHEN Sd.HeaderPerField = 'Sales_Tax_Per' THEN IsNull(Po.Sales_Tax_Per,0) 
+	 WHEN Sd.HeaderPerField = 'Sales_Additional_Tax_Per' THEN IsNull(Po.Sales_Additional_Tax_Per,0)
+	 WHEN Sd.HeaderPerField = 'Insurance_Per' THEN IsNull(Po.Insurance_Per,0)
+	 WHEN Sd.HeaderPerField = 'Discount_Per' THEN IsNull(Po.Discount_Per,0)
+	 ELSE 0 END AS Rate,
+CASE WHEN Sd.HeaderAmtField = 'Gross_Amount' THEN IsNull(Po.Gross_Amount,0)
+	 WHEN Sd.HeaderAmtField = 'Basic_Excise_Duty' THEN IsNull(Po.Basic_Excise_Duty,0)
+	 WHEN Sd.HeaderAmtField = 'Excise_ECess' THEN IsNull(Po.Excise_ECess,0)
+	 WHEN Sd.HeaderAmtField = 'Excise_HECess' THEN IsNull(Po.Excise_HECess,0)
+	 WHEN Sd.LineAmtField = 'Total_Excise_Duty' THEN IsNull(Po.Total_Excise_Duty,0)
+	 WHEN Sd.HeaderAmtField = 'Discount_Pre_Tax' THEN IsNull(Po.Discount_Pre_Tax,0)
+	 WHEN Sd.HeaderAmtField = 'Other_Additions_Pre_Tax' THEN IsNull(Po.Other_Additions_Pre_Tax,0)
+	 WHEN Sd.HeaderAmtField = 'Sales_Tax_Taxable_Amt' THEN IsNull(Po.Sales_Tax_Taxable_Amt,0)
+	 WHEN Sd.HeaderAmtField = 'Sales_Tax' THEN IsNull(Po.Sales_Tax ,0)
+	 WHEN Sd.HeaderAmtField = 'Sales_Additional_Tax' THEN IsNull(Po.Sales_Additional_Tax ,0)
+	 WHEN Sd.HeaderAmtField = 'Sub_Total' THEN IsNull(Po.Sub_Total ,0)
+	 WHEN Sd.HeaderAmtField = 'Insurance' THEN IsNull(Po.Insurance ,0)
+	 WHEN Sd.HeaderAmtField = 'Freight' THEN IsNull(Po.Freight ,0)
+	 WHEN Sd.HeaderAmtField = 'Handling_Charges' THEN IsNull(Po.Handling_Charges ,0)
+	 WHEN Sd.HeaderAmtField = 'Other_Charges' THEN IsNull(Po.Other_Charges ,0)
+	 WHEN Sd.HeaderAmtField = 'Discount' THEN IsNull(Po.Discount ,0)
+	 WHEN Sd.HeaderAmtField = 'Sub_Total2' THEN IsNull(Po.Sub_Total2 ,0)
+	 WHEN Sd.HeaderAmtField = 'Round_Off' THEN IsNull(Po.Round_Off ,0)
+	 WHEN Sd.HeaderAmtField = 'Net_Amount' THEN IsNull(Po.Net_Amount ,0)
+	 WHEN Sd.HeaderAmtField = 'Landed_Value' THEN IsNull(Po.Landed_Value ,0)
+	 ELSE 0 END AS Amount,
+1 AS IsVisible
+FROM Web.PurchaseOrderHeaders H 
+LEFT JOIN PurchOrder Po ON 'Purchase Order-' + Convert(NVARCHAR,H.PurchaseOrderHeaderId) = Po.OMSId
+LEFT JOIN Structure S ON Po.Structure = S.Code
+LEFT JOIN StructureDetail Sd ON S.Code = Sd.Code
+LEFT JOIN Charges C ON Sd.Charges = C.Code
+LEFT JOIN Web.Charges Wc ON C.OMSId = 'Charge-' + Convert(NVARCHAR,Wc.ChargeId) 
+LEFT JOIN Web.ChargeTypes WCt ON Sd.ChargeTypeName = WCt.ChargeTypeName
+LEFT JOIN Web.Charges Wc1 ON  Sd.CalculateOnCharge = Wc1.ChargeCode
+WHERE Sd.LineAmtField <> 'Landed_Value'  AND Sd.LineAmtField <> 'Total_Excise_Duty'
+--AND H.PurchaseOrderHeaderId = 15599
+ORDER BY H.PurchaseOrderHeaderId, Sd.Sr
+
+
+
+
+
+
+
+
+
+
+INSERT INTO Web.PurchaseInvoiceLineCharges (LineTableId, Sr, ChargeId, AddDeduct, AffectCost, ChargeTypeId, CalculateOnId, 
+LedgerAccountDrId, LedgerAccountCrId, CostCenterId, RateType, IncludedInBase, ParentChargeId, Rate, Amount, IsVisible)
+SELECT L.PurchaseInvoiceLineId AS LineTableId, Row_number() OVER (PARTITION BY L.PurchaseInvoiceLineId ORDER BY L.PurchaseInvoiceLineId) AS Sr,
+Wc.ChargeId, Sd.AddDeduct, IsNull(Sd.AffectCost,0) AS AffectCost, WCt.ChargeTypeId, Wc1.ChargeId AS CalculateOnId, NULL AS LedgerAccountDrId, 
+NULL AS LedgerAccountCrId, NULL AS CostCenterId, Sd.RateType AS RateTypeId, 0 AS IncludeInBase, NULL AS ParentChargeId, 
+CASE WHEN Sd.LinePerField = 'Discount_Pre_Tax_Per' THEN IsNull(Pod.Discount_Pre_Tax_Per,0)
+	 WHEN Sd.LinePerField = 'Other_Additions_Pre_Tax_Per' THEN IsNull(Pod.Other_Additions_Pre_Tax_Per,0)
+	 WHEN Sd.LinePerField = 'Sales_Tax_Per' THEN IsNull(Pod.Sales_Tax_Per,0)	
+	 WHEN Sd.LinePerField = 'Sales_Additional_Tax_Per' THEN IsNull(Pod.Sales_Additional_Tax_Per,0) 
+	 ELSE 0 END AS Rate,
+CASE WHEN Sd.LineAmtField = 'Discount_Pre_Tax' THEN IsNull(Pod.Discount_Pre_Tax,0)
+	 WHEN Sd.LineAmtField = 'Other_Additions_Pre_Tax' THEN IsNull(Pod.Other_Additions_Pre_Tax,0)
+	 WHEN Sd.LineAmtField = 'Sales_Tax_Taxable_Amt' THEN IsNull(Pod.Sales_Tax_Taxable_Amt,0)
+	 WHEN Sd.LineAmtField = 'Sales_Tax' THEN IsNull(Pod.Sales_Tax ,0)
+	 WHEN Sd.LineAmtField = 'Sales_Additional_Tax' THEN IsNull(Pod.Sales_Additional_Tax ,0)
+	 WHEN Sd.LineAmtField = 'Gross_Amount' THEN IsNull(Pod.Gross_Amount,0) 
+	 ELSE 0 END AS Amount,
+1 AS IsVisible
+FROM Web.PurchaseInvoiceHeaders H 
+LEFT JOIN Web.PurchaseInvoiceLines L ON H.PurchaseInvoiceHeaderId = L.PurchaseInvoiceHeaderId 
+LEFT JOIN PurchInvoiceDetail Pod ON 'Purchase Invoice-' + Convert(NVARCHAR,L.PurchaseInvoiceLineId) = Pod.OMSId
+LEFT JOIN PurchInvoice Po ON POd.DocId = Po.DocID
+LEFT JOIN Structure S ON Po.Structure = S.Code
+LEFT JOIN StructureDetail Sd ON S.Code = Sd.Code
+LEFT JOIN Charges C ON Sd.Charges = C.Code
+LEFT JOIN Web.Charges Wc ON C.OMSId = 'Charge-' + Convert(NVARCHAR,Wc.ChargeId) 
+LEFT JOIN Web.ChargeTypes WCt ON Sd.ChargeTypeName = WCt.ChargeTypeName
+LEFT JOIN Web.Charges Wc1 ON  Sd.CalculateOnCharge = Wc1.ChargeCode
+WHERE (Sd.LineItem = 1 OR Sd.Charges =  'GAMT')
+--AND H.PurchaseInvoiceHeaderId = 15599
+ORDER BY L.PurchaseInvoiceLineId, Sd.Sr
+
+
+
+
+
+INSERT INTO Web.PurchaseInvoiceHeaderCharges (HeaderTableId, Sr, ChargeId, AddDeduct, AffectCost, ChargeTypeId, ProductChargeId, CalculateOnId, LedgerAccountDrId, LedgerAccountCrId, CostCenterId, 
+RateType, IncludedInBase, ParentChargeId, Rate, Amount, IsVisible)
+SELECT H.PurchaseInvoiceHeaderId AS HeaderTableId, Row_number() OVER (PARTITION BY H.PurchaseInvoiceHeaderId ORDER BY H.PurchaseInvoiceHeaderId) AS Sr,
+Wc.ChargeId, Sd.AddDeduct, IsNull(Sd.AffectCost,0) AS AffectCost, WCt.ChargeTypeId, 
+CASE WHEN Sd.LineItem = 1 THEN Wc.ChargeId ELSE NULL END AS ProductChargeId, 
+Wc1.ChargeId AS CalculateOnId, NULL AS LedgerAccountDrId, 
+NULL AS LedgerAccountCrId, NULL AS CostCenterId, 
+CASE WHEN Sd.LineItem = 1 THEN 3 ELSE Sd.RateType END AS RateTypeId, 
+0 AS IncludeInBase, 
+CASE WHEN (Sd.LineItem = 1 OR Sd.Charges =  'GAMT') THEN Wc.ChargeId ELSE NULL END AS ParentChargeId, 
+CASE WHEN Sd.HeaderPerField = 'Basic_Excise_Duty_Per' THEN IsNull(Po.Basic_Excise_Duty_Per,0)
+	 WHEN Sd.HeaderPerField = 'Excise_ECess_Per' THEN IsNull(Po.Excise_ECess_Per,0)
+	 WHEN Sd.HeaderPerField = 'Excise_HECess_Per' THEN IsNull(Po.Excise_HECess_Per,0)
+	 WHEN Sd.HeaderPerField = 'Discount_Pre_Tax_Per' THEN IsNull(Po.Discount_Pre_Tax_Per,0)
+	 WHEN Sd.HeaderPerField = 'Other_Additions_Pre_Tax_Per' THEN IsNull(Po.Other_Additions_Pre_Tax_Per,0)
+	 WHEN Sd.HeaderPerField = 'Sales_Tax_Per' THEN IsNull(Po.Sales_Tax_Per,0) 
+	 WHEN Sd.HeaderPerField = 'Sales_Additional_Tax_Per' THEN IsNull(Po.Sales_Additional_Tax_Per,0)
+	 WHEN Sd.HeaderPerField = 'Insurance_Per' THEN IsNull(Po.Insurance_Per,0)
+	 WHEN Sd.HeaderPerField = 'Discount_Per' THEN IsNull(Po.Discount_Per,0)
+	 ELSE 0 END AS Rate,
+CASE WHEN Sd.LineAmtField = 'Gross_Amount' THEN IsNull(Po.Gross_Amount,0)
+	 WHEN Sd.LineAmtField = 'Basic_Excise_Duty' THEN IsNull(Po.Basic_Excise_Duty,0)
+	 WHEN Sd.LineAmtField = 'Excise_ECess' THEN IsNull(Po.Excise_ECess,0)
+	 WHEN Sd.LineAmtField = 'Excise_HECess' THEN IsNull(Po.Excise_HECess,0)
+	 WHEN Sd.LineAmtField = 'Total_Excise_Duty' THEN IsNull(Po.Total_Excise_Duty,0)
+	 WHEN Sd.LineAmtField = 'Discount_Pre_Tax' THEN IsNull(Po.Discount_Pre_Tax,0)
+	 WHEN Sd.LineAmtField = 'Other_Additions_Pre_Tax' THEN IsNull(Po.Other_Additions_Pre_Tax,0)
+	 WHEN Sd.LineAmtField = 'Sales_Tax_Taxable_Amt' THEN IsNull(Po.Sales_Tax_Taxable_Amt,0)
+	 WHEN Sd.LineAmtField = 'Sales_Tax' THEN IsNull(Po.Sales_Tax ,0)
+	 WHEN Sd.LineAmtField = 'Sales_Additional_Tax' THEN IsNull(Po.Sales_Additional_Tax ,0)
+	 WHEN Sd.LineAmtField = 'Sub_Total' THEN IsNull(Po.Sub_Total ,0)
+	 WHEN Sd.LineAmtField = 'Insurance' THEN IsNull(Po.Insurance ,0)
+	 WHEN Sd.LineAmtField = 'Freight' THEN IsNull(Po.Freight ,0)
+	 WHEN Sd.LineAmtField = 'Handling_Charges' THEN IsNull(Po.Handling_Charges ,0)
+	 WHEN Sd.LineAmtField = 'Other_Charges' THEN IsNull(Po.Other_Charges ,0)
+	 WHEN Sd.LineAmtField = 'Discount' THEN IsNull(Po.Discount ,0)
+	 WHEN Sd.LineAmtField = 'Sub_Total2' THEN IsNull(Po.Sub_Total2 ,0)
+	 WHEN Sd.LineAmtField = 'Round_Off' THEN IsNull(Po.Round_Off ,0)
+	 WHEN Sd.LineAmtField = 'Net_Amount' THEN IsNull(Po.Net_Amount ,0)
+	 WHEN Sd.LineAmtField = 'Landed_Value' THEN IsNull(Po.Landed_Value ,0)
+	 ELSE 0 END AS Amount,
+1 AS IsVisible
+FROM Web.PurchaseInvoiceHeaders H 
+LEFT JOIN PurchInvoice Po ON 'Purchase Invoice-' + Convert(NVARCHAR,H.PurchaseInvoiceHeaderId) = Po.OMSId
+LEFT JOIN Structure S ON Po.Structure = S.Code
+LEFT JOIN StructureDetail Sd ON S.Code = Sd.Code
+LEFT JOIN Charges C ON Sd.Charges = C.Code
+LEFT JOIN Web.Charges Wc ON C.OMSId = 'Charge-' + Convert(NVARCHAR,Wc.ChargeId) 
+LEFT JOIN Web.ChargeTypes WCt ON Sd.ChargeTypeName = WCt.ChargeTypeName
+LEFT JOIN Web.Charges Wc1 ON  Sd.CalculateOnCharge = Wc1.ChargeCode
+WHERE Sd.LineAmtField <> 'Landed_Value'  AND Sd.LineAmtField <> 'Total_Excise_Duty'
+--AND H.PurchaseInvoiceHeaderId = 15599
+ORDER BY H.PurchaseInvoiceHeaderId, Sd.Sr
+
+
+
+
+
+INSERT INTO Web.PurchaseInvoiceReturnLineCharges (LineTableId, Sr, ChargeId, AddDeduct, AffectCost, ChargeTypeId, CalculateOnId, 
+LedgerAccountDrId, LedgerAccountCrId, CostCenterId, RateType, IncludedInBase, ParentChargeId, Rate, Amount, IsVisible)
+SELECT L.PurchaseInvoiceReturnLineId AS LineTableId, Row_number() OVER (PARTITION BY L.PurchaseInvoiceReturnLineId ORDER BY L.PurchaseInvoiceReturnLineId) AS Sr,
+Wc.ChargeId, Sd.AddDeduct, IsNull(Sd.AffectCost,0) AS AffectCost, WCt.ChargeTypeId, Wc1.ChargeId AS CalculateOnId, NULL AS LedgerAccountDrId, 
+NULL AS LedgerAccountCrId, NULL AS CostCenterId, Sd.RateType AS RateTypeId, 0 AS IncludeInBase, NULL AS ParentChargeId, 
+CASE WHEN Sd.LinePerField = 'Discount_Pre_Tax_Per' THEN IsNull(Pod.Discount_Pre_Tax_Per,0)
+	 WHEN Sd.LinePerField = 'Other_Additions_Pre_Tax_Per' THEN IsNull(Pod.Other_Additions_Pre_Tax_Per,0)
+	 WHEN Sd.LinePerField = 'Sales_Tax_Per' THEN IsNull(Pod.Sales_Tax_Per,0)	
+	 WHEN Sd.LinePerField = 'Sales_Additional_Tax_Per' THEN IsNull(Pod.Sales_Additional_Tax_Per,0) 
+	 ELSE 0 END AS Rate,
+CASE WHEN Sd.LineAmtField = 'Discount_Pre_Tax' THEN IsNull(Pod.Discount_Pre_Tax,0)
+	 WHEN Sd.LineAmtField = 'Other_Additions_Pre_Tax' THEN IsNull(Pod.Other_Additions_Pre_Tax,0)
+	 WHEN Sd.LineAmtField = 'Sales_Tax_Taxable_Amt' THEN IsNull(Pod.Sales_Tax_Taxable_Amt,0)
+	 WHEN Sd.LineAmtField = 'Sales_Tax' THEN IsNull(Pod.Sales_Tax ,0)
+	 WHEN Sd.LineAmtField = 'Sales_Additional_Tax' THEN IsNull(Pod.Sales_Additional_Tax ,0)
+	 WHEN Sd.LineAmtField = 'Gross_Amount' THEN IsNull(Pod.Gross_Amount,0) 
+	 ELSE 0 END AS Amount,
+1 AS IsVisible
+FROM Web.PurchaseInvoiceReturnHeaders H 
+LEFT JOIN Web.PurchaseInvoiceReturnLines L ON H.PurchaseInvoiceReturnHeaderId = L.PurchaseInvoiceReturnHeaderId 
+LEFT JOIN PurchChallanDetail Pod ON 'Purchase Return-' + Convert(NVARCHAR,L.PurchaseInvoiceReturnLineId) = Pod.OMSId
+LEFT JOIN PurchChallan Po ON POd.DocId = Po.DocID
+LEFT JOIN Structure S ON Po.Structure = S.Code
+LEFT JOIN StructureDetail Sd ON S.Code = Sd.Code
+LEFT JOIN Charges C ON Sd.Charges = C.Code
+LEFT JOIN Web.Charges Wc ON C.OMSId = 'Charge-' + Convert(NVARCHAR,Wc.ChargeId) 
+LEFT JOIN Web.ChargeTypes WCt ON Sd.ChargeTypeName = WCt.ChargeTypeName
+LEFT JOIN Web.Charges Wc1 ON  Sd.CalculateOnCharge = Wc1.ChargeCode
+WHERE (Sd.LineItem = 1 OR Sd.Charges =  'GAMT')
+--AND H.PurchaseInvoiceReturnHeaderId = 15599
+ORDER BY L.PurchaseInvoiceReturnLineId, Sd.Sr
+
+
+
+INSERT INTO Web.PurchaseInvoiceReturnHeaderCharges (HeaderTableId, Sr, ChargeId, AddDeduct, AffectCost, ChargeTypeId, ProductChargeId, CalculateOnId, LedgerAccountDrId, LedgerAccountCrId, CostCenterId, 
+RateType, IncludedInBase, ParentChargeId, Rate, Amount, IsVisible)
+SELECT H.PurchaseInvoiceReturnHeaderId AS HeaderTableId, Row_number() OVER (PARTITION BY H.PurchaseInvoiceReturnHeaderId ORDER BY H.PurchaseInvoiceReturnHeaderId) AS Sr,
+Wc.ChargeId, Sd.AddDeduct, IsNull(Sd.AffectCost,0) AS AffectCost, WCt.ChargeTypeId, 
+CASE WHEN Sd.LineItem = 1 THEN Wc.ChargeId ELSE NULL END AS ProductChargeId, 
+Wc1.ChargeId AS CalculateOnId, NULL AS LedgerAccountDrId, 
+NULL AS LedgerAccountCrId, NULL AS CostCenterId, 
+CASE WHEN Sd.LineItem = 1 THEN 3 ELSE Sd.RateType END AS RateTypeId, 
+0 AS IncludeInBase, 
+CASE WHEN (Sd.LineItem = 1 OR Sd.Charges =  'GAMT') THEN Wc.ChargeId ELSE NULL END AS ParentChargeId, 
+CASE WHEN Sd.HeaderPerField = 'Basic_Excise_Duty_Per' THEN IsNull(Po.Basic_Excise_Duty_Per,0)
+	 WHEN Sd.HeaderPerField = 'Excise_ECess_Per' THEN IsNull(Po.Excise_ECess_Per,0)
+	 WHEN Sd.HeaderPerField = 'Excise_HECess_Per' THEN IsNull(Po.Excise_HECess_Per,0)
+	 WHEN Sd.HeaderPerField = 'Discount_Pre_Tax_Per' THEN IsNull(Po.Discount_Pre_Tax_Per,0)
+	 WHEN Sd.HeaderPerField = 'Other_Additions_Pre_Tax_Per' THEN IsNull(Po.Other_Additions_Pre_Tax_Per,0)
+	 WHEN Sd.HeaderPerField = 'Sales_Tax_Per' THEN IsNull(Po.Sales_Tax_Per,0) 
+	 WHEN Sd.HeaderPerField = 'Sales_Additional_Tax_Per' THEN IsNull(Po.Sales_Additional_Tax_Per,0)
+	 WHEN Sd.HeaderPerField = 'Insurance_Per' THEN IsNull(Po.Insurance_Per,0)
+	 WHEN Sd.HeaderPerField = 'Discount_Per' THEN IsNull(Po.Discount_Per,0)
+	 ELSE 0 END AS Rate,
+CASE WHEN Sd.HeaderAmtField = 'Gross_Amount' THEN IsNull(Po.Gross_Amount,0)
+	 WHEN Sd.HeaderAmtField = 'Basic_Excise_Duty' THEN IsNull(Po.Basic_Excise_Duty,0)
+	 WHEN Sd.HeaderAmtField = 'Excise_ECess' THEN IsNull(Po.Excise_ECess,0)
+	 WHEN Sd.HeaderAmtField = 'Excise_HECess' THEN IsNull(Po.Excise_HECess,0)
+	 WHEN Sd.HeaderAmtField = 'Total_Excise_Duty' THEN IsNull(Po.Total_Excise_Duty,0)
+	 WHEN Sd.HeaderAmtField = 'Discount_Pre_Tax' THEN IsNull(Po.Discount_Pre_Tax,0)
+	 WHEN Sd.HeaderAmtField = 'Other_Additions_Pre_Tax' THEN IsNull(Po.Other_Additions_Pre_Tax,0)
+	 WHEN Sd.HeaderAmtField = 'Sales_Tax_Taxable_Amt' THEN IsNull(Po.Sales_Tax_Taxable_Amt,0)
+	 WHEN Sd.HeaderAmtField = 'Sales_Tax' THEN IsNull(Po.Sales_Tax ,0)
+	 WHEN Sd.HeaderAmtField = 'Sales_Additional_Tax' THEN IsNull(Po.Sales_Additional_Tax ,0)
+	 WHEN Sd.HeaderAmtField = 'Sub_Total' THEN IsNull(Po.Sub_Total ,0)
+	 WHEN Sd.HeaderAmtField = 'Insurance' THEN IsNull(Po.Insurance ,0)
+	 WHEN Sd.HeaderAmtField = 'Freight' THEN IsNull(Po.Freight ,0)
+	 WHEN Sd.HeaderAmtField = 'Handling_Charges' THEN IsNull(Po.Handling_Charges ,0)
+	 WHEN Sd.HeaderAmtField = 'Other_Charges' THEN IsNull(Po.Other_Charges ,0)
+	 WHEN Sd.HeaderAmtField = 'Discount' THEN IsNull(Po.Discount ,0)
+	 WHEN Sd.HeaderAmtField = 'Sub_Total2' THEN IsNull(Po.Sub_Total2 ,0)
+	 WHEN Sd.HeaderAmtField = 'Round_Off' THEN IsNull(Po.Round_Off ,0)
+	 WHEN Sd.HeaderAmtField = 'Net_Amount' THEN IsNull(Po.Net_Amount ,0)
+	 WHEN Sd.HeaderAmtField = 'Landed_Value' THEN IsNull(Po.Landed_Value ,0)
+	 ELSE 0 END AS Amount,
+1 AS IsVisible
+FROM Web.PurchaseInvoiceReturnHeaders H 
+LEFT JOIN PurchChallan Po ON 'Purchase Return-' + Convert(NVARCHAR,H.PurchaseInvoiceReturnHeaderId) = Po.OMSId
+LEFT JOIN Structure S ON Po.Structure = S.Code
+LEFT JOIN StructureDetail Sd ON S.Code = Sd.Code
+LEFT JOIN Charges C ON Sd.Charges = C.Code
+LEFT JOIN Web.Charges Wc ON C.OMSId = 'Charge-' + Convert(NVARCHAR,Wc.ChargeId) 
+LEFT JOIN Web.ChargeTypes WCt ON Sd.ChargeTypeName = WCt.ChargeTypeName
+LEFT JOIN Web.Charges Wc1 ON  Sd.CalculateOnCharge = Wc1.ChargeCode
+WHERE Sd.LineAmtField <> 'Landed_Value'  AND Sd.LineAmtField <> 'Total_Excise_Duty'
+--AND H.PurchaseInvoiceReturnHeaderId = 15599
+ORDER BY H.PurchaseInvoiceReturnHeaderId, Sd.Sr
+
+
+
+
+
+
+
+UPDATE Web.ProductUids
+SET Web.ProductUids.GenDocId = V1.GenDocId,
+Web.ProductUids.GenLineId = V1.GenLineId, 
+Web.ProductUids.GenPersonId = V1.GenPersonId
+FROM 
+(
+	SELECT Pu.ProductUIDId, L.PurchaseOrderLineId AS GenLineId, L.PurchaseOrderHeaderId AS GenDocId, P.PersonID AS GenPersonId
+	FROM Web.ProductUids Pu
+	LEFT JOIN Item_UID Iu ON 'Product Uid-' + Convert(NVARCHAR,Pu.ProductUIDId) = Iu.OMSId
+	LEFT JOIN PurchOrderDetail Pod ON Iu.GenDocID = Pod.DocId AND Iu.GenSr = Pod.Sr
+	LEFT JOIN PurchOrder Po ON Pod.DocId = Po.DocID
+	LEFT JOIN SubGroup Sg ON Po.Vendor = Sg.SubCode
+	LEFT JOIN Web.PurchaseOrderLines L ON Pod.OMSId = 'Purchase Order-' + Convert(NVARCHAR,L.PurchaseOrderLineId)
+	LEFT JOIN Web.People P ON Sg.OMSId = 'Person-' + Convert(NVARCHAR,P.PersonID)
+	WHERE L.PurchaseOrderLineId IS NOT NULL
+) AS V1
+WHERE Web.ProductUids.ProductUidId = V1.ProductUIDId

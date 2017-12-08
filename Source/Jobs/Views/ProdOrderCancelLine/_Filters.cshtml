@@ -1,0 +1,116 @@
+﻿@model Model.ViewModel.ProdOrderCancelFilterViewModel
+@using Core.Common
+
+<div class="modal-content">
+   
+
+    <div class="modal-header" style="border-bottom: 1px solid #8E8888">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"> <span class="glyphicon glyphicon-remove"></span></button>
+        <h3>
+            <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-file black"></span> Filters</span>
+        </h3>
+    </div>
+    <div>
+        @using (Html.BeginForm("_FilterPost", "ProdOrderCancelLine", FormMethod.Post, new { enctype = "multipart/form-data", id = "modform" }))
+        {
+
+            <div class="form-horizontal modal-body">
+
+                @Html.AntiForgeryToken()
+                @Html.HiddenFor(model => model.ProdOrderCancelHeaderId)
+
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.UpToDate, "Upto Date", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(m => m.UpToDate, "{0:dd/MMMM/yyyy}", new { @class = "datepicker form-control col-xs-7 required" })
+                                @Html.ValidationMessageFor(model => model.UpToDate, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.ProductId, "Product ", new { @class = "control-label col-md-4 col-sm-2 " })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.ProductId, new { @class = "form-control col-xs-7 required" })
+                                @Html.ValidationMessageFor(model => model.ProductId, "", new { @class = "text-danger" })
+                                <span id="status" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Dimension1Id, "Dimension1", new { @class = "control-label col-md-4 col-sm-2 " })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.Dimension1Id, new { @class = "form-control col-xs-7 required" })
+                                @Html.ValidationMessageFor(model => model.Dimension1Id, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Dimension2Id, "Dimension2", new { @class = "control-label col-md-4 col-sm-2 " })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.Dimension2Id, new { @class = "form-control col-xs-7 required" })
+                                @Html.ValidationMessageFor(model => model.Dimension2Id, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.ProdOrderId, "Prod Order", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.ProdOrderId, new { @class = "form-control col-xs-7 required" })
+                                @Html.ValidationMessageFor(model => model.ProdOrderId, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.ProductGroupId, "Product Group", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.ProductGroupId, new { @class = "form-control col-xs-7 required" })
+                                @Html.ValidationMessageFor(model => model.ProductGroupId, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer " style="padding: 19px 20px 0 20px; border-top:1px solid #8E8888">
+                    <button class="btn custom" name="Command:Edit" type="submit"><h2 style="margin:0px" id="submit" title="Proceed"><span class="glyphicon glyphicon-arrow-right black"></span> </h2></button>
+                </div>
+
+            </div>
+
+        }
+    </div>
+</div>
+
+
+<script type="text/javascript">
+
+
+    $(document).ready(function () {
+
+        $('.datepicker').datepicker({
+            format: 'dd/MM/yyyy',
+            "setDate": new Date(),
+            "autoclose": true
+        })
+
+        $("#ProductId").select2("focus");
+
+        CustomSelectFunction($("#ProductId"), '/ProdOrderCancelLine/GetPendingProdOrderProducts', '/ComboHelpList/SetProducts', 'Enter Product', true, 1, $('#ProdOrderCancelHeaderId', '.modal-body').val());
+        CustomSelectFunction($("#ProdOrderId"), '/ProdOrderCancelLine/GetPendingProdOrdersForCancel', '/ComboHelpList/SetProdOrders', 'Enter Production Order', true, 1, $('#ProdOrderCancelHeaderId', '.modal-body').val());
+        CustomSelectFunction($("#ProductGroupId"), '/ComboHelpList/GetProductGroup', '/ComboHelpList/SetProductGroup', 'Enter Product Group Name', true, 3);
+        CustomSelectFunction($("#Dimension1Id"), '/ComboHelpList/GetDimension1', '/ComboHelpList/SetDimension1', 'Enter Dim1', true, 3);
+        CustomSelectFunction($("#Dimension2Id"), '/ComboHelpList/GetDimension2', '/ComboHelpList/SetDimension2', 'Enter Dim2', true, 3);
+    });
+
+</script>

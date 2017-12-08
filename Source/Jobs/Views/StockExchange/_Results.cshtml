@@ -1,0 +1,410 @@
+﻿@model Model.ViewModel.StockExchangeMasterDetailModel
+@using Core.Common
+
+
+<style type="text/css">
+    .ModalRowValidationError {
+        border: 1px solid;
+        border-color: #EA6A6A;
+    }
+</style>
+
+<div class="modal-content  Custom-modal">
+    <div class="modal-header" style="border-bottom: 1px solid #8E8888">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"> <span class="glyphicon glyphicon-remove"></span></button>
+        <h3>
+            <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-file black"></span> Orders & Quantities</span>
+        </h3>
+    </div>
+    <div>
+        @using (Html.BeginForm("_ResultsPost", "StockExchange", FormMethod.Post, new { enctype = "multipart/form-data", id = "modform" }))
+        {
+            @Html.ValidationLog((string)TempData["CSEXCL"])
+            @Html.AntiForgeryToken()
+            @Html.HiddenFor(m => m.StockHeaderSettings.isVisibleLotNo)
+            @Html.HiddenFor(m => m.StockHeaderSettings.isVisibleDimension1)
+            @Html.HiddenFor(m => m.StockHeaderSettings.isVisibleDimension2)
+            <div class="form-horizontal modal-body">
+
+                <div style="padding-right:15px">
+                    <div class="row">
+                        <div class="form-horizontal">
+                            @Html.ValidationSummary(true)
+
+                            <div class="panel panel-default" id="grid">
+                                <div class="panel-heading headrow" style="background-image: -webkit-linear-gradient(top, #428bca 0%, #428bca 100%);color:white">
+                                    <div class="row grid-head">
+                                        <div class="block text-left" style="width:5%">
+                                            Srl.
+                                        </div>
+                                        <div class="block" style="width:92%">
+                                            <div class="row">
+                                                @*ProductInfo*@
+                                                <div class="block" style="width:55%">
+                                                    Product
+                                                </div>
+                                                @*<div class="block text-center " style="width:15%">
+                                                        Dimension 1
+                                                    </div>
+
+                                                    <div class="block text-right " style="width:15%">
+                                                        Dimension 2
+                                                    </div>*@
+                                                <div class="block text-right" style="width:15%">
+                                                    CostCenter
+                                                </div>
+                                                <div class="block text-right" style="width:15%">
+                                                    Issue Qty
+                                                </div>
+                                                <div class="block" style="width:15%">
+                                                    Receive Qty
+                                                </div>
+
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+                                </div>
+                                <div class="panel-info" id="gbody" style="max-height:250px;overflow-y:scroll">
+
+                                    @{
+            decimal RequisitionQty = 0;
+            decimal IssueQty = 0;
+            byte MaxUnitDecPlaces = 0;
+                                    }
+
+
+                                    @for (int i = 0; i < Model.StockLineViewModel.Count(); i++)
+                                    {
+
+                                        if (MaxUnitDecPlaces < Model.StockLineViewModel[i].UnitDecimalPlaces)
+                                        {
+                                            MaxUnitDecPlaces = Model.StockLineViewModel[i].UnitDecimalPlaces.Value;
+                                        }
+
+                                        <div class='row crow grid-body' style='margin-left:0px;margin-right:0px'>
+                                            @Html.HiddenFor(m => Model.StockLineViewModel[i].ProductId, new { @class = "ProdId" })
+                                            @Html.HiddenFor(m => Model.StockLineViewModel[i].ProductName, new { @class = "ProdName" })
+                                            @Html.HiddenFor(m => Model.StockLineViewModel[i].Specification)
+                                            @Html.HiddenFor(m => Model.StockLineViewModel[i].Dimension1Name, new { @class = "Dim1Name" })
+                                            @Html.HiddenFor(m => Model.StockLineViewModel[i].Dimension2Name, new { @class = "Dim2Name" })
+                                            @Html.HiddenFor(m => Model.StockLineViewModel[i].Dimension1Id, new { @class = "Dim1Id" })
+                                            @Html.HiddenFor(m => Model.StockLineViewModel[i].Dimension2Id, new { @class = "Dim2Id" })
+                                            @Html.HiddenFor(m => Model.StockLineViewModel[i].ProcessId, new { @class = "ProcId" })
+                                            @Html.HiddenFor(m => Model.StockLineViewModel[i].RequisitionLineId)
+                                            @Html.HiddenFor(m => Model.StockLineViewModel[i].StockHeaderId, new { @class = "StockHeaderId" })
+                                            @Html.HiddenFor(m => Model.StockLineViewModel[i].RequisitionHeaderDocNo)
+                                            @Html.HiddenFor(m => Model.StockLineViewModel[i].UnitId)
+                                            @Html.HiddenFor(m => Model.StockLineViewModel[i].CostCenterId)
+                                            @Html.HiddenFor(m => Model.StockLineViewModel[i].CostCenterName)
+                                            @Html.HiddenFor(m => Model.StockLineViewModel[i].UnitDecimalPlaces, new { @class = "UDec" })
+                                            @Html.HiddenFor(m => Model.StockLineViewModel[i].RequisitionBalanceQty, new { @class = "OrdBalQty" })
+                                            <div class='block row-index' style='width:5%'>
+                                                @(i + 1)
+                                            </div>
+                                            <div class='block pull-middle' style='width:94%'>
+                                                <div class='row'>
+                                                    <div class='block' style='width:55%'>
+                                                        <div class="row">
+                                                            <div class="block  ReplacableProduct" style="width: 100%; padding-left: 15px">
+                                                                @*@Html.TextBoxFor(m => Model.StockLineViewModel[i].ProductId, new { @class = "form-control multiple-modal ProdHelpList", @style = "display:inline;margin-bottom:3px", @tabindex = "-1" })*@
+                                                                @Model.StockLineViewModel[i].ProductName
+                                                                <span style="font-size:xx-small;cursor:pointer;padding-left:5px" class="text-info glyphicon glyphicon-pencil EditProduct"></span>
+                                                            </div>
+                                                        </div>
+                                                        <div class="row" style="margin-top:5px;">
+                                                            <div class="block ReplacableDim1" style="width:50%;padding-left:15px;padding-right:0px">
+                                                                @if (!string.IsNullOrEmpty(Model.StockLineViewModel[i].Dimension1Name))
+                                                                {
+                                                                    @Model.StockLineViewModel[i].Dimension1Name<span style="font-size:xx-small;cursor:pointer;padding-left:5px" class="text-info glyphicon glyphicon-pencil EditDim1"></span> }
+                                                                    @*@Html.TextBoxFor(m => Model.StockLineViewModel[i].Dimension1Id, new { @class = "form-control multiple-modal Dime1HelpList", @style = "display:inline", @tabindex = "-1" })*@
+                                                                </div>
+                                                                <div class="block ReplacableDim2" style="width:50%;padding-left:0px;padding-right:15px">
+                                                                    @*@Html.TextBoxFor(m => Model.StockLineViewModel[i].Dimension2Id, new { @class = "form-control multiple-modal Dime2HelpList", @style = "display:inline", @tabindex = "-1" })*@
+                                                                    @if (!string.IsNullOrEmpty(Model.StockLineViewModel[i].Dimension2Name))
+                                                                    {
+                                                                        @Model.StockLineViewModel[i].Dimension2Name<span style="font-size:xx-small;cursor:pointer;padding-left:5px" class="text-info glyphicon glyphicon-pencil EditDim2"></span>}
+                                                                </div>
+                                                            </div>
+
+                                                        </div>
+                                                        <div class='block text-right' style='width:15%'>
+                                                            @Model.StockLineViewModel[i].CostCenterName
+                                                            <br />
+                                                            BalQty: @Model.StockLineViewModel[i].RequisitionBalanceQty
+                                                        </div>
+                                                        <div class='block text-right' style='width:15%'>
+                                                            @Html.TextBoxFor(m => Model.StockLineViewModel[i].QtyIss, new { @class = "form-control text-right multiple-modal IssueQty Qty" })
+                                                            @Html.ValidationMessageFor(m => Model.StockLineViewModel[i].QtyIss, "", new { @class = "text-danger" })
+                                                            <span class="ExcessStockQty text-info" style="cursor:pointer;display:inline">Current Stock</span>
+                                                        </div>
+
+
+                                                        <div class='block' style='width:15%'>
+                                                            @Html.TextBoxFor(m => Model.StockLineViewModel[i].QtyRec, new { @class = "form-control ReceiveQty multiple-modal Qty" })
+                                                            @Html.ValidationMessageFor(m => Model.StockLineViewModel[i].QtyRec, "", new { @class = "text-danger" })
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                            <hr style='margin-top:0px;margin-bottom:0px' />
+                                    }
+                                </div>
+                            </div>
+
+
+                            <div class="row grid-head" style="margin-left:0px;margin-right:0px">
+                                <div class="block text-left" style="width:5%">
+
+                                </div>
+                                <div class="block" style="width:92%">
+                                    <div class="row">
+                                        @*ProductInfo*@
+                                        <div class='block' style='width:55%'>
+                                            <strong>Total</strong>
+
+                                        </div>
+                                        <div class='block' style='width:15%'>
+                                        </div>
+                                        @*Qty*@
+                                        <div class='block text-right' style='width:15%'>
+                                            <strong><span id="IssueQty"></span></strong>
+                                        </div>
+                                        <div class='block text-right' style='width:15%'>
+                                            <strong><span id="ReceiveQty"></span></strong>
+                                        </div>
+
+
+
+                                    </div>
+                                </div>
+
+                            </div>
+
+
+
+
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer " style="padding: 19px 20px 0 20px; border-top:1px solid #8E8888">
+                    <button class="btn custom" name="Command:Edit" type="submit" id="submit"><h2 style="margin:0px" title="Proceed"><span class="glyphicon glyphicon-floppy-disk black black"></span> </h2></button>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+
+
+
+<script type="text/javascript">
+
+
+    $(function () {
+
+        CustomSelectFunction($(".ProdHelpList"), '/ComboHelpList/GetProducts', '/ComboHelpList/SetSingleProducts', 'Enter Product', false, 3);
+        CustomSelectFunction($(".Dime1HelpList"), '/ComboHelpList/GetDimension1', '/ComboHelpList/SetSingleDimension1', 'Enter Dimension1', false, 3);
+        CustomSelectFunction($(".Dime2HelpList"), '/ComboHelpList/GetDimension2', '/ComboHelpList/SetSingleDimension2', 'Enter Dimension2', false, 3);
+
+        var ProcName = '@Model.StockHeaderSettings.SqlFuncCurrentStock';
+
+        if (ProcName)
+            $('div.row.crow', '.modal-body').each(function () {
+                GetExcessStock(this, ProcName);
+            });
+
+    })
+
+
+    function GetExcessStock(obj, ProcName) {
+        var Lock = false;
+        var Error = false;
+        if ($(obj).find('span.ExcessStockQty')) {
+
+            if (ProcName) {
+                var $Block = $(obj)
+                var $this = $(obj).find('span.ExcessStockQty');
+                if (!Error) {
+                    $.get('/StockIssueLine/GetExcessStock', { ProductId: parseInt($('input.ProdId', $Block).val()), Dim1: parseInt($('input.Dim1Id', $Block).val()), Dim2: parseInt($('input.Dim2Id', $Block).val()), ProcId: null, Lot: $('input.LotNo', $Block).val(), MaterialIssueId: parseInt($('input.StockHeaderId', $Block).val()), ProcName: ProcName }).done(function (data) {
+                        $this.text("Stock:" + data);
+                    }).error(function () {
+                        Lock: true;
+                    });
+                }
+            }
+        }
+    };
+
+
+    var reset = false;
+    var IsSaved = false;
+    var ValidationCount = 0;
+
+    $('#modform').bind('submit', function (event) {
+
+        if (!IsSaved) {
+            if (!ValidateData()) {
+                return false;
+            }
+            IsSaved = true;
+            $('button:submit').attr('disabled', 'disabled');
+            return IsSaved;
+        }
+        else {
+            return false;
+        }
+
+
+    });
+
+
+    function ValidateData() {
+        var ValidationMessage = "";
+
+        //Client Side Validaion.....
+
+        return (ValidationMessage == "");
+
+    }
+
+
+
+    $('input.Qty').change(function () {
+
+        var Issue = 0;
+        var maxDeclaces = 0;
+        var REceive = 0;
+        var ValidationMessage = "";
+        var ValidationMessageCount = 0;
+
+        $('.row.crow.grid-body', '.modal-body').each(function () {
+
+            if ($(this).find('input.IssueQty').val()) {
+                Issue += parseFloat($(this).find('input.IssueQty').val());
+                var $Hidiv = $(this).closest('div.row.crow');
+                var unitDecPlaces = parseFloat($Hidiv.find('.UDec').val()) || 0;
+                if (unitDecPlaces > maxDeclaces)
+                    maxDeclaces = unitDecPlaces;
+            }
+            if ($(this).find('input.ReceiveQty').val()) {
+                REceive += parseFloat($(this).find('input.ReceiveQty').val());
+            }
+
+
+            var ReqBalQty = parseFloat($(this).find('input.OrdBalQty').val());
+            var LineIssueQty = parseFloat($(this).find('input.IssueQty').val());
+
+            if (LineIssueQty > ReqBalQty && ReqBalQty > 0) {
+                $(this).addClass('ModalRowValidationError')
+                ValidationMessage = "Qty Exceeding Balance Qty";
+                ValidationMessageCount++;
+            }
+            else {
+                if ($(this).hasClass('ModalRowValidationError'))
+                    $(this).removeClass('ModalRowValidationError');
+            }
+        })
+
+        $('#IssueQty', '.modal-body').text(Issue.toFixed(maxDeclaces));
+        $('#ReceiveQty', '.modal-body').text(REceive.toFixed(maxDeclaces));
+
+        if (REceive != Issue || ValidationMessage != "") {
+            if (!$('#modform').find('.modal-body #errormsg').length) {
+                $('#modform').find('.modal-body').prepend("<div class='alert alert-danger'><span id=errormsg >" + (ValidationMessage != "" ? ValidationMessage : "Qty does not match") + "</span></div>")
+                //$('#submit', '#modform').attr('disabled', 'disabled');
+            }
+            else {
+                $('#modform').find('#errormsg').text((ValidationMessage != "" ? ValidationMessage : "Qty does not match"));
+            }
+
+
+        }
+        else {
+            if ($('#modform').find('.modal-body #errormsg').length && ValidationMessageCount == 0) {
+                $('#modform').find('#errormsg').parent().remove();
+            }
+            //$('#submit').removeAttr('disabled');
+        }
+
+
+    })
+
+
+
+    $('.EditProduct').click(function () {
+
+        var $Block = $(this).closest('div.row.crow');
+        var ProdId = parseInt($Block.find('input.ProdId').val());
+        var ProdName = $Block.find('input.ProdName').val();
+
+        if (ProdId && ProdName) {
+            var ProdElemId = $Block.find('input.ProdId').attr('id');
+            var ProdElemName = $Block.find('input.ProdId').attr('name');
+            $Block.find('input.ProdId').remove();
+            var elem = '<input type="text" class="form-control multiple-modal ProdHelpList ProdId" style="display:inline;margin-bottom:3px" tabindex="-1" id="' + ProdElemId + '" name="' + ProdElemName + '"/>'
+
+            var Container = $Block.find('div.ReplacableProduct:first');
+            Container.html(elem);
+            CustomSelectFunction($('.ProdHelpList', $Block), '/ComboHelpList/GetProducts', '/ComboHelpList/SetSingleProducts', 'Enter Product', false, 3);
+            $('.ProdHelpList', $Block).select2("data", { id: ProdId, text: ProdName });
+
+        }
+
+    })
+
+
+    $('.EditDim1').click(function () {
+
+        var $Block = $(this).closest('div.row.crow');
+        var Dim1Id = parseInt($Block.find('input.Dim1Id').val());
+        var Dim1Name = $Block.find('input.Dim1Name').val();
+
+
+
+        if (Dim1Id && Dim1Name) {
+
+            var Dim1ElemId = $Block.find('input.Dim1Id').attr('id');
+            var Dim1ElemName = $Block.find('input.Dim1Id').attr('name');
+
+            $Block.find('input.Dim1Id').remove();
+            var elem = '<input type="text" class="form-control multiple-modal Dime1HelpList Dim1Id" style="display:inline;" tabindex="-1" id="' + Dim1ElemId + '" name="' + Dim1ElemName + '"/>'
+
+            var Container = $Block.find('div.ReplacableDim1:first');
+            Container.html(elem);
+            CustomSelectFunction($(".Dime1HelpList", $Block), '/ComboHelpList/GetDimension1', '/ComboHelpList/SetSingleDimension1', 'Enter Dimension1', false, 3);
+            $('.Dime1HelpList', $Block).select2("data", { id: Dim1Id, text: Dim1Name });
+        }
+
+    })
+
+
+    $('.EditDim2').click(function () {
+
+        var $Block = $(this).closest('div.row.crow');
+        var Dim2Id = parseInt($Block.find('input.Dim2Id').val());
+        var Dim2Name = $Block.find('input.Dim2Name').val();
+
+
+
+        if (Dim2Id && Dim2Name) {
+            var Dim2ElemId = $Block.find('input.Dim2Id').attr('id');
+            var Dim2ElemName = $Block.find('input.Dim2Id').attr('name');
+
+            $Block.find('input.Dim2Id').remove();
+            var elem = '<input type="text" class="form-control multiple-modal Dime2HelpList Dim2Id" style="display:inline;" tabindex="-1" id="' + Dim2ElemId + '" name="' + Dim2ElemName + '"/>'
+            var Container = $Block.find('div.ReplacableDim2:first');
+            Container.html(elem);
+            CustomSelectFunction($(".Dime2HelpList", $Block), '/ComboHelpList/GetDimension1', '/ComboHelpList/SetSingleDimension1', 'Enter Dimension1', false, 3);
+            $('.Dime2HelpList', $Block).select2("data", { id: Dim2Id, text: Dim2Name });
+        }
+
+    })
+
+
+
+
+</script>

@@ -1,0 +1,270 @@
+﻿
+@model Surya.India.Model.ViewModels.SaleOrderLineViewModel
+@using Surya.India.Core.Common
+
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="myModalLabel">Add new Product</h4>
+    </div>
+
+
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(model => model.SaleOrderHeaderId)
+    @Html.HiddenFor(m=>m.SaleOrderLineId)
+    @Html.HiddenFor(m => m.UnitId)
+    @Html.HiddenFor(m => m.UnitConversionMultiplier)
+
+    <div class="modal-body">
+
+        <div class="form-horizontal">
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+            <div class="row">
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.ProductId, "Product", htmlAttributes: new { @class = "control-label col-xs-4 " })
+                        <div class="col-xs-6">
+                            @Html.TextBoxFor(model => model.ProductId, new { @class = "form-control col-xs-5 required" })
+                            @Html.ValidationMessageFor(model => model.ProductId, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.Specification, "Specification", htmlAttributes: new { @class = "control-label col-xs-4 " })
+                        <div class="col-xs-6">
+                            @Html.TextBoxFor(model => model.Specification, new { @class = "form-control col-xs-5 required" })
+                            @Html.ValidationMessageFor(model => model.Specification, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="row">
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.Qty, htmlAttributes: new { @class = "control-label col-xs-4" })
+                        <div class="col-xs-6">
+                            @Html.TextBoxFor(model => model.Qty, new { @class = "form-control col-xs-5 required" })
+                            @Html.ValidationMessageFor(model => model.Qty, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.DueDate, htmlAttributes: new { @class = "control-label col-xs-4" })
+                        <div class="col-xs-6">
+                            @Html.TextBoxFor(model => model.DueDate, "{0:dd/MMMM/yyyy}", new { @class = "datepicker form-control col-xs-5 required" })
+                            @Html.ValidationMessageFor(model => model.DueDate, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.DeliveryUnitId, htmlAttributes: new { @class = "control-label col-xs-4" })
+                        <div class="col-xs-6">
+                            @Html.DropDownListFor(model => model.DeliveryUnitId, new SelectList(ViewBag.DeliveryUnitList as System.Collections.IEnumerable, "UnitId", "UnitName"), new { @class = "form-control col-xs-5 required" })
+                            @Html.ValidationMessageFor(model => model.DeliveryUnitId, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.DeliveryQty, "Delivery Qty*", htmlAttributes: new { @class = "control-label col-xs-4" })
+                        <div class="col-xs-6">
+                            @Html.TextBoxFor(model => model.DeliveryQty, new { @class = "form-control col-xs-5 required" })
+                            @Html.ValidationMessageFor(model => model.DeliveryQty, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.Rate, htmlAttributes: new { @class = "control-label col-xs-4" })
+                        <div class="col-xs-6">
+                            @Html.TextBoxFor(model => model.Rate, new { @class = "form-control col-xs-5 required" })
+                            @Html.ValidationMessageFor(model => model.Rate, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.Amount, "Amount", htmlAttributes: new { @class = "control-label col-xs-4" })
+                        <div class="col-xs-6">
+                            @Html.TextBoxFor(model => model.Amount, new { @class = "form-control col-xs-5 required" })
+                            @Html.ValidationMessageFor(model => model.Amount, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.SalesTaxGroupId, htmlAttributes: new { @class = "control-label col-xs-4" })
+                        <div class="col-xs-6">
+                            @Html.TextBoxFor(model => model.SalesTaxGroupId, new { @class = "form-control col-xs-5 required", @readonly = true })
+                            @Html.ValidationMessageFor(model => model.SalesTaxGroupId, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.Remark, htmlAttributes: new { @class = "control-label col-xs-4" })
+                        <div class="col-xs-6">
+                            @Html.TextBoxFor(model => model.Remark, new { @class = "form-control col-xs-5 required" })
+                            @Html.ValidationMessageFor(model => model.Remark, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="modal-footer">
+        <input class="btn btn-primary" type="submit" value="Save" />
+        <button class="btn" data-dismiss="modal">Cancel</button>
+
+    </div>
+}
+<script>
+    $(document).ready(function () {
+
+        CustomSelectFunction($("#ProductId"), '/ComboHelpList/GetProducts', '/ComboHelpList/SetSingleProducts', 'Enter Product Name', false, 3);
+
+
+
+    });
+
+</script>
+
+<script type="text/javascript">
+    $(function () {
+        GetProductDetail.call();
+        $("#DeliveryQty,#Rate,#Amount,#Qty").keyup(Calculation);
+        $("#DeliveryUnitId").change(GetUnitConversionMultiplier);
+        $("#ProductId").change(GetProductDetail);
+        $("#ProductId").change(CheckForValidation);
+
+
+
+        function GetProductDetail() {
+            var ProcessProgress = $("#Product detail loading progress");
+            ProcessProgress.show();
+            if ($("#ProductId").val() != 0 || $("#ProductId").val() != NULL) {
+                $.ajax({
+                    cache: false,
+                    type: "POST",
+                    url: "@(Url.Action("GetProductDetailJson"))",
+                    data: { ProductId: $("#ProductId").val() },
+                    success: function (data) {
+                        $("#Rate").val(data[0].StandardCost);
+                        $("#UnitId").val(data[0].UnitId);
+                        $("#DeliveryUnitId").val(data[0].UnitId);
+                        GetUnitConversionMultiplier.call();
+                        Calculation.call();
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        alert('Failed to retrieve product details.' + thrownError);
+                        ProcessProgress.hide();
+                    }
+                });
+            }
+
+        }
+
+        function CheckForValidation() {
+            if ($("#ProductId").val() != 0||$("#ProductId").val() !=NULL)
+            {
+                $.ajax({
+                    cache: false,
+                    type: "POST",
+                    url: "@(Url.Action("CheckForValidationinEdit"))",
+                    data: { ProductId: $("#ProductId").val(), SaleOrderHeaderId: $("#SaleOrderHeaderId").val(), SaleOrderLineId: $("#SaleOrderLineId").val() },
+                success: function (data) {
+                    var status = data;
+                    if (data.returnvalue)
+                        $("#status").text("The Product Already exists in this order");
+                    else
+                        $("#status").text(" ");
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    alert('Failed to Check Validation.' + thrownError);
+                }
+            });
+        }
+
+    }
+
+        function GetUnitConversionMultiplier() {
+
+            if ($("#UnitId").val() == $("#DeliveryUnitId").val()) {
+                $("#UnitConversionMultiplier").val(1);
+                Calculation.call();
+            }
+
+            else {
+                var ProcessProgress = $("#Unit conversion detail loading progress");
+                ProcessProgress.show();
+                $.ajax({
+                    cache: false,
+                    type: "POST",
+                    url: "@(Url.Action("GetUnitConversionDetailJson"))",
+                    data: { ProductId: $("#ProductId").val(), UnitId: $("#UnitId").val(), DeliveryUnitId: $("#DeliveryUnitId").val() },
+
+                success: function (data) {
+                    $("#UnitConversionMultiplier").val(data[0].Value);
+                    Calculation.call();
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    alert('Failed to retrieve Unit conversion details.' + thrownError);
+                    ProcessProgress.hide();
+                }
+            });
+        }
+    }
+
+
+        function Calculation() {
+            if ($('#UnitConversionMultiplier').val() != 0) {
+                $('#DeliveryQty').val($('#Qty').val() * $('#UnitConversionMultiplier').val())
+            }
+            //$('#DeliveryQty').val($('#Qty').val())
+
+            $('#Amount').val($('#DeliveryQty').val() * $('#Rate').val());
+        }
+
+
+
+    });
+</script>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#ProductId").select2("focus");
+    })
+
+    $('.datepicker').datepicker({
+        format: 'dd/MM/yyyy',
+        "setDate": new Date(),
+        "autoclose": true
+
+    })
+</script>

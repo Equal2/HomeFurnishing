@@ -1,0 +1,257 @@
+﻿@{
+    ViewBag.Title = "Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Buyer : @ViewBag.Name</h2>
+  @ViewBag.buyerId
+
+<table id="buyerDetailGrid"></table>
+<div id="buyerDetailGridPager"></div>
+
+<script type="text/javascript">
+
+    $("#buyerDetailGrid").jqGrid({
+        url: "/BuyerDetails/GetBuyerDetails",
+        datatype: "json",
+        colNames: ["BuyerDetailID", "Address1", "Address2", "Address3", "City", "ContectNumber1", "AdditionalContectNo",
+                    "ContectPerson", "Country", "EmailAddr1", "EmailAddr2", "FaxNo", "State", "PostalCode"],
+        colModel: [
+                    { name: "BuyerDetailID", index: "BuyerDetailID", key: true, sorttype: "int" },
+                    { name: "Address1", index: "Address1", editable: true, edittype: 'text', width: 70 },
+                    { name: "Address2", index: "Address2", editable: true, edittype: 'text', width: 70 },
+                    { name: "Address3", index: "Address3", editable: true, edittype: 'text', width: 70 },
+                    { name: "City", index: "City", editable: true, edittype: 'text', width: 100 },
+                    { name: "ContectNumber1", index: "ContectNumber1", editable: true, edittype: 'text', width: 100 },
+
+                    { name: "AdditionalContectNo", index: "AdditionalContectNo", key: true, sorttype: "int" },
+                    { name: "ContectPerson", index: "ContectPerson", editable: true, edittype: 'text', width: 70 },
+                    { name: "Country", index: "Country", editable: true, edittype: 'text', width: 70 },
+                    { name: "EmailAddr1", index: "EmailAddr1", editable: true, edittype: 'text', width: 70 },
+                    { name: "EmailAddr2", index: "EmailAddr2", editable: true, edittype: 'text', width: 100 },
+                    { name: "FaxNo", index: "FaxNo", editable: true, edittype: 'text', width: 100 },
+                    { name: "State", index: "State", editable: true, edittype: 'text', width: 100 },
+                    { name: "PostalCode", index: "PostalCode", editable: true, edittype: 'text', width: 100 }
+
+        ],
+        rowNum: 10,
+        rowList: [10, 20, 25],
+        pager: "#buyerDetailGridPager",
+        sortname: "BuyerDetailID",
+        sortorder: "ASC",
+        postData:{buyerId: @ViewBag.buyerId },
+        width: 750,
+        height: 225,
+        viewrecords: true,
+        rownumbers: true,
+        mtype: 'GET',
+        editurl: "/BuyerDetails/PerformCRUDActionForBuyerDetais",
+        onSelectRow: function (id) {
+            if (id && id !== lastsel) {
+                jQuery('#buyerDetailGrid').jqGrid('restoreRow', lastsel);
+                jQuery('#buyerDetailGrid').jqGrid('editRow', id, true);
+                lastsel = id;
+            }
+        },
+        caption: "Buyer Details"
+    });
+    jQuery("#buyerDetailGrid").jqGrid('navGrid', '#buyerDetailGridPager',
+            { edit: true, add: true, del: true, search: true, refresh: true },
+            {
+                //EDIT portion
+                //Can also set the width and height of the editing window as below commented way
+                //height: 300,
+                //width: 400,
+                //top: 50,
+                //left: 100,
+                //dataheight: 280,
+                closeAfterEdit: true,
+                closeOnEscape: true,//Closes the popup on pressing escape key
+                reloadAfterSubmit: true,
+                drag: true,
+                afterSubmit: function (response, postdata) {
+                    if (response.responseText == "") {
+                        $(this).jqGrid('setGridParam',
+                          { datatype: 'json' }).trigger('reloadGrid');//Reloads the grid after edit
+                        return [true, '']
+                    }
+                    else {
+                        $(this).jqGrid('setGridParam',
+                          { datatype: 'json' }).trigger('reloadGrid'); //Reloads the grid after edit
+                        return [false, response.responseText]
+                        //Captures and displays the response text on th Edit window
+                    }
+                },
+                editData: {
+                    BuyerID: function () {
+                        var sel_id = $('#buyerDetailGrid').jqGrid('getGridParam', 'selrow');
+                        var value = $('#buyerDetailGrid').jqGrid('getCell', sel_id, '_id');
+                        return value;
+                    }
+                }
+            },
+            {  //ADD portion
+                closeAfterAdd: true,//Closes the add window after add
+                afterSubmit: function (response, postdata) {
+                    if (response.responseText == "") {
+                        $(this).jqGrid('setGridParam',
+                          { datatype: 'json' }).trigger('reloadGrid')//Reloads the grid after Add
+                        return [true, '']
+                    }
+                    else {
+                        $(this).jqGrid('setGridParam',
+                          { datatype: 'json' }).trigger('reloadGrid')//Reloads the grid after Add
+                        return [false, response.responseText]
+                    }
+                }
+            },
+           {   //DELETE
+               closeOnEscape: true,
+               closeAfterDelete: true,
+               reloadAfterSubmit: true,
+               closeOnEscape: true,
+               drag: true,
+               afterSubmit: function (response, postdata) {
+                   if (response.responseText == "") {
+                       $("#buyerDetailGrid").trigger("reloadGrid", [{ current: true }]);
+                       return [false, response.responseText]
+                   }
+                   else {
+                       $(this).jqGrid('setGridParam', { datatype: 'json' }).trigger('reloadGrid')
+                       return [true, response.responseText]
+                   }
+               },
+               delData: {
+                   BuyerID: function () {
+                       var sel_id = $('#buyerDetailGrid').jqGrid('getGridParam', 'selrow');
+                       var value = $('#buyerDetailGrid').jqGrid('getCell', sel_id, '_id');
+                       return value;
+                   }
+               }
+           },
+
+           {//SEARCH
+               closeOnEscape: true
+           }
+);
+
+
+</script>
+
+
+
+
+@*<div>
+    <h4>Order</h4>
+	<hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.CustomerID)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.CustomerID)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.EmployeeID)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.EmployeeID)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.OrderDate)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.OrderDate)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.RequiredDate)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.RequiredDate)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.ShippedDate)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.ShippedDate)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.ShipVia)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.ShipVia)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Freight)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Freight)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.ShipName)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.ShipName)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.ShipAddress)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.ShipAddress)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.ShipCity)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.ShipCity)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.ShipRegion)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.ShipRegion)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.ShipPostalCode)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.ShipPostalCode)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.ShipCountry)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.ShipCountry)
+        </dd>
+
+    </dl>
+</div>
+<p>
+    @Html.ActionLink("Edit", "Edit", new { id = Model.OrderID }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>*@

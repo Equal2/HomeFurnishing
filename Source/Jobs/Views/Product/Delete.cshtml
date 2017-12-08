@@ -1,0 +1,71 @@
+﻿@model Surya.India.Model.ViewModels.ProductViewModel
+
+@{
+    ViewBag.Title = "Delete";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h4>
+            <span style="font-family: Calibri,sans-serif,Verdana"> Delete Product.</span>
+        </h4>
+    </div>
+    <div class="panel-info" style="padding-left:15px">
+        <div>            
+            <dl class="dl-horizontal" style="margin-top:15px">
+                <dt>
+                    @Html.DisplayNameFor(model => model.ProductName)
+                </dt>
+
+                <dd>
+                    @Html.DisplayFor(model => model.ProductName)
+                </dd>
+
+                <dt>
+                    @Html.DisplayNameFor(model => model.ProductCode)
+                </dt>
+
+                <dd>
+                    @Html.DisplayFor(model => model.ProductCode)
+                </dd>
+
+                <dt>
+                    @Html.DisplayNameFor(model => model.DivisionName)
+                </dt>
+
+                <dd>
+                    @Html.DisplayFor(model => model.DivisionName)
+                </dd>
+
+                <dt>
+                    @Html.DisplayNameFor(model => model.ProductCategoryName)
+                </dt>
+
+                <dd>
+                    @Html.DisplayFor(model => model.ProductCategoryName)
+                </dd>
+
+                <dt>
+                    @Html.DisplayNameFor(model => model.ProductCollectionName)
+                </dt>
+
+                <dd>
+                    @Html.DisplayFor(model => model.ProductCollectionName)
+                </dd>
+
+            </dl>
+            <hr />
+            @using (Html.BeginForm())
+            {
+                @Html.AntiForgeryToken()
+                <div class="form-actions no-color">
+                    <input type="submit" value="Delete" class="btn btn-primary btn-sm CurveBorder height" id="submit" style=" border-color: #606264" /> 
+                    <span style="font-family: Calibri,sans-serif,Verdana;font-size:large">
+                        @Html.ActionLink("Back to List", "Index", null, new { @class = "btn btn-primary btn-sm col-md-offset-1 CurveBorder ActionLinkPadding CustomCss height" })
+                    </span>
+                </div>
+            }
+        </div>
+    </div>
+</div>

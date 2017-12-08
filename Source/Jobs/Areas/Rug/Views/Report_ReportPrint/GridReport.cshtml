@@ -1,0 +1,387 @@
+﻿@{
+    ViewBag.Title = "Grid Report";
+}
+
+<link href="~/Content/Slick/slick.grid.css" rel="stylesheet" />
+<link href="~/Content/Slick/css/smoothness/jquery-ui-1.8.16.custom.css" rel="stylesheet" />
+<link href="~/Content/Slick/slick-default-theme.css" rel="stylesheet" />
+<link href="~/Content/font-awesome.min.css" rel="stylesheet" />
+<style type="text/css">
+    .slick-header-column.ui-state-default {
+        background-color: #428bca;
+        color: white;
+        height: 35px;
+        line-height: 35px;
+    }
+
+    .slick-row.ui-widget-content, .slick-cell {
+        height: 30px;
+        line-height: 30px;
+    }
+
+    #myGrid * {
+        box-sizing: content-box !important;
+    }
+
+    .hidden {
+        display: none;
+    }
+
+    .Total {
+        color: black !important;
+        background-color: #ffffff !important;
+    }
+
+    .pills {
+        border-radius: 10px;
+    }
+</style>
+
+<div class="panel panel-default">
+    <div class="panel-heading" id="reportHeading">
+        <h3>
+            <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black" id="reportTitle"><span class="glyphicon glyphicon-list black"></span> @ViewBag.ReportName</span>
+            <input type="text" id="txtSearch2" class="right toolbar small" placeholder="Search" style="height:25px;max-width:20%">
+        </h3>
+        <a class="fa fa-file-excel-o right" href="#" id="exportExcel">
+
+        </a>      
+        
+        <p>
+            @CustomHelpers.GenerateDisposableFilters((List<Tuple<string, string, Dictionary<string, string>, bool>>)ViewBag.ReportFilters, "Report_ReportPrint", "DeleteFilter")
+        </p>
+        <ol class="breadcrumb"><li class="mandatory">@Html.DropDownList("ReportType", new SelectList(ViewBag.ReportTypes as System.Collections.IEnumerable, "SubReportName", "SubReportName", ViewBag.SelectedReportType), new { @class = "small" })</li></ol>
+
+    </div>
+
+    <div class="panel-info tab" style="padding-left:0px">
+        <div style="width: 100%;">
+            <div id="myGrid" style="width: 100%; height: 450px; font-size: 12px; "></div>
+        </div>
+    </div>
+</div>
+
+<script src="~/Scripts/Slick/lib/jquery.event.drag-2.2.js"></script>
+<script src="~/Scripts/Slick/slick.core.js"></script>
+<script src="~/Scripts/Slick/slick.grid.js"></script>
+<script src="~/Scripts/Slick/slick.dataview.js"></script>
+<script src="~/Scripts/Slick/slick.rowselectionmodel.js"></script>
+
+<script>
+    var data;
+    var options;
+    var grid;
+    var dataView;
+
+    //Columns Specification
+    var columns;
+
+    columns=@Html.Raw(ViewBag.ColumnNames);
+
+    //Options Initialization
+    options = {
+        editable: false,
+        enableCellNavigation: true,
+        enableColumnReorder: false,
+        forceFitColumns: true,
+        showFooterRow: true,
+        explicitInitialization: true
+    };
+
+    //Creating Custom FilterFunction that can be passed to slickgrid for search
+    var searchString = "";
+    function myFilter(item, args) {
+        var match=false;
+        if (searchString != "" && args)
+        {
+            $.each(columns,function(i,a){
+                console.log(a.id,item[a.id])
+                if(item[a.id] && (item[a.id]).toString().toLowerCase().indexOf(searchString.toLowerCase()) != -1)
+                {
+                    match=true;
+                    return false;
+                }
+            })
+            if(!match)
+                return false;
+        }
+        else
+            return true;
+
+        return match;
+    }
+
+    PopulateGrid();
+
+    function PopulateGrid() {
+        //Instantiating the Grid
+        dataView = new Slick.Data.DataView();
+        grid = new Slick.Grid("#myGrid", dataView, columns, options);
+
+        //Functionality for adding Totals on cell render
+        grid.onFooterRowCellRendered.subscribe(function (e, args) {
+            if (args.column.hasTotal) {
+                $(args.node).empty();
+                $("<span></span>").text((getColumnTotal(args.column.field, grid.getData())).toFixed(2))
+                   .appendTo(args.node);
+                $(args.node).addClass(args.column.headerCssClass);
+            }
+            else if (args.column.hasTotalName) {
+                $(args.node).empty();
+                $("<span></span>").text("Total")
+                   .appendTo(args.node);
+                $(args.node).addClass(args.column.headerCssClass);
+            }
+        });
+    }
+
+
+   
+
+    //Functionality for Enter key navigation
+    grid.onKeyDown.subscribe(function (e) {
+        if (e.which == 13) {
+            var id = grid.getDataItem(grid.getSelectedRows()).LedgerAccountGroupId;
+            //window.location.href = '/TrialBalance/GetSubTrialBalance/' + id;
+        }
+    });
+
+
+    //Functionality for search events
+    $("#txtSearch,#txtSearch2").keyup(function (e) {
+        searchString = this.value;
+        //updateFilter();
+        dataView.setFilterArgs({
+            searchString: searchString
+        });
+        dataView.setFilter(myFilter);
+        grid.invalidate();
+        this.focus();
+    });
+
+    //function updateFilter() {
+    //    dataView.setFilterArgs({
+    //        searchString: searchString
+    //    });
+    //    dataView.refresh();
+    //}
+
+    // wire up model events to drive the grid
+    dataView.onRowCountChanged.subscribe(function (e, args) {
+        grid.updateRowCount();
+        grid.render();
+    });
+
+    dataView.onRowsChanged.subscribe(function (e, args) {
+        grid.invalidateRows(args.rows);
+        grid.render();
+    });
+
+    data = @Html.Raw((ViewBag.ReportDate))
+
+    InitializeGrid();
+
+    //Initializing the Grid
+    function InitializeGrid() {
+
+        //Adding Grid functionalities
+        grid.setSelectionModel(new Slick.RowSelectionModel());
+
+        // initialize the model after all the events have been hooked up
+        dataView.beginUpdate();
+        dataView.setItems(data);
+        //dataView.setFilterArgs({
+        //    searchString: searchString
+        //});
+        //dataView.setFilter(myFilter);
+        dataView.endUpdate();
+
+        // if you don't want the items that are not visible (due to being filtered out
+        // or being on a different page) to stay selected, pass 'false' to the second arg
+        dataView.syncGridSelection(grid, true);
+
+        grid.init();
+    }
+
+    var SubReportId='@ViewBag.Id';
+    var selectedRec;
+    var reportColumnId;
+    var pagenavigator=[];
+    var DomainName='@System.Configuration.ConfigurationManager.AppSettings["AdminSetupDomain"]';
+    var reportName='@ViewBag.ReportName';
+
+    $('#myGrid').on('dblclick', '.ui-widget-content.slick-row', function () {
+
+        var column= columns[grid.getActiveCell().cell];
+
+        if(column.IsDocNo)
+        {
+            var DocRec = grid.getDataItem(grid.getSelectedRows());
+            if(DocRec.DocId && DocRec.DocTypeId){
+                var url=DomainName+"/Redirect/RedirectToDocument?DocTypeId="+DocRec.DocTypeId+"&DocId="+DocRec.DocId;
+                //window.location.href=url;
+                window.open(url,'_blank');
+            }
+        }
+        else if (column.SubReportHeaderId) {
+            pagenavigator.push({Id:SubReportId,Type:$('#ReportType').val(),Rec:selectedRec, ReportColumnId: reportColumnId, ReportName:reportName});
+            selectedRec = grid.getDataItem(grid.getSelectedRows());
+            SubReportId=column.SubReportHeaderId;
+            reportColumnId=column.ReportColumnId;
+            LoadData(column.SubReportHeaderId,selectedRec,null,column.ReportColumnId);
+        }
+    });
+
+    function LoadData(id,rec,rtype,rColumnId) {
+        $.ajax({
+            type: 'POST',
+            url: '/Report_ReportPrint/FetchReport',
+            data: {  ID:id, nameValuePairs: rec, ReportType:rtype, ReportColumnId: rColumnId},
+            success: function (sdata) {
+                if(sdata.success)
+                {
+                    reportName=sdata.ReportName;
+                    $('#reportTitle').html("<span class='glyphicon glyphicon-list black'></span>"+sdata.ReportName);
+                    columns=sdata.columns;
+                    PopulateGrid();
+                    data= $.parseJSON(sdata.data);
+                    InitializeGrid();
+                    UpdateReportType(sdata.reportType,sdata.selectedReportType);
+                    //AllowNavigation();
+                    addCrumbs();
+                }
+            }
+        })
+    }
+
+    $(document).on('change', '#ReportType', function () {
+
+        $.ajax({
+            type: 'POST',
+            url: '/Report_ReportPrint/FetchReport',
+            data: {  ID:SubReportId, ReportType: $('#ReportType').val(), nameValuePairs: selectedRec, ReportColumnId: reportColumnId },
+            success: function (sdata) {
+                if(sdata.success)
+                {
+                    columns=sdata.columns;
+                    PopulateGrid();
+                    data= $.parseJSON(sdata.data);
+                    InitializeGrid();
+                    //UpdateReportType(sdata.reportType);
+                }
+            }
+        })
+    });
+
+    $('a#PrevNavigation').click(function(){
+
+        if(this.href)
+        {
+            var temp=pagenavigator.pop();
+            selectedRec = temp.Rec;
+            SubReportId=temp.Id;
+            reportColumnId=temp.ReportColumnId;
+            LoadData(temp.Id, temp.Rec, temp.Type, temp.reportColumnId)
+        }
+        return false;
+    })
+
+    function AllowNavigation()
+    {
+        if(pagenavigator.length)
+            $('a#PrevNavigation').attr('href','#').css({'display':''});
+        else
+            $('a#PrevNavigation').removeAttr('href').css({'display':'none'});
+    }
+
+    function UpdateReportType(data, selType)
+    {
+        $('#ReportType').html("");
+        $.each(data,function(i,val){
+            if(val==selType)
+                $('#ReportType').append('<option value="'+val+'" selected>'+val+'</option>');
+            else
+                $('#ReportType').append('<option value="'+val+'">'+val+'</option>');
+        });
+    }
+
+    $(window).resize(function (e) {
+        grid.resizeCanvas();
+    })
+
+
+    $('#exportExcel').click(function()
+    {
+        ExportData(data,columns);
+        return false;
+    })
+
+
+    $('a.para-filters').click(function(){
+
+        var link=this;
+
+        $.ajax({
+            type:'POST',
+            url:link.href,
+            success:function(data){
+                if(data.success)
+                {
+                    removeFilter(link);
+                    $('#ReportType').trigger('change');
+                }
+            },
+            error:function()
+            {
+
+            }
+        })
+
+        return false;
+    })
+
+    removeFilter= function(obj){
+        if($(obj).hasClass('para-title'))
+            $(obj).closest('span.ilblock').remove();
+        else
+            $(obj).closest('span').remove();
+    }
+
+    addCrumbs= function(){
+        var elem="";
+        $.each(pagenavigator,function(i,val){
+            elem+="<li><a class='PrevNavigation' href='#' data-reportType='"+val.Type+"' data-reportName='"+val.ReportName+"'>"+val.Type+"</a></li>"
+        });
+
+        if(pagenavigator.length)
+        {$('ol.breadcrumb').find('li:not(.mandatory)').remove();
+            $('ol.breadcrumb').prepend(elem);}
+        else
+            $('#reportHeading').find('ol.breadcrumb li:not(.mandatory)').remove();
+    }
+
+    $(document).on('click','a.PrevNavigation',function(){
+
+        if(this.href)
+        {
+            for(var i=0;i<pagenavigator.length;i++)
+            {
+                var temp=pagenavigator.pop();
+                if(temp.ReportName==$(this).data('reportname') && temp.Type==$(this).data('reporttype'))
+                {
+                    selectedRec = temp.Rec;
+                    SubReportId=temp.Id;
+                    reportColumnId=temp.ReportColumnId;
+                    LoadData(temp.Id, temp.Rec, temp.Type, temp.reportColumnId)
+                }
+            }
+        }
+        return false;
+    })
+
+</script>
+
+<script src="~/Scripts/EB/lodash.min.js"></script>
+<script src="~/Scripts/EB/jszip.js"></script>
+<script src="~/Scripts/EB/excel-builder.dist.js"></script>
+<script src="~/Scripts/EB/ExcelGenerator.js"></script>

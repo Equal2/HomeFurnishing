@@ -1,0 +1,31 @@
+﻿@using GridMvc.Html
+@model IEnumerable<Model.Models.Supplier>
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+</br>
+<p>
+    @Html.ActionLink("Sample a new Product", "SupplierCreate")
+</p>
+
+@Html.Grid(Model).Columns(columns =>
+           {
+               columns.Add(foo => foo.PersonID, true);
+              // columns.Add(foo => foo.PersonType,true).Sortable(true).Titled("Person Type").Filterable(true).SetWidth(80);              
+               columns.Add(foo => foo.Name).Sortable(true).Titled("Name").Filterable(true).SetWidth(80);
+               columns.Add(foo => foo.Code).Titled("Code").SetWidth(30);
+               columns.Add(foo => foo.Active).Titled("Active?").SetWidth(30);
+               columns.Add(foo => foo.CstNo).Sortable(true).Titled("CstNo").Filterable(true).SetWidth(80);
+               columns.Add(foo => foo.LstNo).Titled("LstNo").SetWidth(30);
+               columns.Add(foo => foo.PanNo).Titled("PanN o").SetWidth(30);
+               columns.Add().Encoded(false).Sanitized(false).SetWidth(20).RenderValueAs(d => @Html.ActionLink("Supplier Contects", "SupplierIndex", "PersonContect", new { id = d.PersonID }, new { @class = "modal-link" }));
+
+               columns.Add().Encoded(false).Sanitized(false).SetWidth(20).RenderValueAs(d => @Html.ActionLink("Edit", "SupplierEdit", "Person", new { id = d.PersonID }, new { @class = "modal-link" }));
+               
+           }).WithPaging(25)EmptyText("No records found.")
+
+
+
+

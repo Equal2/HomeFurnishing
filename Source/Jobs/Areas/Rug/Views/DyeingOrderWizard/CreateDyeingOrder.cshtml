@@ -1,0 +1,290 @@
+﻿@{
+    ViewBag.Title = "Dyeing Order Wizard";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<link href="~/Content/DataTables/css/jquery.dataTables.min.css" rel="stylesheet" />
+
+<script src="~/Scripts/DataTables/jquery.dataTables.min.js"></script>
+@*<script src="~/Scripts/DataTables/dataTables.scroller.js"></script>*@
+<script src="~/Scripts/DataTables/dataTables.scroller.min.js"></script>
+
+<style type="text/css">
+    .DTHidden {
+        display: none;
+    }
+
+    .TextRight {
+        text-align: right;
+    }
+
+    .dataTable {
+        font-size: 13px !important;
+        line-height: 1;
+    }
+
+    table.dataTable tbody td {
+        padding: 2px 10px;
+    }
+
+    .popover {
+        max-width: 450px !important;
+        overflow-y: scroll !important;
+        max-height: 300px !important;
+    }
+    .dataTables_scrollBody {
+        min-height: 50px;
+    }
+</style>
+
+
+@*<input type="button" id="button" />*@
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3>
+            <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-list black"></span> Dyeing Plan List</span>
+            @Html.ActionLink(" ", "SelectedProdOrderList", "DyeingOrderWizard", null, new { @class = "glyphicon glyphicon-hand-right toolbar right", @title = "Proceed", @data_toggle = "tooltip", @id = "Proceed" })
+            @Html.ActionLink(" ", "CreateDyeingOrder", "DyeingOrderWizard", null, new { @class = "glyphicon glyphicon-hand-left toolbar right", @style = "margin-right:10px", @title = "Previous", @data_toggle = "tooltip", @id = "Precede" })
+        </h3>
+        <hr style="margin-top:0px;margin-bottom:0px" />
+    </div>
+
+    <div class="panel-info tab" style="padding-left:5px;padding-top:20px">
+        <table id="example" class="display" cellspacing="0" width="100%">
+            <thead style="background: #428bca;color:white">
+                <tr>
+                    <th>OrderNo</th>
+                    <th>OrderDate</th>
+                    <th>Buyer</th>
+                    <th>Design</th>
+                    <th>Products</th>
+                    <th>Shades</th>
+                    <th>Qty</th>
+                    <th>ProdOrderLineId</th>
+                </tr>
+            </thead>
+            <tfoot>
+                <tr>
+                    <th colspan="5" style="text-align:right"></th>
+                    <th></th>
+                    <th></th>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+</div>
+
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#example').dataTable({
+            ajax: "/DyeingOrderWizard/PendingProdOrders",
+            scrollY: "300px",
+            scrollCollapse: true,
+            scroller: true,
+            columns: [
+                { "data": "ProdOrderNo", "width": "6%" },
+                { "data": "ProdOrderDate", "width": "6%" },
+                { "data": "BuyerCode", "width": "10%" },
+                { "data": "Dimension2Name", "width": "11%", "render": function (data, type, row) { return ' <a href="/DyeingOrderWizard/GetShadeWiseBal?IdList=' + row.ProdOrderLineIdList + '" class="Design"> ' + data + ' </a>'; }, },
+                { "data": "ProductList", "width": "25%" },
+                { "data": "Dimension1List", "width": "35%" },
+                { "data": "Qty", className: "TextRight", "width": "7%" },
+                { "data": "ProdOrderLineIdList", "searchable": false, className: "DTHidden", }
+            ],
+            dom: 'T<"clear">frti',
+            TableTools: {
+                "sRowSelect": "os",
+                "aButtons": [
+                "select_all", "select_none"
+                ]
+            },
+
+        });
+
+        $('#example tbody').on('click', 'tr', function () {
+            $(this).toggleClass('selected');
+            CalculateTotal();
+        });
+
+        function CalculateTotal()
+        {
+            var table = $('#example').DataTable();
+
+
+            var intVal = function (i) {
+                return typeof i === 'string' ?
+                    i.replace(/[\$,]/g, '') * 1 :
+                    typeof i === 'number' ?
+                    i : 0;
+            };
+
+            // Total over all pages
+            total = table
+                .column(5)
+                .data()
+                .reduce(function (a, b) {
+                    return intVal(a) + intVal(b);
+                }, 0);
+
+
+            function CheckTotal() {
+                var Qty = 0;
+                $.each(table.rows('.selected').data(), function (index, value) {
+                    Qty += value.Qty;
+                })
+                return Qty.toFixed(3);
+            }
+
+
+
+            $(table.column(4).footer()).html(
+                     CheckTotal() + 'KG ( ' + total.toFixed(3) + 'KG total)'
+               );
+        }
+
+        $('a#Proceed').click(function () {
+
+            var table = $("#example").DataTable();
+            var test = table.rows('.selected').data();
+            var List = "";
+            $.each(test, function (index, value) {
+                List += value.ProdOrderLineIdList;
+            })
+
+            //alert($(this).attr('href'));
+
+            $.ajax({
+                url: $(this).attr('href'),
+                type: "POST",
+                data: { ProdOrderLineId: List },
+                success: function (result) {
+                    if (result.Success == true) {
+                        UpdateDataTable(result, List);
+                    } else if (result.Success == "URL") {
+                        window.location.href = result.Data;
+                    }
+                    else if (!result.Success) {
+                        alert('Something went wrong');
+                    }
+                    else { }
+                },
+            });
+
+            return false;
+
+        });
+
+        function UpdateDataTable(data, List) {
+            var table = $('#example').DataTable();
+
+            table.clear().draw();
+
+            table.rows.add(data.Data).draw();
+
+            $('#example').DataTable().search('').draw();
+
+
+            table.rows().every(function (rowIdx, tableLoop, rowLoop) {
+                var data = this.data();
+                var arr = List.split(',');
+                var node = this.node();
+                $.each(arr, function (i, val) {
+                    var cont = false;
+                    if (data.ProdOrderLineIdList.indexOf(val.trim()) > -1 & val != " ") {
+                        $(node).addClass('selected');
+                    }
+                })                
+
+            });
+
+            CalculateTotal();
+
+            UpdateActionLink();
+
+        }
+
+        function UpdateActionLink() {
+            $('a#Proceed').attr('href', '/DyeingOrderWizard/SummarizeProdOrderList');
+        }
+
+
+
+        $('#example tbody').on('click', 'a.Design', function (e) {
+
+            if ($(e.target).is('a')) {
+                var table = $('#example').DataTable();
+                var data = table.row(this).data();
+                var Block = this;
+                $('.popover').popover('hide');
+                $.get(this.href, {}, function (e) {
+
+                    $(Block).popover({
+                        animation: true,
+                        container: 'body',
+                        trigger: 'focus',
+                        placement: 'bottom',
+                        html: true,
+                        content: ReturnHtml(e.Data),
+                    });
+                    $(Block).popover('show');
+                });
+
+
+            }
+            return false;
+        });
+
+        $(document).click(function (e) {
+            if (($('.popover').has(e.target).length == 0) || $(e.target).is('.close')) {
+                $('.popover').popover('hide');
+            }
+        });
+
+
+        function ReturnHtml(data) {
+            var string = "";
+
+            string += "<ul class='list-group'>  <li class='list-group-item active'> Balance Shade Wise </li> "
+
+                    + "<li class='list-group-item'>"
+                    + "<table border='1' style='font-size:10px'>"
+                    + "<thead>"
+                    + "<tr>"
+                    + "<th style='padding:5px'>"
+                    + "Design"
+                    + "</th>"
+                    + "<th style='padding:5px'>"
+                    + "Shade"
+                    + "</th>"
+                    + "<th style='padding:5px'>"
+                    + "Balance"
+                    + "</th>"
+                    + "</tr>"
+                    + "</thead>"
+                    + "<tbody>";
+
+            $.each(data, function (i, val) {
+
+                string += "<tr>"
+                   + "<td style='padding:5px'>"
+                   + val.Dimension2Name
+                   + "</td>"
+                   + "<td style='padding:5px'>"
+                   + (val.Dimension1Name == null ? "" : val.Dimension1Name)
+                   + "</td>"
+                   + "<td style='padding:5px'>"
+                   + val.BalanceQty
+                   + "</td>"
+                   + "</tr>"
+            });
+
+
+            string += "</tbody></table></li></ul>";
+
+            return string;
+        }
+
+    });
+
+</script>

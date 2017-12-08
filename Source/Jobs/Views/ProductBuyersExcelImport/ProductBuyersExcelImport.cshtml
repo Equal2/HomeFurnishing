@@ -1,0 +1,33 @@
+﻿
+@{
+    ViewBag.Title = "ProductBuyersExcelImport";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Product Buyers Excel Import</h2>
+
+    <p style="font:bold"><b>Check These Fields</b> </p>
+    @{
+        
+    <ul>
+        
+        @if (ViewBag.Buyer != null)
+        {
+            <li>
+                <p style="font:bold"><b>Buyer Names Doesn't Exist:</b>@ViewBag.Buyer</p>
+        </li>
+        }        
+
+
+        @if (ViewBag.Product != null)
+        {
+            <li>
+                <p style="font:bold"><b>Product Doesn't Exist:</b>@ViewBag.Product</p>
+        </li>
+        }     
+
+    </ul>
+}
+
+    @Html.ActionLink("Go Back", "Index", "ProductBuyersExcelImport", new { @class = "btn btn-primary btn-sm col-md-offset-0 CurveBorder ActionLinkPadding" })
+

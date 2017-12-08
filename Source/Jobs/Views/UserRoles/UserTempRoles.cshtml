@@ -1,0 +1,87 @@
+﻿@model IEnumerable<Model.ViewModel.UserRoleViewModel>
+
+<div class="modal-content">
+    <div class="modal-header" style="border-bottom: 1px solid #8E8888">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"> <span class="glyphicon glyphicon-remove"></span></button>
+        <h3>
+            <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-file black"></span> @ViewBag.UserName</span>
+        </h3>
+    </div>
+    <div>
+
+        @Html.AntiForgeryToken()
+
+        <div class="form-horizontal modal-body" style="max-height:250px;overflow-y:scroll">
+            <div class="row">
+                <div class="col-md-3 col-md-offset-1">
+                    <div class="form-group">
+                        @*@Html.Label(item.RoleName +" -", new { @class = "control-label col-xs-8 " })*@
+                        <strong> ExpiryDate                  </strong>
+                    </div>
+                </div>
+                <div class="col-md-7">
+                    <div class="form-group">
+                        @*@Html.Label(item.ExpiryDate.Value.ToString("dd/MMM/yyyy"), new { @class = "control-label col-xs-10 " })*@
+                        <strong> Roles </strong>
+                    </div>
+                </div>
+                <div class="col-md-1">
+                    
+                </div>
+            </div>    
+            
+            @foreach(var item in Model)
+            {
+            <div class="row RolesBlock" style="border-bottom: 1px solid #8E8888; margin-bottom: 5px">
+                <div class="col-md-3 col-md-offset-1">
+                    <div class="form-group">
+                        <strong> @item.ExpiryDate.Value.ToString("dd/MMM/yyyy") - </strong>
+                    </div>
+                </div>
+                <div class="col-md-7">
+                    <div class="form-group">
+                        <strong> @item.RolesList </strong>
+                    </div>
+                </div>
+                <div class="col-md-1">
+                    <a class='glyphicon glyphicon-trash icon-Cus-Size' style="font-size:1.4em" delete='' href='/UserRoles/DeleteTempUserRole?ExpiryDate=@item.ExpiryDate.Value.ToString("dd/MMM/yyyy")&UserId=@item.UserId'></a>
+                </div>
+            </div>    
+            }            
+          
+        </div>
+
+    </div>
+</div>
+
+
+<script type="text/javascript">
+   
+    $('.modal-content').on("click", 'a[delete]', function (e) {
+       
+        var $this = $(this);
+        var $Block = $this.closest('div.RolesBlock');
+
+        $.ajax({
+            url: $this.attr('href'),
+            type: "POST",            
+            success: function (result) {
+                if (result.success) {
+                    $($Block).animate({ height: 0}, 1500, "swing", function () {
+                        $($Block).remove();
+                    })
+                }
+                else
+                {
+                    if (!$('.modal-content').find('.modal-body #errormsg').length) {
+                        $('.modal-content').find('.modal-body').prepend("<div class='alert alert-danger'><span id=errormsg >Error in Deleting TempRoles</span></div>")
+                    }
+                }
+            }
+        });
+
+        return false;
+    });
+
+
+</script>

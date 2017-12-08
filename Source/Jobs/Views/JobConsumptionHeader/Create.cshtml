@@ -1,0 +1,589 @@
+﻿@model Model.ViewModel.StockHeaderViewModel
+@using Core.Common
+@{
+    ViewBag.Title = "Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!-- modal placeholder-->
+<div id='myModal' class='modal fade in'>
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div id='myModalContent'></div>
+        </div>
+    </div>
+</div>
+
+
+@using (Html.BeginForm("Post", "JobConsumptionHeader", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(m => m.SiteId)
+    @Html.HiddenFor(m => m.DivisionId)
+    @Html.HiddenFor(m => m.StockHeaderId)
+    @*@Html.HiddenFor(m => m.ProcessId)*@
+    @Html.HiddenFor(m => m.DocTypeId)
+    @Html.HiddenFor(m => m.CreatedDate)
+    @Html.HiddenFor(m => m.StockHeaderSettings.ProcessId)
+
+
+    <div class="panel panel-default">
+        <div class="panel-heading">
+
+            @CustomHelpers.RenderHeaderInfo(ViewBag.transactionType, (int?)ViewBag.PendingToSubmit, (int?)ViewBag.PendingToReview, ViewBag.Name)
+
+            @*@if (ViewBag.transactionType == "submit")
+            {<h3 style="border-bottom:0px solid #e1dada;padding-bottom:0px;">
+                <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"> <span class="glyphicon glyphicon-file black"></span>Submit @ViewBag.Name</span>
+                <input type="submit" value="Submit" name="Command:Submit" class="btn btn-primary right" style="width: 90px; background-color: #2980b9" />
+            </h3>}
+            else if (ViewBag.transactionType == "review" || ViewBag.transactionType == "ReviewContinue")
+            {<h3 style="border-bottom:0px solid #e1dada;padding-bottom:0px;">
+                <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"> <span class="glyphicon glyphicon-file black"></span> Review @ViewBag.Name</span>
+                <button type="submit" class="btn btn-primary right" name="Command:Review">Review</button>
+                <input type="hidden" id="IsContinue" name="IsContinue" value="" />
+            </h3>}
+            else if (ViewBag.transactionType == "detail")
+            {
+                <h3>
+                    <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"> <span class="glyphicon glyphicon-file black"></span>@ViewBag.Name</span>
+                </h3>
+            }
+            else
+            {
+                <h3 style="border-bottom:0px solid #e1dada;padding-bottom:0px;">
+                    <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"> <span class="glyphicon glyphicon-file black"></span> @ViewBag.Name</span>
+                    <input type="submit" value="Save" class="btn btn-primary right" id="submit" style="width: 90px; background-color: #2980b9" />
+                </h3>
+            }*@
+            <hr style="margin-top:0px;margin-bottom:0px" />
+
+            <div class="panel-info">
+                <h4 style="padding:5px 0 0 0;margin:0px">
+                    @Html.ActionLink(" ", " ", " ", null, new { @class = "glyphicon glyphicon-refresh toolbar", @title = "Refresh Page", @data_toggle = "tooltip", @id = "RefreshPage" })
+                    @Html.ActionLink(" ", "Create", "JobConsumptionHeader", new { @id = ViewBag.id }, new { @class = "glyphicon glyphicon-plus toolbar", @title = "Add New", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "GetHistory", "LogHistory", new { Ids = Model.StockHeaderId, DocTypeId = Model.DocTypeId }, new { @class = "glyphicon glyphicon-user toolbar", @title = "History", @data_toggle = "tooltip", @id = "DocHistory", @data_modal = "" })
+                    @Html.ActionLink(" ", "GeneratePrints", "JobConsumptionHeader", new { Ids = Model.StockHeaderId, DocTypeId = Model.DocTypeId }, new { @class = "glyphicon glyphicon-print toolbar", @title = "Print", @data_toggle = "tooltip", id = "PrintRecordC" })
+                    @Html.ActionLink(" ", "Email", "JobConsumptionHeader", null, new { @class = "glyphicon glyphicon-envelope toolbar", @title = "Email", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "PrevPage", "JobConsumptionHeader", new { id = @Model.StockHeaderId }, new { @class = "glyphicon glyphicon-arrow-left toolbar", @title = "Prev Record", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "NextPage", "JobConsumptionHeader", new { id = @Model.StockHeaderId }, new { @class = "glyphicon glyphicon-arrow-right toolbar", @title = "Next Record", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "Index", "JobConsumptionHeader", new { id = ViewBag.id, IndexType = ViewBag.IndexStatus }, new { @class = "glyphicon glyphicon-list toolbar right", @title = "List", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "Report", "JobConsumptionHeader", null, new { @class = "glyphicon glyphicon-th toolbar right", @title = "Report", @data_toggle = "tooltip" })
+                </h4>
+            </div>
+        </div>
+
+
+        <div class="panel-info" style="padding-left:15px">
+            <div class="form-horizontal">
+                @Html.ValidationSummary(true)
+                <div class="row">
+                    <h4 class="col-md-12 black">
+                        <span class="glyphicon glyphicon-align-justify"></span>
+                        1.Consumption Details
+                    </h4>
+                    <div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group" style="margin-top:15px">
+                                    @Html.LabelFor(model => model.DocDate, "Entry Date", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.DocDate, "{0:dd/MMMM/yyyy}", new
+                                   {
+                                       @class = "datepickerWithNFD form-control col-xs-6 required updateDocNo",
+                                       data_tabl = "StockHeaders",
+                                       data_doctype = Model.DocTypeId,
+                                       data_divId = Model.DivisionId,
+                                       data_sitId = Model.SiteId,
+                                   })
+                                        @Html.ValidationMessageFor(model => model.DocDate, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <div class="col-md-6">
+                                <div class="form-group" style="margin-top:15px">
+                                    @Html.LabelFor(model => model.DocNo, "Entry No", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.DocNo, null, new { @class = "form-control col-xs-6 required" })
+                                        @Html.ValidationMessageFor(m => m.DocNo, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6" style='display:@(Model.StockHeaderSettings.isVisibleProcessHeader ? "" : "none")'>
+                                <div class="form-group">
+                                    @Html.HiddenFor(m => m.StockHeaderSettings.isVisibleProcessHeader)
+                                    @Html.LabelFor(model => model.ProcessId, "Process", new { @class = "control-label col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextBoxFor(m => m.ProcessId, new { @class = "form-control col-xs-6 required" })
+                                        @Html.ValidationMessageFor(m => m.ProcessId, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @if (Model.StockHeaderSettings.PersonFieldHeading != null)
+                                    {
+                                        @Html.LabelFor(model => model.PersonId, Model.StockHeaderSettings.PersonFieldHeading.ToString(), new { @class = "control-label col-xs-4" })
+                                    }
+                                    else
+                                    {
+                                        @Html.LabelFor(model => model.PersonId, "Person", new { @class = "control-label col-xs-4" })
+                                    }
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.PersonId, new { @class = "form-control col-xs-6 required" })
+                                        @Html.ValidationMessageFor(m => m.PersonId, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+
+
+                            <div class="col-md-6" style="display:@(Model.StockHeaderSettings.isVisibleMachine ? "" : "none")">
+                                @Html.HiddenFor(m => m.StockHeaderSettings.isVisibleMachine)
+                                @Html.HiddenFor(m => m.StockHeaderSettings.isMandatoryMachine)
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.MachineId, "Machine", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @if (Model.StockHeaderSettings.isMandatoryMachine)
+                                        {
+                                            @Html.TextBoxFor(m => m.MachineId, new { @class = "form-control col-xs-6 required" })
+                                        }
+                                        else
+                                        {
+                                            @Html.TextBoxFor(m => m.MachineId, new { @class = "form-control col-xs-6" })
+                                        }
+
+                                        @Html.ValidationMessageFor(m => m.MachineId, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.Remark, "Remark", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextAreaFor(m => m.Remark, new { @class = "form-control col-xs-6" })
+                                        @Html.ValidationMessageFor(m => m.Remark, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+
+                <hr />
+
+                <div class="row">
+                    <h4 class="col-md-12 black" style="margin-top:15px">
+                        <span class="glyphicon glyphicon-shopping-cart"></span>
+                        2.Products
+                    </h4>
+                </div>
+
+                <div class="panel-info">
+                    <h5 style="padding:5px 0 3px 0;margin:0px;font-weight:bold">
+                        <span class="glyphicon glyphicon-plus-sign"></span>
+                        @Html.ActionLink("Add New Row", "_Multi", "JobConsumptionLine", new { id = @Model.StockHeaderId, @sid = @Model.PersonId, @CosCenteId = @Model.CostCenterId, @Procid = @Model.ProcessId }, new { data_modal = "", id = "btnCreate", @class = "toolbar", @title = "Add New", @data_toggle = "tooltip", @data_detailDisabled = "true" })
+                    </h5>
+                </div>
+                <div style="padding-right:15px">
+
+                    <div class="panel panel-default" id="grid">
+
+                        <div class="panel-heading headrow" style="background-image: -webkit-linear-gradient(top, #428bca 0%, #428bca 100%);color:white">
+                            <div class="row grid-head">
+                                <div class="text-left block" style="width: 5%; ">
+                                    Srl.
+                                </div>
+                                <div class="block" style="width: 90%;">
+                                    <div class="row">
+                                        @*ProductInfo*@
+                                        <div class="block" style="width: 30%; ">
+                                            Product Name
+                                        </div>
+                                        <div class="block" style="width: 20%;">
+                                            Process
+                                        </div>
+                                        @*Qty*@
+                                        <div class="block" style="width: 15%;">
+                                            CostCenter
+                                        </div>
+                                        <div class="text-right block" style="width: 15%;">
+                                            Qty
+                                        </div>
+                                        @*Amount*@
+                                        @*Remark*@
+                                        <div class="block" style="width: 20%;">
+                                            Remark
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <div class="" style="width:5%">
+
+                                </div>
+                            </div>
+
+                        </div>
+
+
+                        <div class="panel-info" id="gbody">
+
+
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+
+@if ((ViewBag.Mode == "Add") || (ViewBag.Mode == "Edit"))
+{
+
+    <script type="text/javascript">
+
+        //Reloading the table contents on modal hide
+        $('#myModal').on('hidden.bs.modal', function () {
+            LoadProducts();
+        });
+
+        $(document).ready(function(){
+            enableModalTransitions();
+        })
+
+        ////To focus on the first element on modal load
+        //$('#myModal').on('shown.bs.modal', function () {
+        //    $("#ProductId").select2("focus");
+        //});
+
+
+        ////For Populating Modal PopUp on DoubleClick Of Row
+        //$('#gbody').on("dblclick",'.grid-body',function(){
+        //    var editurl=$(this).find('a[edit]').attr('href');
+        //    $('#myModalContent').load(editurl, function () {
+        //        //alert('2');
+        //        $('#myModal').modal({
+        //            backdrop: 'static',
+        //            keyboard: true
+        //        }, 'show');
+
+        //        bindForm1(this);
+        //    });
+        //});
+
+        ////For Handling Modal PopUp on Clicking Delete Icon
+        //$('#gbody').on("click",'a[delete]', function (e) {
+        //    $('#myModalContent').load(this.href, function () {
+        //        //alert('2');
+        //        $('#myModal').modal({
+        //            backdrop: 'static',
+        //            keyboard: true
+        //        }, 'show');
+
+        //        bindForm1(this);
+        //    });
+        //    return false;
+        //});
+
+
+        ////For posting the data through ajax and render the contents sent back from the server
+        //function bindForm1(dialog) {
+        //    //alert("binding");
+        //    $('form#modform', dialog).submit(function () {
+        //        //alert(this.action);
+        //        $.ajax({
+        //            url: this.action,
+        //            type: this.method,
+        //            data: $(this).serialize(),
+        //            success: function (result) {
+        //                if (result.success) {
+        //                    $('#myModal').modal('hide');
+        //                    //Refresh
+        //                    //location.reload();
+        //                    //alert('Data Saved');
+        //                }else if(!result.success)
+        //                {
+        //                    $('#myModalContent').html(result);
+        //                    bindForm1();
+        //                }
+        //                else {
+        //                    $('#myModalContent').html(result);
+        //                    bindForm1();
+        //                }
+        //            }
+        //        });
+        //        return false;
+        //    });
+
+        //}
+
+
+
+    </script>
+
+}
+
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        var id=@Model.StockHeaderId;
+        if(id==null||id==0)
+        {
+            $(document).find('a#btnCreate').removeAttr('href').removeAttr('data-modal');
+            $(document).find('a#btnCreatePO').removeAttr('href').removeAttr('data-modal');
+        }
+
+        CustomSelectFunction($("#ProcessId"), '/ComboHelpList/GetProcessWithChildProcess', '/ComboHelpList/SetSingleProcess', ' ', false,0, $('#StockHeaderSettings_ProcessId').val());
+        //CustomSelectFunction($("#ProcessId"), '/ComboHelpList/GetProcess', '/ComboHelpList/SetSingleProcess', ' ', false, 1);
+        //CustomSelectFunction($("#PersonId"), '/ComboHelpList/GetJobWorkersWithProcess', '/ComboHelpList/SetSinglePerson', ' ', false, 1,$("#ProcessId").val());
+        CustomSelectFunction($("#PersonId"), '/JobConsumptionHeader/GetCustomPerson', '/ComboHelpList/SetSinglePerson', ' ', false, 1,$('#DocTypeId').val());
+        CustomSelectFunction($("#CostCenterId"), '/ComboHelpList/GetCostCenter', '/ComboHelpList/SetSingleCostCenter', ' ', false, 1);
+        CustomSelectFunction($("#MachineId"), '/ComboHelpList/GetMachine', '/ComboHelpList/SetSingleMachine', ' ', false, 1);
+
+
+        if ($("#ProcessId").is(":hidden") == false)
+        {
+            $('#ProcessId').select2('focus');
+        }
+        else{
+            $('#PersonId').select2('focus');
+        }
+
+        $("#ProcessId").change(function(){
+            CustomSelectFunctionWithMultipleFilters($("#PersonId"), '/StockIssueHeader/GetCustomPerson', '/ComboHelpList/SetSinglePerson', ' ', false, 0,$('#DocTypeId').val(),$('#ProcessId').val());
+        });
+
+        //Calling the function to load the table data/ Line information
+        LoadProducts();
+
+        //Adding Hidden Input Fields
+        AddFields();
+
+            $('#PersonId').select2("focus");
+
+
+    });
+
+ 
+    function LoadProducts() {
+        var groupId=@Model.StockHeaderId;
+        var link="/JobConsumptionLine/Index/"+groupId;
+        var status='@Model.Status';
+        var LineEditUrl;
+        var LineDeleteUrl;
+        if(status==StatusContstantsEnum.Drafted||status==StatusContstantsEnum.Import)
+        {
+            LineEditUrl="/JobConsumptionLine/_ModifyLine/";
+            LineDeleteUrl="/JobConsumptionLine/_DeleteLine/";
+        }
+        else if(status==StatusContstantsEnum.Submitted || status == StatusContstantsEnum.Modified )
+        {
+            LineEditUrl="/JobConsumptionLine/_ModifyLineAfterSubmit/";
+            LineDeleteUrl="/JobConsumptionLine/_DeleteLine_AfterSubmit/";
+        }
+        else
+        {
+            LineEditUrl="/JobConsumptionLine/_Detail/";
+            LineDeleteUrl="/JobConsumptionLine/_Detail/";
+        }       
+        var QtyCount=0;
+        var DealQtyCount=0;
+        var AmountCount=0;
+        var unit=true;
+        var dunit=true;
+        var prevunit;
+        var prevdunit;
+        var decimal=0;
+        var DUdecimal=0;
+        $.ajax({
+            url: link,
+            type: "GET",
+            success: function (data) {
+                var row = ""
+                var srno=1;
+
+                if(data.length!=0)
+                {
+                    $.each(data, function (index, item) {
+                        row += " <div class='row crow grid-body' style='margin-left:0px;margin-right:0px'>"
+                            +"      <div class='row-index block'  style='width:5%'>"+srno+"<input type='hidden' class='id' value='"+item.StockLineId+"' /></div>"
+                            +"          <div class='block'  style='width:90%'>"
+                            +"              <div class='row'>"
+                            +"                  <div class='block' style='width:30%'>"+(item.ProductName==null?" ":"<strong>"+item.ProductName+"</strong>")
+                            +"                      <br />"+(item.Specification==null?" ":item.Specification)
+                            +"                          <p>"+(item.Dimension1Name==null?" ":item.Dimension1Name+",")+(item.Dimension2Name==null?" ":item.Dimension2Name)+"</p>"
+                            +"                          <p>"+(item.Dimension3Name==null?" ":item.Dimension3Name+",")+(item.Dimension4Name==null?" ":item.Dimension4Name)+"</p>"
+                            +"                          <div>"+((item.DueDate==null)?" ":"<span title='DueDate' class='label label-danger' style='font-weight:bold'>"+formatDate('d/m/Y',new Date(parseInt(item.DueDate.substr(6))))+"</span>")
+                            +"                          </div>"
+                            +"                  </div>"
+                            +"                  <div class='block'  style='width:20%'>"+(item.FromProcessName==null?" ":"<span title='' class='' style='font-weight:bold'>"+item.FromProcessName)+"</span><br />"
+                            +"                   </div>"
+                            +"                  <div class='block'  style='width:15%'>"+(item.CostCenterName==null?" ":"<span title='' class='' style='font-weight:bold'>"+item.CostCenterName+"</span>")
+                            +"                   </div>"
+                            +"                  <div class='text-right block'  style='width:15%'>"+(item.Qty==null?" ":item.Qty.toFixed(item.UnitDecimalPlaces))+"<br />"
+                            +"                      <div><small>"+(item.UnitName==null?" ":item.UnitName)+"</small>"
+                            +"                      </div>"
+                            +"                   </div>"
+                            +"                   <div class='block'  style='width:20%'>"+(item.ProductUidName==null?" ":"ProductUID:"+item.ProductUidName+"<br/>")+(item.Remark==null?" ":item.Remark)+(item.LoNo==null?" ":"<br /><span title='' class='' style='font-weight:bold'>"+item.LoNo+"</span>")
+                            +"                   </div>"
+                            +"              </div>"
+                            +"          </div>"
+                            +"      <div class='block'  style='width:5%'><a class='glyphicon glyphicon-trash icon-Cus-Size'  data-modal='' data-detailDisabled='true' delete='' href='"+LineDeleteUrl+item.StockLineId+"'></a>"
+                            +"          <a  edit='' href='"+LineEditUrl+item.StockLineId+"'></a>"
+                            +"      </div>"
+                            +"  </div>"
+                            +"<hr style='margin-top:0px;margin-bottom:0px'/>";
+                        QtyCount+=item.Qty;
+                        AmountCount+=item.Amount;
+                        if(srno!=1)
+                        {
+                            if(item.UnitName==prevunit && unit!=false)
+                            {}
+                            else
+                            {unit=false;}
+                        }
+
+                        if(decimal- parseInt(item.UnitDecimalPlaces) < 0){decimal=item.UnitDecimalPlaces;}
+                        srno++;
+                        prevunit=item.UnitName;
+                    });
+                    row+="<div class='row tfooter' style='padding-top:10px;margin-left:0px;margin-right:0px'>"
+                        +"  <div class='block' style='width:5%'>"
+                        +"  </div>"
+                        +"  <div class='block' style='width:90%'>"
+                        +"      <div class='row'> "
+                        +"          <div class='block'  style='width:30%'><strong>Total</strong></div>"
+                        +"          <div class='block' style='width:20%'>"
+                        +"          </div>"
+                        +"          <div class='block text-right' style='width:15%'>"
+                        +"          </div>"
+                        +"          <div class='block text-right' style='width:15%'><strong>"
+                        +               ((unit==true)?QtyCount.toFixed(decimal)+"<br /><small>"+prevunit:QtyCount.toFixed(decimal))+"</small></strong>"
+                        +"          </div>"
+                        +"          <div class='block' style='width:20%'>"
+                        +"          </div>"
+                        +"      </div>"
+                        +"  </div>"
+                        +"  <div class='block'  style='width:5%'>"
+                        +"  </div>"
+                        +"</div>"
+                }
+                else
+                {
+                    ;
+                }
+                $("#gbody").html(row);
+
+            },
+            error: function (result) {
+                alert("Error");
+            }
+        });
+    };
+
+</script>
+
+
+@if ((ViewBag.Mode != "Add") && (ViewBag.Mode != "Edit"))
+{
+    <script type="text/javascript">
+
+        $(document).ready(function(){
+            DisablePageNavigation();
+        })
+        
+        //RemoveFields();
+
+        //function RemoveFields(){
+        //    //Disabling input fields
+        //    $(':input:not(:submit)').attr('disabled','disabled');
+
+        //    //Removing all the events from the newly created lines
+        //    $('#gbody').unbind();
+
+        //    //Removing Add New Row ActionLink
+        //    $('a#btnCreate').parents('h5')[0].remove();
+
+
+        //    //Preventing the click event on newly created elements
+        //    $(document).on('click','#gbody a',function(event){
+        //        event.preventDefault();
+        //    })
+        //    //Removing the action link from the form so that the request will be redirected to the Submit function in the controller instead of the hardcoded path
+        //    $('form:last').prop('action','');
+        //}
+
+
+    </script>
+}
+
+@if ((Model.Status == (int)ActivityTypeContants.Modified || Model.Status == (int)ActivityTypeContants.Submitted)
+   && (ViewBag.transactionType == "submit" || ViewBag.transactionType == "submitContinue" || ViewBag.transactionType == "review" || ViewBag.transactionType == "ReviewContinue"))
+{
+    <script type="text/javascript">
+       
+        $(document).ready(function(){
+            enableActivityLogReason();
+        })
+        
+        //var href = '/ActivityLog/LogEditReason'
+
+        //var $btnClicked;
+
+        //$(':submit').bind('click', function () {
+        //    $btnClicked=$(this);
+        //    $('#myModalContent').load(href, function () {
+
+        //        $('#myModal').modal({
+        //            backdrop: 'static',
+        //            keyboard: true
+        //        }, 'show');
+
+        //        bindForm1(this);
+        //    });
+
+        //    return false;
+        //})
+
+        //function bindForm1(dialog) {
+
+        //    $('#modformr', dialog).submit(function () {
+
+        //        $.ajax({
+        //            url: this.action,
+        //            type: this.method,
+        //            data: $(this).serialize(),
+        //            success: function (result) {
+        //                if (result.success) {
+        //                    $('#myModal').modal('hide');
+
+        //                    $(':submit').unbind();
+
+        //                    $('input[name="UserRemark"]').val(result.UserRemark);
+
+        //                    $btnClicked.trigger('click');
+
+        //                } else {
+        //                    $('#myModalContent').html(result);
+        //                    bindForm1();
+        //                }
+        //            }
+        //        });
+        //        return false;
+        //    });
+
+        //}
+
+    </script>
+}

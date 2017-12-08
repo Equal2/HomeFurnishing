@@ -1,0 +1,75 @@
+﻿@model Model.Models.Department
+
+@{
+    ViewBag.Title = "Create";
+}
+
+@using (Html.BeginForm("Post", "Department", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(model => model.DepartmentId)
+    <div class="panel panel-default">
+        <div class="panel-heading">
+      
+            <div class="row">
+                <div class="col-xs-10">
+                    <h3 style="border-bottom:0px solid #e1dada;padding-bottom:0px;">
+                        <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"> <span class="glyphicon glyphicon-file black"></span>Department</span>
+                    </h3>
+                </div>
+                <div class="col-xs-2">
+                    <input type="submit" value="Save" class="hidden-xs btn btn-primary right" id="submit" style="width: 90px; background-color: #2980b9" />
+                    <button class="hidden-lg hidden-md hidden-sm right" name="" type="submit" id="submit"><span class="glyphicon glyphicon-floppy-disk black"></span> </button>
+                </div>
+            </div>
+
+            <hr style="margin-top:0px;margin-bottom:0px" />
+
+            <div class="panel-info">
+              
+                <div class="btn-group">
+                    @Html.ActionLink(" ", "Create", "Department", null, new { @class = "cbtn btn-circle glyphicon glyphicon-plus toolbar", @title = "Add New", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "History", "Department", null, new { @class = "cbtn btn-circle glyphicon glyphicon-user toolbar", @title = "History", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "PrevPage", "Department", new { id = @Model.DepartmentId }, new { @class = "cbtn btn-circle glyphicon glyphicon-arrow-left toolbar", @title = "Prev Record", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "NextPage", "Department", new { id = @Model.DepartmentId }, new { @class = "cbtn btn-circle glyphicon glyphicon-arrow-right toolbar", @title = "Next Record", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "Index", "Department", null, new { @class = "cbtn btn-circle glyphicon glyphicon-list toolbar", @title = "List", @data_toggle = "tooltip" })
+                </div>
+            </div>
+        </div>
+        <div class="panel-info" style="padding-left:15px">
+            <div class="form-horizontal">
+
+                @Html.ValidationSummary(true)
+
+                <div>
+                    <div class="col-md-6">
+                        <div class="form-group" style="margin-top:15px">
+                            @Html.LabelFor(model => model.DepartmentName, "Department Name", new { @class = "control-label  col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(m => m.DepartmentName, null, new { @class = "form-control col-xs-6 required" })
+                                @Html.ValidationMessageFor(m => m.DepartmentName, null, new { @class = "has-error" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group" style="margin-top:15px">
+                            @Html.LabelFor(model => model.IsActive, "Is Active", new { @class = "control-label  col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10" style=" padding-top:4px">
+                                @Html.CheckBoxFor(m => m.IsActive, new { @class = "checkbox col-xs-1" })
+                                @Html.ValidationMessageFor(model => model.IsActive)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row"></div>
+                @*<hr/>
+
+                    <div class="form-group">
+                        <div class="col-md-offset-2 col-md-10">
+                            <input type="submit" value="Create" class="btn btn-primary btn-sm CurveBorder height" style=" border-color: #606264" />
+                        </div>
+                    </div>*@
+            </div>
+        </div>
+    </div>
+}

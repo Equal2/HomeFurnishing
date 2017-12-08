@@ -1,0 +1,133 @@
+﻿@model Model.ViewModels.UpdateRates
+
+
+@using Core.Common
+
+
+
+       
+<div class="modal-content">
+    <div class="modal-header" style="border-bottom: 1px solid #8E8888">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"> <span class="glyphicon glyphicon-remove"></span></button>
+        <h3>
+            <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-file black"></span>Update Rates</span>
+        </h3>
+    </div>
+    <div>
+        @using (Html.BeginForm("UpdateRates", "SaleInvoiceLine", FormMethod.Post, new { @class = "modal-form", id = "modform" }))
+        {
+            @Html.AntiForgeryToken()
+            @Html.HiddenFor(m=>m.SaleInvoiceHeaderId)
+
+            <div class="form-horizontal modal-body">
+
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.FromBaleNo, "From Bale No", new { @class = "control-label col-xs-6 " })
+                            <div class="col-xs-6">
+                                @Html.TextBoxFor(m => m.FromBaleNo, null, new { @class = "form-control col-xs-6 required" })
+                                @Html.ValidationMessageFor(m => m.FromBaleNo, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.ToBaleNo, "To Bale No", new { @class = "control-label col-xs-6 " })
+                            <div class="col-xs-6">
+                                @Html.TextBoxFor(m => m.ToBaleNo, null, new { @class = "form-control col-xs-6 required" })
+                                @Html.ValidationMessageFor(m => m.ToBaleNo, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.ProductInvoiceGroupId, "Invoice Group", new { @class = "control-label col-xs-3 " })
+                            <div class="col-xs-9">
+                                @Html.TextBoxFor(m => m.ProductInvoiceGroupId, null, new { @class = "form-control col-xs-6 required" })
+                                @Html.ValidationMessageFor(m => m.ProductInvoiceGroupId, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Rate, "Rate", new { @class = "control-label col-xs-3 " })
+                            <div class="col-xs-3">
+                                @Html.TextBoxFor(m => m.Rate, null, new { @class = "form-control col-xs-6 required" })
+                                @Html.ValidationMessageFor(m => m.Rate, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+
+                        <div class="modal-footer " style="padding: 19px 20px 0 20px; border-top:1px solid #8E8888">
+                            <button class="btn custom right" name="Command:submit" type="submit" id="submit"><h2 style="margin:0px"><span class="glyphicon glyphicon-floppy-disk black"></span> </h2></button>
+                        </div>
+                    </div>
+        }
+    </div>
+</div>
+
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        CustomSelectFunction($("#ProductInvoiceGroupId"), '/ComboHelpList/GetProductInvoiceGroup', '/ComboHelpList/SetSingleProductInvoiceGroup', ' ', false, 0);
+
+        $('#FromBaleNo').val('');
+        $('#ToBaleNo').val('');
+
+        $('#FromBaleNo').focus();
+        $('#ProductInvoiceGroupId').change(GetRate);
+    })
+
+    function GetRate(){
+        $.ajax({
+            cache:false,
+            type: "POST",
+            url:"@(Url.Action("GetRate"))",
+            data: { ProductInvoiceGroupId : $('#ProductInvoiceGroupId').val() },
+        success:function(data){
+            $('#Rate').val(data);
+        },
+        error:function(xhr,ajaxOptions,thrownError){
+            alert('Failed to Retrive Rate'+thrownError);
+        }
+      })
+    }
+
+    $('#submit').click(function () {
+        
+        if ($('#FromBaleNo').val() == 0 || $('#FromBaleNo').val() == "" || $('#FromBaleNo').val() == null)
+        {
+            $('#FromBaleNo').parent().append("<span id=errormsg style='color:red'> From bale no is required.</span>")
+            return false;
+        }
+
+        if ($('#ToBaleNo').val() == 0 || $('#ToBaleNo').val() == "" || $('#ToBaleNo').val() == null) {
+            $('#ToBaleNo').parent().append("<span id=errormsg style='color:red'> To bale no is required.</span>")
+            return false;
+        }
+
+        if ($('#Rate').val() == 0 || $('#Rate').val() == "" || $('#Rate').val() == null) {
+            $('#Rate').parent().append("<span id=errormsg style='color:red'> Rate is required.</span>")
+            return false;
+        }
+
+        if ($('#ProductInvoiceGroupId').val() == 0 || $('#ProductInvoiceGroupId').val() == "" || $('#ProductInvoiceGroupId').val() == null) {
+            $('#ProductInvoiceGroupId').parent().append("<span id=errormsg style='color:red'> Product Invoice Group is required.</span>")
+            return false;
+        }
+
+
+    })
+</script>

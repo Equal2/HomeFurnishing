@@ -1,0 +1,210 @@
+﻿@model Model.Tasks.ViewModel.DARViewModel
+
+@{
+    ViewBag.Title = "Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<link href="~/Content/bootstrap-datetimepicker.min.css" rel="stylesheet" />
+<script src="~/Scripts/bootstrap-datetimepicker.min.js"></script>
+
+@using (Html.BeginForm("Post", "DAR", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(model => model.DARId)
+    @Html.HiddenFor(model => model.ForUser)
+
+    <div class="panel panel-default">
+
+        <div class="panel-heading">
+
+            <h3>
+                <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-file black"></span> DARs</span>
+                <input type="submit" value="Save" class="btn btn-primary right" id="submit" style="width: 90px; background-color: #2980b9" />
+            </h3>
+            <hr style="margin-top:0px;margin-bottom:0px" />
+
+            <div class="panel-info">
+                <h4 style="padding:5px 0 0 0;margin:0px">
+                    @Html.ActionLink(" ", " ", " ", null, new { @class = "glyphicon glyphicon-refresh toolbar", @title = "Refresh Page", @data_toggle = "tooltip", @id = "RefreshPage" })
+                    @Html.ActionLink(" ", "Create", "DAR", null, new { @class = "glyphicon glyphicon-plus toolbar", @title = "Add New", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "History", "DAR", null, new { @class = "glyphicon glyphicon-user toolbar", @title = "History", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "Email", "DAR", null, new { @class = "glyphicon glyphicon-envelope toolbar", @title = "Email", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "PrevPage", "DAR", new { id = @Model.DARId }, new { @class = "glyphicon glyphicon-arrow-left toolbar", @title = "Prev Record", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "NextPage", "DAR", new { id = @Model.DARId }, new { @class = "glyphicon glyphicon-arrow-right toolbar", @title = "Next Record", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "Index", "Tasks", null, new { @class = "glyphicon glyphicon-pushpin toolbar right", @title = "List", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "Index", "DAR", null, new { @class = "glyphicon glyphicon-list toolbar right", @title = "List", @data_toggle = "tooltip" })
+                </h4>
+            </div>
+        </div>
+        <div class="panel-info" style="padding-left:15px">
+
+            <div class="form-horizontal">
+
+                @Html.ValidationSummary(true)
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group" style="margin-top:15px">
+                            @Html.LabelFor(model => model.DARDate, "DAR Date", new { @class = "control-label col-xs-4" })
+                            <div class="col-xs-6">
+                                @Html.TextBoxFor(m => m.DARDate, "{0:dd/MMMM/yyyy}", new { @class = "datepickerWithNFD form-control col-xs-6 required" })
+                                @Html.ValidationMessageFor(model => model.DARDate, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group" style="margin-top:15px">
+                            @Html.LabelFor(model => model.FromTime, "From Time", new { @class = "control-label col-xs-4" })
+                            <div class="col-xs-6">
+                                <div id="FromTimeDP" class="input-group input-append">
+                                    @Html.TextBoxFor(m => m.FromTime,"{0:HH:mm:ss}", new { @class = "form-control col-xs-6 required", @placeholder = "00:00", @data_format = "hh:mm:ss" })
+                                    <span class="input-group-addon add-on">
+                                        <i data-time-icon="icon-time" data-date-icon="icon-calendar" class="glyphicon glyphicon-time"></i>
+                                    </span>
+                                </div>
+                                @Html.ValidationMessageFor(model => model.FromTime, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">         
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.FromTime, "From Time", new { @class = "control-label col-xs-4" })
+                            <div class="col-xs-6">
+                                <div id="ToTimeDP" class="input-group input-append">
+                                    @Html.TextBoxFor(m => m.ToTime, "{0:HH:mm:ss}", new { @class = "form-control col-xs-6 required", @placeholder = "00:00", @data_format = "hh:mm:ss" })                                    
+                                    <span class="input-group-addon add-on">
+                                        <i data-time-icon="icon-time" data-date-icon="icon-calendar" class="glyphicon glyphicon-time"></i>
+                                    </span>
+                                </div>
+                                @Html.ValidationMessageFor(model => model.FromTime, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.WorkHours, "Work Hours", new { @class = "control-label col-xs-4" })
+                            <div class="col-xs-6">
+                                @Html.TextBoxFor(m => m.WorkHours, null, new { @class = "form-control col-xs-6 required" })
+                                @Html.ValidationMessageFor(m => m.WorkHours, null, new { @class = "has-error" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.TaskId, "Task", new { @class = "control-label col-xs-2" })
+                            <div class="col-xs-9">
+                                @Html.TextBoxFor(m => m.TaskId, new { @class = "form-control col-xs-8 required" })
+                                @Html.ValidationMessageFor(m => m.TaskId, null, new { @class = "has-error" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Description, "Description", new { @class = "control-label col-xs-2" })
+                            <div class="col-xs-9">
+                                @Html.TextAreaFor(m => m.Description,2,10, new { @class = "form-control col-xs-9" })
+                                @Html.ValidationMessageFor(m => m.Description, null, new { @class = "has-error" })
+                            </div>
+                        </div>
+                    </div>
+                </div>                
+                @*<div class="row">                   
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.ForUser, "User", new { @class = "control-label col-xs-4" })
+                            <div class="col-xs-6">
+                                @Html.TextBoxFor(m => m.ForUser, null, new { @class = "form-control col-xs-6 required" })
+                                @Html.ValidationMessageFor(m => m.ForUser, null, new { @class = "has-error" })
+                            </div>
+                        </div>
+                    </div>
+                </div>*@
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Status, "Status", new { @class = "control-label col-xs-4" })
+                            <div class="col-xs-6">
+                                @Html.DropDownListFor(m => m.Status, new SelectList(ViewBag.StatList as System.Collections.IEnumerable, "Value", "Text"), new { @class = "form-control col-xs-6 height" })
+                                @Html.ValidationMessageFor(m => m.Status, null, new { @class = "has-error" })
+                            </div>
+                        </div>
+                    </div>
+                </div>               
+            </div>
+        </div>
+    </div>
+}
+<script type="text/javascript">
+    var IsSaved=false;
+    var ValidationCount=0;
+
+    CustomSelectFunction($("#TaskId"), '/Tasks/GetTasks', '/Tasks/SetSingleTasks', ' ', false, 1);
+    //CustomSelectFunction($("#ForUser"), '/ComboHelpList/GetUsers', '/ComboHelpList/SetSingleUsers', ' ', false, 1);
+
+    $('form').submit(function(event){
+
+        if(!IsSaved)
+        {
+            if(!ValidateData())
+            {
+                return false;
+            }
+            IsSaved=true;
+            return IsSaved;
+        }
+
+    });
+
+
+    function ValidateData() {
+        var DocId=@Model.DARId;
+        var TempValue;
+        var ValidationMessage="";
+
+        //Checking for dulicate key value
+        return  (ValidationMessage=="");
+    }
+
+    $('#ToTimeDP').on("changeDate",function(e){
+    
+        if($('#ToTime').val() && $('#FromTime').val() )
+        {
+            var TD=new Date();
+            var Da=new Date(TD.getFullYear(),TD.getMonth(),TD.getDay(),$('#ToTime').val().split(":",2)[0],$('#ToTime').val().split(":",2)[1],0,0);
+            var FT=new Date(TD.getFullYear(),TD.getMonth(),TD.getDay(),$('#FromTime').val().split(":",2)[0],$('#FromTime').val().split(":",2)[1],0,0);
+            var FromTime=$('#ToTime').val().split(":",2)
+            var ToTime=$('#FromTime').val().split(":",2)
+            var Hrs=(parseInt(FromTime[0])*60 + parseInt(FromTime[1]) )-( parseInt(ToTime[0])*60 + parseInt(ToTime[1]));
+            var time= new Date(Hrs);
+            if(Hrs>0){
+                $('#WorkHours').val(parseFloat(Math.floor(Hrs/60).toFixed(0)+"."+(Hrs%60)));
+                $('input:submit').removeAttr("disabled");
+            }
+            else
+            {                
+                $('#WorkHours').val(0);
+                $('input:submit').attr("disabled","disabled");
+                return false;
+            }
+        }
+    
+    });
+
+    $(function() {
+        $('#ToTimeDP').datetimepicker({
+            pickDate: false
+        });
+        $('#FromTimeDP').datetimepicker({
+            pickDate: false
+        });
+    });
+
+</script>
+

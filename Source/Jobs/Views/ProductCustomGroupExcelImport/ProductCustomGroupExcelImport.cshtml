@@ -1,0 +1,24 @@
+﻿
+@{
+    ViewBag.Title = "ProductCustomGroupExcelImport";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Sale Order Excel Import</h2>
+
+    <p style="font:bold"><b>Check These Fields</b> </p>
+    @{
+        
+    <ul>
+        @if (ViewBag.product!=null)
+        {
+            <li>
+                <p style="font:bold"><b>Product Doesn't Exist:</b>@ViewBag.product</p>
+        </li>
+        }     
+
+    </ul>
+}
+
+    @Html.ActionLink("Go Back", "Index", "ProductCustomGroupExcelImport", new { @class = "btn btn-primary btn-sm col-md-offset-0 CurveBorder ActionLinkPadding" })
+

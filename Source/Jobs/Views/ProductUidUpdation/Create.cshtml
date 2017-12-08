@@ -1,0 +1,182 @@
+﻿@model Model.Models.ProductUid
+
+@{
+    ViewBag.Title = "Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@using (Html.BeginForm("Post", "ProductUidUpdation", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(m => m.ProductUIDId)
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3>
+                <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-file black"></span> Product Uid Updation</span>
+                <input type="submit" value="Save" class="btn btn-primary right" id="submit" style="width: 90px; background-color: #2980b9" />
+            </h3>
+            <div class="panel-info">
+                <div class="btn-group">
+                    @Html.ActionLink(" ", "Create", "ProductUidUpdation", null, new { @class = "cbtn btn-circle glyphicon glyphicon-plus toolbar", @title = "Add New", @data_toggle = "tooltip" })
+                </div>
+            </div>
+        </div>
+        <div class="panel-info" style="padding-left:15px">
+            <div class="form-horizontal">                
+                @Html.ValidationSummary(true)
+                <div>
+                    <div class="col-md-6">
+                        <div class="form-group" style="margin-top:15px">
+                            @Html.LabelFor(model => model.ProductUIDId, "Chassis No.", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(m => m.ProductUidName, new { @class = "form-control col-xs-6" })
+                                @Html.ValidationMessageFor(m => m.ProductUIDId, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group" style="margin-top:15px">
+                            @Html.LabelFor(model => model.ProductId, "Product/VC #", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(m => m.ProductId, new { @class = "form-control col-xs-6", @readonly = true })
+                                @Html.ValidationMessageFor(m => m.ProductId, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Dimension1Id, "Colour", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(m => m.Dimension1Id, new { @class = "form-control col-xs-6" })
+                                @Html.ValidationMessageFor(m => m.Dimension1Id, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Dimension2Id, "Tyre Type", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(m => m.Dimension2Id, new { @class = "form-control col-xs-6" })
+                                @Html.ValidationMessageFor(m => m.Dimension2Id, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6" style="display:none">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Dimension3Id, "Dimension3", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(m => m.Dimension3Id, new { @class = "form-control col-xs-6" })
+                                @Html.ValidationMessageFor(m => m.Dimension3Id, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6" style="display:none">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Dimension4Id, "Dimension4", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(m => m.Dimension4Id, new { @class = "form-control col-xs-6" })
+                                @Html.ValidationMessageFor(m => m.Dimension4Id, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6" style="display:none">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.ProductUidSpecification, "ProductUidSpecification", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(m => m.ProductUidSpecification, new { @class = "form-control col-xs-6" })
+                                @Html.ValidationMessageFor(m => m.ProductUidSpecification, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.ProductUidSpecification1, "Reg.No.", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(m => m.ProductUidSpecification1, new { @class = "form-control col-xs-6" })
+                                @Html.ValidationMessageFor(m => m.ProductUidSpecification1, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row"></div>
+            </div>
+        </div>
+    </div>
+}
+<script type="text/javascript">
+
+
+    $(document).ready(function () {
+        CustomSelectFunction($("#ProductUidName"), '/ComboHelpList/GetProductUids', '/ComboHelpList/SetSingleProductUids', ' ', false, 0);
+        CustomSelectFunction($("#ProductId"), '/ComboHelpList/GetProducts', '/ComboHelpList/SetSingleProducts', ' ', false, 0);
+        CustomSelectFunction($("#Dimension1Id"), '/ComboHelpList/GetDimension1', '/ComboHelpList/SetSingleDimension1', ' ', false, 0);
+        CustomSelectFunction($("#Dimension2Id"), '/ComboHelpList/GetDimension2', '/ComboHelpList/SetSingleDimension2', ' ', false, 0);
+        CustomSelectFunction($("#Dimension3Id"), '/ComboHelpList/GetDimension3', '/ComboHelpList/SetSingleDimension3', ' ', false, 0);
+        CustomSelectFunction($("#Dimension4Id"), '/ComboHelpList/GetDimension4', '/ComboHelpList/SetSingleDimension4', ' ', false, 0);
+    });
+
+    $("#ProductUidName").change(GetProductUidDetail);
+
+
+
+    function GetProductUidDetail() {
+        var ProcessProgress = $("#Product detail loading progress");
+        ProcessProgress.show();
+        if ($("#ProductUidName").val() != 0 && $("#ProductUidName").val() != null) {
+            $("#ProductUIDId").val($("#ProductUidName").val())
+            $.ajax({
+                cache: false,
+                type: "POST",
+                url: "@(Url.Action("GetProductUidDetailJson"))",
+                data: { ProductUidId: $("#ProductUIDId").val() },
+            success: function (data) {
+                if (data.ProductId != null) {
+                    $("#ProductId").select2('data', { id: data.ProductId, text: data.ProductName });
+                }
+                else {
+                    $("#ProductId").select2('data', { id: '', text: '' });
+                }
+                if (data.Dimension1Id != null) {
+                    $("#Dimension1Id").select2('data', { id: data.Dimension1Id, text: data.Dimension1Name });
+                }
+                else {
+                    $("#Dimension1Id").select2('data', { id: '', text: '' });
+                }
+                if (data.Dimension2Id != null) {
+                    $("#Dimension2Id").select2('data', { id: data.Dimension2Id, text: data.Dimension2Name });
+                }
+                else {
+                    $("#Dimension2Id").select2('data', { id: '', text: '' });
+                }
+                if (data.Dimension3Id != null) {
+                    $("#Dimension3Id").select2('data', { id: data.Dimension3Id, text: data.Dimension3Name });
+                }
+                else {
+                    $("#Dimension3Id").select2('data', { id: '', text: '' });
+                }
+                if (data.Dimension4Id != null) {
+                    $("#Dimension4Id").select2('data', { id: data.Dimension4Id, text: data.Dimension4Name });
+                }
+                else {
+                    $("#Dimension4Id").select2('data', { id: '', text: '' });
+                }
+                $("#ProductUidSpecification").val(data.ProductUidSpecification);
+                $("#ProductUidSpecification1").val(data.ProductUidSpecification1);
+            },
+            error: function (xhr, ajaxOptions, thrownError) {
+                alert('Failed to retrieve product details.' + thrownError);
+            }
+        });
+    }
+    }
+
+</script>
+

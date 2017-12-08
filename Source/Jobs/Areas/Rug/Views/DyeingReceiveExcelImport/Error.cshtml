@@ -1,0 +1,29 @@
+﻿@model List<Model.ViewModel.ImportErrors>
+@{
+    ViewBag.Title = "DyeingReceiveExcelImport";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Dyeing Receive Import</h2>
+
+<p style="font:bold"><b>Check These Fields</b> </p>
+@{
+    string StoreDomain = @System.Configuration.ConfigurationManager.AppSettings["StoreDomain"];
+    //@*<ul>
+    //    <p style="font:bold">@ViewBag.Error</p>
+    //</ul>*@
+}
+
+@foreach (var item in Model)
+{
+    <div>
+        @Html.DisplayFor(modelItem => item.ErrorText) :
+    </div>
+
+}
+
+
+@Html.ActionLink("Go Back", "Index", "DyeingReceiveExcelImport", new { @id = ViewBag.id }, new { @class = "btn btn-primary btn-sm col-md-offset-0 CurveBorder ActionLinkPadding" })
+@Html.ActionLink("Continue", "Continue", "DyeingReceiveExcelImport", new { @id = ViewBag.id }, new { @class = "btn btn-primary btn-sm col-md-offset-0 CurveBorder ActionLinkPadding" })
+
+

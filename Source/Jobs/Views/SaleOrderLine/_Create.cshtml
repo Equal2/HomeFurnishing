@@ -1,0 +1,442 @@
+﻿@model Model.ViewModels.SaleOrderLineViewModel
+@using Core.Common
+
+<div class="modal-content">
+    <div class="modal-header" style="border-bottom: 1px solid #8E8888">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"> <span class="glyphicon glyphicon-remove"></span></button>
+        <h3>
+            <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-file black"></span> Products-(@ViewBag.DocNo)</span>
+        </h3>
+    </div>
+    <div>
+        @using (Html.BeginForm("_CreatePost", "SaleOrderLine", FormMethod.Post, new { enctype = "multipart/form-data", id = "modform" }))
+        {
+            @Html.ValidationLog((string)TempData["CSEXCL"])
+            @Html.AntiForgeryToken()
+
+            @Html.HiddenFor(model => model.SaleOrderHeaderId)
+            @Html.HiddenFor(m => m.SaleOrderLineId)
+
+            <div class="form-horizontal modal-body">
+
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                <div class="row">
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.ProductId, (Model.DocumentTypeSettings.ProductCaption ?? "Product"), new { @class = "control-label col-md-4 col-sm-2 " })
+                            @Html.HiddenFor(m => m.DocumentTypeSettings.ProductCaption)
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.ProductId, new { @class = "form-control col-xs-7 required" })
+                                @Html.ValidationMessageFor(model => model.ProductId, "", new { @class = "text-danger" })
+                                <span id="status" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    
+
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.BuyerSku, "Buyer SKU", new { @class = "control-label col-md-4 col-sm-2" })
+                                <div class="col-md-7 col-sm-10">
+                                    @Html.TextBoxFor(model => model.BuyerSku, new { @class = "form-control col-xs-7 required", @Readonly = true })
+                                    @Html.ValidationMessageFor(model => model.BuyerSku, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+                        </div>
+
+
+                    </div>
+
+                <div class="row">
+                    <div class="col-md-6" style="display:@(Model.SaleOrderSettings.isVisibleDimension1 ? "" : "none")">
+                        @Html.HiddenFor(m => m.SaleOrderSettings.isVisibleDimension1)
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Dimension1Id, (Model.DocumentTypeSettings.Dimension1Caption ?? "Dimension1"), new { @class = "control-label col-md-4 col-sm-2" })
+                            @Html.HiddenFor(m => m.DocumentTypeSettings.Dimension1Caption)
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.Dimension1Id, new { @class = "form-control col-xs-7" })
+                                @Html.ValidationMessageFor(model => model.Dimension1Id, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6" style="display:@(Model.SaleOrderSettings.isVisibleDimension2 ? "" : "none")">
+                        @Html.HiddenFor(m => m.SaleOrderSettings.isVisibleDimension2)
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Dimension2Id, (Model.DocumentTypeSettings.Dimension2Caption ?? "Dimension2"), new { @class = "control-label col-md-4 col-sm-2" })
+                            @Html.HiddenFor(m => m.DocumentTypeSettings.Dimension2Caption)
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.Dimension2Id, new { @class = "form-control col-xs-7 required" })
+                                @Html.ValidationMessageFor(model => model.Dimension2Id, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+
+                <div class="row">
+                    <div class="col-md-6" style="display:@(Model.SaleOrderSettings.isVisibleDimension3 ? "" : "none")">
+                        @Html.HiddenFor(m => m.SaleOrderSettings.isVisibleDimension3)
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Dimension3Id, (Model.DocumentTypeSettings.Dimension3Caption ?? "Dimension3"), new { @class = "control-label col-md-4 col-sm-2" })
+                            @Html.HiddenFor(m => m.DocumentTypeSettings.Dimension3Caption)
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.Dimension3Id, new { @class = "form-control col-xs-7" })
+                                @Html.ValidationMessageFor(model => model.Dimension3Id, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6" style="display:@(Model.SaleOrderSettings.isVisibleDimension4 ? "" : "none")">
+                        @Html.HiddenFor(m => m.SaleOrderSettings.isVisibleDimension4)
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Dimension4Id, (Model.DocumentTypeSettings.Dimension4Caption ?? "Dimension4"), new { @class = "control-label col-md-4 col-sm-2" })
+                            @Html.HiddenFor(m => m.DocumentTypeSettings.Dimension4Caption)
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.Dimension4Id, new { @class = "form-control col-xs-7 required" })
+                                @Html.ValidationMessageFor(model => model.Dimension4Id, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="row">
+                    <div class="col-md-6" style="display:@(Model.SaleOrderSettings.isVisibleSpecification ? "" : "none")">
+                        @Html.HiddenFor(m => m.SaleOrderSettings.isVisibleSpecification)
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Specification, "Specification", new { @class = "control-label col-md-4 col-sm-2 " })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.Specification, new { @class = "form-control col-xs-7 required" })
+                                @Html.ValidationMessageFor(model => model.Specification, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Qty, "Qty", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10" style="padding:0px;">
+                                <div class="col-xs-7" style="padding-right:0px;">
+                                    @Html.TextBoxFor(model => model.Qty, new { @class = "form-control required cusrightnormal" })
+                                    @Html.ValidationMessageFor(model => model.Qty, "", new { @class = "text-danger" })
+                                </div>
+                                <div class="col-xs-5" style="padding-left:0px">
+                                    @Html.TextBoxFor(m => m.UnitId, new { @class = "form-control col-xs-2 cusleftnormal", @readonly = "true" })
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6" style="display:@(Model.SaleOrderSettings.isVisibleDealUnit ? "" : "none")">
+                        @Html.HiddenFor(m => m.SaleOrderSettings.isVisibleDealUnit)
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.DealUnitId, "Deal Unit& Multiplier", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10" style="padding:0px;">
+                                <div class="col-xs-7">
+                                    @Html.DropDownListFor(model => model.DealUnitId, new SelectList(ViewBag.DeliveryUnitList as System.Collections.IEnumerable, "UnitId", "UnitName"), new { @class = "form-control height cusrightnormal required" })
+                                    @Html.ValidationMessageFor(model => model.DealUnitId, "", new { @class = "text-danger" })
+                                </div>
+                                <div class="col-xs-5">
+                                    @Html.TextBoxFor(model => model.UnitConversionMultiplier, new { @class = "form-control cusleftnormal required" })
+                                    @Html.ValidationMessageFor(model => model.UnitConversionMultiplier, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+                            </div>
+                    </div>
+
+                    <div class="col-md-6" style="display:@(Model.SaleOrderSettings.isVisibleDealUnit ? "" : "none")">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.DealQty, "Deal Qty", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.DealQty, new { @class = "form-control col-xs-7 required" })
+                                @Html.ValidationMessageFor(model => model.DealQty, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="row">
+
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.DueDate, "Due Date", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.DueDate, "{0:dd/MMMM/yyyy}", new { @class = "datepicker form-control col-xs-7 required" })
+                                @Html.ValidationMessageFor(model => model.DueDate, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Rate, "Rate", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.Rate, new { @class = "form-control col-xs-7 required" })
+                                @Html.ValidationMessageFor(model => model.Rate, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="row">
+
+                    @*<div class="col-md-6">
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.SalesTaxGroupId, "Sales Tax Group", new { @class = "control-label col-xs-4" })
+                                <div class="col-xs-7">
+                                    @Html.TextBoxFor(model => model.SalesTaxGroupId, new { @class = "form-control col-xs-7 required", @readonly = true })
+                                    @Html.ValidationMessageFor(model => model.SalesTaxGroupId, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+                        </div>*@
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Amount, "Amount", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.Amount, new { @class = "form-control col-xs-7 required" })
+                                @Html.ValidationMessageFor(model => model.Amount, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Remark, "Remark", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextAreaFor(model => model.Remark, new { @class = "form-control col-xs-7 required" })
+                                @Html.ValidationMessageFor(model => model.Remark, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer " style="padding: 19px 20px 0 20px; border-top:1px solid #8E8888">
+                    @if (ViewBag.LineMode == "Edit" || ViewBag.LineMode == "Create")
+                    { <button class="btn custom left" name="Command:Edit" type="submit" id="submit"><h2 style="margin:0px"><span class="glyphicon glyphicon-floppy-disk black"></span> </h2></button>
+                    }
+                    @if (ViewBag.LineMode == "Delete")
+                    {
+                        <button class="btn custom" name="Command:Delete" id="delete" type="submit"><h2 style="margin:0px"><span class="glyphicon glyphicon-trash black"></span> </h2></button>
+                    }
+
+                </div>
+
+            </div>
+
+        }
+    </div>
+</div>
+
+
+<script type="text/javascript">
+    
+    $(document).ready(function () {
+        var DocID = $('#SaleOrderHeaderId').val();
+        CustomSelectFunction($("#ProductId"), '/SaleOrderLine/GetCustomProducts', '/ComboHelpList/SetSingleProducts', ' ', false, 1,DocID);
+        //CustomSelectFunction($("#ProductId"), '/SaleInvoiceLine/GetCustomProductsForSaleDispatch', '/ComboHelpList/SetProducts', ' ', true, 1, DocID);
+        CustomSelectFunction($("#Dimension1Id"), '/ComboHelpList/GetDimension1', '/ComboHelpList/SetSingleDimension1', ' ', false, 1);
+        CustomSelectFunction($("#Dimension2Id"), '/ComboHelpList/GetDimension2', '/ComboHelpList/SetSingleDimension2', ' ', false, 1);
+        CustomSelectFunction($("#Dimension3Id"), '/ComboHelpList/GetDimension3', '/ComboHelpList/SetSingleDimension3', ' ', false, 1);
+        CustomSelectFunction($("#Dimension4Id"), '/ComboHelpList/GetDimension4', '/ComboHelpList/SetSingleDimension4', ' ', false, 1);
+
+
+        $("#ProductId").select2("focus");
+
+        $('.datepicker').datepicker({
+            format: 'dd/MM/yyyy',
+            "setDate": new Date(),
+            "autoclose": true
+
+        })
+
+        var id=@Model.SaleOrderLineId;
+        $('#delete','.modal-content').click(function (e) {
+            if(id>0)
+            {
+                var url = '/SaleOrderLine/DeletePost';
+                $('form#modform').attr('action',url);
+                return;
+            }
+            else
+            {
+                return false;
+            }
+        })
+
+
+
+        var IsSaved=false;
+        var ValidationCount=0;
+
+        $('#modform').bind('submit',function(){
+            if(!IsSaved)
+            {
+                IsSaved=true;
+                $('button:submit').attr('disabled','disabled');
+            }
+            else
+            {
+                return false;
+            }
+        });
+    });
+
+</script>
+
+<script type="text/javascript">
+    $(function () {
+
+        $("#DealQty,#Rate,#Amount,#Qty").keyup(Calculation);
+        $("#DealUnitId").change(GetUnitConversionMultiplier);
+        $("#ProductId").change(GetProductDetail);
+        $("#ProductId").change(function(){
+
+            GetBuyerSku();
+
+            if($('#SaleOrderLineId').val()!=0)
+                CheckForValidationInEdit.call();
+            else
+                CheckForValidation.call();
+        });
+        if($("#SaleOrderLineId").val()>0)
+        {
+            GetUnitConversionMultiplier();
+        }
+
+
+        function GetBuyerSku() {
+
+            if ($("#ProductId").val() != 0 && $("#ProductId").val() != null) {
+                $.ajax({
+                    cache: false,
+                    url: "@(Url.Action("GetBuyerSKU"))",
+                    data: { ProductId: $("#ProductId").val(), SaleOrderHeaderId: $("#SaleOrderHeaderId").val() },
+                    success: function (data) {
+                        $("#BuyerSku").val(data);
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        alert('Failed to retrieve product details.' + thrownError);
+                    }
+                });
+            }
+
+        }
+
+
+        function GetProductDetail() {
+            var ProcessProgress = $("#Product detail loading progress");
+            ProcessProgress.show();
+            if ($("#ProductId").val() != 0 && $("#ProductId").val() != null) {
+                $.ajax({
+                    cache: false,
+                    type: "POST",
+                    url: "@(Url.Action("GetProductDetailJson"))",
+                    data: { ProductId: $("#ProductId").val() },
+                    success: function (data) {
+                        $("#Rate").val(data[0].StandardCost);
+                        $("#UnitId").val(data[0].UnitId);
+                        $("#DealUnitId").val(data[0].UnitId);
+                        $("#Specification").val(data[0].ProductSpecification);
+                        GetUnitConversionMultiplier.call();
+                        Calculation.call();
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        alert('Failed to retrieve product details.' + thrownError);
+                        ProcessProgress.hide();
+                    }
+                });
+            }
+
+        }
+
+        function CheckForValidation() {
+            if ($("#ProductId").val() != 0 && $("#ProductId").val() != null) {
+                $.ajax({
+                    cache: false,
+                    type: "POST",
+                    url: "@(Url.Action("CheckForValidation"))",
+                    data: { ProductId: $("#ProductId").val(), SaleOrderHeaderId: $("#SaleOrderHeaderId").val() },
+                    success: function (data) {
+                        var status = data;
+                        if (data.returnvalue)
+                            $("#status").text("Product already exists");
+                        else
+                            $("#status").text(" ");
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        alert('Failed to Check Validation.' + thrownError);
+                    }
+                });
+            }
+
+        }
+
+
+        function CheckForValidationInEdit() {
+            if ($("#ProductId").val() != 0 && $("#ProductId").val() != null) {
+                $.ajax({
+                    cache: false,
+                    type: "POST",
+                    url: "@(Url.Action("CheckForValidationinEdit"))",
+                    data: { ProductId: $("#ProductId").val(), SaleOrderHeaderId: $("#SaleOrderHeaderId").val(), SaleOrderLineId: $("#SaleOrderLineId").val() },
+                    success: function (data) {
+                        var status = data;
+                        if (data.returnvalue)
+                            $("#status").text("Product already exists");
+                        else
+                            $("#status").text(" ");
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        alert('Failed to Check Validation.' + thrownError);
+                    }
+                });
+            }
+        }
+
+        function GetUnitConversionMultiplier() {
+            if ($("#UnitId").val() == $("#DealUnitId").val()) {
+                $("#UnitConversionMultiplier").val(1);
+                Calculation.call();
+            }
+            else {
+                var ProcessProgress = $("#Unit conversion detail loading progress");
+                ProcessProgress.show();
+                $.ajax({
+                    cache: false,
+                    type: "POST",
+                    url: "@(Url.Action("GetUnitConversionDetailJson"))",
+                    data: { ProductId: $("#ProductId").val(), UnitId: $("#UnitId").val(), DeliveryUnitId: $("#DealUnitId").val(),HeaderId: $("#SaleOrderHeaderId").val()},
+
+                    success: function (data) {
+                        $("#UnitConversionMultiplier").val(data[0].Value);
+                        Calculation.call();
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        alert('Failed to retrieve Unit conversion details.' + thrownError);
+                        ProcessProgress.hide();
+                    }
+                });
+            }
+        }
+
+
+        function Calculation() {
+            if ($('#UnitConversionMultiplier').val() != 0) {
+                $('#DealQty').val($('#Qty').val() * $('#UnitConversionMultiplier').val())
+            }
+            $('#Amount').val(($('#DealQty').val() * $('#Rate').val()).toFixed(2));
+        }
+
+
+
+    });
+</script>

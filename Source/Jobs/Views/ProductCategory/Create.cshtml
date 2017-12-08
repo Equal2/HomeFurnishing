@@ -1,0 +1,158 @@
+﻿@model Model.Models.ProductCategory
+
+@{
+    ViewBag.Title = "Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@using (Html.BeginForm("Post", "ProductCategory", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(model => model.ProductCategoryId)
+    @Html.HiddenFor(m=>m.ProductTypeId)
+    <div class="panel panel-default">
+
+        <div class="panel-heading">
+
+            <h3>
+                <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-file black"></span> @ViewBag.Name </span>
+                @if (@Model.IsSystemDefine)
+                {
+                    <input type="submit" value="Save" class="btn btn-primary right" id="submit" style="width: 90px; background-color: #2980b9;margin-left:20px" disabled="disabled" />
+                    <span style="font-family: Calibri,sans-serif,Verdana; font-weight:bold ;font-size: large" class="text-danger right "><span class="glyphicon glyphicon-floppy-remove"></span> System Defined</span>
+                }
+                else
+                {
+                    <input type="submit" value="Save" class="btn btn-primary right" id="submit" style="width: 90px; background-color: #2980b9" />
+                }
+            </h3>
+            <hr style="margin-top:0px;margin-bottom:0px" />
+
+            <div class="panel-info">
+                <div class="btn-group">
+                    @Html.ActionLink(" ", "Create", "ProductCategory", new { id = @ViewBag.id }, new { @class = "cbtn btn-circle glyphicon glyphicon-plus toolbar", @title = "Add New", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "History", "ProductCategory", null, new { @class = "cbtn btn-circle glyphicon glyphicon-user toolbar", @title = "History", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "PrevPage", "ProductCategory", new { id = @Model.ProductCategoryId, ptypeid = @ViewBag.id }, new { @class = "cbtn btn-circle glyphicon glyphicon-arrow-left toolbar", @title = "Prev Record", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "NextPage", "ProductCategory", new { id = @Model.ProductCategoryId, ptypeid = @ViewBag.id }, new { @class = "cbtn btn-circle glyphicon glyphicon-arrow-right toolbar", @title = "Next Record", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "Index", "ProductCategory", new { id = @ViewBag.id }, new { @class = "cbtn btn-circle glyphicon glyphicon-list toolbar", @title = "List", @data_toggle = "tooltip" })
+                </div>
+            </div>
+
+        </div>
+        <div class="panel-info" style="padding-left:15px">
+            <div class="form-horizontal">                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group" style="margin-top:15px">
+                            @Html.LabelFor(model => model.ProductCategoryName, (string)@ViewBag.ProductCategoryCaption, new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(m => m.ProductCategoryName, null, new { @class = "form-control col-xs-6 required" })
+                                @Html.ValidationMessageFor(m => m.ProductCategoryName, null, new { @class = "has-error" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6" style="display:@(ViewBag.IsVisibleSalesTaxProductCode ? "" : "none")">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.DefaultSalesTaxProductCodeId, (string)@ViewBag.SalesTaxProductCodeCaption, new { @class = "control-label col-xs-4" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(m => m.DefaultSalesTaxProductCodeId, null, new { @class = "form-control col-xs-6 " })
+                                @Html.ValidationMessageFor(m => m.DefaultSalesTaxProductCodeId, null, new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.IsActive, "Is Active", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10" style=" padding-top:4px">
+                                @Html.CheckBoxFor(m => m.IsActive, new { @class = "checkbox col-xs-1" })
+                                @Html.ValidationMessageFor(model => model.IsActive)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+}
+
+<script type="text/javascript">
+    $(function()
+    {
+        var TitleCase= '@Session["TitleCase"]';
+        //alert(TitleCase);
+        $('#ProductCategoryName').focusout(function() {
+            if (TitleCase=="UpperCase")
+            this.value = this.value.toUpperCase() ;
+    });
+    });
+</script>
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        CustomSelectFunction($("#DefaultSalesTaxProductCodeId"), '/ComboHelpList/GetSalesTaxProductCodes', '/ComboHelpList/SetSingleSalesTaxProductCode', ' ', false, 0);
+    });
+
+     var IsSaved=false;
+    var ValidationCount=0;
+
+    $('form').submit(function(event){
+
+        if(!IsSaved)
+        {
+            if(!ValidateData())
+            {
+                return false;
+            }
+            IsSaved=true;
+            return IsSaved;
+        }
+        else
+        {
+            return false;
+        }
+
+
+    });
+
+
+    function ValidateData() {
+        var DocId=@Model.ProductCategoryId;
+        var TempValue;
+        var ValidationMessage="";
+
+
+
+        //Checking for dulicate key value
+        if(DocId<=0)
+        {
+            TempValue= $('#ProductCategoryName').DuplicateCheckForCreate({ name: 'ProductCategory', value: $('#ProductCategoryName').val(), doctype: 0 });
+            if (TempValue){ ValidationMessage=$('#ProductCategoryName').val() + " already exist <br />";}
+        }
+        else
+        {
+            test = $('#ProductCategoryName').DuplicateCheckForEdit({ name: 'ProductCategory', value: $('#ProductCategoryName').val(), doctype: 0,headerId:DocId });
+            if (TempValue) {ValidationMessage+=$('#ProductCategoryName').val() + " already exist <br />";}
+        }
+        if(TempValue)
+        {
+            if($('#validationerrormsg').length==0){
+                $('.panel-info').filter(':eq(1)').before('<div class="alert alert-danger" role="alert" id="validationerrormsg">'+ValidationMessage+'</div>');}
+            else
+            {
+                $('#validationerrormsg').html(ValidationMessage);
+            }
+        }
+        return  (ValidationMessage=="");
+
+    }
+
+
+</script>

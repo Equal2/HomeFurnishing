@@ -1,0 +1,320 @@
+﻿@model Model.ViewModel.JobReceiveSummaryDetailViewModel
+@using Core.Common
+@{
+    ViewBag.Title = "Summary";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style type="text/css">
+    .ValidationError {
+        border: 1px solid red;
+    }
+</style>
+
+<!-- modal placeholder-->
+@using (Html.BeginForm("PostSummary", "WeavingReceive", FormMethod.Post, new { enctype = "multipart/form-data", id = "Summary" }))
+{
+    @Html.AntiForgeryToken()
+
+
+    <div class="panel panel-default">
+        <div class="panel-heading">
+
+            <h3 style="border-bottom:0px solid #e1dada;padding-bottom:0px;">
+                <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"> <span class="glyphicon glyphicon-file black"></span> @ViewBag.Name- @ViewBag.DocNo</span>
+                <input type="submit" value="Save" class="btn btn-primary right" id="submit" style="width: 90px; background-color: #2980b9" />
+            </h3>
+
+            <hr style="margin-top:10px;margin-bottom:0px" />
+
+            <div class="panel-info">
+                <h4 style="padding:5px 0 0 0;margin:0px">
+                    @Html.ActionLink(" ", " ", " ", null, new { @class = "glyphicon glyphicon-refresh toolbar", @title = "Refresh Page", @data_toggle = "tooltip", @id = "RefreshPage" })
+                    <a href="@ViewBag.Url" class="glyphicon glyphicon-list toolbar right"></a>
+                </h4>
+            </div>
+        </div>
+        <div class="panel-info" style="padding-left:15px">
+            <div class="form-horizontal">
+                @Html.ValidationSummary(true)
+                @Html.HiddenFor(m => Model.JobReceiveHeaderId)
+
+
+                <div class="row">
+
+                    <h4 class="col-md-12 black">
+                        <span class="glyphicon glyphicon-align-justify"></span>
+                        1.Receive Details
+                    </h4>
+                    <div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group" style="margin-top:15px">
+                                    @Html.LabelFor(model => model.DocData, "Receipt Date", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.DocData, "{0:dd/MMMM/yyyy}", new { @class = "datepickerWithNFD form-control required", @readonly = true })
+                                        @Html.ValidationMessageFor(model => model.DocData, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group" style="margin-top:15px">
+                                    @Html.LabelFor(model => model.JobWorkerId, "Job Worker", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.JobWorkerId, null, new { @class = "form-control required", @readonly = true })
+                                        @Html.ValidationMessageFor(m => m.JobWorkerId, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <hr />
+                <div class="row">
+                    <h4 class="col-md-12 black" style="margin-top:15px">
+                        <span class="glyphicon glyphicon-shopping-cart"></span>
+                        2.Summary
+                    </h4>
+                </div>
+
+
+
+
+                <div class="row Custom-Summary" style="padding-right:15px">
+
+                    <div class="panel panel-default" id="grid">
+
+                        <div class="panel-heading headrow" style="background-image: -webkit-linear-gradient(top, #428bca 0%, #428bca 100%);color:white">
+                            <div class="row grid-head">
+                                <div class="text-left block" style="width: 5%; ">
+                                    Srl.
+                                </div>
+                                <div class="block" style="width: 95%;">
+                                    <div class="row">
+                                        @*ProductInfo*@
+                                        <div class="block" style="width: 13%; ">
+                                            Product
+                                        </div>
+                                        <div class="block" style="width: 9%;">
+                                            OrderNo
+                                        </div>
+                                        <div class="block" style="width: 9%;">
+                                            CostCenter
+                                        </div>
+                                        <div class="block text-right" style="width: 7%;">
+                                            Qty
+                                        </div>
+                                        <div class="block text-right" style="width: 8%;">
+                                            Ret Qty
+                                        </div>
+                                        <div class="block" style="width: 8%;">
+                                            Unit
+                                        </div>
+                                        <div class="block text-right" style="width: 9%;">
+                                            PerPc
+                                        </div>
+                                        <div class="block text-right" style="width: 9%;">
+                                            Deal Qty
+                                        </div>
+                                        <div class="block" style="width: 9%;">
+                                            DealUnit
+                                        </div>
+                                        <div class="block text-right" style="width: 7%;">
+                                            Penalty
+                                        </div>
+                                        <div class="block text-right" style="width: 12%;">
+                                            Weight
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+
+                        <div class="panel-info">
+
+                            @{int count = 0;
+                            decimal QtyCount = 0;
+                            int MaxDecPlaces = 0;
+                            decimal DealQtyCount = 0;
+                            int MaxDealDecPlaces = 0;
+                            decimal Penalty = 0;
+                            decimal Weight = 0;
+                            }
+                            @for (int i = 0; i < Model.JobReceiveSummaryViewModel.Count(); i++)
+                            {
+                                count++;
+                                if (Model.JobReceiveSummaryViewModel[i].MaxDecPlaces > MaxDecPlaces)
+                                {
+                                    MaxDecPlaces = Model.JobReceiveSummaryViewModel[i].MaxDecPlaces;
+                                }
+                                if (Model.JobReceiveSummaryViewModel[i].MaxDealUnitDecPlaces > MaxDealDecPlaces)
+                                {
+                                    MaxDealDecPlaces = Model.JobReceiveSummaryViewModel[i].MaxDealUnitDecPlaces;
+                                }
+
+                                <div class="row crow @(Model.JobReceiveSummaryViewModel[i].ValidationError?"ValidationError":"")" style="margin:0px; padding: 0px;padding-top:5px;padding-bottom:5px;">
+
+                                    @Html.HiddenFor(m => Model.JobReceiveSummaryViewModel[i].ProductId)
+                                    @Html.HiddenFor(m => Model.JobReceiveSummaryViewModel[i].ProductName)
+                                    @Html.HiddenFor(m => Model.JobReceiveSummaryViewModel[i].Qty)
+                                    @Html.HiddenFor(m => Model.JobReceiveSummaryViewModel[i].UnitName)
+                                    @Html.HiddenFor(m => Model.JobReceiveSummaryViewModel[i].MaxDecPlaces)
+                                    @Html.HiddenFor(m => Model.JobReceiveSummaryViewModel[i].DealQty)
+                                    @Html.HiddenFor(m => Model.JobReceiveSummaryViewModel[i].DealUnitName)
+                                    @Html.HiddenFor(m => Model.JobReceiveSummaryViewModel[i].JobOrderNo)
+                                    @Html.HiddenFor(m => Model.JobReceiveSummaryViewModel[i].JobOrderHeaderId)
+                                    @Html.HiddenFor(m => Model.JobReceiveSummaryViewModel[i].MaxDealUnitDecPlaces)
+
+                                    <div class="block" style="width:5%">
+                                        @count
+                                    </div>
+                                    <div class="block" style="width:95%">
+                                        <div class="row">
+                                            <div class="block" style="width:13%">
+                                                <span> @Model.JobReceiveSummaryViewModel[i].ProductName </span>
+                                            </div>
+                                            <div class="block" style="width:9%">
+                                                <span> @Model.JobReceiveSummaryViewModel[i].JobOrderNo </span>
+                                            </div>
+                                            <div class="block" style="width:9%">
+                                                <span> @Model.JobReceiveSummaryViewModel[i].CostCenterName </span>
+                                            </div>
+                                            <div class="block text-right" style="width:7%">
+                                                <span class="QtySum">@string.Format("{" + "0:0.".PadRight(@Model.JobReceiveSummaryViewModel[i].MaxDecPlaces + 4, '0') + "}", Model.JobReceiveSummaryViewModel[i].Qty)</span>
+                                            </div>
+                                            <div class="block text-right" style="width:8%">
+                                                <span class="RetQtySum">@string.Format("{" + "0:0.".PadRight(@Model.JobReceiveSummaryViewModel[i].MaxDecPlaces + 4, '0') + "}", Model.JobReceiveSummaryViewModel[i].ReturnQty)</span>
+                                            </div>
+                                            <div class="block" style="width:8%">
+                                                @Model.JobReceiveSummaryViewModel[i].UnitName
+                                            </div>
+                                            <div class="block text-right" style="width:9%">
+                                                <span class="">@string.Format("{" + "0:0.".PadRight(@Model.JobReceiveSummaryViewModel[i].MaxDealUnitDecPlaces + 4, '0') + "}", Model.JobReceiveSummaryViewModel[i].DealQtyPP)</span>
+                                            </div>
+                                            <div class="block text-right" style="width:9%">
+                                                <span class="DealQty">@string.Format("{" + "0:0.".PadRight(@Model.JobReceiveSummaryViewModel[i].MaxDealUnitDecPlaces + 4, '0') + "}", Model.JobReceiveSummaryViewModel[i].DealQty)</span>
+                                            </div>
+                                            <div class="block" style="width:9%">
+                                                @Model.JobReceiveSummaryViewModel[i].DealUnitName
+                                            </div>
+                                            <div class="block text-right" style="width:7%">
+                                                @string.Format("{" + "0:0.".PadRight(2 + 4, '0') + "}", Model.JobReceiveSummaryViewModel[i].Penalty)
+                                            </div>
+                                            @{QtyCount += Model.JobReceiveSummaryViewModel[i].Qty;}
+                                            @{DealQtyCount += Model.JobReceiveSummaryViewModel[i].DealQty;}
+                                            @{Penalty += Model.JobReceiveSummaryViewModel[i].Penalty;}
+                                            @{Weight += Model.JobReceiveSummaryViewModel[i].Weight;}
+
+                                            <div class="block text-right" style="width:12%">
+                                                @Html.TextBoxFor(m => Model.JobReceiveSummaryViewModel[i].Weight, "{" + "0:0.".PadRight(3 + 4, '0') + "}", new { @class = "form-control required Weight text-right" })
+                                                @Html.ValidationMessageFor(m => Model.JobReceiveSummaryViewModel[i].Weight, "", new { @class = "text-danger" })
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+                                </div>
+                                <hr style="margin:0px" />
+                            }
+
+                        </div>
+                    </div>
+
+                    <div class="row grid-head" style="margin:0px">
+                        <div class="text-left block" style="width: 5%; ">
+
+                        </div>
+                        <div class="block" style="width: 95%;">
+                            <div class="row">
+                                @*ProductInfo*@
+                                <div class="block" style="width: 13%; ">
+                                    <strong>Total</strong>
+                                </div>
+                                <div class="block" style="width: 9%; ">
+                                </div>
+                                <div class="block" style="width: 9%; ">
+                                </div>
+                                <div class="block text-right" style="width: 7%;">
+                                    @string.Format("{" + "0:0.".PadRight(MaxDecPlaces + 4, '0') + "}", QtyCount)
+                                </div>
+                                <div class="block text-right" style="width: 8%;">
+                                </div>
+                                <div class="block" style="width: 8%;">
+
+                                </div>
+                                <div class="block text-right" style="width: 9%;">
+                                </div>
+                                <div class="block text-right" style="width: 9%;">
+                                    @string.Format("{" + "0:0.".PadRight(MaxDealDecPlaces + 4, '0') + "}", DealQtyCount)
+                                </div>
+
+                                <div class="block" style="width: 9%;">
+
+                                </div>
+                                <div class="block text-right" style="width: 7%;">
+                                    @string.Format("{" + "0:0.".PadRight(2 + 4, '0') + "}", Penalty)
+                                </div>
+                                <div class="block text-right" id="Weight" style="width: 12%;">
+                                    @string.Format("{" + "0:0.".PadRight(3 + 4, '0') + "}", Weight)
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+}
+
+<script type="text/javascript">
+    CustomSelectFunction($("#JobWorkerId"), '/ComboHelpList/GetJobWorkers', '/ComboHelpList/SetSinglePerson', ' ', false, 1);
+
+    $('input.Weight').change(function () {
+        $(this).val(eval($(this).val()));
+        CalculateTotal();
+    })
+
+    function CalculateTotal() {
+        var TotWeight = 0;
+        $('.row.crow').each(function () {
+
+            if ($(this).find('input.Weight').val()) {
+                TotWeight += parseFloat($(this).find('input.Weight').val());
+            }
+
+        })
+        $('div#Weight').text(TotWeight.toFixed(3));
+    }
+
+    var Lock = false;
+    $('input:submit').click(function () {
+        if (!Lock) {
+            Lock = true;
+            $.ajax({
+                url: $('form#Summary').attr('action'),
+                type: "POST",
+                data: $('form#Summary').serialize(),
+                success: function (result) {
+                    if (result.Success) {
+                        Lock = false;
+                        window.location.href = result.Url;
+                    } else {
+                        Lock = false;
+                        alert("Error in Updating Penality");
+                    }
+                },
+                error: function () {
+                    Lock = false;
+                }
+            });
+        }
+        return false;
+    })
+
+</script>

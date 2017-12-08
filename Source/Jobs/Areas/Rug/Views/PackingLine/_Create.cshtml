@@ -1,0 +1,957 @@
+﻿@model Model.ViewModels.PackingLineViewModel
+@using Core.Common
+
+
+<style type="text/css">
+    #image background-image {
+        max-width: 100%;
+        max-height: 100%;
+    }
+
+
+    #Print, #PrintOnlyQR {
+        color: black;
+        display: inline-block;
+        text-decoration: none;
+    }
+</style>
+
+<div class="modal-content">
+    <div class="modal-header" style="border-bottom: 1px solid #8E8888">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"> <span class="glyphicon glyphicon-remove"></span></button>
+        <h3>
+            <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-file black"></span> Packing No : @ViewBag.DocNo</span>
+        </h3>
+    </div>
+    <div>
+        @using (Html.BeginForm("_CreatePost", "PackingLine", FormMethod.Post, new { enctype = "multipart/form-data", id = "modform" }))
+        {
+            @Html.ValidationLog((string)TempData["CSEXCL"])
+            @Html.AntiForgeryToken()
+            @Html.HiddenFor(model => model.PackingLineId)
+            @Html.HiddenFor(model => model.PackingHeaderId)
+            @Html.HiddenFor(model => model.DealUnitId)
+            @Html.HiddenFor(model => model.DealUnitName)
+            @Html.HiddenFor(model => model.FromProcessId)
+            @Html.HiddenFor(m => m.UnitId)
+            @Html.HiddenFor(m => m.UnitConversionMultiplier)
+            @Html.HiddenFor(m => m.ProductUidId)
+            @Html.HiddenFor(m => m.SaleOrderNo)
+            @Html.HiddenFor(m => m.ProductName)
+            @Html.HiddenFor(m => m.GodownId)
+            @Html.HiddenFor(m => m.DivisionId)
+            @Html.HiddenFor(m => m.DocTypeId)
+            @Html.HiddenFor(m => m.GodownName)
+            @Html.HiddenFor(m => m.ImageFolderName)
+            @Html.HiddenFor(m => m.ImageFileName)
+            @Html.HiddenFor(m => m.IsSample)
+            @Html.HiddenFor(m => m.CreatedBy)
+            @Html.HiddenFor(m => m.CreatedDate)
+            @Html.HiddenFor(m => m.CreateExtraSaleOrder)
+            @Html.HiddenFor(m => m.PackingShipMethodId)
+            @Html.HiddenFor(m => m.DeliveryOrderShipMethodId)
+            @Html.HiddenFor(m => m.OtherBuyerDeliveryOrders)
+            @Html.HiddenFor(m => m.PartyProductUid)
+
+
+            <div class="form-horizontal modal-body">
+
+                @Html.ValidationSummary(true, "", new { @class = "alert alert-danger" })
+
+                <div>
+                    <div class="row">
+                        <div class="col-md-9">
+                            <div class="row">
+                                <div class="col-md-6" style="display:@(Model.PackingSettings.isVisibleProductUID?"":"none")">
+                                    @Html.HiddenFor(m => m.PackingSettings.isVisibleProductUID)
+                                    <div class="form-group">
+                                        @Html.LabelFor(model => model.ProductUidName, "Barcode", new { @class = "control-label col-xs-4" })
+                                        <div class="col-xs-7">
+                                            @Html.TextBoxFor(model => model.ProductUidName, new { @class = "form-control col-xs-7 scannerIP" })
+                                            @Html.ValidationMessageFor(model => model.ProductUidName)
+                                            <span id="ProductUidValidation"></span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        @Html.LabelFor(model => model.ProductId, new { @class = "control-label col-xs-4" })
+                                        <div class="col-xs-7">
+                                            @Html.TextBoxFor(a => a.ProductId, new { @class = "form-control col-xs-7" })
+                                            @Html.ValidationMessageFor(model => model.ProductId)
+                                            <a style="display:none;cursor:pointer" id="ExtraPO"> Click Here</a>
+
+                                            @*<a data-modal href='/PackingLine/SetFlagForExtraSaleOrder/@Model.PackingHeaderId' style="display:none" id="AddToExisting"> Click Here</a>*@
+                                            @*<a data-modal href='/PackingLine/SetFlagForExtraSaleOrder/345' id="AddToExisting"> Click</a>*@
+                                            @*<a data-modal="" data-toggle="tooltip" href="/PackingLine/SetFlagForExtraSaleOrder/345" >Click </a>*@
+                                            @*<a class="toolbar" data-modal="" data-toggle="tooltip" href="/PackingLine/CreateLine/3811" id="AddToExisting" title="Add New">Add New Row </a>*@
+                                            <span id="ProductValidation"></span>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        @Html.LabelFor(model => model.ProductInvoiceGroupId, "Invoice Group", new { @class = "control-label col-xs-2" })
+                                        <div class="col-xs-10">
+                                            @Html.TextBoxFor(model => model.ProductInvoiceGroupId, new { @class = "form-control col-xs-7", @style = "width:95% ! important" })
+                                            @Html.ValidationMessageFor(model => model.ProductInvoiceGroupId)
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        @Html.LabelFor(model => model.BaleNo, new { @class = "control-label col-xs-4" })
+                                        <div class="col-xs-7">
+                                            @Html.TextBoxFor(model => model.BaleNo, new { @class = "form-control col-xs-7" })
+                                            @Html.ValidationMessageFor(model => model.BaleNo)
+                                            <span id="BaleNoValidation"></span>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        @Html.LabelFor( model => model.SaleOrderLineId,  new { @class = "control-label col-xs-4" })
+                                        <div class="col-xs-7">
+                                            @Html.DropDownList("SaleOrderLineId", Enumerable.Empty<SelectListItem>(), new { @class = "form-control col-xs-7 height" })
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        @Html.LabelFor(model => model.Specification, new { @class = "control-label col-xs-4" })
+                                        <div class="col-xs-7">
+                                            @Html.TextBoxFor(model => model.Specification, new { @class = "form-control col-xs-7" })
+                                            @Html.ValidationMessageFor(model => model.Specification)
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        @Html.LabelFor(model => model.Qty, new { @class = "control-label col-xs-4" })
+                                        <div class="col-xs-7">
+                                            @Html.TextBoxFor(model => model.Qty, new { @class = "form-control col-xs-7" })
+                                            @Html.ValidationMessageFor(model => model.Qty)
+                                            <span id="QtyValidation"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        @Html.LabelFor(model => model.DealQty, "Deal Qty (" + @Html.DisplayFor(model => model.DealUnitName) + ")", new { @class = "control-label col-xs-4" })
+                                        <div class="col-xs-7">
+                                            @Html.TextBoxFor(model => model.DealQty, new { @class = "form-control col-xs-7", @readonly = "readonly" })
+                                            @Html.ValidationMessageFor(model => model.DealQty)
+                                            <span id="DealQtyValidation"></span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        @Html.LabelFor(model => model.GrossWeight, new { @class = "control-label col-xs-4" })
+                                        <div class="col-xs-7">
+                                            @Html.TextBoxFor(model => model.GrossWeight, new { @class = "form-control col-xs-7" })
+                                            @Html.ValidationMessageFor(model => model.GrossWeight)
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        @Html.LabelFor(model => model.NetWeight, new { @class = "control-label col-xs-4" })
+                                        <div class="col-xs-7">
+                                            @Html.TextBoxFor(model => model.NetWeight, new { @class = "form-control col-xs-7" })
+                                            @Html.ValidationMessageFor(model => model.NetWeight)
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        @Html.LabelFor(model => model.Remark, new { @class = "control-label col-xs-4" })
+                                        <div class="col-xs-7">
+                                            @Html.TextBoxFor(model => model.Remark, new { @class = "form-control col-xs-7" })
+                                            @Html.ValidationMessageFor(model => model.Remark)
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        @Html.LabelFor(model => model.SaleDeliveryOrderLineId, new { @class = "control-label col-xs-4" })
+                                        <div class="col-xs-7">
+                                            @Html.DropDownList("SaleDeliveryOrderLineId", Enumerable.Empty<SelectListItem>(), new { @class = "form-control col-xs-7 height" })
+                                            <span id="DeliveryOrderValidation" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        @Html.LabelFor(model => model.BaleCount, new { @class = "control-label col-xs-4" })
+                                        <div class="col-xs-7">
+                                            @Html.TextBoxFor(model => model.BaleCount, new { @class = "form-control col-xs-7" })
+                                            @Html.ValidationMessageFor(model => model.BaleCount)
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+
+
+
+
+                        <div class="col-md-3">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <div class="row">
+                                        <div style="width: 300px; height: 250px; border-style: solid; border-width: 1px; border-color: rgb(210, 206, 206); background-repeat: no-repeat; background-position: center; background-size: inherit; ">
+                                            @*<img src="~/Uploads/@(Model.ImageFolderName)/Medium/@(Model.ImageFileName).jpg" alt="...">*@
+                                            <a id="imagelink" href="#" target="_blank">
+                                                <img id="image" style="max-width:inherit; position: relative; max-height: 100%; margin-left: 25%; margin-right: 25%;" />
+                                            </a>
+                                            @*<img src="~/Uploads/cb8c9e85-f996-487c-a1b8-b6e21f455a28/Medium/78979_499685ff-1f7a-4ebd-99e0-d04ea14045c3.jpg">*@
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer " style="padding: 19px 20px 0 20px; border-top:1px solid #8E8888">
+                    @if (ViewBag.LineMode == "Edit" || ViewBag.LineMode == "Create")
+                    {
+                        <button class="btn custom left" id="save" name="Command:Edit" type="submit"><h2 style="margin:0px" id="submit"><span class="glyphicon glyphicon-floppy-disk black"></span> </h2></button>
+                        @Html.ActionLink(" ", "Print", "PackingLine", new { id = @Model.PackingHeaderId }, new { @class = "glyphicon glyphicon-print left Print", @title = "Print", @style = "font-size:2.2em", @data_toggle = "tooltip", target = "_blank", id = "Print" })
+                        <span class="badge left" id="PendingToPrint" style="background-color:red;color:white"></span>
+                        
+                        @Html.ActionLink(" ", "PrintOnlyQRCode", "PackingLine", new { id = @Model.PackingHeaderId }, new { @class = "glyphicon glyphicon-barcode left Print", @title = "Print Only QR Code", @style = "font-size:2.2em", @data_toggle = "tooltip", target = "_blank", id = "PrintOnlyQR" })
+                        <span class="badge left" id="PendingToPrint" style="background-color:red;color:white"></span>
+                        
+                    }
+                    @if (ViewBag.LineMode == "Delete")
+                    {
+                        <button class="btn custom" name="Command:Delete" id="delete" type="submit"><h2 style="margin:0px"><span class="glyphicon glyphicon-trash black"></span> </h2></button>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        //CustomSelectFunction($("#ProductId"), '/ComboHelpList/GetProducts', '/ComboHelpList/SetSingleProducts', ' ', false, 3);
+        //CustomSelectFunction($("#ProductId"), '/ComboHelpList/GetFinishedMaterialDivisionWise', '/ComboHelpList/SetSingleProducts', ' ', false, 3);
+        var DocID = $('#PackingHeaderId').val();
+
+        CustomSelectFunction($("#ProductId"), '/PackingLine/GetCustomProducts', '/ComboHelpList/SetSingleProducts', ' ', false, 0, DocID);
+        CustomSelectFunction($("#ProductInvoiceGroupId"), '/ComboHelpList/GetProductInvoiceGroupsDivisionWise', '/ComboHelpList/SetSingleProductInvoiceGroup', ' ', false, 0);
+
+
+
+        //Preventing and Duplicate DocCheck Double Click Post
+
+
+        var IsSaved=false;
+        var ValidationCount=0;
+
+        $('#modform').bind('submit',function(event){
+            if(!IsSaved)
+            {               
+
+                if(!ValidateData())
+                {
+                    return false;
+                }
+                else if($(document.activeElement).hasClass("scannerIP"))
+                {                    
+                    var NextElem = $('#ProductUidName').parents('.col-md-6').next().find('input[type=text].form-control,select.form-control').filter(':visible:first');
+
+                    if(NextElem.hasClass('select2-offscreen'))
+                    {
+                        $(NextElem).select2("focus");
+                    }
+                    else
+                    {
+                        $(NextElem).focus();
+                    }
+
+                    event.stopImmediatePropagation();
+                    return false;
+                }
+                IsSaved=true;
+                $('button:submit').attr('disabled','disabled');
+                return IsSaved;
+            }
+            else
+            {
+                return false;
+            }
+
+
+        });
+
+
+        function ValidateData() {
+            var ValidationMessage = "";
+
+            //Client Side Validaion.....
+
+            return  (ValidationMessage=="");
+
+        }
+
+
+        //End For Double Click Post Validation
+
+
+
+    });
+</script>
+
+
+
+
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#ProductUidName").focus();
+        var PackingLineId = @Model.PackingLineId;
+        if ($("#ProductId").val() != 0 && $("#ProductId").val() != null) {
+            CreateSaleDeliveryOrderLineIdList()
+            CreateSaleOrderLineIdList()
+            //$("#image").attr('src', '/Uploads/cb8c9e85-f996-487c-a1b8-b6e21f455a28/Medium/78979_499685ff-1f7a-4ebd-99e0-d04ea14045c3.jpg');
+            AssignImage();
+        }
+        AssignPendingToPrint();
+
+
+
+        if (PackingLineId != 0 && PackingLineId != null)
+        {
+            $("#ProductUidName").prop('readonly', true);
+            $('#ProductId').prop('readonly', true);
+            $("#Qty").prop('readonly', true);
+            $('#ProductInvoiceGroupId').prop('readonly', true);
+            $("#BaleNo").focus() ;
+        }
+    })
+
+    $("#save").click(function () {
+        if ($('#ProductId').select2('data') != null) {
+            $("#ProductName").val($('#ProductId').select2('data').text);
+        }
+        else {
+            $("#Product").val("");
+        }
+        $("#SaleOrderNo").val($('option:selected', $("#SaleOrderLineId")).text());
+        //$("#ProductUidName").focus() ;
+    });
+
+
+
+    $("#Print").click(function () {
+        $.ajax({
+            cache:false,
+            type: "POST",
+            url:"/Rug/PackingLine/DisposeSessionPrintVariable",
+            data: { PackingHeaderId: $("#PackingHeaderId").val()},
+            success:function(data){
+            },
+            error:function(xhr,ajaxOptions,thrownError){
+                alert('Failed to Dispose Session Variables'+thrownError);
+            }
+        })
+        AssignPendingToPrint();
+    });
+
+
+    $(function () {
+        //$("#DealQty,#Qty").keyup(Calculation);
+
+        $("#DealQty,#Qty").keyup(function(){
+            QtyValidation();
+            Calculation();
+        });
+
+
+        $("#ProductUidName").change(function(){
+            $("#CreateExtraSaleOrder").val(false);
+            Validate_ProductUid();
+        });
+        $("#ProductId").change(function(){
+            $("#CreateExtraSaleOrder").val(false);
+            Validate_Product();
+        });
+        $("#ProductInvoiceGroupId").change(GetBaleNo);
+        $("#ProductUidName").focusout(AssignLastProduct);
+    })
+
+
+
+
+    function Validate_ProductUid() {
+        var ProcessProgress = $("#Product Uid detail loading progress");
+        ProcessProgress.show();
+        if ($("#ProductUidName").val() != "") {
+            $.ajax({
+                cache: false,
+                type: "POST",
+                url: "@(Url.Action("GetProductUIDDetailJson"))",
+                data: { ProductUIDNo: $("#ProductUidName").val(),PackingHeaderId: $("#PackingHeaderId").val()},
+                success: function (data) {
+                    if (Object.keys(data).length != 0) {
+                        $("#ProductUidValidation").text("");
+                        $("#ProductId").val(data[0].ProductId);
+                        $("#ProductUidId").val(data[0].ProductUidId);
+                        $("#ProductId").select2("data", { id: data[0].ProductId, text: data[0].ProductName });
+                        $("#FromProcessId").val(data[0].PrevProcessId);
+                        $("#Qty").val(1);
+                        $("#DivisionId").val(data[0].DivisionId);
+
+                        $("#Qty").prop('readonly', true);
+                        //$("#UnitConversionMultiplier").val(data[0].NField1);
+                        //Calculation();
+
+                        IsThirdBackingProcessDone();
+                        Validate_Product();
+
+                        $('#ProductId').prop('readonly', true);
+                        $("#BaleNo").focus();
+                        $("#BaleNo").select();
+                    }
+                    else {
+                        $("#ProductUidId").val("");
+                        $("#ProductId").val("");
+                        $("#ProductId").select2("data", { id: "", text: "" });
+                        $("#Qty").val("");
+                        $("#FromProcessId").val("");
+                        $("#ProductUidValidation").text("Invalid Bar Code.");
+                        $("#SaleOrderLineId").val("");
+                    }
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    alert('Failed to retrieve product Uid details.' + thrownError);
+                    ProcessProgress.hide();
+                }
+            });
+
+        }
+        else {
+            $("#ProductUidId").val("");
+            $("#Qty").prop('readonly', false);
+            $('#ProductId').prop('readonly', false);
+        }
+    }
+
+    function AssignLastProduct(){
+        //alert($("#ProductId").val());
+        //alert($("#ProductUidId").val());
+
+
+
+        if (($("#ProductId").val() == null || $("#ProductId").val() == 0) && ($("#ProductUidId").val() == null || $("#ProductUidId").val() == 0) && ($("#ProductUidName").val() == null || $("#ProductUidName").val() == 0) )
+        {
+            $.ajax({
+                cache: false,
+                type: "POST",
+                url: "@(Url.Action("GetLastProduct"))",
+                data: { PackingHeaderId: $("#PackingHeaderId").val()},
+                success: function (data) {
+                    if(data.length!=0 && data[0])
+                    {
+                        $("#ProductId").select2("data", { id: data[0].ProductId, text: data[0].ProductName });
+                        $("#ProductName").val(data[0].ProductName);
+                        Validate_Product();
+                        Calculation();
+                    }
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    alert('Failed to retrieve Last Product .' + thrownError);
+                    ProcessProgress.hide();
+                }
+            });
+        }
+    }
+
+    function Validate_Product() {
+        var ProcessProgress = $("#Product detail loading progress");
+        ProcessProgress.show();
+
+        $('button:submit').attr('disabled','disabled');
+
+        if ($("#ProductUid").val() != 0 && $("#ProductUid").val() != null && $("#ProductUid").val() != "") {
+            //$('#ProductId').select2().enable(false);
+        }
+        $("#DeliveryOrderValidation").text("");
+
+        if ($("#ProductId").val() != 0 && $("#ProductId").val() != null && $("#ProductId").val() != "") {
+
+            $("#Qty").val(1);
+
+            $.ajax({
+                cache: false,
+                async: false,
+                type: "POST",
+                url: "@(Url.Action("GetProductDetailJson"))",
+                data: { ProductId: $("#ProductId").val(),PackingHeaderId: $("#PackingHeaderId").val() },
+                success: function (data) {
+                    CreateSaleDeliveryOrderLineIdList()
+                    CreateSaleOrderLineIdList();
+                    $("#UnitId").val(data[0].UnitId);
+                    $("#ImageFolderName").val(data[0].ImageFolderName);
+                    $("#ImageFileName").val(data[0].ImageFileName);
+                    $("#IsSample").val(data[0].IsSample);
+
+                    $("#UnitConversionMultiplier").val(data[0].NField1);
+                    Calculation();
+
+
+                    if ($("#IsSample").val() == "false")
+                    {
+                        CustomSelectFunction($("#ProductInvoiceGroupId"), '/ComboHelpList/GetProductInvoiceGroupsDivisionWise', '/ComboHelpList/SetSingleProductInvoiceGroup', ' ', false, 0);
+                    }
+                    else{
+                        CustomSelectFunction($("#ProductInvoiceGroupId"), '/ComboHelpList/GetProductInvoiceGroupsDivisionWiseExcludeSample', '/ComboHelpList/SetSingleProductInvoiceGroup', ' ', false, 0);
+                    }
+
+
+                    if (data[0].ProductInvoiceGroupId != null && data[0].ProductInvoiceGroupId != '')
+                    {
+                        $("#ProductInvoiceGroupId").select2("data", { id: data[0].ProductInvoiceGroupId, text: data[0].ProductInvoiceGroupName });
+                    }
+
+
+
+                    if ((data[0].ProductInvoiceGroupId != null && data[0].ProductInvoiceGroupId != '') || ($("#SaleOrderLineId").val()!= null && $("#SaleOrderLineId").val() != 0))
+                    {
+                        $("#ProductInvoiceGroupId").select2("data", { id: data[0].ProductInvoiceGroupId, text: data[0].ProductInvoiceGroupName });
+                        GetBaleNo();
+                    }
+                    else{
+                        $("#BaleNo").val(1);
+                    }
+
+                    AssignImage();
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    alert('Failed to retrieve Product Detail.' + thrownError);
+                    ProcessProgress.hide();
+                }
+            });
+
+
+            @*if ($("#ProductId").val() != 0 && $("#ProductId").val() != null )
+            {
+                $.ajax({
+                    cache: false,
+                    type: "POST",
+                    url: "@(Url.Action("GetProductAreaJson"))",
+                    data: { ProductId: $("#ProductId").val(), PackingHeaderId: $("#PackingHeaderId").val() },
+                    success: function (data) {
+                        $("#UnitConversionMultiplier").val(data[0].ProductArea);
+                        Calculation();
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        alert('Failed to retrieve Area for Product.' + thrownError);
+                        ProcessProgress.hide();
+                    }
+                });
+            }*@
+
+
+
+
+
+
+
+            if ($("#ProductUidId").val() == 0 || $("#ProductUidId").val() == null || $("#ProductUidId").val() == "") {
+                $.ajax({
+                    cache: false,
+                    type: "POST",
+                    url: "@(Url.Action("GetProductPrevProcess"))",
+                    data: { ProductId: $("#ProductId").val(), GodownId: $("#GodownId").val(), DocTypeId: $("#DocTypeId").val() },
+                    success: function (data) {
+                        $("#FromProcessId").val(data[0].ProcessId);
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        ProcessProgress.hide();
+                    }
+                });
+            }
+        }
+        else {
+
+            $("#UnitConversionMultiplier").val(0);
+            $("#UnitId").val("");
+            $("#Specification").val("");
+            $("#Qty").val("");
+            $("#DealQty").val("");
+            $("#SaleOrderLineId").html('');
+            $("#ProductInvoiceGroupId").select2("data", { id: "", text: "" });
+        }
+        $('button:submit').removeAttr('disabled');
+    }
+
+    function Calculation() {
+        if ($('#UnitConversionMultiplier').val() != 0) {
+            $('#DealQty').val($('#Qty').val() * $('#UnitConversionMultiplier').val())
+        }
+    }
+
+    function GetBaleNo() {
+        var BaleNoPattern = @ViewBag.BaleNoPattern
+        $.ajax({
+            cache: false,
+            async: false,
+            type: "POST",
+            url: "@(Url.Action("GetNewPackingBaleNoJson"))",
+            data: { PackingHeaderId: $("#PackingHeaderId").val(), ProductInvoiceGroupId: $("#ProductInvoiceGroupId").val(), SaleOrderLineId: $("#SaleOrderLineId").val(), BaleNoPatternId: BaleNoPattern,DealQty: $("#DealQty").val()},
+            success: function (data) {
+                $("#BaleNo").val(data[0].NewBaleNo);
+                $("#BaleNo").select();
+            },
+            error: function (xhr, ajaxOptions, thrownError) {
+                alert('Failed to retrieve Bale No.' + thrownError);
+                //ProcessProgress.hide();
+            }
+        });
+
+    }
+
+    function AssignImage() {
+        var ImageFolderName = $("#ImageFolderName").val();
+        var ImageFileName = $("#ImageFileName").val();
+        if (ImageFolderName != ""){
+            var url="/Uploads/" + ImageFolderName + "/Medium/" + ImageFileName ;
+            var link="/Uploads/" + ImageFolderName + "/" + ImageFileName ;
+            $('#image').attr("src",url);
+            $('#imagelink').attr("href",link);
+        }
+        else{
+            $('#image').attr("src","");
+            $('#imagelink').attr("href","");
+        }
+    }
+
+
+    function CreateSaleOrderLineIdList() {
+        var SaleOrderLineId = $("#SaleOrderLineId");
+        var ProductName = "";
+
+        var PackingLineId = @Model.PackingLineId;
+        alert
+
+        if ($("#ProductId").val() != 0 && $("#ProductId").val() != null && $("#ProductId").val() != "")
+        {
+
+            if ($("#SaleDeliveryOrderLineId").val() != 0 && $("#SaleDeliveryOrderLineId").val() != null && $("#SaleDeliveryOrderLineId").val() != "")
+            {
+                //alert($("#SaleDeliveryOrderLineId").val());
+                $.ajax({
+                    cache: false,
+                    async: false,
+                    type: "POST",
+                    url: "@(Url.Action("GetSaleOrderLineIdListForDeliveryOrderJson"))",
+                    data: { SaleDeliveryOrderLineId: $("#SaleDeliveryOrderLineId").val() } ,
+                    success: function (data) {
+                        SaleOrderLineId.html('');
+                        if(data.length!=0)
+                        {
+                            $.each(data, function (id, option) {
+                                SaleOrderLineId.append($('<option> </option>').val(option.SaleOrderLineId).html(option.SaleOrderNo));
+                            });
+                        }
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        alert('Failed to Retrive Sale Order List.' + thrownError);
+                    }
+                });
+            }
+
+            else{
+
+
+
+                $.ajax({
+                    cache: false,
+                    async: false,
+                    type: "POST",
+                    url: "@(Url.Action("GetSaleOrderLineIdListJson"))",
+                    data: { ProductId: $("#ProductId").val(), PackingHeaderId: $("#PackingHeaderId").val(), PackingLineId: $("#PackingLineId").val() },
+                    success: function (data) {
+                        SaleOrderLineId.html('');
+                        //SaleOrderLineId.append($('<option></option>').html('-Please Select-'));
+
+                        //alert($("#ProductId").select2('data').text);
+                        if(data.length!=0)
+                        {
+                            $.each(data, function (id, option) {
+                                SaleOrderLineId.append($('<option> </option>').val(option.SaleOrderLineId).html(option.SaleOrderNo));
+                            });
+                            GetSpecification();
+                            $('#errormsg').remove();
+                            $('#ExtraPO').css('display', 'none')
+                        }
+                        else{
+                            if ($('#CreateExtraSaleOrder').val().toString().toUpperCase()== "FALSE")
+                            {
+                                $('#errormsg').remove();
+                                SaleOrderLineId.html('');
+                                if( !$('#errormsg').length)
+                                {
+                                    $('#ExtraPO').before("<span id=errormsg style='color:red'> No sale order is pending for product "+ $("#ProductId").select2('data').text +" . Want to create extra sale order ?  </span>")
+                                    //$('#ExtraPO').removeAttr('display');
+                                    $('#ExtraPO').css('display', '')
+
+                                }
+                                //$('#ProductId').select2("val","");
+                            }
+                        }
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        alert('Failed to Retrive Sale Order List.' + thrownError);
+                    }
+                });
+            }
+        }
+    }
+
+    $('#ExtraPO').click(function(){
+        //alert("flag assigned");
+        AssignExtraSaleOrderFlag()
+        //alert($('#errormsg').text());
+        $('#errormsg').remove();
+        //alert($('#errormsg').text());
+        $('#ExtraPO').css('display', 'none')
+        //alert("Process Done");
+    })
+
+    function AssignExtraSaleOrderFlag(){
+        $.ajax({
+            cache:false,
+            type: "POST",
+            url:"@(Url.Action("SetFlagForExtraSaleOrder"))",
+            success:function(data){
+                if (data.toString().toUpperCase()== "TRUE")
+                {
+                    $("#CreateExtraSaleOrder").val(data);
+                }
+                else{
+                    $("#CreateExtraSaleOrder").val(false);
+                }
+
+                Validate_Product();
+                $('#Specification').val("");
+                //alert($("#CreateExtraSaleOrder").val());
+            },
+            error:function(xhr,ajaxOptions,thrownError){
+                alert('Failed to Retrive Extra Sale Order Flag'+thrownError);
+            }
+        })
+    }
+
+    function GetSpecification(){
+        $.ajax({
+            cache:false,
+            type: "POST",
+            url:"@(Url.Action("GetSpecification"))",
+            data:{SaleOrderLineId:$('#SaleOrderLineId').val()},
+            success:function(data){
+                $('#Specification').val(data);
+            },
+            error:function(xhr,ajaxOptions,thrownError){
+                alert('Failed to Retrive My Specification'+thrownError);
+            }
+        })
+    }
+    $('#SaleOrderLineId').change(GetSpecification);
+
+
+
+
+
+    function AssignPendingToPrint(){
+        $.ajax({
+            cache:false,
+            type: "POST",
+            url:"@(Url.Action("GetPendingToPrint"))",
+            data:{PackingHeaderId:$('#PackingHeaderId').val()},
+            success:function(data){
+                $("#PendingToPrint").text(data);
+            },
+            error:function(xhr,ajaxOptions,thrownError){
+                alert('Failed to Retrive Pending To Print Qty'+thrownError);
+            }
+        })
+    }
+
+
+
+
+
+    function IsThirdBackingProcessDone()
+    {
+        if ($('#DivisionId').val() == 6)
+        {
+            $.ajax({
+                cache:false,
+                type: "POST",
+                url:"@(Url.Action("IsThirdBackingProcessDone"))",
+                data:{ProductUidId:$('#ProductUidId').val()},
+                success:function(data){
+                    if (data == false)
+                    {
+                        //$('#ProductUidName').parent().append("<span id=errormsg style='color:red'> Third Backing Process is not done for Barcode "+ $("#ProductUidName").val() +" .</span>")
+                        $("#ProductUidValidation").text("Third Backing Process is not done for Barcode "+ $("#ProductUidName").val() +".");
+                        $("#ProductId").val("");
+                        $("#ProductId").select2("data", { id: "", text: "" });
+                    }
+                    else{
+                        $("#ProductUidValidation").text("");
+                    }
+                },
+                error:function(xhr,ajaxOptions,thrownError){
+                    alert('Failed to Retrive that third backing is done or not.');
+                }
+            })
+        }
+    }
+
+
+    function QtyValidation()
+    {
+        if ($('#UnitConversionMultiplier').val() > 0.25 && $('#Qty').val() > 1 && $('#DealUnitId').val() != 'PCS' && $('#DealUnitId').val() != 'KG')
+        {
+            $("#QtyValidation").text("Packed Qty can not be greater then 1 for "+ $("#ProductId").select2('data').text +".");
+            //alert($('#UnitConversionMultiplier').val());
+            $("#Qty").val("");
+
+        }
+        else
+        {
+            $("#QtyValidation").text("");
+        }
+    }
+
+
+
+
+    function CreateSaleDeliveryOrderLineIdList() {
+        var SaleDeliveryOrderLineId = $("#SaleDeliveryOrderLineId");
+        var ProductName = "";
+
+        var PackingLineId = @Model.PackingLineId;
+
+
+
+        if ($("#ProductId").val() != 0 && $("#ProductId").val() != null && $("#ProductId").val() != "")
+        {
+
+
+            $.ajax({
+                cache: false,
+                async: false,
+                type: "POST",
+                url: "@(Url.Action("GetDeliveryOrderLineIdListJson"))",
+                data: { ProductId: $("#ProductId").val(), PackingHeaderId: $("#PackingHeaderId").val(), PackingLineId: $("#PackingLineId").val() },
+                success: function (data) {
+                    SaleDeliveryOrderLineId.html('');
+                    if(data.length!=0)
+                    {
+                        $.each(data, function (id, option) {
+                            SaleDeliveryOrderLineId.append($('<option> </option>').val(option.SaleDeliveryOrderLineId).html(option.SaleDeliveryOrderNo));
+                        });
+                        $("#DeliveryOrderShipMethodId").val(data[0].ShipMethodId);
+                        $("#OtherBuyerDeliveryOrders").val(data[0].OtherBuyerDeliveryOrders);
+                        //$("#PendingToPrint").text(data);
+
+
+
+                        if ($("#ProductId").val() != 0 && $("#ProductId").val() != null && $("#ProductId").val() != "")
+                        {
+                            if ($("#DeliveryOrderShipMethodId").val() != $("#PackingShipMethodId").val())
+                            {
+                                $("#DeliveryOrderValidation").text("Product "+ $("#ProductId").select2('data').text +" should be shipped by some other method." );
+                                //alert($("#DeliveryOrderValidation").text());
+
+                                $("#ProductId").val("");
+                                $("#ProductId").select2("data", { id: "", text: "" });
+                                $("#SaleDeliveryOrderLineId").val("");
+                            }
+                            else{
+                                $("#DeliveryOrderValidation").text("");
+                            }
+                        }
+
+                        //alert($("#OtherBuyerDeliveryOrders").val());
+
+                        if ($("#ProductId").val() != 0 && $("#ProductId").val() != null && $("#ProductId").val() != "")
+                        {
+
+                            if ($("#OtherBuyerDeliveryOrders").val() != null && $("#OtherBuyerDeliveryOrders").val() != '0')
+                            {
+                                $("#DeliveryOrderValidation").text("There are some Other High Priotiry Delivery Orders Pending For Product "+ $("#ProductId").select2('data').text +".Can't Proceed.");
+
+                                $("#ProductId").val("");
+                                $("#ProductId").select2("data", { id: "", text: "" });
+                                $("#SaleDeliveryOrderLineId").val("");
+                            }
+                            else{
+                                $("#DeliveryOrderValidation").text("");
+                            }
+                        }
+                    }
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    alert('Failed to Retrive Sale Delivery Order List.' + thrownError);
+                }
+            });
+        }
+    }
+
+
+    $(document).ready(function () {
+        var id=@Model.PackingLineId;
+        $('#delete','.modal-content').click(function (e) {
+            if(id>0)
+            {
+                var url = '/Rug/PackingLine/DeletePost';
+                $('form#modform').attr('action',url);
+                return;
+            }
+            else
+            {
+                return false;
+            }
+        })
+    });
+</script>

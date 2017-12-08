@@ -1,0 +1,309 @@
+﻿@model Model.ViewModels.ReportMasterViewModel
+@using System.Text.RegularExpressions
+
+@{
+    ViewBag.Title = Model.ReportHeader.ReportName;
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style type="text/css">
+    .grid {
+        width: 500px;
+        height: 250px;
+    }
+</style>
+
+
+<form action="/" id="registerSubmit">
+    <div class="panel panel-default">
+
+        <div class="panel-heading">
+            <h4>
+                <span> @Model.ReportHeader.ReportName </span>
+                <input type="submit" value="Fill" class="btn btn-primary btn-sm CurveBorder height" id="submit" style="float : right ; width:5em; background-color: #2980b9" />
+            </h4>
+        </div>
+
+        <div class="panel-info" style="padding-left:15px">
+
+            @if (!string.IsNullOrEmpty(Model.ReportHeader.Notes))
+            {
+                <div class="alert alert-info alert-dismissible" role="alert">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <strong>Notes: </strong> @Model.ReportHeader.Notes
+                </div>
+            }
+
+            @Html.AntiForgeryToken()
+            @Html.HiddenFor(m => m.ReportHeaderId)
+            @Html.HiddenFor(m => m.ReportHeader.Controller)
+            @Html.HiddenFor(m => m.ReportHeader.Action)
+            <div class="form-horizontal" role="form">
+                @Html.ValidationSummary(true)
+
+                <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+                    @foreach (var item in Model.ReportLine.GroupBy(m => new { m.Type, m.IsCollapse }).OrderBy(m => m.Key.Type))
+                    {
+                        Regex rexp = new Regex(@"[\d\W]");
+                        string key = rexp.Replace(item.Key.Type, "");
+                        <div class="panel-heading" role="tab" id="@( key + item.Key.IsCollapse)h">
+                            <h4 class="panel-title">
+                                <span role="button" data-toggle="collapse" data-parent="#accordion" href="#@(key + item.Key.IsCollapse)d" aria-expanded="@(item.Key.IsCollapse?"false":"true")" aria-controls="@(key + item.Key.IsCollapse)d">
+                                    <span style="color:black" class="glyphicon glyphicon-@(item.Key.IsCollapse?"plus-sign":"minus-sign") collapse_Ico"></span>
+                                    @(item.Key.Type)
+                                </span>
+                            </h4>
+                        </div>
+                        <div id="@(key + item.Key.IsCollapse)d" class="panel-collapse collapse @(item.Key.IsCollapse?"":"in")" role="tabpanel" aria-labelledby="@( key + item.Key.IsCollapse)h">
+                            <div class="panel-body">
+                                <div class="row">
+
+
+                                    @foreach (var temp in item)
+                                    {
+                                        <div class="col-md-6" style="display:@(temp.IsVisible ? "" : "none")">
+                                            <div class="form-group">
+                                                @if (temp.DataType != "Constant Value")
+                                                {
+                                                    @Html.Label(temp.DisplayName, new { @class = "control-label col-xs-4" })
+                                                }
+
+                                                <div class="col-xs-6">
+                                                    @switch (temp.DataType)
+                                                    {
+                                                        case "Text":
+                                                            {
+
+                                                                @Html.TextBox(temp.FieldName, temp.DefaultValue, new { @class = "form-control col-xs-6 height" + (temp.IsMandatory && temp.IsVisible ? " required" : ""), @placeholder = temp.PlaceHolder, @title = temp.ToolTip, @data_toggle = "tooltip" })
+
+
+                                                                break;
+                                                            }
+                                                        case "Number":
+                                                            {
+                                                                @Html.TextBox(temp.FieldName, temp.DefaultValue, new { @class = "form-control col-xs-6 height" + (temp.IsMandatory && temp.IsVisible ? " required" : ""), @placeholder = temp.PlaceHolder, @title = temp.ToolTip, @data_toggle = "tooltip" })
+
+                                                                break;
+                                                            }
+                                                        case "Date":
+                                                            {
+                                                                if (!string.IsNullOrEmpty(temp.DefaultValue) && temp.DefaultValue == "Today")
+                                                                {
+                                                                    @Html.TextBox(temp.FieldName, DateTime.Now, "{0:dd/MMM/yyyy}", new { @class = "datepicker form-control col-xs-6 height" + (temp.IsMandatory && temp.IsVisible ? " required" : ""), @placeholder = temp.PlaceHolder, @title = temp.ToolTip, @data_toggle = "tooltip" })
+                                                                }
+                                                                else
+                                                                {
+                                                                    @Html.TextBox(temp.FieldName, null, new { @class = "datepicker form-control col-xs-6 height" + (temp.IsMandatory && temp.IsVisible ? " required" : ""), @placeholder = temp.PlaceHolder, @title = temp.ToolTip, @data_toggle = "tooltip" })
+                                                                }
+                                                                break;
+                                                            }
+                                                        case "Single Select":
+                                                            {
+
+                                                                if (!string.IsNullOrEmpty(temp.ListItem))
+                                                                {
+                                                                    List<SelectListItem> tem = new List<SelectListItem>();
+                                                                    foreach (string Litem in (temp.ListItem).Split(',').ToList())
+                                                                    {
+                                                                        if (Litem == temp.DefaultValue)
+                                                                        {
+                                                                            tem.Add(new SelectListItem { Text = Litem, Value = Litem, Selected = true });
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            tem.Add(new SelectListItem { Text = Litem, Value = Litem });
+                                                                        }
+                                                                    }
+                                                                    @Html.DropDownList(temp.FieldName, new SelectList(tem as System.Collections.IEnumerable, "Value", "Text", temp.DefaultValue), string.Empty, new { @class = "form-control col-xs-6 height" + (temp.IsMandatory && temp.IsVisible ? " required" : ""), @placeholder = temp.PlaceHolder, @title = temp.ToolTip, @data_toggle = "tooltip" })
+                                                                    break;
+                                                                }
+                                                                else
+                                                                {
+                                                                    @Html.TextBox(temp.FieldName, temp.DefaultValue, new { @class = "form-control col-xs-6 height" + (temp.IsMandatory && temp.IsVisible ? " required" : ""), @placeholder = temp.PlaceHolder, @title = temp.ToolTip, @data_toggle = "tooltip" })
+                                                                    <input type="hidden" id="@(temp.FieldName)s" name="@(temp.FieldName)names" value="@temp.DefaultValue" />
+                                                                    break;
+                                                                }
+                                                            }
+                                                        case "Multi Select":
+                                                            {
+                                                                <input type='hidden' name='@temp.FieldName' id='@temp.FieldName' value="@temp.DefaultValue" class="multisel form-control col-xs-6 @(temp.IsMandatory && temp.IsVisible ? "required" : "")" placeholder="@temp.PlaceHolder" title="@temp.ToolTip" />
+                                                                <input type="hidden" id="@(temp.FieldName)s" name="@(temp.FieldName)names" />
+                                                                break;
+                                                            }
+                                                        default:
+                                                            {
+                                                                break;
+                                                            }
+                                                    }
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+
+                            </div>
+                        </div>
+
+                    }
+                </div>
+
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-10">
+
+                        <span style="font-family: Calibri,sans-serif,Verdana;font-size:large">
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div id="tableDiv"></div>
+    </div>
+</form>
+
+
+<!doctype html>
+<html ng-app="app">
+<head>
+    <title>
+        UI-Grid
+    </title>
+    <script src="~/Scripts/angular.js"></script>
+    <script src="~/Scripts/angular-touch.js"></script>
+    <script src="~/Scripts/angular-animate.js"></script>
+    <script src="http://ui-grid.info/docs/grunt-scripts/csv.js"></script>
+    <script src="http://ui-grid.info/docs/grunt-scripts/pdfmake.js"></script>
+    <script src="http://ui-grid.info/docs/grunt-scripts/vfs_fonts.js"></script>
+    <script src="~/Scripts/app.js"></script>
+    <script src="~/Scripts/ui-grid.js"></script>
+    <link href="~/Content/ui-grid.css" rel="stylesheet" />
+</head>
+<body>
+    <div ng-controller="MainCtrl">
+        <div id="grid1" ui-grid="{ data: myData }" class="grid"></div>
+    </div>
+</body>
+</html>
+
+
+
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        alert("Go");
+        var GridObjectTest = require('../../test/e2e/gridObjectTestUtils.spec.js');
+        var grid1 = new GridObjectTest('grid1');
+        describe('101 tutorial', function() {
+            it('grid should have three visible rows', function () {
+                grid1.expectRowCount( 3 );
+            });
+ 
+            it('header values should be as expected', function () {
+                grid1.expectHeaderColumns( ['First Name', 'Last Name', 'Company', 'Employed'] );
+            });
+ 
+            it('first row cell values should be as expected', function () {
+                // checking individual cells usually gives a better stack trace when there are errors
+                grid1.expectCellValueMatch( 0, 0, 'Cox' );
+                grid1.expectCellValueMatch( 0, 1, 'Carney' );
+                grid1.expectCellValueMatch( 0, 2, 'Enormo' );
+                grid1.expectCellValueMatch( 0, 3, 'true' );
+            });
+ 
+            it('next two row cell values should be as expected', function () {
+                // checking in bulk is convenient to write, but can be less informative with errors
+                grid1.expectRowValuesMatch( 1, [ 'Lorraine', 'Wise', 'Comveyer', 'false' ] );
+                grid1.expectRowValuesMatch( 2, [ 'Nancy', 'Waters', 'Fuelton', 'false' ] );
+            });
+        });
+    });
+
+
+    $('#submit').click(function () {
+        GenerateDataTable();
+        return false;
+    })
+
+
+
+    var Lock = false;
+
+    function GenerateDataTable() {
+        if (!Lock) {
+            Lock = true;
+            var MName = '@ViewBag.MenuName'
+            $.ajax({
+                url: '/SaleInvoiceHeaderCharge/SaleInvoiceChargelist/' + $(this).serialize(),
+                type: "POST",
+                data: $("#registerSubmit").serialize(), //{ FromDate: FromD, ToDate: ToD, MenuName: MName },
+                success: function (result) {
+                    Lock = false;
+                    if (result.Success == true) {
+                        var results = result;
+                        var tableHeaders = "";
+                        if (results.Data.length > 0) {
+                            var columnsIn = results.Data[0];
+                            var j = 0;
+
+                            $.each(columnsIn, function (key, value) {
+                                tableHeaders += "<th>" + columnsIn[j]["Key"] + "</th>";
+                                j++;
+                            });
+                        }
+                        $("#tableDiv").empty();
+                        $("#tableDiv").append('<table id="displayTable" class="display" cellspacing="0" width="100%"><thead><tr style="background: #428bca;color:white">' + tableHeaders + '</tr></thead></table>');
+
+                        var rowDataSet = [];
+                        var i = 0;
+                        $.each(results.Data, function (key, value) {
+                            var rowData = [];
+                            var j = 0;
+                            var columnsIn = results.Data[i];
+                            $.each(columnsIn, function (key, value) {
+                                rowData[j] = columnsIn[j]["Value"];
+                                j++;
+                            });
+
+                            rowDataSet[i] = rowData;
+
+                            i++;
+                        });
+                        $('#displayTable').dataTable({
+                            "bDestroy": true,
+                            "bScrollCollapse": true,
+                            "bJQueryUI": true,
+                            "bPaginate": false,
+                            "scroller": true,
+                            "scrollY": "310px",
+                            "scrollX": true,
+                            "bInfo": true,
+                            "bFilter": true,
+
+
+                            dom: 'Bfrtip',
+                            buttons: [
+                                'excel'
+                            ],
+                            "aaData": rowDataSet
+                        });
+                    }
+                    else if (!result.Success) {
+                        alert('Something went wrong');
+                    }
+                },
+                error: function () {
+                    Lock: false;
+                    alert('Something went wrong');
+                }
+            });
+        }
+        else {
+            return false;
+        }
+    }
+
+
+</script>
+

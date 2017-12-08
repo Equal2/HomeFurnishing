@@ -1,0 +1,191 @@
+
+UPDATE MaterialPlan
+SET MaterialPlan.ManualRefNo = V1.ManualRefNo
+FROM 
+(
+	SELECT H.DocID, Po.ManualRefNo
+	FROM MaterialPlan H 
+	LEFT JOIN ProdOrder Po ON H.ProdOrder = Po.DocID
+	WHERE H.ManualRefNo IS NULL
+) AS V1
+WHERE MaterialPlan.DocID = V1.DocId
+
+
+
+
+
+UPDATE MaterialPlan
+SET MaterialPlan.ManualRefNo = V1.ManualRefNo
+FROM 
+(
+	SELECT H.DocID, ISNull(Po.ManualRefNo, Pi.ManualRefNo) AS ManualRefNO
+	FROM MaterialPlan H 
+	LEFT JOIN MaterialPlan Po ON H.ProdPlan  = Po.DocID
+	LEFT JOIN PurchIndent Pi ON H.DocID  = Pi.DocID
+	WHERE H.DocID IN ('D1    MP 2014       4', 'D1    MP 2014       5', 'K1    MP 2014       4', 'K1   UMP 2014       2', 'R1    MP 2014      72', 'R1 CINDT 2012     111', 'R1 CINDT 2012     119', 'R1 PINCL 2013       7', 'R1 PINCL 2013      11')
+) AS V1
+WHERE MaterialPlan.DocID = V1.DocId
+
+
+
+
+INSERT INTO Web.MaterialPlanHeaders (DocTypeId, DocDate, DocNo, DivisionId, SiteId, DueDate, GodownId, Status, Remark, CreatedBy, CreatedDate, ModifiedBy, ModifiedDate, OMSId)
+SELECT WDt.DocumentTypeId AS DocTypeId, H.V_Date AS DocDate, Substring(H.ManualRefNo,1,20) AS DocNo, Wd.DivisionId, Wsm.SiteId, 
+IsNull(H.DueDate,H.V_Date) AS DueDate, Wg.GodownId, 1 AS Status ,
+H.Remarks AS Remark, H.EntryBy AS CreatedBy,
+H.EntryDate AS CreatedDate, H.EntryBy AS ModifiedBy, H.EntryDate AS ModifiedDate, 'Material Plan-' + H.DocID AS OMSId
+FROM MaterialPlan H 
+LEFT JOIN Voucher_Type Vt ON H.V_Type = Vt.V_Type
+LEFT JOIN Division D ON H.Div_Code = D.Div_Code
+LEFT JOIN SiteMast Sm ON H.Site_Code = Sm.Code
+LEFT JOIN Godown G ON H.Godown = G.Code
+LEFT JOIN Web.DocumentTypes WDt ON Vt.OMSId = 'Document Type-' + Convert(NVARCHAR,WDt.DocumentTypeId)
+LEFT JOIN WEb.Divisions Wd ON D.OMSId = 'Division-' + COnvert(NVARCHAR, Wd.DivisionId)
+LEFT JOIN Web.Sites Wsm ON Sm.OMSId = 'Site-' +  COnvert(NVARCHAR, Wsm.SiteId)
+LEFT JOIN Web.Godowns WG ON G.OMSId = 'Godown-' +  COnvert(NVARCHAR, Wg.GodownId)
+WHERE H.Site_Code = '1' AND H.V_Type IN ('PRP','FPRP')
+
+
+
+
+
+
+UPDATE MaterialPlan 
+SET MaterialPlan.OMSId = 'Material Plan-' + Convert(NVARCHAR,Web.MaterialPlanHeaders.MaterialPlanHeaderId)
+FROM Web.MaterialPlanHeaders
+WHERE 'Material Plan-' +  MaterialPlan.DocID = Web.MaterialPlanHeaders.OMSId
+
+
+
+
+INSERT INTO Web.MaterialPlanLines (MaterialPlanHeaderId, ProductId, RequiredQty, DueDate, ExcessStockQty, StockPlanQty, ProdPlanQty, PurchPlanQty, Remark, CreatedBy, ModifiedBy, CreatedDate, ModifiedDate, OMSId, GeneratedFor, ProcessId, Dimension1Id, Dimension2Id)
+SELECT H.V_Type, WH.MaterialPlanHeaderId, Wp.ProductId, IsNull(L.BomQty,0) AS RequiredQty, NULL AS DueDate, L.ExcessStock AS ExcessStockQty, 0 AS StockPlanQty, 
+L.UserMaterialPlanQty AS ProdPlanQty, L.UserPurchPlanQty AS PurchPlanQty, NULL AS Remark,
+H.EntryBy AS CreatedBy, H.EntryBy AS ModifiedBy, 
+H.EntryDate AS CreatedDate, H.EntryDate AS ModifiedDate, 'Material Plan-' +  L.DocId + Convert(NVARCHAR,L.Sr) AS OMSId,
+'Sale Order' AS GeneratedFor, NULL AS ProcessId, NULL AS Dimension1Id, NULL AS Dimension2Id
+FROM MaterialPlanDetail L 
+LEFT JOIN MaterialPlan H ON L.MaterialPlan = H.DocID
+LEFT JOIN Item I ON L.Item = I.Code
+LEFT JOIN Web.MaterialPlanHeaders WH ON H.OMSId = 'Material Plan-' + Convert(NVARCHAR,WH.MaterialPlanHeaderId)
+LEFT JOIN Web.Products Wp ON I.OMSId = 'Product-' + Convert(NVARCHAR,Wp.ProductId)
+WHERE H.Site_Code = '1' AND H.V_Type IN ('PRP','FPRP')
+
+
+
+UPDATE MaterialPlanDetail
+SET MaterialPlanDetail.OMSId = 'Material Plan-' + Convert(NVARCHAR,Web.MaterialPlanLines.MaterialPlanLineId)
+FROM Web.MaterialPlanLines
+WHERE 'Material Plan-' +  MaterialPlanDetail.DocID + Convert(NVARCHAR,MaterialPlanDetail.Sr) = Web.MaterialPlanLines.OMSId
+
+
+
+
+
+
+INSERT INTO Web.MaterialPlanForSaleOrders (MaterialPlanHeaderId, SaleOrderLineId, Qty, OMSId, CreatedBy, ModifiedBy, CreatedDate, ModifiedDate, MaterialPlanLineId)
+SELECT WH.MaterialPlanHeaderId, Sol.SaleOrderLineId, L.BomQty,
+'Material Plan-' +  L.DocId + Convert(NVARCHAR,L.Sr) AS OMSId, 
+H.EntryBy AS CreatedBy, H.EntryBy AS ModifiedBy, 
+H.EntryDate AS CreatedDate, H.EntryDate AS ModifiedDate, Mpl.MaterialPlanLineId
+FROM MaterialPlanDetail L 
+LEFT JOIN MaterialPlan H ON L.DocId = H.DocID
+LEFT JOIN SaleOrderDetail Sod ON L.SaleOrder = Sod.DocId AND L.SaleOrderSr = Sod.Sr
+LEFT JOIN Web.MaterialPlanHeaders WH ON H.OMSId = 'Material Plan-' + Convert(NVARCHAR,WH.MaterialPlanHeaderId)
+LEFT JOIN Web.SaleOrderLines Sol ON Sod.OMSId = 'Sale Order-' + Convert(NVARCHAR,Sol.SaleOrderLineId)
+LEFT JOIN Web.MaterialPlanLines Mpl ON 'Material Plan-' +  L.DocId + Convert(NVARCHAR,L.Sr) = Mpl.OMSId
+WHERE H.Site_Code = '1' AND H.V_Type IN ('PRP','FPRP')
+AND L.SaleOrder IS NOT NULL
+AND Sol.SaleOrderLineId IS NOT NULL
+
+
+
+
+
+
+INSERT INTO Web.ProdOrderHeaders (DocTypeId, DocDate, DocNo, DivisionId, SiteId, DueDate, Status, Remark, CreatedBy, CreatedDate, ModifiedBy, ModifiedDate, OMSId, MaterialPlanHeaderId)
+SELECT WDt.DocumentTypeId AS DocTypeId, H.V_Date AS DocDate, Substring(H.ManualRefNo,1,20) AS DocNo, Wd.DivisionId, Wsm.SiteId, 
+IsNull(H.DueDate,H.V_Date) AS DueDate, 1 AS Status ,
+H.Remarks AS Remark, H.EntryBy AS CreatedBy,
+H.EntryDate AS CreatedDate, H.EntryBy AS ModifiedBy, H.EntryDate AS ModifiedDate, 'Prod Order-' + H.DocID AS OMSId, 
+Mph.MaterialPlanHeaderId
+FROM ProdOrder H 
+LEFT JOIN MaterialPlan Mp ON H.DocID = Mp.DocID
+LEFT JOIN (SELECT * FROM MaterialPlan WHERE V_Type = 'PRP') AS Mp1 ON Mp1.ProdOrder = H.DocID
+LEFT JOIN MaterialPlan Mp2 ON IsNull(Mp.DocID,Mp1.DocID) = Mp2.DocId
+LEFT JOIN Voucher_Type Vt ON H.V_Type = Vt.V_Type
+LEFT JOIN Division D ON H.Div_Code = D.Div_Code
+LEFT JOIN SiteMast Sm ON H.Site_Code = Sm.Code
+LEFT JOIN Web.DocumentTypes WDt ON Vt.OMSId = 'Document Type-' + Convert(NVARCHAR,WDt.DocumentTypeId)
+LEFT JOIN WEb.Divisions Wd ON D.OMSId = 'Division-' + COnvert(NVARCHAR, Wd.DivisionId)
+LEFT JOIN Web.Sites Wsm ON Sm.OMSId = 'Site-' +  COnvert(NVARCHAR, Wsm.SiteId)
+LEFT JOIN Web.MaterialPlanHeaders Mph  ON Mp2.OMSId = 'Material Plan-' + Convert(NVARCHAR,Mph.MaterialPlanHeaderId)
+WHERE H.Site_Code = '1' AND H.V_Type IN ('PRP','FPRP')
+
+
+
+UPDATE ProdOrder
+SET ProdOrder.OMSId = 'Prod Order-' + Convert(NVARCHAR,Web.ProdOrderHeaders.ProdOrderHeaderId)
+FROM Web.ProdOrderHeaders
+WHERE 'Prod Order-' +  ProdOrder.DocID = Web.ProdOrderHeaders.OMSId
+
+
+
+
+
+UPDATE ProdOrderDetail
+SET ProdOrderDetail.MaterialPlan = V1.MaterialPlan,
+ProdOrderDetail.MaterialPlanSr = V1.MaterialPlanSr
+FROM 
+(
+	SELECT Pod.DocId, Pod.Sr, Mpd.DocId AS MaterialPlan, Mpd.Sr AS MaterialPlanSr
+	FROM ProdOrderDetail Pod
+	LEFT JOIN MaterialPlanDetail Mpd ON Pod.DocId = MPd.ProdOrder AND Pod.Sr = Mpd.ProdOrderSr
+	WHERE Pod.MaterialPlan IS NULL
+	AND Mpd.DocId IS NOT NULL
+) AS V1 
+WHERE ProdOrderDetail.DocId = V1.DocId AND ProdOrderDetail.Sr = V1.Sr
+
+
+
+
+
+
+UPDATE ProdOrderDetail
+SET ProdOrderDetail.MaterialPlan = V1.MaterialPlan,
+ProdOrderDetail.MaterialPlanSr = V1.MaterialPlanSr
+FROM 
+(
+	SELECT Pod.DocId, Pod.Sr, Mpd.DocId AS MaterialPlan, Mpd.Sr AS MaterialPlanSr
+	FROM ProdOrderDetail Pod
+	LEFT JOIN MaterialPlanDetail Mpd ON Pod.DocId = MPd.DocId AND Pod.Sr = Mpd.Sr
+	WHERE Pod.MaterialPlan IS NULL
+	AND Mpd.DocId IS NOT NULL
+) AS V1 
+WHERE ProdOrderDetail.DocId = V1.DocId AND ProdOrderDetail.Sr = V1.Sr
+
+
+
+
+INSERT INTO Web.ProdOrderLines (ProdOrderHeaderId, ProductId, MaterialPlanLineId, Qty, Remark, CreatedBy, ModifiedBy, CreatedDate, ModifiedDate, OMSId, ProcessId, Specification, Dimension1Id, Dimension2Id)
+SELECT WH.ProdOrderHeaderId, Wp.ProductId, Mpl.MaterialPlanLineId, L.Qty, NULL AS Remark,
+H.EntryBy AS CreatedBy, H.EntryBy AS ModifiedBy, 
+H.EntryDate AS CreatedDate, H.EntryDate AS ModifiedDate,
+'Prod Order-' +  L.DocId + Convert(NVARCHAR,L.Sr) AS OMSId, 
+NULL AS ProcessId, L.Specification, NULL AS Dimension1Id, NULL AS Dimension2Id
+FROM ProdOrder H 
+LEFT JOIN ProdOrderDetail L ON H.DocID = L.DocId
+LEFT JOIN Item I ON L.Item = I.Code
+LEFT JOIN MaterialPlanDetail Mpd ON L.MaterialPlan = Mpd.DocId AND L.MaterialPlanSr = Mpd.Sr
+LEFT JOIN Web.ProdOrderHeaders WH ON H.OMSId = 'Prod Order-' + Convert(NVARCHAR,WH.ProdOrderHeaderId)
+LEFT JOIN Web.Products Wp ON I.OMSId = 'Product-' + Convert(NVARCHAR,Wp.ProductId)
+LEFT JOIN Web.MaterialPlanLines Mpl ON 'Material Plan-' +  Mpd.DocId + Convert(NVARCHAR,Mpd.Sr) = Mpl.OMSId
+WHERE H.Site_Code = '1' AND H.V_Type IN ('PRP','FPRP')
+AND Wp.ProductId IS NOT NULL
+
+
+
+SELECT * FROM Web.ProductTypes 
+
+
+

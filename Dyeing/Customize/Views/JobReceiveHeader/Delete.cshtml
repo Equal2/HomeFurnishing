@@ -1,0 +1,48 @@
+﻿@model Surya.India.Model.ViewModels.PurchaseGoodsReceiptHeaderViewModel
+
+@{
+    ViewBag.Title = "Delete";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h4>
+            <span style="font-family: Calibri,sans-serif,Verdana"> Delete Purchase Indent.</span>
+        </h4>
+    </div>
+    @Html.HiddenFor(m=>m.DocNo)
+    <div class="panel-info" style="padding-left:15px">
+        <div>            
+            <dl class="dl-horizontal" style="margin-top:15px">
+                <dt>
+                    @Html.DisplayNameFor(model => model.DocNo)
+                </dt>
+
+                <dd>
+                    @Html.DisplayFor(model => model.DocNo)
+                </dd>
+
+                <dt>
+                    @Html.DisplayNameFor(model => model.DocDate)
+                </dt>
+
+                <dd>
+                    @Html.DisplayFor(model => model.DocDate)
+                </dd>                
+
+            </dl>
+            <hr />
+            @using (Html.BeginForm())
+            {
+                @Html.AntiForgeryToken()
+                <div class="form-actions no-color">
+                    <input type="submit" value="Delete" class="btn-primary xxlarge" /> 
+                    <span style="font-family: Calibri,sans-serif,Verdana;font-size:large">
+                        |@Html.ActionLink("Back to List", "Index")
+                    </span>
+                </div>
+            }
+        </div>
+    </div>
+</div>

@@ -1,0 +1,22 @@
+﻿@model IEnumerable<Model.Models.DeliveryTerms>
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="panel panel-danger">
+
+    <div class="panel-heading">
+
+        <h3>
+            <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-list black"></span>Error</span>
+        </h3>
+       
+    </div>
+    <div class="panel-info" style="padding-left:5px;padding-top:2px">
+
+       <h2 class="text-danger">Some thing went wrong.Try again later</h2>
+        <cite>@ViewBag.ErrorMessage</cite>
+    </div>
+</div>

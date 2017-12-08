@@ -1,0 +1,118 @@
+﻿@model Login.Models.RegisterViewModel
+
+@{
+    ViewBag.Title = "Register";
+    Layout = null;
+}
+
+@Styles.Render("~/Content/css")
+@Scripts.Render("~/bundles/modernizr")
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Register</title>
+    <!-- Tell the browser to be responsive to screen width -->
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+
+    <link href="~/Content/AdminLTE-Login.css" rel="stylesheet" />
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+</head>
+
+<body class="hold-transition register-page">
+
+    <div class="register-box">
+        <div class="register-logo">
+            @System.Configuration.ConfigurationManager.AppSettings["LogoName"]
+        </div>
+        <!-- /.login-logo -->
+        <div class="register-box-body">
+            <p class="register-box-msg">Register a new membership for @Model.Email</p>
+
+            @using (Html.BeginForm("Register", "Account", FormMethod.Post, new { @class = "", role = "form" }))
+            {
+                @Html.AntiForgeryToken()
+                @Html.HiddenFor(m => m.RetUrl)
+                @Html.HiddenFor(m => m.ApplicationId)
+                @Html.HiddenFor(m=>m.Email)
+                @Html.HiddenFor(m => m.InvitationBy)
+                @Html.HiddenFor(m => m.InvitationDate)
+                @Html.HiddenFor(m => m.UserRole)
+                @Html.HiddenFor(m => m.SiteId)
+                @Html.HiddenFor(m => m.DivisionId)
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+                <div class="form-group has-feedback">
+                    @Html.TextBoxFor(m => m.FirstName, new { @class = "form-control", @placeholder = "Full Name" })
+                    <span class="glyphicon glyphicon-user form-control-feedback"></span>
+                    @Html.ValidationMessageFor(m => m.FirstName, null, new { @class = "text-danger" })
+                </div>
+
+                <div class="form-group has-feedback">
+                    @Html.TextBoxFor(m => m.PhoneNumber, new { @class = "form-control", @placeholder = "Phone" })
+                    <span class="glyphicon glyphicon-phone form-control-feedback"></span>
+                    @Html.ValidationMessageFor(m => m.PhoneNumber, null, new { @class = "text-danger" })
+                </div>
+
+                @*<div class="form-group has-feedback">
+                        @Html.TextBoxFor(m => m.Email, new { @class = "form-control", @placeholder = "Email" })
+                        <span class="glyphicon glyphicon-envelope form-control-feedback"></span>
+                        @Html.ValidationMessageFor(m => m.Email, null, new { @class = "text-danger" })
+                    </div>*@
+
+                <div class="form-group has-feedback">
+                    @Html.TextBoxFor(m => m.UserName, new { @class = "form-control", @placeholder = "User Name" })
+                    <span class="glyphicon glyphicon-user form-control-feedback"></span>
+                    @Html.ValidationMessageFor(m => m.UserName, null, new { @class = "text-danger" })
+                </div>
+
+                <div class="form-group has-feedback">
+                    @Html.PasswordFor(m => m.Password, new { @class = "form-control", @placeholder = "Password" })
+                    <span class="glyphicon glyphicon-lock form-control-feedback"></span>
+                    @Html.ValidationMessageFor(m => m.Password, null, new { @style = "color:#12768C" })
+                </div>
+
+                <div class="form-group has-feedback">
+                    @Html.PasswordFor(m => m.ConfirmPassword, new { @class = "form-control", @placeholder = "Retype Password" })
+                    <span class="glyphicon glyphicon-lock form-control-feedback"></span>
+                    @Html.ValidationMessageFor(m => m.ConfirmPassword, null, new { @style = "color:#12768C" })
+                </div>
+
+                <div class="row">
+                    <div class="col-xs-offset-4 col-xs-4">
+                        <button type="submit" class="btn btn-primary btn-block btn-flat">Register</button>
+                    </div>
+                </div>
+
+            }
+            @*<div class="social-auth-links text-center">
+                <p>- OR -</p>
+                <a href="#" class="btn btn-block btn-social btn-facebook btn-flat">
+                    <i class="fa fa-facebook"></i> Sign up using
+                    Facebook
+                </a>
+                <a href="#" class="btn btn-block btn-social btn-google btn-flat">
+                    <i class="fa fa-google-plus"></i> Sign up using
+                    Google+
+                </a>
+            </div>*@
+            <!-- /.social-auth-links -->
+            @Html.ActionLink("I already have a membership", "Login")
+        </div>
+        <!-- /.login-box-body -->
+    </div>
+</body>
+@Scripts.Render("~/bundles/jquery")
+@Scripts.Render("~/bundles/bootstrap")
+@Scripts.Render("~/bundles/jqueryval")
+
+</html>
+
+<script type="text/javascript">
+
+    $('#FirstName').change(function () {
+        $('#UserName').val($(this).val());
+    })
+
+</script>

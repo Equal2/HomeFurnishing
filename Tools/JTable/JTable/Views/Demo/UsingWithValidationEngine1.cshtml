@@ -1,0 +1,238 @@
+﻿@{
+    ViewBag.Title = "Validation engine integration";
+}
+@section CssImport
+{
+    <link href="@Url.Content("~/Scripts/validationEngine/validationEngine.jquery.css")" rel="stylesheet" type="text/css" />
+}
+@section JavascriptImport
+{
+    <script type="text/javascript" src="@Url.Content("~/Scripts/validationEngine/jquery.validationEngine.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/validationEngine/jquery.validationEngine-en.js")"></script>
+}
+<div id="StudentTableContainer"></div>
+<script type="text/javascript">
+
+    $(document).ready(function () {
+
+        $('#StudentTableContainer').jtable({
+            title: 'Student List',
+            paging: true, //Enable paging
+            sorting: true, //Enable sorting
+            defaultSorting: 'Name ASC',
+            actions: {
+                listAction: '@Url.Action("StudentList")',
+                deleteAction: '@Url.Action("DeleteStudent")',
+                updateAction: '@Url.Action("UpdateStudent")',
+                createAction: '@Url.Action("CreateStudent")'
+            },
+            fields: {
+                StudentId: {
+                    key: true,
+                    create: false,
+                    edit: false,
+                    list: false
+                },
+                Name: {
+                    title: 'Name',
+                    width: '15%'
+                },
+                EmailAddress: {
+                    title: 'Email address',
+                    list: false
+                },
+                Password: {
+                    title: 'User Password',
+                    type: 'password',
+                    list: false
+                },
+                Gender: {
+                    title: 'Gender',
+                    width: '12%',
+                    options: { 'M': 'Male', 'F': 'Female' }
+                },
+                CityId: {
+                    title: 'Living city',
+                    width: '15%',
+                    options: '@Url.Action("GetCityOptions")'
+                },
+                BirthDate: {
+                    title: 'Birth date',
+                    width: '18%',
+                    type: 'date',
+                    displayFormat: 'yy-mm-dd'
+                },
+                Education: {
+                    title: 'Education',
+                    list: false,
+                    type: 'radiobutton',
+                    options: { '1': 'Primary school', '2': 'High school', '3': 'University' }
+                    //,setOnTextClick: false //Activate this line to not to change checkbox when clicked to radio button's text
+                },
+                About: {
+                    title: 'About this person',
+                    type: 'textarea',
+                    list: false
+                },
+                IsActive: {
+                    title: 'Status',
+                    width: '10%',
+                    type: 'checkbox',
+                    values: { 'false': 'Passive', 'true': 'Active' },
+                    defaultValue: 'true'
+                    //,formText: 'User is active' //Activate this line to make checkbox text fixed in edit/create form
+                    //,setOnTextClick: false //Activate this line to not to change checkbox when clicked to checkbox's text
+                },
+                RecordDate: {
+                    title: 'Record date',
+                    width: '18%',
+                    type: 'date',
+                    displayFormat: 'yy-mm-dd',
+                    create: false,
+                    edit: false
+                }
+            },
+            formCreated: function (event, data) {
+                data.form.find('input[name="Name"]').addClass('validate[required]');
+                data.form.find('input[name="EmailAddress"]').addClass('validate[required,custom[email]]');
+                data.form.find('input[name="Password"]').addClass('validate[required]');
+                data.form.find('input[name="BirthDate"]').addClass('validate[required,custom[date]]');
+                data.form.find('input[name="Education"]').addClass('validate[required]');
+                data.form.validationEngine();
+            },
+            formSubmitting: function (event, data) {
+                return data.form.validationEngine('validate');
+            },
+            formClosed: function (event, data) {
+                data.form.validationEngine('hide');
+                data.form.validationEngine('detach');
+            }
+        });
+
+        //Load student list from server
+        $('#StudentTableContainer').jtable('load');
+    });
+
+</script>
+<br />
+<hr />
+<h3>
+    HTML code</h3>
+<pre class="brush:html">&lt;!-- Import CSS file for validation engine (in Head section of HTML) --&gt;
+&lt;link href=&quot;/Scripts/validationEngine/validationEngine.jquery.css&quot; rel=&quot;stylesheet&quot; type=&quot;text/css&quot; /&gt;
+
+&lt;!-- Import Javascript files for validation engine (in Head section of HTML) --&gt;
+&lt;script type=&quot;text/javascript&quot; src=&quot;/Scripts/validationEngine/jquery.validationEngine.js&quot;&gt;&lt;/script&gt;
+&lt;script type=&quot;text/javascript&quot; src=&quot;/Scripts/validationEngine/jquery.validationEngine-en.js&quot;&gt;&lt;/script&gt;
+
+&lt;!-- Container for jTable --&gt;
+&lt;div id=&quot;StudentTableContainer&quot;&gt;&lt;/div&gt;</pre>
+
+<h3>
+    Javascript code</h3>
+<pre class="brush:js; highlight:[79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96]">&lt;script type=&quot;text/javascript&quot;&gt;
+
+    $(document).ready(function () {
+
+        $(&#39;#StudentTableContainer&#39;).jtable({
+            title: &#39;Student List&#39;,
+            paging: true, //Enable paging
+            sorting: true, //Enable sorting
+            defaultSorting: &#39;Name ASC&#39;,
+            actions: {
+                listAction: &#39;/Demo/StudentList&#39;,
+                deleteAction: &#39;/Demo/DeleteStudent&#39;,
+                updateAction: &#39;/Demo/UpdateStudent&#39;,
+                createAction: &#39;/Demo/CreateStudent&#39;
+            },
+            fields: {
+                StudentId: {
+                    key: true,
+                    create: false,
+                    edit: false,
+                    list: false
+                },
+                Name: {
+                    title: &#39;Name&#39;,
+                    width: &#39;15%&#39;
+                },
+                EmailAddress: {
+                    title: &#39;Email address&#39;,
+                    list: false
+                },
+                Password: {
+                    title: &#39;User Password&#39;,
+                    type: &#39;password&#39;,
+                    list: false
+                },
+                Gender: {
+                    title: &#39;Gender&#39;,
+                    width: &#39;12%&#39;,
+                    options: { &#39;M&#39;: &#39;Male&#39;, &#39;F&#39;: &#39;Female&#39; }
+                },
+                CityId: {
+                    title: &#39;Living city&#39;,
+                    width: &#39;15%&#39;,
+                    options: &#39;/Demo/GetCityOptions&#39;
+                },
+                BirthDate: {
+                    title: &#39;Birth date&#39;,
+                    width: &#39;18%&#39;,
+                    type: &#39;date&#39;,
+                    displayFormat: &#39;yy-mm-dd&#39;
+                },
+                Education: {
+                    title: &#39;Education&#39;,
+                    list: false,
+                    type: &#39;radiobutton&#39;,
+                    options: { &#39;1&#39;: &#39;Primary school&#39;, &#39;2&#39;: &#39;High school&#39;, &#39;3&#39;: &#39;University&#39; }
+                },
+                About: {
+                    title: &#39;About this person&#39;,
+                    type: &#39;textarea&#39;,
+                    list: false
+                },
+                IsActive: {
+                    title: &#39;Status&#39;,
+                    width: &#39;10%&#39;,
+                    type: &#39;checkbox&#39;,
+                    values: { &#39;false&#39;: &#39;Passive&#39;, &#39;true&#39;: &#39;Active&#39; },
+                    defaultValue: &#39;true&#39;
+                },
+                RecordDate: {
+                    title: &#39;Record date&#39;,
+                    width: &#39;18%&#39;,
+                    type: &#39;date&#39;,
+                    displayFormat: &#39;yy-mm-dd&#39;,
+                    create: false,
+                    edit: false
+                }
+            },
+			//Initialize validation logic when a form is created
+            formCreated: function (event, data) {
+                data.form.find(&#39;input[name=&quot;Name&quot;]&#39;).addClass(&#39;validate[required]&#39;);
+                data.form.find(&#39;input[name=&quot;EmailAddress&quot;]&#39;).addClass(&#39;validate[required,custom[email]]&#39;);
+                data.form.find(&#39;input[name=&quot;Password&quot;]&#39;).addClass(&#39;validate[required]&#39;);
+                data.form.find(&#39;input[name=&quot;BirthDate&quot;]&#39;).addClass(&#39;validate[required,custom[date]]&#39;);
+                data.form.find(&#39;input[name=&quot;Education&quot;]&#39;).addClass(&#39;validate[required]&#39;);
+                data.form.validationEngine();
+            },
+			//Validate form when it is being submitted
+            formSubmitting: function (event, data) {
+                return data.form.validationEngine(&#39;validate&#39;);
+            },
+			//Dispose validation logic when form is closed
+            formClosed: function (event, data) {
+                data.form.validationEngine(&#39;hide&#39;);
+                data.form.validationEngine(&#39;detach&#39;);
+            }
+        });
+
+        //Load student list from server
+        $(&#39;#StudentTableContainer&#39;).jtable(&#39;load&#39;);
+    });
+
+&lt;/script&gt;</pre>
+<h3>
+    Server side code</h3>
+@Html.Partial("_PagedAndSortedServerSideCodes")

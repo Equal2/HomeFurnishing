@@ -1,0 +1,160 @@
+﻿
+@model Model.ViewModels.PersonOpeningViewModel
+@using Core.Common
+
+<div class="modal-content">
+    <div class="modal-header" style="border-bottom: 1px solid #8E8888">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"> <span class="glyphicon glyphicon-remove"></span></button>
+        <h3>
+            <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-file black"></span> Person Opening Detail</span>
+        </h3>
+    </div>
+    <div>
+        @using (Html.BeginForm("_CreatePost", "PersonOpening", FormMethod.Post, new { enctype = "multipart/form-data", id = "modform" }))
+        {
+            @Html.AntiForgeryToken()
+
+            @Html.HiddenFor(model => model.PersonId)
+            @Html.HiddenFor(model => model.LedgerSetting.IsAutoDocNo)
+            @Html.HiddenFor(m => m.LedgerHeaderId)
+            @Html.HiddenFor(m => m.DocTypeId)
+
+            <div class="form-horizontal modal-body">
+
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })               
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.DocDate, "Opening Date", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.DocDate, "{0:dd/MMMM/yyyy}", new { @class = "datepicker form-control col-xs-7" })
+                                @Html.ValidationMessageFor(model => model.DocDate, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.DocNo, "Opening No", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.DocNo, new { @class = "form-control required" })
+                                @Html.ValidationMessageFor(model => model.DocNo, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.PartyDocNo, "Party Doc No", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.PartyDocNo, new { @class = "form-control required" })
+                                @Html.ValidationMessageFor(model => model.PartyDocNo, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.PartyDocDate, "Party Doc Date", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.PartyDocDate, "{0:dd/MMMM/yyyy}", new { @class = "datepicker form-control col-xs-7" })
+                                @Html.ValidationMessageFor(model => model.PartyDocDate, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.SiteId, "Site", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.SiteId, new { @class = "form-control required" })
+                                @Html.ValidationMessageFor(model => model.SiteId, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.DivisionId, "Division", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.DivisionId, new { @class = "form-control required" })
+                                @Html.ValidationMessageFor(model => model.DivisionId, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.DrCr, "Dr Cr", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.DropDownListFor(m => m.DrCr, new SelectList(ViewBag.DrCrList as System.Collections.IEnumerable, "Value", "Text"), "", new { @class = "form-control col-xs-6 height" })
+                                @Html.ValidationMessageFor(model => model.DrCr, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Amount, "Amount", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.Amount, new { @class = "form-control required" })
+                                @Html.ValidationMessageFor(model => model.Amount, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Narration, "Narration", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.Narration, new { @class = "form-control required" })
+                                @Html.ValidationMessageFor(model => model.Narration, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                </div>             
+
+                <div class="modal-footer " style="padding: 19px 20px 0 20px; border-top:1px solid #8E8888">
+                    <button class="btn custom left" name="Command:Edit" type="submit"><h2 style="margin:0px" id="submit"><span class="glyphicon glyphicon-floppy-disk black"></span> </h2></button>
+                    <button class="btn custom" name="Command:Delete" id="delete" type="submit"><h2 style="margin:0px"><span class="glyphicon glyphicon-trash black"></span> </h2></button>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            CustomSelectFunction($("#SiteId"), '/ComboHelpList/GetSites', '/ComboHelpList/SetSingleSite', ' ', false, 0);
+            CustomSelectFunction($("#DivisionId"), '/ComboHelpList/GetDivisions', '/ComboHelpList/SetSingleDivision', ' ', false, 0);
+
+            $('.datepicker').datepicker({
+                format: 'dd/MM/yyyy',
+                "setDate": new Date(),
+                "autoclose": true
+            })
+
+            $("#PartyDocNo").focus();
+
+            var id=@Model.LedgerHeaderId;
+            
+            $('#delete','.modal-content').click(function (e) {
+                
+                if(id>0)
+                {
+                    var url = '/PersonOpening/DeletePost';
+                    $('form#modform').attr('action',url);                    
+                    return;
+                }
+                else
+                {
+                    return false;
+                }
+            })
+        });
+
+    </script>
+
+   

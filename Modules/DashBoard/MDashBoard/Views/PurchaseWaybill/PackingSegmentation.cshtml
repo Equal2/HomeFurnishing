@@ -1,0 +1,91 @@
+﻿@model Surya.India.Model.ViewModels.PackingSegmentationViewModel
+
+@{
+    ViewBag.Title = "Packing Segmentation";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<style type="text/css">
+    .DDWidth{
+        width:170px;
+    }
+</style>
+
+<style type="text/css">
+    .select2-container {
+        width: 300px;
+    }
+</style>
+
+@using (Html.BeginForm("PackingSegmentation", "PackingHeader", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+    
+    <script>
+        $(document).ready(function () {
+            //CustomSelectFunction($("#BuyerId"), '/ComboHelpList/GetBuyers', '/ComboHelpList/SetSingleBuyer', 'Enter Buyer Name', false, 3);
+        });
+    </script>
+        
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h4>
+                <span style="font-family: Calibri,sans-serif,Verdana"> Create Packing Header.</span>
+            </h4>
+        </div>
+        <div class="panel-info" style="padding-left:15px">
+            <div class="form-horizontal">                
+                @Html.ValidationSummary(true)
+
+                <div class="form-group" style="margin-top:15px">
+                    @Html.LabelFor(model => model.FromPackingHeaderId,"From Packing No.*", new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.DropDownListFor(model => model.FromPackingHeaderId, new SelectList(ViewBag.PackingNoList as System.Collections.IEnumerable, "PackingHeaderId", "DocNo"), new {@class="DDWidth" })
+                        @Html.ValidationMessageFor(model => model.FromPackingHeaderId)
+                        <span id="FromPackingValidation"></span>
+                    </div>
+                </div>
+
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.ToPackingHeaderId,"To Packing No.*", new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.DropDownListFor(model => model.ToPackingHeaderId, new SelectList(ViewBag.PackingNoList as System.Collections.IEnumerable, "PackingHeaderId", "DocNo"), new { @class = "DDWidth" })
+                        @Html.ValidationMessageFor(model => model.ToPackingHeaderId)
+                        <span id="ToPackingValidation"></span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.FromBaleNo, "From Bale No.*", new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.TextBoxFor(model => model.FromBaleNo)
+                        @Html.ValidationMessageFor(model => model.FromBaleNo)
+                        <span id="FromBaleValidation"></span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.ToBaleNo, "To Bale No.*", new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.TextBoxFor(model => model.ToBaleNo)
+                        @Html.ValidationMessageFor(model => model.ToBaleNo)
+                        <span id="ToBaleValidation"></span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-8">
+                        <input type="submit" value="Next" class="btn btn-primary btn-sm CurveBorder" id="submit" />
+                            @Html.ActionLink("Back", "Index", "PackingHeader", new { @class = "btn btn-primary btn-sm col-md-offset-1 CurveBorder ActionLinkPadding" })
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#FromPackingHeaderId").focus();
+    })
+</script>

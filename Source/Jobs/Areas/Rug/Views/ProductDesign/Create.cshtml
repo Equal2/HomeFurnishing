@@ -1,0 +1,125 @@
+﻿@model Model.Models.ProductDesign
+
+@{
+    ViewBag.Title = "Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@using (Html.BeginForm("Post", "ProductDesign", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(m=>m.ProductDesignId)
+    @Html.HiddenFor(m=>m.ProductTypeId)
+    <div class="panel panel-default">
+
+        <div class="panel-heading">
+
+            <h3>
+                <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-file black"></span> Product Design</span>
+                <input type="submit" value="Save" class="btn btn-primary right" id="submit" style="width: 90px; background-color: #2980b9" />
+            </h3>
+            @Html.ValidationSummary(true)
+            <hr style="margin-top:0px;margin-bottom:0px" />
+
+            <div class="panel-info">
+                <div class="btn-group">
+                    @Html.ActionLink(" ", "Create", "ProductDesign", new {id=@ViewBag.id}, new { @class = "cbtn btn-circle glyphicon glyphicon-plus toolbar", @title = "Add New", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "History", "ProductDesign", null, new { @class = "cbtn btn-circle glyphicon glyphicon-user toolbar", @title = "History", @data_toggle = "tooltip" })                   
+                    @Html.ActionLink(" ", "PrevPage", "ProductDesign", new { id = @Model.ProductDesignId,ptypeid=@ViewBag.id }, new { @class = "cbtn btn-circle glyphicon glyphicon-arrow-left toolbar", @title = "Prev Record", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "NextPage", "ProductDesign", new { id = @Model.ProductDesignId,ptypeid=@ViewBag.id }, new { @class = "cbtn btn-circle glyphicon glyphicon-arrow-right toolbar", @title = "Next Record", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "Index", "ProductDesign", new { id=@ViewBag.id}, new { @class = "cbtn btn-circle glyphicon glyphicon-list", @title = "List", @data_toggle = "tooltip" })
+                </div>
+            </div>
+
+        </div>
+        <div class="panel-info" style="padding-left:15px">
+
+            <div class="form-horizontal">
+                
+                <div class="row">
+                    <h4 class="col-md-12 black" style="margin-top:15px">
+                        <span class="glyphicon glyphicon-align-justify"></span>
+                        @ViewBag.Name-Designs
+                    </h4> 
+                    <div class="col-md-6">
+                        <div class="form-group" style="margin-top:15px">
+                            @Html.LabelFor(model => model.ProductDesignName, "Name", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(m => m.ProductDesignName, null, new { @class = "form-control col-xs-6 required" })
+                                @Html.ValidationMessageFor(m => m.ProductDesignName, null, new { @class = "has-error" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                   
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.IsActive, "Is Active", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10" style=" padding-top:4px">
+                                @Html.CheckBoxFor(m => m.IsActive, new { @class = "checkbox col-xs-1" })
+                                @Html.ValidationMessageFor(model => model.IsActive)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+<script type="text/javascript">
+    var IsSaved=false;
+    var ValidationCount=0;
+
+    $('form').submit(function(event){
+
+        if(!IsSaved)
+        {
+            if(!ValidateData())
+            {
+                return false;
+            }
+            IsSaved=true;
+            return IsSaved;
+        }
+        else
+        {
+            return false;
+        }
+
+
+    });
+
+
+    function ValidateData() {
+        var DocId=@Model.ProductDesignId;
+        var TempValue;
+        var ValidationMessage="";
+
+
+
+        //Checking for dulicate key value
+        if(DocId<=0)
+        {
+            TempValue= $('#ProductDesignName').DuplicateCheckForCreate({ name: 'ProductDesign', value: $('#ProductDesignName').val(), doctype: 0 });
+            if (TempValue){ ValidationMessage=$('#ProductDesignName').val() + " already exist <br />";}
+        }
+        else
+        {
+            test = $('#ProductDesignName').DuplicateCheckForEdit({ name: 'ProductDesign', value: $('#ProductDesignName').val(), doctype: 0,headerId:DocId });
+            if (TempValue) {ValidationMessage+=$('#ProductDesignName').val() + " already exist <br />";}
+        }
+        if(TempValue)
+        {
+            if($('#validationerrormsg').length==0){
+                $('.panel-info').filter(':eq(1)').before('<div class="alert alert-danger" role="alert" id="validationerrormsg">'+ValidationMessage+'</div>');}
+            else
+            {
+                $('#validationerrormsg').html(ValidationMessage);
+            }
+        }
+        return  (ValidationMessage=="");
+
+    }
+
+</script>

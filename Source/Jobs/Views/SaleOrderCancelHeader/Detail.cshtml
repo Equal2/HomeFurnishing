@@ -1,0 +1,198 @@
+﻿@model Model.ViewModels.SaleOrderCancelMasterDetailModel
+
+@{
+    ViewBag.Title = "Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h4>
+            <span style="font-family: Calibri,sans-serif,Verdana">
+                @if (ViewBag.transactionType == "submit")
+                {<h2>Submit Sale Order Cancel</h2>}
+                else if (ViewBag.transactionType == "approve")
+                {<h2>Approve Sale Order Cancel</h2>}
+                else if (ViewBag.transactionType == "delete")
+                {<h2>Delete Sale Order Cancel</h2>}
+                else
+                {<h2>Sale Order Cancel Detail</h2>}
+            </span>
+        </h4>
+
+    </div>
+    <div class="panel-info" style="padding-left:15px">
+        @using (Html.BeginForm())
+        {
+
+            @Html.AntiForgeryToken()
+            <div>
+                <hr />
+                <dl class="dl-horizontal">
+                    @Html.HiddenFor(m => m.SaleOrderCancelHeaderDetailsViewModel.SaleOrderCancelHeaderId)
+                    @Html.HiddenFor(m => m.SaleOrderCancelHeaderId)
+                    @Html.HiddenFor(m=>m.SaleOrderCancelHeaderDetailsViewModel.Remark)
+                    @Html.HiddenFor(m=>m.SaleOrderCancelHeaderDetailsViewModel.DocNo)
+
+                    <dt>
+                        @Html.DisplayNameFor(model => model.SaleOrderCancelHeaderDetailsViewModel.DocumentTypeName)    :
+                    </dt>
+
+                    <dd>
+                        @Html.DisplayFor(model => model.SaleOrderCancelHeaderDetailsViewModel.DocumentTypeName)
+                    </dd>
+
+                    <dt>
+                        @Html.DisplayNameFor(model => model.SaleOrderCancelHeaderDetailsViewModel.DocDate)    :
+                    </dt>
+
+                    <dd>
+                        @Html.DisplayFor(model => model.SaleOrderCancelHeaderDetailsViewModel.DocDate)
+                    </dd>
+
+                    <dt>
+                        @Html.DisplayNameFor(model => model.SaleOrderCancelHeaderDetailsViewModel.DocNo)    :
+                    </dt>
+
+                    <dd>
+                        @Html.DisplayFor(model => model.SaleOrderCancelHeaderDetailsViewModel.DocNo)
+                    </dd>
+
+
+
+                    <dt>
+                        @Html.DisplayNameFor(model => model.SaleOrderCancelHeaderDetailsViewModel.Reason)    :
+                    </dt>
+
+                    <dd>
+                        @Html.DisplayFor(model => model.SaleOrderCancelHeaderDetailsViewModel.Reason)
+                    </dd>
+
+                    <dt>
+                        @Html.DisplayNameFor(model => model.SaleOrderCancelHeaderDetailsViewModel.Remark)    :
+                    </dt>
+
+                    <dd>
+                        @Html.DisplayFor(model => model.SaleOrderCancelHeaderDetailsViewModel.Remark)
+                    </dd>
+
+                    @if (ViewBag.transactionType == "delete")
+                    {
+                        <dt>
+                            @Html.DisplayName("Delete Reason*")    :
+                        </dt>
+
+                        <dd>
+                            @Html.EditorFor(model => model.SaleOrderCancelHeaderDetailsViewModel.LogReason)<span style="font-family:Arial Rounded MT"> Min 20 characters</span>
+                        </dd>
+
+                    }
+                </dl>
+            </div>
+
+            var objLine = Model.SaleOrderCancelViewModels.FirstOrDefault();
+            <table class="table">
+                <tr>
+                    <th>
+                        @Html.DisplayNameFor(model => objLine.DocNo)
+                    </th>
+
+                    <th>
+                        @Html.DisplayNameFor(model => objLine.BuyerName)
+                    </th>
+                    <th>
+
+                        @Html.DisplayNameFor(model => objLine.ProductName)
+
+                    </th>
+                    <th>
+                        <div class="text-right">
+                            @Html.DisplayNameFor(model => objLine.Qty)
+                        </div>
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => objLine.LineRemark)
+                    </th>
+
+                </tr>
+
+
+                @{decimal TotalQty = 0;}
+
+                @foreach (var item in Model.SaleOrderCancelViewModels)
+                {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.DocNo)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.BuyerName)
+                        </td>
+                        <td>
+                            <div>
+                                @Html.DisplayFor(modelItem => item.ProductName)
+                            </div>
+                        </td>
+
+                        <td>
+                            <div class="text-right">
+                                @Html.DisplayFor(modelItem => item.Qty)
+                            </div>
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.LineRemark)
+                        </td>
+                    </tr>
+
+                    TotalQty = TotalQty + System.Convert.ToDecimal(Html.DisplayFor(modelItem => item.Qty).ToString());
+                }
+                <tr>
+                    <td>
+                        <b>Total :</b>
+                    </td>
+                    <td></td>
+                    <td></td>
+                    <td class="text-right">
+                        <b>@TotalQty</b>
+                    </td>
+                    <td></td>
+                </tr>
+            </table>
+
+
+            <hr />
+            <div class="form-actions no-color">
+                @if (ViewBag.transactionType == "submit")
+                {
+                    <input type="submit" name="Command:Submit" value="Submit" class="btn btn-primary btn-sm CurveBorder" />
+                    <span style="font-family: Calibri,sans-serif,Verdana;font-size:large">
+
+                        @Html.ActionLink("Back", "Index", null, new { @class = "btn btn-primary btn-sm col-md-offset-1 CurveBorder ActionLinkPadding" })
+                    </span>
+                }
+
+                else if (ViewBag.transactionType == "approve")
+                {
+                    <input type="submit" name="Command:Approve" value="Approve" class="btn btn-primary btn-sm CurveBorder" />
+                    <span style="font-family: Calibri,sans-serif,Verdana;font-size:large">
+
+                        @Html.ActionLink("Back", "Index", null, new { @class = "btn btn-primary btn-sm col-md-offset-1 CurveBorder ActionLinkPadding" })
+                    </span>
+                }
+                else if (ViewBag.transactionType == "delete")
+                {
+                    <input type="submit" name="Command:Delete" value="Delete" class="btn btn-primary btn-sm CurveBorder" />
+                    <span style="font-family: Calibri,sans-serif,Verdana;font-size:large">
+
+                        @Html.ActionLink("Back", "Index", null, new { @class = "btn btn-primary btn-sm col-md-offset-1 CurveBorder ActionLinkPadding" })
+                    </span>
+                }
+                else
+                {
+                    <span style="font-family: Calibri,sans-serif,Verdana;font-size:large">
+                        @Html.ActionLink("Back", "Index", null, new { @class = "btn btn-primary btn-sm col-md-offset-0 CurveBorder ActionLinkPadding" })
+                    </span>
+                }
+            </div>
+        }
+    </div>
+</div>

@@ -1,0 +1,25 @@
+﻿@model IEnumerable<Model.Models.ProductManufacturingStyle>
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Index</h2>
+<h4>Product Manufacturing Style</h4>
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+
+
+@Html.Grid(Model).Columns(columns =>
+           {
+               columns.Add(foo => foo.ProductManufacturingStyleId, true);               
+               columns.Add(foo => foo.ProductManufacturingStyleName).Sortable(true).Titled("Name").Filterable(true).SetWidth(100).Css("modal-link");                              
+               columns.Add().Encoded(false).Sanitized(false).SetWidth(5).RenderValueAs(d => @Html.ActionLink("Edit", "Edit", "ProductManufacturingStyle", new { id = d.ProductManufacturingStyleId }, new { @class = "modal-link" }));
+               columns.Add().Encoded(false).Sanitized(false).SetWidth(5).RenderValueAs(d => @Html.ActionLink("Delete", "Delete", "ProductManufacturingStyle", new { id = d.ProductManufacturingStyleId }, new { @class = "modal-link" }));
+
+           }).WithPaging(25).EmptyText("No records found.")
+
+
+

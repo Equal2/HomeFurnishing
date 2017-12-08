@@ -1,0 +1,258 @@
+ALTER TABLE Web.JobOrderBoms ALTER COLUMN JobOrderLineId INT NULL
+
+
+DISABLE TRIGGER [Web].[Tr_JobOrderLine_Delete] ON [Web].[JobOrderLines]; 
+DISABLE TRIGGER [Web].[Mig_Tr_JobOrderBom_Delete] ON [Web].[JobOrderBoms] ;
+DISABLE TRIGGER [Web].[Mig_Tr_JobOrderBom_Update] ON [Web].[JobOrderBoms] ;
+DISABLE TRIGGER [Web].[Mig_Tr_JobOrderCancelBom_Delete] ON [Web].[JobOrderCancelBoms] ;
+DISABLE TRIGGER [Web].[Mig_Tr_JobOrderCancelLine_Delete] ON [Web].[JobOrderCancelLines]; 
+DISABLE TRIGGER [Web].[Tr_JobOrderCancelCancelLine_Delete] ON [Web].[JobOrderCancelLines] 
+DISABLE TRIGGER [Web].[Mig_Tr_JobOrderLine_Delete] ON [Web].[JobOrderLines] ;
+DISABLE TRIGGER [Web].[Tr_JobOrderLine_Add] ON [Web].[JobOrderLines];
+DISABLE TRIGGER Web.Mig_Tr_JobOrderLine_Add ON [Web].[JobOrderLines]; 
+DISABLE TRIGGER [Web].[Mig_Tr_JobOrderLineCharges_Add] ON [Web].[JobOrderLineCharges] ;
+DISABLE TRIGGER [Web].[Mig_Tr_JobOrderCancelLine_Add] ON [Web].[JobOrderCancelLines] ;
+DISABLE TRIGGER [Web].[Mig_Tr_JobOrderCancelBom_Delete] ON [Web].[JobOrderCancelBoms] ;
+
+
+DELETE Web.JobOrderLineStatus
+FROM Web.JobOrderLineStatus,
+ (
+	SELECT L.JobOrderLineId
+	FROM Web.JobOrderHeaders H 
+	LEFT JOIN Web.JobOrderLines L ON H.JobOrderHeaderId = L.JobOrderHeaderId
+	WHERE H.SiteId <> 17
+) AS V1
+WHERE Web.JobOrderLineStatus.JobOrderLineId = V1.JobOrderLineId
+
+
+DELETE Web.JobOrderLineCharges
+FROM Web.JobOrderLineCharges,
+ (
+	SELECT L.JobOrderLineId
+	FROM Web.JobOrderHeaders H 
+	LEFT JOIN Web.JobOrderLines L ON H.JobOrderHeaderId = L.JobOrderHeaderId
+	WHERE H.SiteId <> 17
+) AS V1
+WHERE Web.JobOrderLineCharges.LineTableId = V1.JobOrderLineId
+
+
+UPDATE Web.JobOrderBoms
+SET Web.JobOrderBoms.JobOrderLineId = NULL
+FROM (
+	SELECT L.JobOrderBomId
+	FROM Web.JobOrderHeaders H 
+	LEFT JOIN Web.JobOrderBoms L ON H.JobOrderHeaderId = L.JobOrderHeaderId
+	WHERE H.SiteId <> 17
+) AS V1
+WHERE Web.JobOrderBoms.JobOrderBomId = V1.JobOrderBomId
+
+
+DELETE Web.JobOrderCancelBoms
+FROM (
+	SELECT L.JobOrderCancelBomId
+	FROM Web.JobOrderCancelHeaders H 
+	LEFT JOIN Web.JobOrderCancelLines Cl ON H.JobOrderCancelHeaderId = Cl.JobOrderCancelHeaderId
+	LEFT JOIN Web.JobOrderCancelBoms L ON Cl.JobOrderCancelLineId = L.JobOrderCancelLineId
+	WHERE H.SiteId <> 17
+) AS V1
+WHERE Web.JobOrderCancelBoms.JobOrderCancelBomId = V1.JobOrderCancelBomId
+
+
+DELETE Web.JobOrderCancelLines
+FROM Web.JobOrderCancelLines,
+ (
+	SELECT L.JobOrderCancelLineId
+	FROM Web.JobOrderCancelHeaders H 
+	LEFT JOIN Web.JobOrderCancelLines L ON H.JobOrderCancelHeaderId = L.JobOrderCancelHeaderId
+	WHERE H.SiteId <> 17
+) AS V1
+WHERE Web.JobOrderCancelLines.JobOrderCancelLineId = V1.JobOrderCancelLineId
+
+
+
+
+
+DELETE  Web.JobOrderLines
+FROM Web.JobOrderLines,
+ (
+	SELECT L.JobOrderLineId
+	FROM Web.JobOrderHeaders H 
+	LEFT JOIN Web.JobOrderLines L ON H.JobOrderHeaderId = L.JobOrderHeaderId
+	WHERE H.SiteId <> 17
+) AS V1
+WHERE Web.JobOrderLines.JobOrderLineId = V1.JobOrderLineId
+
+
+ALTER TABLE JobOrderDetail ADD WeavingOMSId NVARCHAR(Max)
+ALTER TABLE JobOrderDetail_Log ADD WeavingOMSId NVARCHAR(Max)
+
+
+
+
+
+INSERT INTO Web.JobOrderLines (JobOrderHeaderId, ProductUidId, ProductId, ProdOrderLineId, Dimension1Id, Dimension2Id, Qty, 
+DueDate, FromProcessId, DealUnitId, DealQty, Rate, Amount, Remark, CreatedBy, ModifiedBy, CreatedDate, ModifiedDate, OMSId, 
+LotNo, NonCountedQty, LossQty, Specification, UnitConversionMultiplier)
+SELECT Wjo.JobOrderHeaderId, WPu.ProductUIDId, Wp.ProductId, WPol.ProdOrderLineId, NULL AS Dimension1Id, 
+NULL AS Dimension2Id, 
+CASE WHEN Wpu.ProductUIDId IS NOT NULL THEN 1 ELSE L.Qty END AS Qty ,
+NULL AS DueDate, Wprc.ProcessId AS FromProcessId, 
+CASE WHEN Wdu.UnitId IS NULL THEN Wu.UnitId ELSE Wdu.UnitId END AS DealUnitId,
+CASE WHEN Wpu.ProductUIDId IS NOT NULL THEN L.MeasurePerPcs  ELSE L.TotalMeasure END AS DealQty, 
+L.Rate, 
+CASE WHEN Wpu.ProductUIDId IS NOT NULL THEN L.Amount/L.Qty ELSE L.Amount END AS Amount, 
+L.Remark,
+H.EntryBy AS CreatedBy, H.EntryBy AS ModifiedBy, 
+H.EntryDate AS CreatedDate, H.EntryDate AS ModifiedDate, 'Job Order-' +  L.DocId + Convert(NVARCHAR,L.Sr) AS OMSId,
+L.LotNo, H.ClothWeight AS NonCountedQty, L.Loss, L.Specification, 
+CASE WHEN 'WVORD' = 'DYORD' THEN 1
+	 WHEN 'WVORD' = 'RDORD' THEN 1	
+	 ELSE L.MeasurePerPcs END AS UnitConversionMultiplier 
+FROM JobOrderDetail L 
+LEFT JOIN JobOrder H With (NoLock) ON L.DocId = H.DocID
+LEFT JOIN JobIssRecUID Jiru ON L.DocId = Jiru.DocID AND L.Sr = Jiru.TSr
+LEFT JOIN Item_UID Iu With (NoLock) ON Jiru.Item_UID = Iu.Code
+LEFT JOIN Item I With (NoLock) ON L.Item = I.Code
+LEFT JOIN ProdOrderDetail Pod With (NoLock) ON L.ProdOrder = Pod.DocId AND L.ProdOrderSr = Pod.Sr
+LEFT JOIN Process P With (NoLock) ON L.FromProcess = P.NCat
+LEFT JOIN Unit U With (NoLock) ON L.Unit = U.Code
+LEFT JOIN Unit Mu With (NoLock) ON L.MeasureUnit = Mu.Code 
+LEFT JOIN Web.JobOrderHeaders WJo With (NoLock) ON H.OMSId = 'Job Order-' + Convert(NVARCHAR,WJo.JobOrderHeaderId)
+LEFT JOIN Web.ProductUids WPu With (NoLock) ON Iu.Item_UID = Wpu.ProductUidName
+LEFT JOIN Web.Products Wp With (NoLock) ON I.Description = Wp.ProductName
+LEFT JOIN Web.ProdOrderLines WPol With (NoLock) ON POd.OMSId = 'Prod Order-' + Convert(NVARCHAR,WPol.ProdOrderLineId)
+LEFT JOIN Web.Processes Wprc With (NoLock) ON P.OMSId = 'Process-' + Convert(NVARCHAR,Wprc.ProcessId)
+LEFT JOIN Web.Units Wu With (NoLock) ON U.OMSId = 'Unit-' + Convert(NVARCHAR,Wu.UnitId)
+LEFT JOIN Web.Units WDu With (NoLock) ON MU.OMSId = 'Unit-' + Convert(NVARCHAR,Wdu.UnitId)
+WHERE H.V_Type = 'WVORD'
+AND L.WeavingOMSId IS NULL
+AND H.Site_Code <> '1'
+AND Wjo.JobOrderHeaderId IS NOT NULL
+--ORDER BY L.DocId, L.Sr
+
+
+
+
+UPDATE JobOrderDetail
+SET JobOrderDetail.WeavingOMSId = SubString(V1.WeavingOMSId, 1,len(V1.WeavingOMSId)-1)
+FROM (
+	SELECT  L.DocId, L.Sr,
+	(SELECT '|' + Convert(NVARCHAR,JobOrderLineId) + '|,'
+	FROM Web.JobOrderLines
+	WHERE OMSId = 'Job Order-' + L.DocId + Convert(NVARCHAR,L.Sr)
+	FOR XML Path ('')
+	) AS WeavingOMSId
+	FROM JobOrder H WITH (NOLock)
+	LEFT JOIN JobOrderDetail L  WITH (NOLock) ON H.DocID = L.DocId
+	WHERE H.V_Type = 'WVORD'
+	AND L.WeavingOMSId IS NULL
+	AND H.Site_Code <> '1'
+) AS V1
+WHERE JobOrderDetail.DocId = V1.DocId AND JobOrderDetail.Sr = V1.Sr
+AND JobOrderDetail.WeavingOMSId IS NULL
+
+
+
+
+
+INSERT INTO Web.JobOrderLineCharges (LineTableId, Sr, ChargeId, AddDeduct, AffectCost, ChargeTypeId, CalculateOnId, 
+LedgerAccountDrId, LedgerAccountCrId, CostCenterId, RateType, IncludedInBase, ParentChargeId, Rate, Amount, IsVisible)
+SELECT L.JobOrderLineId AS LineTableId, Row_number() OVER (PARTITION BY L.JobOrderLineId ORDER BY L.JobOrderLineId) AS Sr,
+Wc.ChargeId, Sd.AddDeduct, IsNull(Sd.AffectCost,0) AS AffectCost, WCt.ChargeTypeId, Wc1.ChargeId AS CalculateOnId, NULL AS LedgerAccountDrId, 
+NULL AS LedgerAccountCrId, NULL AS CostCenterId, Sd.RateType AS RateTypeId, 0 AS IncludeInBase, NULL AS ParentChargeId, 
+Stl.Percentage AS Rate,
+CASE WHEN L.ProductUidId IS NOT NULL THEN Stl.Amount/ Jod.Qty ELSE Stl.Amount END AS Amount, 
+--Stl.Amount AS Amount,
+1 AS IsVisible
+FROM Web.JobOrderHeaders H 
+LEFT JOIN Web.JobOrderLines L With (NoLock) ON H.JobOrderHeaderId = L.JobOrderHeaderId 
+--LEFT JOIN JobOrderDetail Jod With (NoLock) ON 'Job Order-' + Convert(NVARCHAR,L.JobOrderLineId) = Jod.OMSId
+LEFT JOIN JobOrderDetail Jod With (NoLock) ON L.OMSId =  'Job Order-' + Jod.DocId + Convert(NVARCHAR,Jod.Sr)
+LEFT JOIN JobOrder Jo With (NoLock) ON Jod.DocId = Jo.DocID
+LEFT JOIN Structure S With (NoLock) ON Jo.Structure = S.Code
+LEFT JOIN StructureDetail Sd With (NoLock) ON S.Code = Sd.Code
+LEFT JOIN Charges C With (NoLock) ON Sd.Charges = C.Code
+LEFT JOIN Structure_TransLine Stl With (NoLock) ON Jod.DocID = Stl.DocID AND Jod.Sr = Stl.TSr  AND C.Code = Stl.Charges
+LEFT JOIN Web.Charges Wc With (NoLock) ON C.OMSId = 'Charge-' + Convert(NVARCHAR,Wc.ChargeId) 
+LEFT JOIN Web.ChargeTypes WCt With (NoLock) ON Sd.ChargeTypeName = WCt.ChargeTypeName
+LEFT JOIN Web.Charges Wc1 With (NoLock) ON  Sd.CalculateOnCharge = Wc1.ChargeCode
+LEFT JOIN Web.JobOrderLineCharges Jolc ON L.JobOrderLineId = Jolc.LineTableId
+WHERE (Sd.LineItem = 1 OR Sd.Charges =  'GAMT')
+AND H.SiteId <> 17
+AND Jo.V_Type IN ('WVORD','WFORD')
+AND Wc.ChargeId IS NOT NULL
+AND Jolc.LineTableId IS NULL
+--AND H.DocDate < '31/Mar/2013'
+--AND H.DocDate >= '31/Mar/2013' AND H.DocDate < '31/Mar/2014' 
+--AND H.DocDate >= '31/Mar/2014' AND H.DocDate < '31/Mar/2015' 
+AND H.DocDate >= '31/Mar/2015' 
+ORDER BY L.JobOrderLineId, Sd.Sr
+
+
+
+
+INSERT INTO Web.JobOrderCancelLines (JobOrderCancelHeaderId, JobOrderLineId, Qty, 
+Remark, CreatedBy, ModifiedBy, CreatedDate, ModifiedDate, OMSId)
+SELECT WJoc.JobOrderCancelHeaderId, WJol.JobOrderLineId, Abs(L.Qty) AS Qty,
+L.Remark, H.EntryBy AS CreatedBy, H.EntryBy AS ModifiedBy, 
+IsNull(H.EntryDate,H.V_Date) AS CreatedDate, IsNull(H.EntryDate,H.V_Date) AS ModifiedDate, 'Job Order Cancel-' +  L.DocId + Convert(NVARCHAR,L.Sr) AS OMSId
+FROM JobOrderDetail L With (NoLock) 
+LEFT JOIN JobOrder H With (NoLock) ON L.DocId = H.DocID
+LEFT JOIN JobOrderDetail Jod With (NoLock) ON L.JobOrder = Jod.DocId AND L.JobOrderSr = Jod.Sr
+LEFT JOIN JobIssRecUID Jiru ON L.DocId = Jiru.DocID AND L.Sr = Jiru.TSr
+LEFT JOIN Item_UID Iu ON Jiru.Item_UID = Iu.Code
+LEFT JOIN Web.ProductUids Pu ON Iu.Item_UID = Pu.ProductUidName
+LEFT JOIN Web.JobOrderCancelHeaders WJoc With (NoLock) ON H.OMSId = 'Job Order Cancel-' + Convert(NVARCHAR,WJoc.JobOrderCancelHeaderId)
+LEFT JOIN Web.JobOrderLines WJol With (NoLock) ON Jod.DocIdSr = WJol.OMSId AND IsNull(Pu.ProductUIDId,'') = IsNull(WJol.ProductUidId,'')
+WHERE H.V_Type IN ('WVCNL')
+AND H.Site_Code <> '1'
+AND WJol.JobOrderLineId IS NOT NULL
+AND WJoc.JobOrderCancelHeaderId IS NOT NULL
+--AND L.DocId = 'D3 WVCNL 2014       1'
+ORDER BY L.DocId, L.Sr
+
+
+
+
+INSERT INTO Web.JobOrderCancelBoms (JobOrderCancelHeaderId, JobOrderCancelLineId, ProductId, Qty, 
+Dimension1Id, Dimension2Id, CreatedBy, ModifiedBy, CreatedDate, ModifiedDate, OMSId)
+SELECT Wjo.JobOrderCancelHeaderId, WJol.JobOrderCancelLineId, Wp.ProductId, L.Qty, 
+H.EntryBy AS CreatedBy, H.EntryBy AS ModifiedBy, 
+H.EntryDate AS CreatedDate, H.EntryDate AS ModifiedDate, 
+'Job Order Cancel-' +  L.DocId + Convert(NVARCHAR,L.TSr)+ Convert(NVARCHAR,L.Sr) AS OMSId,
+Wd1.Dimension1Id, NULL AS Dimension2Id
+FROM JobOrderBom L With (NoLock) 
+LEFT JOIN JobOrder H With (NoLock) ON L.DocId = H.DocID
+LEFT JOIN Item I With (NoLock) ON L.Item = I.Code
+LEFT JOIN RUG_YarnSKU Ys With (NoLock) ON I.Code = Ys.Code
+LEFT JOIN Item Y With (NoLock) ON Ys.Yarn = Y.Code
+LEFT JOIN JobOrderDetail Jod With (NoLock) ON L.DocID = Jod.DocId AND L.TSr = Jod.Sr
+LEFT JOIN RUG_SHADE S With (NoLock) ON Ys.SHADE = S.Code
+LEFT JOIN Web.JobOrderCancelHeaders WJo With (NoLock) ON H.OMSId = 'Job Order Cancel-' + Convert(NVARCHAR,WJo.JobOrderCancelHeaderId)
+LEFT JOIN Web.Products Wp With (NoLock) ON IsNull(Y.OMSId,I.OMSId) = 'Product-' + Convert(NVARCHAR,Wp.ProductId)
+LEFT JOIN Web.JobOrderCancelLines WJol With (NoLock) ON Jod.OMSId = 'Job Order Cancel-' + Convert(NVARCHAR,WJol.JobOrderCancelLineId)
+LEFT JOIN Web.Dimension1 Wd1 With (NoLock) ON S.OMSId = 'Dimension1-'+ Convert(NVARCHAR,WD1.Dimension1Id)
+WHERE H.V_Type = 'WVCNL'
+AND H.Site_Code <> '1'
+
+
+
+
+
+
+
+
+
+ENABLE TRIGGER [Web].[Tr_JobOrderLine_Delete] ON [Web].[JobOrderLines] ;
+ENABLE TRIGGER [Web].[Mig_Tr_JobOrderBom_Delete] ON [Web].[JobOrderBoms]; 
+ENABLE TRIGGER [Web].[Mig_Tr_JobOrderCancelBom_Delete] ON [Web].[JobOrderCancelBoms] ;
+ENABLE TRIGGER [Web].[Mig_Tr_JobOrderBom_Update] ON [Web].[JobOrderBoms] ;
+ENABLE TRIGGER [Web].[Mig_Tr_JobOrderCancelLine_Delete] ON [Web].[JobOrderCancelLines]; 
+ENABLE TRIGGER [Web].[Tr_JobOrderCancelCancelLine_Delete] ON [Web].[JobOrderCancelLines] 
+ENABLE TRIGGER [Web].[Mig_Tr_JobOrderLine_Delete] ON [Web].[JobOrderLines] ;
+ENABLE TRIGGER [Web].[Tr_JobOrderLine_Add] ON [Web].[JobOrderLines];
+ENABLE TRIGGER Web.Mig_Tr_JobOrderLine_Add ON [Web].[JobOrderLines]; 
+ENABLE TRIGGER [Web].[Mig_Tr_JobOrderLineCharges_Add] ON [Web].[JobOrderLineCharges] ;
+ENABLE TRIGGER [Web].[Mig_Tr_JobOrderCancelLine_Add] ON [Web].[JobOrderCancelLines] ;
+ENABLE TRIGGER [Web].[Mig_Tr_JobOrderCancelBom_Delete] ON [Web].[JobOrderCancelBoms] ;

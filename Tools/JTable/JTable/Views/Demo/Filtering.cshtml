@@ -1,0 +1,253 @@
+﻿@{
+    ViewBag.Title = "Filtering Demo";
+}
+
+@section CssImport{
+    <style>
+        div.filtering
+        {
+            border: 1px solid #999;
+            margin-bottom: 5px;
+            padding: 10px;
+            background-color: #EEE;
+        }
+    </style>
+}
+
+<div class="filtering">
+    <form>
+        <label>Name: <input type="text" name="name" id="name" /></label>
+        <label>City: @Html.DropDownList("cityId", (IEnumerable<SelectListItem>)ViewBag.Cities, new { id = "cityId" })</label>
+        <button type="submit" id="LoadRecordsButton">Load records</button>
+    </form>
+</div>
+
+<div id="StudentTableContainer"></div>
+<script type="text/javascript">
+
+    $(document).ready(function () {
+
+        $('#StudentTableContainer').jtable({
+            title: 'Student List',
+            paging: true,
+            pageSize: 10,
+            sorting: true,
+            defaultSorting: 'Name ASC',
+            actions: {
+                listAction: '@Url.Action("StudentListByFiter")',
+                deleteAction: '@Url.Action("DeleteStudent")',
+                updateAction: '@Url.Action("UpdateStudent")',
+                createAction: '@Url.Action("CreateStudent")'
+            },
+            fields: {
+                StudentId: {
+                    key: true,
+                    create: false,
+                    edit: false,
+                    list: false
+                },
+                Name: {
+                    title: 'Name',
+                    width: '23%'
+                },
+                EmailAddress: {
+                    title: 'Email address',
+                    list: false
+                },
+                Password: {
+                    title: 'User Password',
+                    type: 'password',
+                    list: false
+                },
+                Gender: {
+                    title: 'Gender',
+                    width: '13%',
+                    options: { 'M': 'Male', 'F': 'Female' }
+                },
+                CityId: {
+                    title: 'City',
+                    width: '12%',
+                    options: '@Url.Action("GetCityOptions")'
+                },
+                BirthDate: {
+                    title: 'Birth date',
+                    width: '15%',
+                    type: 'date',
+                    displayFormat: 'yy-mm-dd'
+                },
+                Education: {
+                    title: 'Education',
+                    list: false,
+                    type: 'radiobutton',
+                    options: { '1': 'Primary school', '2': 'High school', '3': 'University' }
+                },
+                About: {
+                    title: 'About this person',
+                    type: 'textarea',
+                    list: false
+                },
+                IsActive: {
+                    title: 'Status',
+                    width: '12%',
+                    type: 'checkbox',
+                    values: { 'false': 'Passive', 'true': 'Active' },
+                    defaultValue: 'true'
+                },
+                RecordDate: {
+                    title: 'Record date',
+                    width: '15%',
+                    type: 'date',
+                    displayFormat: 'dd.mm.yy',
+                    create: false,
+                    edit: false,
+                    sorting: false //This column is not sortable!
+                }
+            }
+        });
+
+        //Re-load records when user click 'load records' button.
+        $('#LoadRecordsButton').click(function (e) {
+            e.preventDefault();
+            $('#StudentTableContainer').jtable('load', {
+                name: $('#name').val(),
+                cityId: $('#cityId').val()
+            });
+        });
+
+        //Load all records when page is first shown
+        $('#LoadRecordsButton').click();
+    });
+
+</script>
+<br />
+<hr />
+<h3>
+    HTML code</h3>
+<pre class="brush:html">&lt;div class=&quot;filtering&quot;&gt;
+    &lt;form&gt;
+        Name: &lt;input type=&quot;text&quot; name=&quot;name&quot; id=&quot;name&quot; /&gt;
+        City: 
+        &lt;select id=&quot;cityId&quot; name=&quot;cityId&quot;&gt;
+            &lt;option selected=&quot;selected&quot; value=&quot;0&quot;&gt;All cities&lt;/option&gt;
+            &lt;option value=&quot;1&quot;&gt;Adana&lt;/option&gt;
+            &lt;option value=&quot;2&quot;&gt;Ankara&lt;/option&gt;
+            &lt;option value=&quot;3&quot;&gt;Athens&lt;/option&gt;
+            &lt;option value=&quot;4&quot;&gt;Beijing&lt;/option&gt;
+            &lt;option value=&quot;5&quot;&gt;Berlin&lt;/option&gt;
+            &lt;option value=&quot;6&quot;&gt;Bursa&lt;/option&gt;
+            &lt;option value=&quot;7&quot;&gt;İstanbul&lt;/option&gt;
+            &lt;option value=&quot;8&quot;&gt;London&lt;/option&gt;
+            &lt;option value=&quot;9&quot;&gt;Madrid&lt;/option&gt;
+            &lt;option value=&quot;10&quot;&gt;Mekke&lt;/option&gt;
+            &lt;option value=&quot;11&quot;&gt;New York&lt;/option&gt;
+            &lt;option value=&quot;12&quot;&gt;Paris&lt;/option&gt;
+            &lt;option value=&quot;13&quot;&gt;Samsun&lt;/option&gt;
+            &lt;option value=&quot;14&quot;&gt;Trabzon&lt;/option&gt;
+            &lt;option value=&quot;15&quot;&gt;Volos&lt;/option&gt;
+        &lt;/select&gt;
+        &lt;button type=&quot;submit&quot; id=&quot;LoadRecordsButton&quot;&gt;Load records&lt;/button&gt;
+    &lt;/form&gt;
+&lt;/div&gt;
+
+&lt;div id=&quot;StudentTableContainer&quot;&gt;&lt;/div&gt;</pre>
+<h3>
+    Javascript code</h3>
+<pre class="brush:js; highlight: [11,82,83,84,85,86,87,88,89,91,92]">&lt;script type=&quot;text/javascript&quot;&gt;
+
+    $(document).ready(function () {
+
+        $(&#39;#StudentTableContainer&#39;).jtable({
+            title: &#39;Student List&#39;,
+            paging: true,
+            sorting: true,
+            defaultSorting: &#39;Name ASC&#39;,
+            actions: {
+                listAction: &#39;/Demo/StudentListByFiter&#39;,
+                deleteAction: &#39;/Demo/DeleteStudent&#39;,
+                updateAction: &#39;/Demo/UpdateStudent&#39;,
+                createAction: &#39;/Demo/CreateStudent&#39;
+            },
+            fields: {
+                StudentId: {
+                    key: true,
+                    create: false,
+                    edit: false,
+                    list: false
+                },
+                Name: {
+                    title: &#39;Name&#39;,
+                    width: &#39;23%&#39;
+                },
+                EmailAddress: {
+                    title: &#39;Email address&#39;,
+                    list: false
+                },
+                Password: {
+                    title: &#39;User Password&#39;,
+                    type: &#39;password&#39;,
+                    list: false
+                },
+                Gender: {
+                    title: &#39;Gender&#39;,
+                    width: &#39;13%&#39;,
+                    options: { &#39;M&#39;: &#39;Male&#39;, &#39;F&#39;: &#39;Female&#39; }
+                },
+                CityId: {
+                    title: &#39;City&#39;,
+                    width: &#39;12%&#39;,
+                    options: &#39;/Demo/GetCityOptions&#39;
+                },
+                BirthDate: {
+                    title: &#39;Birth date&#39;,
+                    width: &#39;15%&#39;,
+                    type: &#39;date&#39;,
+                    displayFormat: &#39;yy-mm-dd&#39;
+                },
+                Education: {
+                    title: &#39;Education&#39;,
+                    list: false,
+                    type: &#39;radiobutton&#39;,
+                    options: { &#39;1&#39;: &#39;Primary school&#39;, &#39;2&#39;: &#39;High school&#39;, &#39;3&#39;: &#39;University&#39; }
+                },
+                About: {
+                    title: &#39;About this person&#39;,
+                    type: &#39;textarea&#39;,
+                    list: false
+                },
+                IsActive: {
+                    title: &#39;Status&#39;,
+                    width: &#39;12%&#39;,
+                    type: &#39;checkbox&#39;,
+                    values: { &#39;false&#39;: &#39;Passive&#39;, &#39;true&#39;: &#39;Active&#39; },
+                    defaultValue: &#39;true&#39;
+                },
+                RecordDate: {
+                    title: &#39;Record date&#39;,
+                    width: &#39;15%&#39;,
+                    type: &#39;date&#39;,
+                    displayFormat: &#39;dd.mm.yy&#39;,
+                    create: false,
+                    edit: false,
+                    sorting: false //This column is not sortable!
+                }
+            }
+        });
+
+        //Re-load records when user click &#39;load records&#39; button.
+        $(&#39;#LoadRecordsButton&#39;).click(function (e) {
+            e.preventDefault();
+            $(&#39;#StudentTableContainer&#39;).jtable(&#39;load&#39;, {
+                name: $(&#39;#name&#39;).val(),
+                cityId: $(&#39;#cityId&#39;).val()
+            });
+        });
+
+        //Load all records when page is first shown
+        $(&#39;#LoadRecordsButton&#39;).click();
+    });
+
+&lt;/script&gt;</pre>
+<h3>
+    Server side code</h3>
+@Html.Partial("_FilteredPagedAndSortedServerSideCodes")
+

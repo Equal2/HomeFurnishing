@@ -1,0 +1,200 @@
+﻿@model Model.ViewModels.SaleInvoiceMasterDetailModel
+
+@{
+    ViewBag.Title = "Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<style type="text/css">
+    .CurveBorder {
+        border-radius: 5px;
+        width: 8em;
+        height: 3em;
+    }
+</style>
+
+
+@using (Html.BeginForm())
+{
+    <div class="panel panel-default">
+        <div class="panel-heading">
+
+
+            @if (ViewBag.transactionType == "submit")
+            {<h3>
+                <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"> <span class="glyphicon glyphicon-file black"></span>Submit Sale Invoice</span>
+                <input type="submit" value="Submit" name="Command:Submit" class="btn btn-primary right" style="width: 90px; background-color: #2980b9" />
+            </h3>}
+            else if (ViewBag.transactionType == "approve")
+            {<h3>
+                <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"> <span class="glyphicon glyphicon-file black"></span>Approve Sale Invoice</span>
+                <input type="submit" value="Approve" class="btn btn-primary right" name="Command:Approve" style="width: 90px; background-color: #2980b9" />
+            </h3>}
+            else
+            {<h3>
+                <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"> <span class="glyphicon glyphicon-file black"></span>Sale Invoice Details</span>
+            </h3>}
+            <hr style="margin-top:0px;margin-bottom:0px" />
+
+            <div class="panel-info">
+                <h4 style="padding:5px 0 0 0;margin:0px">
+                    @Html.ActionLink(" ", " ", " ", null, new { @class = "glyphicon glyphicon-refresh toolbar", @title = "Refresh Page", @data_toggle = "tooltip", @id = "RefreshPage" })
+
+                    @Html.ActionLink(" ", "History", "SaleInvoiceHeader", null, new { @class = "glyphicon glyphicon-user toolbar", @title = "History", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "Print", "SaleInvoiceHeader", null, new { @class = "glyphicon glyphicon-print toolbar", @title = "Print", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "Email", "SaleInvoiceHeader", null, new { @class = "glyphicon glyphicon-envelope toolbar", @title = "Email", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "Index", "SaleInvoiceHeader", null, new { @class = "glyphicon glyphicon-list toolbar right", @title = "List", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "Report", "SaleInvoiceHeader", null, new { @class = "glyphicon glyphicon-th toolbar right", @title = "Report", @data_toggle = "tooltip" })
+                </h4>
+            </div>
+
+        </div>
+
+        <div class="panel-info" style="padding-left:15px">
+            @Html.AntiForgeryToken()
+            <div class="row">
+                <div class="col-md-6">
+                    <dl class="dl-horizontal" style="padding-top:15px">
+                        @Html.HiddenFor(m => m.SaleInvoiceHeaderId)
+                        @Html.HiddenFor(m => m.SaleInvoiceHeaderIndexViewModelForEdit.SaleInvoiceHeaderId)
+                        @Html.HiddenFor(m => m.SaleInvoiceHeaderIndexViewModelForEdit.DocNo)
+                        <dt>
+                            @Html.DisplayNameFor(model => model.SaleInvoiceHeaderIndexViewModelForEdit.DocumentTypeName)    :
+                        </dt>
+
+                        <dd>
+                            @Html.DisplayFor(model => model.SaleInvoiceHeaderIndexViewModelForEdit.DocumentTypeName)
+                        </dd>
+
+                        <dt>
+                            @Html.DisplayNameFor(model => model.SaleInvoiceHeaderIndexViewModelForEdit.DocDate)    :
+                        </dt>
+
+                        <dd>
+                            @Html.DisplayFor(model => model.SaleInvoiceHeaderIndexViewModelForEdit.DocDate)
+                        </dd>
+
+                        <dt>
+                            @Html.DisplayNameFor(model => model.SaleInvoiceHeaderIndexViewModelForEdit.DocNo)    :
+                        </dt>
+
+                        <dd>
+                            @Html.DisplayFor(model => model.SaleInvoiceHeaderIndexViewModelForEdit.DocNo)
+                        </dd>
+
+                        <dt>
+                            @Html.DisplayNameFor(model => model.SaleInvoiceHeaderIndexViewModelForEdit.SaleToBuyerName)    :
+                        </dt>
+
+                        <dd>
+                            @Html.DisplayFor(model => model.SaleInvoiceHeaderIndexViewModelForEdit.SaleToBuyerName)
+                        </dd>
+
+                        <dt>
+                            @Html.DisplayNameFor(model => model.SaleInvoiceHeaderIndexViewModelForEdit.BillToBuyerName)    :
+                        </dt>
+
+                        <dd>
+                            @Html.DisplayFor(model => model.SaleInvoiceHeaderIndexViewModelForEdit.BillToBuyerName)
+                        </dd>
+                    </dl>
+                </div>
+                <div class="col-md-6">
+
+                    <dl class="dl-horizontal" style=" padding-top:15px">
+
+                        <dt>
+                            @Html.DisplayNameFor(model => model.SaleInvoiceHeaderIndexViewModelForEdit.CurrencyName)    :
+                        </dt>
+
+                        <dd>
+                            @Html.DisplayFor(model => model.SaleInvoiceHeaderIndexViewModelForEdit.CurrencyName)
+                        </dd>
+
+                        <dt>
+                            @Html.DisplayNameFor(model => model.SaleInvoiceHeaderIndexViewModelForEdit.Remark)    :
+                        </dt>
+
+                        <dd>
+                            @Html.DisplayFor(model => model.SaleInvoiceHeaderIndexViewModelForEdit.Remark)
+                        </dd>
+
+                    </dl>
+
+                </div>
+            </div>
+
+            @{var objLine = Model.SaleInvoiceLineViewModel.FirstOrDefault();}
+            <table class="table">
+                <tr>
+                    <th>
+                        @Html.DisplayNameFor(model => objLine.ProductName)
+                    </th>
+                    <th>
+                        <div class="text-right">
+                            @Html.DisplayNameFor(model => objLine.Qty)
+                        </div>
+                    </th>
+                    <th>
+                        <div class="text-right">
+                            @Html.DisplayNameFor(model => objLine.Rate)
+                        </div>
+                    </th>
+                    <th>
+                        <div class="text-right">
+                            @Html.DisplayNameFor(model => objLine.Amount)
+                        </div>
+                    </th>
+
+
+                </tr>
+
+
+                @{decimal TotalQty = 0;}
+                @{decimal TotalAmount = 0;}
+
+                @foreach (var item in Model.SaleInvoiceLineViewModel)
+                {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.ProductName)
+                        </td>
+                        <td>
+                            <div class="text-right">
+                                @Html.DisplayFor(modelItem => item.Qty)
+                            </div>
+                        </td>
+                        <td>
+                            <div class="text-right">
+                                @Html.DisplayFor(modelItem => item.Rate)
+                            </div>
+                        </td>
+                        <td>
+                            <div class="text-right">
+                                @Html.DisplayFor(modelItem => item.Amount)
+                            </div>
+                        </td>
+                    </tr>
+
+                    TotalQty = TotalQty + System.Convert.ToDecimal(Html.DisplayFor(modelItem => item.Qty).ToString());
+                    TotalAmount = TotalAmount + System.Convert.ToDecimal(Html.DisplayFor(modelItem => item.Amount).ToString());
+                }
+                <tr>
+                    <td>
+                        <b>Totals :</b>
+                    </td>
+                    <td class="text-right">
+                        <b>@TotalQty</b>
+                    </td>
+
+                    
+                    <td></td>
+                    <td class="text-right">
+                        <b>@TotalAmount</b>
+                    </td>
+
+
+                </tr>
+            </table>
+        </div>
+    </div>
+}

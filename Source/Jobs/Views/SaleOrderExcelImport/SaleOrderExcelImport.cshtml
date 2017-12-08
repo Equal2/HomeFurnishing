@@ -1,0 +1,74 @@
+﻿
+@{
+    ViewBag.Title = "PurchaseOrderExcelImport";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Sale Order Excel Import</h2>
+
+    <p style="font:bold"><b>Check These Fields</b> </p>
+    @{
+        
+    <ul>
+        @if (ViewBag.orderno!=null)
+        {
+             <li>
+                 <p style="font:bold"><b>Order Numbers Already Exist:</b>@ViewBag.orderno</p> 
+        </li>
+        }
+        
+        @if (ViewBag.SaleToBuyer != null)
+        {
+            <li>
+                <p style="font:bold"><b>Sale To Buyer Names Doesn't Exist:</b>@ViewBag.SaleToBuyer</p>
+        </li>
+        }
+
+        @if (ViewBag.BillToBuyer != null)
+        {
+            <li>
+                <p style="font:bold"><b>Bill To Buyer Names Doesn't Exist:</b>@ViewBag.BillToBuyer</p>
+            </li>
+        }
+        
+        @if (ViewBag.Currency != null)
+        {
+            <li>
+                <p style="font:bold"><b>Currency Names Doesn't Exist:</b>@ViewBag.Currency</p>
+            </li>
+        }
+        
+
+        @if (ViewBag.ShipMethod != null)
+        {
+            <li>
+                <p style="font:bold"><b>Ship Method Names Doesn't Exist:</b>@ViewBag.ShipMethod</p>
+            </li>
+        }
+        
+        @if (ViewBag.DeliveryTerms != null)
+        {
+            <li>
+                <p style="font:bold"><b>Delivery Terms Doesn't Exist:</b>@ViewBag.DeliveryTerms</p>
+            </li>
+        }
+        
+        @if (ViewBag.Priority != null)
+        {
+            <li>
+                <p style="font:bold"><b>Priority Names Doesn't Exist:</b>@ViewBag.Priority</p>
+            </li>
+        }
+
+        @if (ViewBag.product!=null)
+        {
+            <li>
+                <p style="font:bold"><b>Product Doesn't Exist:</b>@ViewBag.product</p>
+        </li>
+        }     
+
+    </ul>
+}
+
+    @Html.ActionLink("Go Back", "Index", "SaleOrderExcelImport", new { @class = "btn btn-primary btn-sm col-md-offset-0 CurveBorder ActionLinkPadding" })
+

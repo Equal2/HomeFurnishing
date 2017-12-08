@@ -1,0 +1,91 @@
+﻿@model Surya.India.Model.ViewModels.PurchaseIndentHeaderViewModel
+@{
+    ViewBag.Title = "Edit";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@using (Html.BeginForm("Edit", "PurchaseIndentHeader", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(m=>m.PurchaseIndentHeaderId)
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h4>
+                <span style="font-family: Calibri,sans-serif,Verdana"> Edit Sale Order.</span>
+            </h4>
+        </div>
+        <div class="panel-info" style="padding-left:15px">
+            <div class="form-horizontal">
+                @Html.ValidationSummary(true)
+                <input type="hidden" name="Redirect" id="Redirect" value="@ViewBag.Redirect" />
+                <div class="form-group" style="margin-top:15px">
+                    @Html.LabelFor(model => model.DocTypeId,"Entry Type*", new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.DropDownListFor(model => model.DocTypeId, new SelectList(ViewBag.DocTypeList as System.Collections.IEnumerable, "DocumentTypeId", "DocumentTypeName"), new { @class = "DDWidth" })
+                        @Html.ValidationMessageFor(model => model.DocTypeId)
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.DocDate,"Indent Date*", new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.DocDate)
+                        @Html.ValidationMessageFor(model => model.DocDate)
+                    </div>
+                </div>
+
+                
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.DocNo,"Indent No*", new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.DocNo)
+                        @Html.ValidationMessageFor(model => model.DocNo)
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.DepartmentId, "Department*", new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.DropDownListFor(m => m.DepartmentId, new SelectList(ViewBag.ListDepart as System.Collections.IEnumerable, "DepartmentId", "DepartmentName"), new { @class = "DDWidth" })
+                        @Html.ValidationMessageFor(model => model.DepartmentId)
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.DueDate, "Due Date*", new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(m => m.DueDate)
+                        @Html.ValidationMessageFor(model => model.DueDate)
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.Remark, new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(m => m.Remark)
+                        @Html.ValidationMessageFor(model => model.Remark)
+                    </div>
+                </div>
+
+                
+                <hr />
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-10">
+                        <input type="submit" value="Save" class="btn btn-primary btn-sm CurveBorder" />
+                        <span style="font-family: Calibri,sans-serif,Verdana;font-size:large">
+                            @Html.ActionLink("Back", "Index", null, new { @class = "btn btn-primary btn-sm col-md-offset-1 CurveBorder ActionLinkPadding" })
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#DocTypeId").focus();
+    })
+
+
+</script>

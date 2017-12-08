@@ -1,0 +1,351 @@
+﻿@model Model.ViewModel.MaterialPlanLineListViewModel
+@using Core.Common
+
+<style type="text/css">
+    #tbody {
+        height: 250px;
+        overflow-y: scroll;
+        width: 100%;
+    }
+
+    #gbody-modal {
+        height: 250px;
+        overflow-y: scroll;
+        width: 100%;
+    }
+
+    tbody td {
+        padding: 2px 2px 2px 2px;
+    }
+
+    .textRight {
+        text-align: right;
+    }
+    /*th div{
+        position:absolute;
+    }*/
+</style>
+
+<div class="modal-content">
+    <div class="modal-header" style="border-bottom: 1px solid #8E8888">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"> <span class="glyphicon glyphicon-remove"></span></button>
+        <h3>
+            <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-file black"></span> Production Orders & Quantities</span>
+        </h3>
+    </div>
+    <div>
+        @using (Html.BeginForm("_ResultsPostProduction", "MaterialPlanLineNew", FormMethod.Post, new { enctype = "multipart/form-data", id = "modform" }))
+        {
+            @Html.AntiForgeryToken()
+            <div class="form-horizontal modal-body">
+
+                <div style="padding-right:15px">
+                    <div class="row">
+
+                        <div class="form-horizontal">
+                            @Html.ValidationSummary(true)
+
+
+
+                            @*<table class="table" style="width:100%">
+                                        <thead >
+                                            <tr style="color:black">
+                                                <th style="width:5%;padding-left:0px">
+                                                    <div>
+                                                        Sr.
+                                                    </div>
+                                                </th>
+                                                <th style="width: 20%; padding-left: 0px">
+                                                    <div>
+                                                        Prod Order
+                                                    </div>
+                                                </th>
+                                                <th style="width: 25%; padding-left: 0px" >
+                                                    <div>
+                                                        Product
+                                                    </div>
+                                                </th>
+                                                <th style="width: 15%; padding-left: 0px" >
+                                                    <div>
+                                                        Balance Qty
+                                                    </div>
+                                                </th>
+                                                <th style="width: 15%; text-align: right; padding-right: 15px" >
+                                                    <div>
+                                                        Plan Qty
+                                                    </div>
+                                                </th>
+                                                <th style="width: 20%; padding-left: 0px">
+                                                    <div>
+                                                        Remark
+                                                    </div>
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                    </table>
+                                <div id="tbody">
+                                    <div class="tbody">
+                                        <table>
+                                            <tbody>
+
+                                                @for (int i = 0; i < Model.MaterialPlanLineViewModel.Count(); i++)
+                                                {
+                                                    @Html.HiddenFor(m => m.MaterialPlanLineViewModel[i].MaterialPlanHeaderId)
+                                                    @Html.HiddenFor(m => m.MaterialPlanLineViewModel[i].ProdOrderDocNo)
+                                                    @Html.HiddenFor(m => m.MaterialPlanLineViewModel[i].ProdOrderLineId)
+                                                    @Html.HiddenFor(m => m.MaterialPlanLineViewModel[i].ProductName)
+                                                    @Html.HiddenFor(m => m.MaterialPlanLineViewModel[i].ProductId)
+                                                    @Html.HiddenFor(m => m.MaterialPlanLineViewModel[i].BalanceQtyForPlan)
+                                                    <tr>
+                                                        <td style="width:5%">
+                                                            @(i + 1)
+                                                        </td>
+                                                        <td style="width:20%">
+                                                            @Html.TextBoxFor(m => m.MaterialPlanLineViewModel[i].ProdOrderDocNo, new { @class = "form-control", @disabled = "disabled" })
+                                                        </td>
+                                                        <td style="width:25%">
+                                                            @Html.TextBoxFor(m => m.MaterialPlanLineViewModel[i].ProductName, new { @class = "form-control", @disabled = "disabled" })
+                                                        </td>
+                                                        <td style="width:15%">
+                                                            @Html.TextBoxFor(m => Model.MaterialPlanLineViewModel[i].BalanceQtyForPlan, new { @class = "form-control text-right", @disabled = "disabled" })
+                                                        </td>
+                                                        <td style="width:15%">
+                                                            @Html.TextBoxFor(m => m.MaterialPlanLineViewModel[i].Qty, new { @class = "form-control text-right" })
+                                                            @Html.ValidationMessageFor(m => m.MaterialPlanLineViewModel[i].Qty)
+                                                        </td>
+                                                        <td style="width:20%">
+                                                            @Html.TextBoxFor(m => m.MaterialPlanLineViewModel[i].Remark, new { @class = "form-control" })
+                                                            @Html.ValidationMessageFor(m => m.MaterialPlanLineViewModel[i].Remark)
+                                                        </td>
+
+                                                    </tr>
+
+                                                }
+
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+
+                                </div>*@
+
+
+
+
+
+
+                            @{
+            var count = Model.MaterialPlanLineViewModel.Where(m => m.BomDetailExists == false).Count();
+            string message;
+            if (count > 0)
+            {
+                message = count + " records dont have consumption";
+            }
+            else
+            {
+                message = "";
+            }
+                            }
+                            @if(count>0)
+                            { 
+                            <div id="alertzone" class="alert alert-danger" style="font-weight:bold"> &hellip; @message</div>
+                            }
+
+
+
+
+
+
+                            <div class="panel panel-default" id="grid">
+                                <div class="panel-heading headrow" style="background-image: -webkit-linear-gradient(top, #428bca 0%, #428bca 100%);color:white">
+                                    <div class="row grid-head">
+                                        <div class="block text-left" style="width:5%">
+                                            Srl.
+                                        </div>
+                                        <div class="block" style="width:92%">
+                                            <div class="row">
+                                                @*ProductInfo*@
+                                                <div class="block" style="width:35%">
+                                                    Product Name
+                                                </div>
+                                                @*Qty*@
+                                                <div class="block" style="width:25%">
+                                                    Production<br />Order
+                                                </div>
+                                                <div class="block" style="width:10%">
+                                                    Unit
+                                                </div>
+                                                <div class="text-right block" style="width:15%">
+                                                    Balance<br />Qty
+                                                </div>
+                                                @*Amount*@
+                                                <div class="block text-right" style="width:15%">
+                                                    Plan<br />Qty
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                                <div class="panel-info" id="gbody-modal">
+                                    @{decimal BalanceCount = 0;}
+                                    @for (int i = 0; i < Model.MaterialPlanLineViewModel.Count(); i++)
+                                    {
+
+
+                                        <div class='row crow grid-body' style='margin-left:0px;margin-right:0px;@(!Model.MaterialPlanLineViewModel[i].BomDetailExists?"color:red":"")'>
+
+
+                                            <div class='block row-index' style='width:5%'>
+                                                @Html.HiddenFor(m => m.MaterialPlanLineViewModel[i].MaterialPlanHeaderId)
+                                                @Html.HiddenFor(m => m.MaterialPlanLineViewModel[i].ProdOrderDocNo)
+                                                @Html.HiddenFor(m => m.MaterialPlanLineViewModel[i].ProdOrderLineId)
+                                                @Html.HiddenFor(m => m.MaterialPlanLineViewModel[i].ProductName)
+                                                @Html.HiddenFor(m => m.MaterialPlanLineViewModel[i].ProductId)
+                                                @Html.HiddenFor(m => m.MaterialPlanLineViewModel[i].BalanceQtyForPlan)
+                                                @Html.HiddenFor(m => m.MaterialPlanLineViewModel[i].BomDetailExists, new { @class = "form-control text-right BomDetailExists" })
+                                                @(i + 1)
+                                            </div>
+                                            <div class='block pull-middle' style='width:94%'>
+
+                                                <div class='row'>
+                                                    <div class='block' style='width:35%'>
+                                                        <strong> @Model.MaterialPlanLineViewModel[i].ProductName</strong>
+                                                        <p style="margin-bottom:0px">
+                                                            @{
+                                        var Dim1 = (string.IsNullOrEmpty(Model.MaterialPlanLineViewModel[i].Dimension1Name) || Model.MaterialPlanSettings.isVisibleDimension1 == false) ? "" : Model.MaterialPlanLineViewModel[i].Dimension1Name + ",";
+                                        var Dim2 = (string.IsNullOrEmpty(Model.MaterialPlanLineViewModel[i].Dimension2Name) || Model.MaterialPlanSettings.isVisibleDimension2 == false) ? "" : Model.MaterialPlanLineViewModel[i].Dimension2Name + ",";
+                                        var Dim3 = (string.IsNullOrEmpty(Model.MaterialPlanLineViewModel[i].Dimension3Name) || Model.MaterialPlanSettings.isVisibleDimension3 == false) ? "" : Model.MaterialPlanLineViewModel[i].Dimension3Name + ",";
+                                        var Dim4 = (string.IsNullOrEmpty(Model.MaterialPlanLineViewModel[i].Dimension4Name) || Model.MaterialPlanSettings.isVisibleDimension4 == false) ? "" : Model.MaterialPlanLineViewModel[i].Dimension4Name;
+                                        var Processname = (string.IsNullOrEmpty(Model.MaterialPlanLineViewModel[i].ProcessName) || Model.MaterialPlanSettings.isMandatoryProcessLine == false) ? "" : Model.MaterialPlanLineViewModel[i].ProcessName;
+                                                            }
+
+                                                            @Dim1 @Dim2
+                                                        </p>
+                                                        <p style="margin-bottom:0px">
+                                                            @Processname
+                                                        </p>
+
+                                                    </div>
+                                                    <div>
+                                                        <div class='block' style='width:25%'>
+                                                            @(Model.MaterialPlanLineViewModel[i].ProdOrderDocNo)
+                                                        </div>
+                                                        <div class='block' style='width:10%'>
+                                                            @(Model.MaterialPlanLineViewModel[i].UnitName)
+                                                        </div>
+                                                        <div class='block text-right' style='width:15%'>
+                                                            @(Model.MaterialPlanLineViewModel[i].BalanceQtyForPlan)
+                                                            @{BalanceCount += Model.MaterialPlanLineViewModel[i].BalanceQtyForPlan;}
+                                                        </div>
+                                                        <div class='block text-right pull-middle' style='width:15%'>
+                                                            @Html.TextBoxFor(m => Model.MaterialPlanLineViewModel[i].Qty, new { @class = "form-control text-right stockplanQty" })
+                                                        </div>
+
+                                                    </div>
+
+                                                </div>
+
+                                            </div>
+
+                                        </div>
+                                        <hr style='margin-top:0px;margin-bottom:0px' />
+
+                                    }
+
+
+
+                                </div>
+                            </div>
+
+
+
+                            <div class="row grid-head" style="margin-left:0px;margin-right:0px">
+                                <div class="block text-left" style="width:5%">
+
+                                </div>
+                                <div class="block" style="width:92%">
+                                    <div class="row">
+                                        <div class="block" style="width:35%">
+                                            <strong>Total</strong>
+                                        </div>
+                                        <div class="block" style="width:25%">
+                                        </div>
+                                        <div class="block" style="width:10%">
+                                        </div>
+                                        <div class="text-right block" style="width:15%">
+                                            <strong> @BalanceCount</strong>
+                                        </div>
+                                        @*Amount*@
+                                        <div class="block text-right" style="width:15%">
+                                            <strong> <span id="QtyCount">@BalanceCount</span></strong>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+
+
+
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer " style="padding: 19px 20px 0 20px; border-top:1px solid #8E8888">
+                    @if (count > 0)
+                    {
+                        <button class="btn custom" name="Command:Edit" type="submit" id="submit1" disabled="disabled"><h2 style="margin:0px" title="Proceed"><span class="glyphicon glyphicon-arrow-right black"></span> </h2></button>
+                    }
+                    else
+                    {
+                        <button class="btn custom" name="Command:Edit" type="submit" id="submit1"><h2 style="margin:0px" title="Proceed"><span class="glyphicon glyphicon-arrow-right black"></span> </h2></button>
+                    }
+
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+
+<script type="text/javascript">
+    
+    $('.stockplanQty').keyup(function () {
+        var ConsumptionValidation = false;
+        var Count = 0;
+
+        $('.row.crow.grid-body', '.modal-body').each(function () {
+            if ($(this).find('input.stockplanQty').val()) {
+                Count += parseFloat($(this).find('input.stockplanQty').val());
+            }
+
+
+            //alert($(this).find('input.stockplanQty').val());
+            //alert($(this).find('input.BomDetailExists').val());
+            if ($(this).find('input.stockplanQty').val() != 0 && $(this).find('input.BomDetailExists').val() == 'False') {
+                ConsumptionValidation = true;
+                //alert(ConsumptionValidation);
+            }
+
+        })
+        $('#QtyCount', '.modal-body').text(Count);
+
+        alert(ConsumptionValidation.toString());
+
+        if (ConsumptionValidation == false)
+        {
+            $('#alertzone').remove();
+            $('#submit1').prop('disabled', false);
+        }
+        else {
+            $('#alertzone').show();
+            $('#submit1').prop('disabled', true);
+        }
+
+    })
+
+
+
+
+</script>

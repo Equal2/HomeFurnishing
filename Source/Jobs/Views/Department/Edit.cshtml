@@ -1,0 +1,55 @@
+﻿@model Surya.India.Model.Models.Department
+
+@{
+    ViewBag.Title = "Edit";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(model => model.DepartmentId)
+
+    @Html.HiddenFor(model => model.CreatedBy)
+    @Html.HiddenFor(model => model.CreatedDate)
+
+    <div class="panel panel-default">
+
+        <div class="panel-heading">
+
+            <h4>
+                <span style="font-family: Calibri,sans-serif,Verdana"> Edit Delivery Terms.</span>
+            </h4>
+
+        </div>
+        <div class="panel-info" style="padding-left:15px">
+
+            <div class="form-horizontal">
+
+                
+                @Html.ValidationSummary(true)
+                @Html.HiddenFor(model => model.DepartmentId)
+
+                <div class="form-group" style="margin-top:15px">
+                    @Html.LabelFor(model => model.DepartmentName, new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.DepartmentName)
+                        @Html.ValidationMessageFor(model => model.DepartmentName)
+                    </div>
+                </div>
+                <hr />
+
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-10">
+                        <input type="submit" value="Save" class="btn-primary xxlarge" />
+                        <span style="font-family: Calibri,sans-serif,Verdana;font-size:large">
+                            |@Html.ActionLink("Back to List", "Index")
+
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}

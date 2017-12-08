@@ -1,0 +1,183 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{E7B6F2DD-5845-431D-B065-7CA2C51C698A}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Models.BasicSetup</RootNamespace>
+    <AssemblyName>Models.BasicSetup</AssemblyName>
+    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.AspNet.Identity.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.Identity.Core.2.2.1\lib\net45\Microsoft.AspNet.Identity.Core.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.AspNet.Identity.EntityFramework, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.Identity.EntityFramework.2.2.1\lib\net45\Microsoft.AspNet.Identity.EntityFramework.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="DatabaseViews\_Roles.cs" />
+    <Compile Include="DatabaseViews\_Employee.cs" />
+    <Compile Include="DatabaseViews\_Users.cs" />
+    <Compile Include="Models\Area.cs" />
+    <Compile Include="Models\BinLocation.cs" />
+    <Compile Include="Models\BusinessEntity.cs" />
+    <Compile Include="Models\Calculation.cs" />
+    <Compile Include="Models\CalculationFooter.cs" />
+    <Compile Include="Models\CalculationHeaderCharge.cs" />
+    <Compile Include="Models\CalculationHeaderLedgerAccount.cs" />
+    <Compile Include="Models\CalculationLineCharge.cs" />
+    <Compile Include="Models\CalculationLineLedgerAccount.cs" />
+    <Compile Include="Models\CalculationProduct.cs" />
+    <Compile Include="Models\Charge.cs" />
+    <Compile Include="Models\ChargeType.cs" />
+    <Compile Include="Models\City.cs" />
+    <Compile Include="Models\CompanySettings.cs" />
+    <Compile Include="Models\CostCenter.cs" />
+    <Compile Include="Models\CostCenterStatus.cs" />
+    <Compile Include="Models\Country.cs" />
+    <Compile Include="Models\Currency.cs" />
+    <Compile Include="Models\Dimension1.cs" />
+    <Compile Include="Models\Dimension1Type.cs" />
+    <Compile Include="Models\Dimension2.cs" />
+    <Compile Include="Models\Dimension2Type.cs" />
+    <Compile Include="Models\Division.cs" />
+    <Compile Include="Models\DocumentCategory.cs" />
+    <Compile Include="Models\DocumentType.cs" />
+    <Compile Include="Models\DocumentTypeDivision.cs" />
+    <Compile Include="Models\DocumentTypeSite.cs" />
+    <Compile Include="Models\Gate.cs" />
+    <Compile Include="Models\GatePassHeader.cs" />
+    <Compile Include="Models\GatePassLine.cs" />
+    <Compile Include="Models\Godown.cs" />
+    <Compile Include="Models\Ledger.cs" />
+    <Compile Include="Models\LedgerAccount.cs" />
+    <Compile Include="Models\LedgerAccountGroup.cs" />
+    <Compile Include="Models\LedgerAdj.cs" />
+    <Compile Include="Models\LedgerHeader.cs" />
+    <Compile Include="Models\LedgerLine.cs" />
+    <Compile Include="Models\Person.cs" />
+    <Compile Include="Models\PersonAddress.cs" />
+    <Compile Include="Models\PersonBankAccount.cs" />
+    <Compile Include="Models\PersonContact.cs" />
+    <Compile Include="Models\GenericType.cs" />
+    <Compile Include="Models\PersonDocument.cs" />
+    <Compile Include="Models\PersonProcess.cs" />
+    <Compile Include="Models\PersonRateGroup.cs" />
+    <Compile Include="Models\PersonRegistration.cs" />
+    <Compile Include="Models\Process.cs" />
+    <Compile Include="Models\Product.cs" />
+    <Compile Include="Models\PaymentModeLedgerAccount.cs" />
+    <Compile Include="Models\PersonAttributes.cs" />
+    <Compile Include="Models\ProductBuyer.cs" />
+    <Compile Include="Models\ProductGroup.cs" />
+    <Compile Include="Models\ProductNature.cs" />
+    <Compile Include="Models\ProductType.cs" />
+    <Compile Include="Models\DocumentTypeAttributes.cs" />
+    <Compile Include="Models\ProductUid.cs" />
+    <Compile Include="Models\ProductUidHeader.cs" />
+    <Compile Include="Models\SalesTaxGroupParty.cs" />
+    <Compile Include="Models\SalesTaxGroupProduct.cs" />
+    <Compile Include="Models\ServiceTaxCategory.cs" />
+    <Compile Include="Models\Company.cs" />
+    <Compile Include="Models\Site.cs" />
+    <Compile Include="Models\PaymentMode.cs" />
+    <Compile Include="Models\State.cs" />
+    <Compile Include="Models\Stock.cs" />
+    <Compile Include="Models\StockAdj.cs" />
+    <Compile Include="Models\StockBalance.cs" />
+    <Compile Include="Models\StockHeader.cs" />
+    <Compile Include="Models\StockInOut.cs" />
+    <Compile Include="Models\StockLine.cs" />
+    <Compile Include="Models\StockProcess.cs" />
+    <Compile Include="Models\StockProcessBalance.cs" />
+    <Compile Include="Models\TdsCategory.cs" />
+    <Compile Include="Models\TdsGroup.cs" />
+    <Compile Include="Models\Unit.cs" />
+    <Compile Include="Models\UnitConversion.cs" />
+    <Compile Include="Models\UnitConversonFor.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ViewModels\CalculationFooterViewModel.cs" />
+    <Compile Include="ViewModels\CalculationHeaderLedgerAccountViewModel.cs" />
+    <Compile Include="ViewModels\CalculationLineLedgerAccountViewModel.cs" />
+    <Compile Include="ViewModels\CalculationProductViewModel.cs" />
+    <Compile Include="ViewModels\CompanySettingsViewModel.cs" />
+    <Compile Include="ViewModels\PaymentModeViewModel.cs" />
+    <Compile Include="ViewModels\GatePassViewModel.cs" />
+    <Compile Include="ViewModels\LedgerHeaderViewModel.cs" />
+    <Compile Include="ViewModels\LedgerViewModel.cs" />
+    <Compile Include="ViewModels\ProductIndexViewModel.cs" />
+    <Compile Include="ViewModels\DocumentTypeAttributeViewModel.cs" />
+    <Compile Include="ViewModels\ProductUidViewModel.cs" />
+    <Compile Include="ViewModels\HeaderChargeViewModel.cs" />
+    <Compile Include="ViewModels\LineChargeViewModel.cs" />
+    <Compile Include="ViewModels\ReasonViewModel.cs" />
+    <Compile Include="ViewModels\CityViewModel.cs" />
+    <Compile Include="ViewModels\DocumentTypeViewModel.cs" />
+    <Compile Include="ViewModels\HelpList.cs" />
+    <Compile Include="ViewModels\SiteViewModel.cs" />
+    <Compile Include="ViewModels\StockHeaderViewModel.cs" />
+    <Compile Include="ViewModels\StockProcessViewModel.cs" />
+    <Compile Include="ViewModels\StockViewModel.cs" />
+    <Compile Include="ViewModels\UnitConversionViewModel.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Infrastructure\Infrastructure.csproj">
+      <Project>{5a880c5b-c73d-4715-a6e6-70a7dc484695}</Project>
+      <Name>Infrastructure</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

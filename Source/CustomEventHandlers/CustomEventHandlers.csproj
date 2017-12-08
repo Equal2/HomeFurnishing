@@ -1,0 +1,135 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{465D7BDD-279E-4337-B291-B1EA61EAC35C}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>CustomEventHandlers</RootNamespace>
+    <AssemblyName>CustomEventHandlers</AssemblyName>
+    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
+    <RestorePackages>true</RestorePackages>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.AspNet.Identity.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.Identity.Core.2.2.1\lib\net45\Microsoft.AspNet.Identity.Core.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.AspNet.Identity.EntityFramework, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.Identity.EntityFramework.2.2.1\lib\net45\Microsoft.AspNet.Identity.EntityFramework.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="JobInvoiceAmendmentEvents.cs" />
+    <Compile Include="GatePassEvents.cs" />
+    <Compile Include="PackingEvents.cs" />
+    <Compile Include="SaleDeliveryEvents.cs" />
+    <Compile Include="SaleDispatchEvents.cs" />
+    <Compile Include="SaleInvoiceEvents.cs" />
+    <Compile Include="JobReceiveQaEvents.cs" />
+    <Compile Include="JobInvoiceReturnEvents.cs" />
+    <Compile Include="PurchaseOrderAmendmentEvents.cs" />
+    <Compile Include="JobOrderInspectionRequestCancelEvents.cs" />
+    <Compile Include="JobOrderInspectionEvents.cs" />
+    <Compile Include="JobOrderInspectionRequestEvents.cs" />
+    <Compile Include="PurchaseInvoiceReceiveEvents.cs" />
+    <Compile Include="JobInvoiceReceiveEvents.cs" />
+    <Compile Include="JobOrderAmendmentEvents.cs" />
+    <Compile Include="PurchaseGoodsReturnEvents.cs" />
+    <Compile Include="PurchaseIndentCancelEvents.cs" />
+    <Compile Include="PurchaseGoodsReceiptEvents.cs" />
+    <Compile Include="PurchaseInvoiceReturnEvents.cs" />
+    <Compile Include="PurchaseInvoiceEvents.cs" />
+    <Compile Include="PurchaseOrderCancelEvents.cs" />
+    <Compile Include="PurchaseOrderEvents.cs" />
+    <Compile Include="PurchaseIndentEvents.cs" />
+    <Compile Include="JobReturnEvents.cs" />
+    <Compile Include="LedgerEvents.cs" />
+    <Compile Include="ExcessMaterialEvents.cs" />
+    <Compile Include="SaleQuotationEvents.cs" />
+    <Compile Include="StockHeaderEvents.cs" />
+    <Compile Include="StockProcessTransferEvents.cs" />
+    <Compile Include="StockExchangeEvents.cs" />
+    <Compile Include="MaterialTransferEvents.cs" />
+    <Compile Include="JobOrderCancelEvents.cs" />
+    <Compile Include="JobInvoiceEvents.cs" />
+    <Compile Include="MaterialRequestCancelEvents.cs" />
+    <Compile Include="MaterialRequestEvents.cs" />
+    <Compile Include="JobConsumptionEvents.cs" />
+    <Compile Include="RateConversionEvents.cs" />
+    <Compile Include="StockReceiveEvents.cs" />
+    <Compile Include="StockIssueEvents.cs" />
+    <Compile Include="JobReceiveEvents.cs" />
+    <Compile Include="JobOrderEvents.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DocumentEvents\DocumentEvents.csproj">
+      <Project>{a3834660-2785-47df-8d29-67edfaafb720}</Project>
+      <Name>DocumentEvents</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Core\Core.csproj">
+      <Project>{b1053a2d-a1ea-412f-ba95-19ce794f8891}</Project>
+      <Name>Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Data\Data.csproj">
+      <Project>{23b3d0d9-0f5c-4fd7-ba7e-a9e0c53a86c9}</Project>
+      <Name>Data</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Model\Model.csproj">
+      <Project>{4d4923f5-548c-4d13-859d-7f5e9699facd}</Project>
+      <Name>Model</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

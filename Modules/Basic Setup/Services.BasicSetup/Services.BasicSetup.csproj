@@ -1,0 +1,144 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{2CB98992-0690-49D2-9ADE-DB76D5D77C73}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Services.BasicSetup</RootNamespace>
+    <AssemblyName>Services.BasicSetup</AssemblyName>
+    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="AutoMapper, Version=5.0.2.0, Culture=neutral, PublicKeyToken=be96cd2c38ef1005, processorArchitecture=MSIL">
+      <HintPath>..\packages\AutoMapper.5.0.2\lib\net45\AutoMapper.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.AspNet.Identity.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.Identity.Core.2.2.1\lib\net45\Microsoft.AspNet.Identity.Core.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.AspNet.Identity.EntityFramework, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.Identity.EntityFramework.2.2.1\lib\net45\Microsoft.AspNet.Identity.EntityFramework.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AreaService.cs" />
+    <Compile Include="PaymentModeLedgerAccountService.cs" />
+    <Compile Include="PaymentModeService.cs" />
+    <Compile Include="CalculationFooterService.cs" />
+    <Compile Include="CalculationHeaderLedgerAccountService.cs" />
+    <Compile Include="CalculationLineLedgerAccountService.cs" />
+    <Compile Include="CalculationProductService.cs" />
+    <Compile Include="ChargesCalculationService.cs" />
+    <Compile Include="CityService.cs" />
+    <Compile Include="ComboHelpListService.cs" />
+    <Compile Include="CostCenterService.cs" />
+    <Compile Include="CostCenterStatusService.cs" />
+    <Compile Include="CountryService.cs" />
+    <Compile Include="CurrencyService.cs" />
+    <Compile Include="Dimension1Service.cs" />
+    <Compile Include="Dimension2Service.cs" />
+    <Compile Include="DivisionService.cs" />
+    <Compile Include="DocumentCategoryService.cs" />
+    <Compile Include="DocumentTypeService.cs" />
+    <Compile Include="GatePassHeaderService.cs" />
+    <Compile Include="GateService.cs" />
+    <Compile Include="BinLocationService.cs" />
+    <Compile Include="PersonRateGroupService.cs" />
+    <Compile Include="GodownService.cs" />
+    <Compile Include="LedgerAccountGroupService.cs" />
+    <Compile Include="LedgerAccountService.cs" />
+    <Compile Include="LedgerAdjService.cs" />
+    <Compile Include="LedgerHeaderService.cs" />
+    <Compile Include="LedgerLineService.cs" />
+    <Compile Include="LedgerService.cs" />
+    <Compile Include="NextPrevIdService.cs" />
+    <Compile Include="PersonService.cs" />
+    <Compile Include="ProcessService.cs" />
+    <Compile Include="ProductGroupService.cs" />
+    <Compile Include="ProductNatureService.cs" />
+    <Compile Include="ProductService.cs" />
+    <Compile Include="ProductTypeService.cs" />
+    <Compile Include="ProductUidHeaderService.cs" />
+    <Compile Include="ProductUidService.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SalesTaxGroupProductService.cs" />
+    <Compile Include="CompanyService.cs" />
+    <Compile Include="SiteService.cs" />
+    <Compile Include="StateService.cs" />
+    <Compile Include="StockAdjService.cs" />
+    <Compile Include="StockBalanceService.cs" />
+    <Compile Include="StockHeaderService.cs" />
+    <Compile Include="StockProcessBalanceService.cs" />
+    <Compile Include="StockProcessService.cs" />
+    <Compile Include="StockService.cs" />
+    <Compile Include="UnitConverionService.cs" />
+    <Compile Include="UnitService.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Infrastructure\Infrastructure.csproj">
+      <Project>{5a880c5b-c73d-4715-a6e6-70a7dc484695}</Project>
+      <Name>Infrastructure</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\ProjLib\Source\ProjLib.csproj">
+      <Project>{2d5dac81-3374-4622-a5e4-7881dc0fc77c}</Project>
+      <Name>ProjLib</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Models.BasicSetup\Models.BasicSetup.csproj">
+      <Project>{e7b6f2dd-5845-431d-b065-7ca2c51c698a}</Project>
+      <Name>Models.BasicSetup</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

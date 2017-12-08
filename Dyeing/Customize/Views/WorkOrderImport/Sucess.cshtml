@@ -1,0 +1,9 @@
+﻿
+@{
+    ViewBag.Title = "Sucess";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Import Completed Successfully</h2>
+
+@Html.ActionLink("Go Back", "Index", "WorkOrderImport", new { @id = ViewBag.id }, new { @class = "btn btn-primary btn-sm col-md-offset-0 CurveBorder ActionLinkPadding" })

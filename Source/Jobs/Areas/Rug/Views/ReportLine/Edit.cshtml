@@ -1,0 +1,108 @@
+﻿@model Model.Models.ReportLine
+
+@{
+    ViewBag.Title = "Edit";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@using (Html.BeginForm())
+{
+    <div class="panel panel-default">
+
+        <div class="panel-heading">
+
+            <h4>
+                <span style="font-family: Calibri,sans-serif,Verdana"> Edit ReportLine.</span>
+            </h4>
+
+        </div>
+        <div class="panel-info" style="padding-left:15px">
+            @Html.AntiForgeryToken()
+            @Html.HiddenFor(model => model.ReportHeaderId)
+            @Html.HiddenFor(m=>m.ReportLineId)
+            <div class="form-horizontal">
+
+                
+                @Html.ValidationSummary(true)
+
+                <div class="form-group" style="padding-top:15px">
+                    @Html.LabelFor(model => model.FieldName, new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.FieldName)
+                        @Html.ValidationMessageFor(model => model.FieldName)
+                    </div>
+                </div>
+
+                <div class="form-group" style="padding-top:15px">
+                    @Html.LabelFor(model => model.DataType, new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.DataType)
+                        @Html.ValidationMessageFor(model => model.DataType)
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Type, new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(m => m.Type)
+                        @Html.ValidationMessageFor(m => m.Type)
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(m => m.ServiceFuncGet, new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(m => m.ServiceFuncGet)
+                        @Html.ValidationMessageFor(m => m.ServiceFuncGet)
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(m => m.ServiceFuncSet, new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(m => m.ServiceFuncSet)
+                        @Html.ValidationMessageFor(m => m.ServiceFuncSet)
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(m => m.CacheKey, new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(m => m.CacheKey)
+                        @Html.ValidationMessageFor(m => m.CacheKey)
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(m => m.CacheKey, new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(m => m.CacheKey)
+                        @Html.ValidationMessageFor(m => m.CacheKey)
+                    </div>
+                </div>
+
+
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Serial, new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(m => m.Serial)
+                        @Html.ValidationMessageFor(m => m.Serial)
+                    </div>
+                </div>
+
+                <hr />
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-10">
+                        <input type="submit" value="Save" class="btn-primary xxlarge" />
+
+                        <span style="font-family: Calibri,sans-serif,Verdana;font-size:large">
+                            |@Html.ActionLink("Back to List", "Index", new { id=Model.ReportHeaderId})
+
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+

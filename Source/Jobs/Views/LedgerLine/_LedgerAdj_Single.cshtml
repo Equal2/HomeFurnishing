@@ -1,0 +1,405 @@
+﻿@model Model.ViewModels.LedgerToAdjustViewModel_Single
+@using Core.Common
+
+<style type="text/css">
+    .cusleftnormal {
+        border-bottom-left-radius: 0pc !important;
+        border-top-left-radius: 0px !important;
+    }
+
+    .cusrightnormal {
+        border-bottom-right-radius: 0px !important;
+        border-top-right-radius: 0px !important;
+    }
+
+    .ui-autocomplete {
+        max-height: 250px;
+        overflow-y: auto;
+        /* prevent horizontal scrollbar */
+        overflow-x: hidden;
+    }
+</style>
+
+<div class="modal-content">
+    <div class="modal-header" style="border-bottom: 1px solid #8E8888">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"> <span class="glyphicon glyphicon-remove"></span></button>
+        <h3>
+            <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-file black"></span> @ViewBag.Name</span>
+        </h3>
+    </div>
+    <div>
+        @using (Html.BeginForm("_LedgerAdj_Single", "LedgerLine", FormMethod.Post, new { enctype = "multipart/form-data", id = "modform" }))
+        { @Html.ValidationLog((string)TempData["CSEXCL"])
+            <div class="form-horizontal modal-body">
+
+                @Html.AntiForgeryToken()
+                @Html.HiddenFor(m => m.LedgerLineId)
+                @Html.HiddenFor(m => m.LedgerHeaderId)
+                @Html.HiddenFor(m => m.LedgerAccountId)
+                @Html.HiddenFor(m => m.LedgerId)
+                @Html.HiddenFor(model => model.DrCr)
+                @Html.HiddenFor(m => m.BalanceAmount)
+                @Html.HiddenFor(m => m.Amount)
+
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.LedgerId_Adjusted, "Adjusted Bill", new { @class = "control-label col-md-4 col-sm-2 " })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.LedgerId_Adjusted, new { @class = "form-control col-xs-7 required" })
+                                @Html.ValidationMessageFor(model => model.LedgerId_Adjusted, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.LedgerHeaderDocNo_Adjusted, "Ref No.", new { @class = "control-label col-md-4 col-sm-2 " })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.LedgerHeaderDocNo_Adjusted, new { @class = "form-control col-xs-7 ", @readonly = "true" })
+                                @Html.ValidationMessageFor(model => model.LedgerHeaderDocNo_Adjusted, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.PartyDocNo_Adjusted, "Party Doc No.", new { @class = "control-label col-md-4 col-sm-2 " })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.PartyDocNo_Adjusted, new { @class = "form-control col-xs-7 ", @readonly = "true" })
+                                @Html.ValidationMessageFor(model => model.PartyDocNo_Adjusted, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.PartyDocDate_Adjusted, "Party Doc Date", new { @class = "control-label col-md-4 col-sm-2 " })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.PartyDocDate_Adjusted, new { @class = "form-control col-xs-7 ", @readonly = "true" })
+                                @Html.ValidationMessageFor(model => model.PartyDocDate_Adjusted, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.BillAmount_Adjusted, "Bill Amount", new { @class = "control-label col-md-4 col-sm-2 " })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.BillAmount_Adjusted, new { @class = "form-control col-xs-7 ", @readonly = "true" })
+                                @Html.ValidationMessageFor(model => model.BillAmount_Adjusted, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.BalanceAmount_Adjusted, "Bal. Amount", new { @class = "control-label col-md-4 col-sm-2 " })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.BalanceAmount_Adjusted, new { @class = "form-control col-xs-7 ", @readonly = "true" })
+                                @Html.ValidationMessageFor(model => model.BalanceAmount_Adjusted, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.AdjustedAmount, "Adj Amount", new { @class = "control-label col-md-4 col-sm-2 " })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.AdjustedAmount, new { @class = "form-control col-xs-7 required" })
+                                @Html.ValidationMessageFor(model => model.AdjustedAmount, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                
+
+
+                <div class="modal-footer " style="padding: 19px 20px 0 20px; border-top:1px solid #8E8888">
+                    <button class="btn custom left" name="Command:Edit" type="submit" id="submit"><h2 style="margin:0px"><span class="glyphicon glyphicon-floppy-disk black"></span> </h2></button>
+                </div>
+
+                <div class="row" style="max-height: 400px; overflow: scroll; margin-top: 0px">
+                    <div class="row col-md-12 " style="background: #428bca; color: white">
+                        <div class="col-md-1">
+                            <strong>Srl.</strong>
+                        </div>
+                        <div class="col-md-2">
+                            <strong>Ref No</strong>
+                        </div>
+                        <div class="col-md-2">
+                            <strong>Party Doc No </strong>
+                        </div>
+                        <div class="col-md-3">
+                            <strong>Party Doc Date</strong>
+                        </div>
+                        <div class="col-md-1" style="text-align:right">
+                            <strong>Bill Amount</strong>
+                        </div>
+                        <div class="col-md-2" style="text-align:right">
+                            <strong>Adjusted Amount</strong>
+                        </div>
+                        <div class="col-md-1" style="text-align:right">
+                        </div>
+                    </div>
+
+                    <div class="panel-info" id="gbody-modal">
+                        @for (int i = 0; i < Model.LedgerViewModel.Count(); i++)
+                        {
+                            string delurl = "/LedgerLine/_LedgerAdj_DeletePost/" + Model.LedgerViewModel[i].LedgerAdjId;
+                            <div class="row athblock" style='margin-left: 0px; margin-right: 0px; margin-top: 0px; margin-bottom: 0px; '>
+                                <div class="row col-md-12 block row-index" style="@(((i%2)==0)?"background:#E0E0E0":"")">
+                                    @Html.HiddenFor(m => Model.LedgerViewModel[i].LedgerId)
+                                    @Html.HiddenFor(m => Model.LedgerViewModel[i].LedgerHeaderDocNo)
+                                    @Html.HiddenFor(m => Model.LedgerViewModel[i].PartyDocNo)
+                                    @Html.HiddenFor(m => Model.LedgerViewModel[i].PartyDocDate)
+                                    @Html.HiddenFor(m => Model.LedgerViewModel[i].BillAmount)
+                                    @Html.HiddenFor(m => Model.LedgerViewModel[i].BalanceAmount, new { @class = "BalanceAmount" })
+                                    @Html.HiddenFor(m => Model.LedgerViewModel[i].AdjustedAmount, new { @class = "AdjustedAmount" })
+
+                                    <div class="col-md-1">
+                                        @(i + 1)
+                                    </div>
+                                    <div class="col-md-2">
+                                        @Model.LedgerViewModel[i].LedgerHeaderDocNo
+                                    </div>
+                                    <div class="col-md-2">
+                                        @Model.LedgerViewModel[i].PartyDocNo <br />
+                                    </div>
+                                    <div class="col-md-3">
+                                        @Model.LedgerViewModel[i].PartyDocDate.ToString("dd/MMM/yyyy")
+                                    </div>
+                                    <div class="col-md-1" style="text-align:right">
+                                        @Model.LedgerViewModel[i].BillAmount
+                                    </div>
+                                    <div class="col-md-2 AdjustedAmount-Label" style="text-align:right">
+                                        @Model.LedgerViewModel[i].AdjustedAmount
+                                    </div>
+                                    <div class="col-md-1" style="text-align:right">
+                                        <a href="@delurl" class="delatch"><span class="glyphicon glyphicon-trash"></span> </a>
+                                        @*<a href="@delurl"> <h3 style="margin:0px"> <i class="fa fa-trash-o" aria-hidden="true"></i></h3></a>*@
+                                    </div>
+
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+                </div>
+        }
+    </div>
+</div>
+
+<script type="text/javascript">
+
+    //var cachearray={};
+    var PTAID='@ViewBag.TAID';
+    var TChqNo=parseInt($('#ChqNo').val());
+
+    $(document).ready(function () {
+        var Nature  =  '@Model.DrCr';
+
+        CustomSelectFunctionForLedgerId_Adjusted($("#LedgerId_Adjusted"), '/LedgerLine/GetLedgerIds_Adusted', '/ComboHelpList/SetSingleLedger', ' ', false, 0, $('#LedgerAccountId', '.modal-body').val(), Nature, $('#LedgerHeaderId', '.modal-body').val());
+
+        function CustomSelectFunctionForLedgerId_Adjusted(ElementId, GetAction, SetAction, placehold, IsMultiple, MinLength, filterid, filter2id, filter3id) {
+            var geturl = GetAction;
+            //The url we will send our get request to
+            var attendeeUrl = GetAction;
+            var pageSize = 20;
+
+            ElementId.select2(
+            {
+
+                placeholder: placehold,
+                //Does the user have to enter any data before sending the ajax request
+                minimumInputLength: MinLength,
+                allowClear: true,
+                multiple: IsMultiple,
+                ajax: {
+                    //How long the user has to pause their typing before sending the next request
+                    quietMillis: 150,
+                    //The url of the json service
+                    url: attendeeUrl,
+                    dataType: 'jsonp',
+                    //Our search term and what page we are on
+                    data: function (term, page) {
+                        return {
+                            pageSize: pageSize,
+                            pageNum: page,
+                            searchTerm: term,
+                            filter: filterid,
+                            filter2: filter2id,
+                            filter3: filter3id,
+                        };
+                    },
+                    results: function (data, page) {
+                        //Used to determine whether or not there are more results available,
+                        //and if requests for more data should be sent in the infinite scrolling
+                        var more = (page * pageSize) < data.Total;
+                        return { results: data.Results, more: more };
+                    }
+                },
+                initSelection: function (element, callback) {
+
+                    var xval = element.val();
+                    if (xval != 0) {
+                        $.ajax({
+                            cache: false,
+                            type: "POST",
+                            url: SetAction,
+                            data: { Ids: element.val() },
+                            success: function (data) {
+                                callback(data);
+                            },
+                            error: function (xhr, ajaxOptions, thrownError) {
+                                alert('Failed to Retrive Qty' + thrownError);
+                            }
+                        })
+                    }
+                    //callback([{ id: "1", text: "arpit" }, { id: "2", text: "akash" }]);
+                }
+            });
+        }
+
+        $("#LedgerId_Adjusted").select2('focus');
+
+        $('.datepicker').datepicker({
+            format: 'dd/MM/yyyy',
+            "setDate": new Date(),
+            "autoclose": true
+        })
+
+
+
+        var IsSaved=false;
+        var ValidationCount=0;
+
+        $('#modform').bind('submit',function(event){
+
+            if(!IsSaved)
+            {
+                if(!ValidateData())
+                {
+                    return false;
+                }
+                IsSaved=true;
+                $('button:submit').attr('disabled','disabled');
+                return IsSaved;
+            }
+            else
+            {
+                return false;
+            }
+        });
+
+        function ValidateData() {
+            var ValidationMessage = "";
+
+            //Client Side Validaion.....
+
+            return  (ValidationMessage=="");
+
+        }
+
+
+        $("#LedgerId_Adjusted").change(function () {
+            Validate_LedgerId_Adjusted();
+        });
+
+
+
+        function Validate_LedgerId_Adjusted()
+        {
+            if ($("#LedgerId_Adjusted").val()) {
+                $.ajax({
+                    cache: false,
+                    type: "POST",
+                    url: "@(Url.Action("GetLedgerIds_AdustedDetailJson"))",
+                    data: { LedgerId: $("#LedgerId_Adjusted").val() },
+                success: function (data) {
+                    if (data != null && data != "")
+                    {
+                        if (data.BalanceAmount < $("#BalanceAmount").val())
+                        {
+                            $("#AdjustedAmount").val(data.BalanceAmount)
+                        }
+                        else {
+                            $("#AdjustedAmount").val($("#BalanceAmount").val())
+                        }
+                        $("#LedgerHeaderDocNo_Adjusted").val(data.LedgerHeaderDocNo)
+                        $("#PartyDocNo_Adjusted").val(data.PartyDocNo)
+                        $("#PartyDocDate_Adjusted").val((data.PartyDocDate==null ? "" :formatDate('d/m/Y',new Date(parseInt(data.PartyDocDate.substr(6))))))
+                        $("#BillAmount_Adjusted").val(data.BillAmount)
+                        $("#BalanceAmount_Adjusted").val(data.BalanceAmount)
+                    }
+                    else
+                    {
+                        $("#AdjustedAmount").val(0);
+                        $("#LedgerHeaderDocNo_Adjusted").val('')
+                        $("#PartyDocNo_Adjusted").val('')
+                        $("#PartyDocDate_Adjusted").val('')
+                        $("#BillAmount_Adjusted").val(0)
+                        $("#BalanceAmount_Adjusted").val(0)
+                    }
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    alert('Failed to retrieve product details.' + thrownError);
+                }
+            });
+        }
+    }
+
+
+        $('a.delatch').click(function () {
+
+            $('a', '#modformDocAttchmt').attr('disabled', 'disabled');
+            var thisele = $(this);
+            $.ajax({
+                url: this.href,
+                success: function (data) {
+                    if (data.success) {
+                        var row = thisele.closest('div.row.athblock')
+                        $(row).animate({ height: 0 }, 500, "swing", function () {
+                            $(row).remove();
+                        })
+                        $('a', '#modformDocAttchmt').removeAttr('disabled');
+                    }
+                    else {
+                        if ($('#errormsg', '#modformDocAttchmt'))
+                            $('#modformDocAttchmt').prepend("<div id='errormsg'>" + data.message + "</div> ");
+                        else
+                            $('#errormsg').text(data.message);
+
+                        $('a', '#modformDocAttchmt').removeAttr('disabled');
+                    }
+                }
+
+            })
+            return false;
+        })
+
+    });
+
+
+    $('#submit').click(function(){
+        if($('#Amount').val()<=0)
+        {
+            if($(this).closest('.modal-body').find('#cerr').length==0){
+                $(this).closest('.modal-body').find('.row:first').before('<div id="cerr" class="alert alert-danger text-center"> <span>Amount is mandatory </span> </div>');}
+
+            return false;
+        }
+        else
+        {
+            return true;
+        }
+    })
+
+
+</script>
+
+

@@ -1,0 +1,30 @@
+﻿@model IEnumerable<Model.ViewModel.NotificationViewModel>
+@using GridMvc.Html;
+@{
+    ViewBag.Title = "All Notifications";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3>
+            <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-list black"></span> Notifications List</span>
+        </h3>
+        <hr style="margin-top:0px;margin-bottom:0px" />        
+    </div>
+
+    <div class="panel-info" style="padding-left:5px;padding-top:2px">
+
+        @Html.Grid(Model).Columns(columns =>
+           {
+               columns.Add(m => m.NotificationId, true);               
+               columns.Add(foo => foo.NotificationSubjectName).Sortable(true).Titled("Subject").Filterable(true);
+               columns.Add(m => m.NotificationText).Sortable(true).Titled("Notification").Filterable(true).Sortable(true);
+               columns.Add(m => m.SeenDate).Titled("Seen Date").Filterable(true).Format("{0:dd/MMM/yyyy}").Sortable(true);
+               columns.Add(foo => foo.ExpiryDate).Sortable(true).Titled("Expiry Date").Format("{0:dd/MMM/yyyy}").Filterable(true);
+               columns.Add(true).RenderValueAs(m => "<a href='/Notification/NotificationRequest/" + m.NotificationId + "' hidden class='RecEditurl'></a>");
+           }).WithPaging(25).EmptyText("No records found.").Sortable().Filterable().WithMultipleFilters()
+    </div>
+</div>

@@ -1,0 +1,134 @@
+﻿@model Model.Models.ChargeGroupPerson
+
+@{
+    ViewBag.Title = "Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+@using (Html.BeginForm("Post", "ChargeGroupPerson", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+     @Html.HiddenFor(model => model.ChargeGroupPersonId)
+    @Html.HiddenFor(m=>m.ChargeTypeId)
+    <div class="panel panel-default">
+
+        <div class="panel-heading">
+
+            <h3>
+                <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-file black"></span> Charge Group Person-@ViewBag.Name</span>
+                @if(@Model.IsSystemDefine)
+                {
+                <input type="submit" value="Save" class="btn btn-primary right" id="submit" style="width: 90px; background-color: #2980b9;margin-left:20px" disabled="disabled"/>
+                <span style="font-family: Calibri,sans-serif,Verdana; font-weight:bold ;font-size: large" class="text-danger right "><span class="glyphicon glyphicon-floppy-remove"></span> System Defined</span>
+                }
+                else
+                {
+                <input type="submit" value="Save" class="btn btn-primary right" id="submit" style="width: 90px; background-color: #2980b9" />
+                }
+            </h3>
+            <hr style="margin-top:0px;margin-bottom:0px" />
+
+            <div class="panel-info">
+                <h4 style="padding:5px 0 0 0;margin:0px">
+                    @Html.ActionLink(" ", " ", " ", null, new { @class = "glyphicon glyphicon-refresh toolbar", @title = "Refresh Page", @data_toggle = "tooltip", @id = "RefreshPage" })
+                    @Html.ActionLink(" ", "Create", "ChargeGroupPerson",  new { id = @ViewBag.id }, new { @class = "glyphicon glyphicon-plus toolbar", @title = "Add New", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "History", "ChargeGroupPerson", null, new { @class = "glyphicon glyphicon-user toolbar", @title = "History", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "PrevPage", "ChargeGroupPerson", new { id = @Model.ChargeGroupPersonId,ctypeid=@ViewBag.id }, new { @class = "glyphicon glyphicon-arrow-left toolbar", @title = "Prev Record", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "NextPage", "ChargeGroupPerson", new { id = @Model.ChargeGroupPersonId,ctypeid=@ViewBag.id }, new { @class = "glyphicon glyphicon-arrow-right toolbar", @title = "Next Record", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "Index", "ChargeGroupPerson", new { id = @ViewBag.id }, new { @class = "glyphicon glyphicon-list toolbar right", @title = "List", @data_toggle = "tooltip" })
+                </h4>
+            </div>
+
+        </div>
+        <div class="panel-info" style="padding-left:15px">
+
+            <div class="form-horizontal">
+                
+                @Html.ValidationSummary(true)
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group" style="margin-top:15px">
+                            @Html.LabelFor(model => model.ChargeGroupPersonName, " Name", new { @class = "control-label col-xs-5" })
+                            <div class="col-xs-6">
+                                @Html.TextBoxFor(m => m.ChargeGroupPersonName, null, new { @class = "form-control col-xs-6 required" })
+                                @Html.ValidationMessageFor(m => m.ChargeGroupPersonName, null, new { @class = "has-error" })
+                            </div>
+                        </div>
+                    </div>                                  
+                </div>
+            
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.IsActive,"Is Active", new { @class = "control-label col-xs-5" })
+                            <div class="col-xs-6" style=" padding-top:4px">
+                                @Html.CheckBoxFor(m => m.IsActive, new { @class = "checkbox col-xs-1" })
+                                @Html.ValidationMessageFor(model => model.IsActive)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+<script type="text/javascript">
+    var IsSaved=false;
+    var ValidationCount=0;
+
+    $('form').submit(function(event){
+
+        if(!IsSaved)
+        {
+            if(!ValidateData())
+            {
+                return false;
+            }
+            IsSaved=true;
+            return IsSaved;
+        }
+        else
+        {
+            return false;
+        }
+
+    });
+
+
+    function ValidateData() {
+        var DocId=@Model.ChargeGroupPersonId;
+        var TempValue;
+        var ValidationMessage="";
+
+
+
+        //Checking for dulicate key value
+        if(DocId<=0)
+        {
+            TempValue= $('#ChargeGroupPersonName').DuplicateCheckForCreate({ name: 'ChargeGroupPersons', value: $('#ChargeGroupPersonName').val(), doctype: 0 });
+            if (TempValue){ ValidationMessage=$('#ChargeGroupPersonName').val() + " already exist <br />";}
+        }
+        else
+        {
+            test = $('#ChargeGroupPersonName').DuplicateCheckForEdit({ name: 'ChargeGroupPersons', value: $('#ChargeGroupPersonName').val(), doctype: 0,headerId:DocId });
+            if (TempValue) {ValidationMessage+=$('#ChargeGroupPersonName').val() + " already exist <br />";}
+        }
+        if(TempValue)
+        {
+            if($('#validationerrormsg').length==0){
+            $('.panel-info').filter(':last').before('<div class="alert alert-danger" role="alert" id="validationerrormsg">'+ValidationMessage+'</div>');}
+        else
+            {
+                $('#validationerrormsg').html(ValidationMessage);
+        }
+        }
+        return  (ValidationMessage=="");
+
+    }
+
+
+</script>
+
+

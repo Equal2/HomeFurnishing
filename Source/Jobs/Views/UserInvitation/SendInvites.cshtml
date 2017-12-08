@@ -1,0 +1,101 @@
+﻿@{
+    ViewBag.Title = "SendInvites";
+}
+
+@using (Html.BeginForm("SendInvites", "UserInvitation", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            @*<h3>
+                <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-file black"></span> UserInvitations</span>
+                <input type="submit" value="Invite" class="btn btn-primary right" id="submit" style="width: 90px; background-color: #2980b9" />
+            </h3>*@
+
+
+            <div class="row">
+                <div class="col-xs-10">
+                    <h3 style="border-bottom:0px solid #e1dada;padding-bottom:0px;">
+                        <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"> <span class="glyphicon glyphicon-file black"></span>UserInvitations</span>
+                    </h3>
+                </div>
+                <div class="col-xs-2">
+                    <input type="submit" value="Invite" class="hidden-xs btn btn-primary right" id="submit" style="width: 90px; background-color: #2980b9" />
+                    <button class="hidden-lg hidden-md hidden-sm right" name="" type="submit" id="submit"><span class="glyphicon glyphicon-floppy-disk black"></span> </button>
+                </div>
+            </div>
+
+            <hr style="margin-top:0px;margin-bottom:0px" />
+        </div>
+        <div class="panel-info" style="padding-left:15px">
+            <div class="form-horizontal">
+                @Html.ValidationSummary(true)
+                <div>
+                    <div class="col-md-6">
+                        <div class="form-group" style="margin-top:15px">
+                            @Html.Label("Emails", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBox("UserEmails", "", new { @class = "form-control col-xs-6 required" })
+                                @Html.ValidationMessage("UserEmails", new { @class = "has-error" })
+                            </div>
+                        </div>
+                    </div>
+                    @*<div class="col-md-6">
+                        <div class="form-group" style="margin-top:15px">
+                            @Html.Label("UserType", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.DropDownList("UserType", new SelectList(ViewBag.UserTypeList as System.Collections.IEnumerable), new { @class = "form-control height col-xs-6 required" })
+                                @Html.ValidationMessage("UserEmails", new { @class = "has-error" })
+                            </div>
+                        </div>
+                    </div>*@
+                </div>
+                <div>
+                    <div class="col-md-6">
+                        <div class="form-group" style="margin-top:15px">
+                            @Html.Label("UserRole", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.DropDownList("UserRole", new SelectList(ViewBag.UserRoleList as System.Collections.IEnumerable, "Key", "Value"), string.Empty, new { @class = "form-control height col-xs-6 required" })
+                                @Html.ValidationMessage("UserRole", new { @class = "has-error" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.Label("Site", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.DropDownList("SiteId", new SelectList(ViewBag.SiteList as System.Collections.IEnumerable, "Key", "Value"), string.Empty, new { @class = "form-control height col-xs-6 required" })
+                                @Html.ValidationMessage("SiteId", new { @class = "has-error" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.Label("Division", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.DropDownList("DivisionId", new SelectList(ViewBag.DivisionList as System.Collections.IEnumerable, "Key", "Value"), string.Empty, new { @class = "form-control height col-xs-6 required" })
+                                @Html.ValidationMessage("SiteId", new { @class = "has-error" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">&nbsp;</div>
+            </div>
+        </div>
+    </div>
+}
+
+<script type="text/javascript">
+
+    $("#UserRole").select2();
+    $("#Site").select2();
+    $("#Division").select2();
+
+</script>

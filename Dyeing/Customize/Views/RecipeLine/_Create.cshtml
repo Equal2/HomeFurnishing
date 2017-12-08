@@ -1,0 +1,333 @@
+﻿@model Models.Customize.ViewModels.RecipeLineViewModel
+
+<style type="text/css">
+    .cusleftnormal {
+        border-bottom-left-radius: 0pc !important;
+        border-top-left-radius: 0px !important;
+    }
+
+    .cusrightnormal {
+        border-bottom-right-radius: 0px !important;
+        border-top-right-radius: 0px !important;
+    }
+</style>
+
+<div class="modal-content">
+    <div class="modal-header" style="border-bottom: 1px solid #8E8888">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"> <span class="glyphicon glyphicon-remove"></span></button>
+        <h3>
+            <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-file black"></span> @ViewBag.DocNo</span>
+        </h3>
+    </div>
+    <div>
+        @using (Html.BeginForm("_CreatePost", "RecipeLine", FormMethod.Post, new { enctype = "multipart/form-data", id = "modform" }))
+        {
+
+            @Html.ValidationLog((string)TempData["CSEXCL"])
+            <div class="form-horizontal modal-body">
+                @Html.AntiForgeryToken()
+
+                @Html.HiddenFor(model => model.StockHeaderId)
+                @Html.HiddenFor(model => model.JobOrderHeaderId)
+                @Html.HiddenFor(m => m.StockLineId)
+                @Html.HiddenFor(m => m.HeaderTestingQty)
+                @Html.HiddenFor(m => m.HeaderQty)
+
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                <div class="row">
+                    
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.ProductId, "Product", new { @class = "control-label col-xs-4 " })
+                            <div class="col-xs-7">
+                                @Html.TextBoxFor(model => model.ProductId, new { @class = "form-control col-xs-7 required" })
+                                @Html.ValidationMessageFor(model => model.ProductId, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.DyeingRatio, "Dyeing Ratio", new { @class = "control-label col-xs-4 " })
+                            <div class="col-xs-7">
+                                @Html.TextBoxFor(model => model.DyeingRatio, new { @class = "form-control col-xs-7" })
+                                @Html.ValidationMessageFor(model => model.DyeingRatio, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.TestingQty, "Testing Qty", new { @class = "control-label col-xs-4 " })
+                            <div class="col-xs-7">
+                                @Html.TextBoxFor(model => model.TestingQty, new { @class = "form-control col-xs-7 required" })
+                                @Html.ValidationMessageFor(model => model.TestingQty, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.DocQty, "Doc Qty", new { @class = "control-label col-xs-4 " })
+                            <div class="col-xs-7">
+                                @Html.TextBoxFor(model => model.DocQty, new { @class = "form-control col-xs-7" })
+                                @Html.ValidationMessageFor(model => model.DocQty, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.ExcessQty, "Excess Qty", new { @class = "control-label col-xs-4 " })
+                            <div class="col-xs-7">
+                                @Html.TextBoxFor(model => model.ExcessQty, new { @class = "form-control col-xs-7 required" })
+                                @Html.ValidationMessageFor(model => model.ExcessQty, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Qty, "Qty", new { @class = "control-label col-xs-4" })
+                            <div class="col-xs-4" style="padding-right:0px;">
+                                @Html.TextBoxFor(model => model.Qty, new { @class = "form-control col-xs-3 required cusrightnormal number" })
+                                @Html.ValidationMessageFor(model => model.Qty, "", new { @class = "text-danger" })
+                                <span id="ExcessStockQty"></span>
+                            </div>
+                            <div class="col-xs-3" style="padding-left:0px">
+                                @Html.TextBoxFor(m => m.UnitId, new { @class = "form-control col-xs-2 cusleftnormal", @readonly = "true" })
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Rate, "Rate", new { @class = "control-label col-xs-4" })
+                            <div class="col-xs-7">
+                                @Html.TextBoxFor(model => model.Rate, new { @class = "form-control col-xs-7 required text-right" })
+                                @Html.ValidationMessageFor(model => model.Rate, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6" >
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Amount, "Amount", new { @class = "control-label col-xs-4 " })
+                            <div class="col-xs-7">
+                                @Html.TextBoxFor(model => model.Amount, new { @class = "form-control col-xs-7" })
+                                @Html.ValidationMessageFor(model => model.Amount, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Remark, "Remark", new { @class = "control-label col-xs-4" })
+                            <div class="col-xs-7">
+                                @Html.TextBoxFor(model => model.Remark, new { @class = "form-control col-xs-7 required" })
+                                @Html.ValidationMessageFor(model => model.Remark, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer " style="padding: 19px 20px 0 20px; border-top:1px solid #8E8888">
+                    @if (ViewBag.LineMode == "Edit" || ViewBag.LineMode == "Create")
+                    {
+                        <button class="btn custom left" name="Command:Edit" type="submit" id="submit"><h2 style="margin:0px"><span class="glyphicon glyphicon-floppy-disk black"></span> </h2></button>}
+                    @if (ViewBag.LineMode == "Delete")
+                    {
+                        <button class="btn custom" name="Command:Delete" id="delete" type="submit"><h2 style="margin:0px"><span class="glyphicon glyphicon-trash black"></span> </h2></button>}
+
+                </div>
+
+            </div>
+
+        }
+    </div>
+</div>
+
+
+
+
+
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        CustomSelectFunction($("#ProductId"), '/ComboHelpList/GetProduct', '/ComboHelpList/SetSingleProduct', ' ', false, 0);
+
+        var DocID = $('#StockHeaderId', '.modal-body').val();
+
+
+        var IsSaved=false;
+        var ValidationCount=0;
+
+        $('#modform').bind('submit',function(event){
+
+            if(!IsSaved)
+            {
+                if(!ValidateData())
+                {
+                    return false;
+                }
+                IsSaved=true;
+                $('button:submit').attr('disabled','disabled');
+                return IsSaved;
+            }
+            else
+            {
+                return false;
+            }
+
+
+        });
+
+        function ValidateData() {
+            var ValidationMessage = "";
+
+            //Client Side Validaion.....
+
+            return  (ValidationMessage=="");
+
+        }
+
+        $("#ProductId").select2('focus');
+
+        $('.datepicker').datepicker({
+            format: 'dd/MM/yyyy',
+            "setDate": new Date(),
+            "autoclose": true
+
+        })
+
+        var id=@Model.StockLineId;
+
+        if(id>0)
+        {
+            $('#ProductId').attr('readonly','true');
+        }
+
+        $('#delete','.modal-content').click(function (e) {
+            if(id>0)
+            {
+                var url = '/RecipeLine/DeletePost';
+                $('form#modform').attr('action',url);
+
+                return;
+            }
+            else
+            {
+                return false;
+            }
+        })
+    });
+
+
+    $('#Qty').focusin(function(){
+        if($('#ProductId').val())
+            $.get('/RecipeLine/GetExcessStock', {ProductId:$('#ProductId').val(),Dim1:null,Dim2:null,ProcId:null,Lot:null,StockHeaderId:$('#StockHeaderId').val(),ProcName:null}).done(function(data){
+                $('#ExcessStockQty').text("Stock:"+data);
+            });
+    })
+
+</script>
+
+@if (ViewBag.LineMode == "Edit" || ViewBag.LineMode == "Create" || ViewBag.LineMode == "Delete")
+{
+
+    <script type="text/javascript">
+
+        $(function(){
+
+            $("#Rate,#Amount,#Qty,#TestingQty,#DocQty,#ExcessQty").keyup(Calculation);
+            $("#ProductId").change(GetProductDetail);
+
+
+            function GetProductDetail() {
+                var ProcessProgress = $("#Product detail loading progress");
+                ProcessProgress.show();
+                if ($("#ProductId").val() != 0 && $("#ProductId").val() != null) {
+                    $.ajax({
+                        cache: false,
+                        type: "POST",
+                        url: "@(Url.Action("GetProductDetailJson"))",
+                        data: { ProductId: $("#ProductId").val()},
+                        success: function (data) {
+                            $("#Rate").val(data.StandardCost);
+                            $("#UnitId").val(data.UnitId);
+                            //Calculation.call();
+                        },
+                        error: function (xhr, ajaxOptions, thrownError) {
+                            alert('Failed to retrieve product details.' + thrownError);
+                        }
+                    });
+                }
+            }
+
+
+
+
+            function Calculation() {
+
+                var mTestingQty = $('#TestingQty').val() / (500 * 1000)
+                var mExcessQtyInKg = $('#ExcessQty').val();
+
+                if (mExcessQtyInKg == "" || mExcessQtyInKg == null)
+                {
+                    mExcessQtyInKg = 0;
+                }
+
+                var DocQty = 0;
+
+                if ($('#HeaderTestingQty').val() != 0 && mTestingQty != 0)
+                {
+                    if ($('#DyeingRatio').val() != 0)
+                    {
+                        //$('#DocQty').val((((mTestingQty / $('#HeaderTestingQty').val()) *  $('#HeaderQty').val()) * $('#DyeingRatio').val() / 100).toFixed(4));
+                        DocQty = (((mTestingQty / $('#HeaderTestingQty').val()) *  $('#HeaderQty').val()) * $('#DyeingRatio').val() / 100);
+                        $('#DocQty').val(Math.max( Math.round(DocQty * 1000) / 1000).toFixed(3));
+                    }
+                    else
+                    {
+                        //alert($('#HeaderTestingQty').val());
+                        //$('#DocQty').val(((mTestingQty / $('#HeaderTestingQty').val()) * $('#HeaderQty').val()).toFixed(4));
+                        DocQty = ((mTestingQty / $('#HeaderTestingQty').val()) * $('#HeaderQty').val());
+                        $('#DocQty').val(Math.max( Math.round(DocQty * 1000) / 1000).toFixed(4));
+                    }
+                }
+
+
+
+
+                //$('#Qty').val(($('#DocQty').val() + mExcessQtyInKg).toFixed(4));
+
+                $('#Qty').val((parseFloat($('#DocQty').val()) + parseFloat(mExcessQtyInKg)));
+                $('#Amount').val(($('#Qty').val() * $('#Rate').val()).toFixed(2));
+
+
+
+            }
+        })
+    </script>
+}
+
+@if ((ViewBag.LineMode != "Create") && (ViewBag.LineMode != "Edit") && (ViewBag.LineMode != "Delete"))
+{
+    <script type="text/javascript">
+
+        RemoveFields();
+
+        function RemoveFields(){
+            //Disabling input fields
+            $(':input','.modal-body').attr('disabled','disabled');
+        }
+
+
+    </script>
+}

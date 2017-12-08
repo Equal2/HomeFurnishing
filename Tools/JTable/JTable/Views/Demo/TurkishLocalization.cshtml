@@ -1,0 +1,247 @@
+﻿@{
+    ViewBag.Title = "Theme Demo";
+}
+@section CssImport 
+{
+    <style type="text/css">
+        #SelectedRowList
+        {
+            margin-top: 5px;
+            border: 1px solid #999;
+            background-color: #EEE;
+            padding: 5px;
+        }
+    </style>
+}
+<!-- Container for jTable -->
+<div id="StudentTableContainer">
+</div>
+<script type="text/javascript">
+
+    $(document).ready(function () {
+
+        //Localization
+        var turkishMessages = {
+            serverCommunicationError: 'Sunucu ile iletişim kurulurken bir hata oluştu.',
+            loadingMessage: 'Kayıtlar yükleniyor...',
+            noDataAvailable: 'Hiç kayıt bulunmamaktadır!',
+            addNewRecord: '+ Yeni kayıt ekle',
+            editRecord: 'Kayıt düzenle',
+            areYouSure: 'Emin misiniz?',
+            deleteConfirmation: 'Bu kayıt silinecektir. Emin misiniz?',
+            save: 'Kaydet',
+            saving: 'Kaydediyor',
+            cancel: 'İptal',
+            deleteText: 'Sil',
+            deleting: 'Siliyor',
+            error: 'Hata',
+            close: 'Kapat',
+            cannotLoadOptionsFor: '{0} alanı için seçenekler yüklenemedi!',
+            pagingInfo: 'Toplam {2}, {0} ile {1} arası gösteriliyor',
+            canNotDeletedRecords: '{1} kayıttan {0} adedi silinemedi!',
+            deleteProggress: '{1} kayıttan {0} adedi silindi, devam ediliyor...'
+        };
+
+        $('#StudentTableContainer').jtable({
+            messages: turkishMessages, //Lozalize
+            title: 'Öğrenci Listesi',
+            paging: true,
+            sorting: true,
+            defaultSorting: 'Name ASC',
+            actions: {
+                listAction: '@Url.Action("StudentList")',
+                deleteAction: '@Url.Action("DeleteStudent")',
+                updateAction: '@Url.Action("UpdateStudent")',
+                createAction: '@Url.Action("CreateStudent")'
+            },
+            fields: {
+                StudentId: {
+                    key: true,
+                    create: false,
+                    edit: false,
+                    list: false
+                },
+                Name: {
+                    title: 'İsim',
+                    width: '23%',
+                    inputClass: 'validate[required]'
+                },
+                EmailAddress: {
+                    title: 'E-posta adresi',
+                    list: false
+                },
+                Password: {
+                    title: 'Şifre',
+                    type: 'password',
+                    list: false
+                },
+                Gender: {
+                    title: 'Cinsiyet',
+                    width: '13%',
+                    options: { 'M': 'Erkek', 'F': 'Bayan' }
+                },
+                CityId: {
+                    title: 'Şehir',
+                    width: '12%',
+                    options: '@Url.Action("GetCityOptions")'
+                },
+                BirthDate: {
+                    title: 'Doğum',
+                    width: '15%',
+                    type: 'date',
+                    displayFormat: 'yy-mm-dd'
+                },
+                Education: {
+                    title: 'Eğitim',
+                    list: false,
+                    type: 'radiobutton',
+                    options: { '1': 'İlkokul', '2': 'Lise', '3': 'Üniversite' }
+                },
+                About: {
+                    title: 'Bu kişi hakkında',
+                    type: 'textarea',
+                    list: false
+                },
+                IsActive: {
+                    title: 'Durum',
+                    width: '12%',
+                    type: 'checkbox',
+                    values: { 'false': 'Pasif', 'true': 'Aktif' },
+                    defaultValue: 'true'
+                },
+                RecordDate: {
+                    title: 'Kayıt tarihi',
+                    width: '15%',
+                    type: 'date',
+                    displayFormat: 'yy-mm-dd',
+                    create: false,
+                    edit: false,
+                    sorting: false
+                }
+            }
+        });
+
+        //Load student list from server
+        $('#StudentTableContainer').jtable('load');
+    });
+   
+</script>
+<br />
+<hr />
+<h3>
+    HTML code</h3>
+<pre class="brush:html">&lt;div id=&quot;StudentTableContainer&quot;&gt;&lt;/div&gt;</pre>
+<h3>
+    Javascript code</h3>
+
+<pre class="brush:js;highlight:[5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,28]">&lt;script type=&quot;text/javascript&quot;&gt;
+
+    $(document).ready(function () {
+
+        //Localization texts
+        var turkishMessages = {
+            serverCommunicationError: &#39;Sunucu ile iletişim kurulurken bir hata oluştu.&#39;,
+            loadingMessage: &#39;Kayıtlar y&#252;kleniyor...&#39;,
+            noDataAvailable: &#39;Hi&#231; kayıt bulunmamaktadır!&#39;,
+            addNewRecord: &#39;+ Yeni kayıt ekle&#39;,
+            editRecord: &#39;Kayıt d&#252;zenle&#39;,
+            areYouSure: &#39;Emin misiniz?&#39;,
+            deleteConfirmation: &#39;Bu kayıt silinecektir. Emin misiniz?&#39;,
+            save: &#39;Kaydet&#39;,
+            saving: &#39;Kaydediyor&#39;,
+            cancel: &#39;İptal&#39;,
+            deleteText: &#39;Sil&#39;,
+            deleting: &#39;Siliyor&#39;,
+            error: &#39;Hata&#39;,
+            close: &#39;Kapat&#39;,
+            cannotLoadOptionsFor: &#39;{0} alanı i&#231;in se&#231;enekler y&#252;klenemedi!&#39;,
+            pagingInfo: &#39;Toplam {2}, {0} ile {1} arası g&#246;steriliyor&#39;,
+            canNotDeletedRecords: &#39;{1} kayıttan {0} adedi silinemedi!&#39;,
+            deleteProggress: &#39;{1} kayıttan {0} adedi silindi, devam ediliyor...&#39;
+        };
+
+        $(&#39;#StudentTableContainer&#39;).jtable({
+            messages: turkishMessages, //Lozalize
+            title: &#39;&#214;ğrenci Listesi&#39;,
+            paging: true,
+            sorting: true,
+            defaultSorting: &#39;Name ASC&#39;,
+            actions: {
+                listAction: &#39;/Demo/StudentList&#39;,
+                deleteAction: &#39;/Demo/DeleteStudent&#39;,
+                updateAction: &#39;/Demo/UpdateStudent&#39;,
+                createAction: &#39;/Demo/CreateStudent&#39;
+            },
+            fields: {
+                StudentId: {
+                    key: true,
+                    create: false,
+                    edit: false,
+                    list: false
+                },
+                Name: {
+                    title: &#39;İsim&#39;,
+                    width: &#39;23%&#39;
+                },
+                EmailAddress: {
+                    title: &#39;E-posta adresi&#39;,
+                    list: false
+                },
+                Password: {
+                    title: &#39;Şifre&#39;,
+                    type: &#39;password&#39;,
+                    list: false,
+                    inputClass: &#39;validate[required]&#39;
+                },
+                Gender: {
+                    title: &#39;Cinsiyet&#39;,
+                    width: &#39;13%&#39;,
+                    options: { &#39;M&#39;: &#39;Male&#39;, &#39;F&#39;: &#39;Female&#39; }
+                },
+                CityId: {
+                    title: &#39;Şehir&#39;,
+                    width: &#39;12%&#39;,
+                    options: &#39;/Demo/GetCityOptions&#39;
+                },
+                BirthDate: {
+                    title: &#39;Doğum&#39;,
+                    width: &#39;15%&#39;,
+                    type: &#39;date&#39;,
+                    displayFormat: &#39;yy-mm-dd&#39;
+                },
+                Education: {
+                    title: &#39;Eğitim&#39;,
+                    list: false,
+                    type: &#39;radiobutton&#39;,
+                    options: { &#39;1&#39;: &#39;İlkokul&#39;, &#39;2&#39;: &#39;Lise&#39;, &#39;3&#39;: &#39;Üniversite&#39; }
+                },
+                About: {
+                    title: &#39;Bu kişi hakkında&#39;,
+                    type: &#39;textarea&#39;,
+                    list: false
+                },
+                IsActive: {
+                    title: &#39;Durum&#39;,
+                    width: &#39;12%&#39;,
+                    type: &#39;checkbox&#39;,
+                    values: { &#39;false&#39;: &#39;Aktif&#39;, &#39;true&#39;: &#39;Pasif&#39; },
+                    defaultValue: &#39;true&#39;
+                },
+                RecordDate: {
+                    title: &#39;Kayıt tarihi&#39;,
+                    width: &#39;15%&#39;,
+                    type: &#39;date&#39;,
+                    displayFormat: &#39;yy-mm-dd&#39;,
+                    create: false,
+                    edit: false,
+                    sorting: false
+                }
+            }
+        });
+
+        //Load student list from server
+        $(&#39;#StudentTableContainer&#39;).jtable(&#39;load&#39;);
+    });
+   
+&lt;/script&gt;</pre>
+<p><a href="@Url.Content("~/ApiReference#Localization")">Click here</a> to get more information about localization.</p>

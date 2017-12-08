@@ -1,0 +1,416 @@
+﻿@{
+    ViewBag.Title = "Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<link href="~/Content/Slick/slick.grid.css" rel="stylesheet" />
+<link href="~/Content/Slick/css/smoothness/jquery-ui-1.11.3.custom.min.css" rel="stylesheet" />
+<link href="~/Content/Slick/slick-default-theme.css" rel="stylesheet" />
+
+<style>
+    .slick-row {
+        line-height: 16px;
+    }
+
+    #PurchaseOrdList *, #quantites * {
+        box-sizing: content-box !important;
+    }
+
+    .slick-header-column.ui-state-default {
+        background-color: #428bca;
+        color: white;
+        height: 35px;
+        line-height: 35px;
+    }
+
+    .loading-indicator {
+        display: inline-block;
+        padding: 12px;
+        background: white;
+        opacity: 0.5;
+        color: black;
+        font-weight: bold;
+        z-index: 9999;
+        border: 1px solid red;
+        -moz-border-radius: 10px;
+        -webkit-border-radius: 10px;
+        -moz-box-shadow: 0 0 5px red;
+        -webkit-box-shadow: 0px 0px 5px red;
+        -text-shadow: 1px 1px 1px white;
+    }
+
+        .loading-indicator label {
+            padding-left: 20px;
+            background: url('../images/ajax-loader-small.gif') no-repeat center left;
+        }
+
+    .rowSelected {
+        background-color: beige !important;
+    }
+
+    span.checkbox {
+        color: lightgray;
+    }
+
+    .checked {
+        color: #9add4e !important;
+    }
+    /* Slick.Editors.Text, Slick.Editors.Date */
+    input.editor-text {
+        width: 100%;
+        height: 100%;
+        border: 0;
+        margin: 0;
+        background: transparent;
+        outline: 0;
+        padding: 0;
+    }
+</style>
+
+<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+    <div class="panel panel-info">
+        <div class="panel-heading" role="tab" id="headingOne">
+            <h4 class="panel-title">
+                Purchase Orders
+            </h4>
+        </div>
+        <div class="panel-body">
+            <div style="width:100%;">
+                <div class="grid-header" style="width: 100%">
+                    <label>Products</label>
+                    <span style="float:right;display:inline-block;">
+                        Search:
+                        <input type="text" id="prodSearch" value="">
+                    </span>
+                </div>
+                <div id="PurchaseOrdList" style="width: 100%; height: 500px; font-size: 11px; "></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script src="~/Scripts/jquery-ui-1.11.4.min.js"></script>
+<script src="~/Scripts/Slick/slick.checkboxselectcolumn.js"></script>
+<script src="~/Scripts/Slick/jquery.event.drag-2.2.js"></script>
+<script src="~/Scripts/Slick/jquery.jsonp-2.4.min.js"></script>
+<script src="~/Scripts/Slick/slick.core.js"></script>
+<script src="~/Scripts/Slick/slick.editors.js"></script>
+
+<script src="~/Scripts/Slick/slick.grid.js"></script>
+<script src="~/Scripts/Slick/slick.rowselectionmodel.js"></script>
+
+<script type="text/javascript">
+    /***
+   * A sample AJAX data store implementation.
+   * Right now, it's hooked up to load search results from Octopart, but can
+   * easily be extended to support any JSONP-compatible backend that accepts paging parameters.
+   */
+    function RemoteModel() {
+        // private
+        var PAGESIZE = 100;
+        var data = { length: 0 };
+        var searchstr = "";
+        var sortcol = null;
+        var sortdir = 1;
+        var h_request = null;
+        var req = null; // ajax request
+
+        // events
+        var onDataLoading = new Slick.Event();
+        var onDataLoaded = new Slick.Event();
+
+
+        function init() {
+        }
+
+
+        function isDataLoaded(from, to) {
+            for (var i = from; i <= to; i++) {
+                if (data[i] == undefined || data[i] == null) {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+
+        function clear() {
+            for (var key in data) {
+                delete data[key];
+            }
+            data.length = 0;
+        }
+
+
+        function ensureData(from, to) {
+            if (req) {
+                req.abort();
+                for (var i = req.fromPage; i <= req.toPage; i++)
+                    data[i * PAGESIZE] = undefined;
+            }
+
+            if (from < 0) {
+                from = 0;
+            }
+
+            if (data.length > 0) {
+                to = Math.min(to, data.length - 1);
+            }
+
+            var fromPage = Math.floor(from / PAGESIZE);
+            var toPage = Math.floor(to / PAGESIZE);
+
+            while (data[fromPage * PAGESIZE] !== undefined && fromPage < toPage)
+                fromPage++;
+
+            while (data[toPage * PAGESIZE] !== undefined && fromPage < toPage)
+                toPage--;
+
+            if (fromPage > toPage || ((fromPage == toPage) && data[fromPage * PAGESIZE] !== undefined)) {
+                // TODO:  look-ahead
+                onDataLoaded.notify({ from: from, to: to });
+                return;
+            }
+
+            var url = "/PurchaseOrderDueDateExtension/PendingPurchaseOrderIndex?search=" + searchstr + "&start=" + (fromPage * PAGESIZE) + "&count=" + (((toPage - fromPage) * PAGESIZE) + PAGESIZE);
+
+            if (sortcol != null) {
+                url += ("&sortby=" + sortcol + ((sortdir > 0) ? "+asc" : "+desc"));
+            }
+
+            if (h_request != null) {
+                clearTimeout(h_request);
+            }
+
+            h_request = setTimeout(function () {
+                for (var i = fromPage; i <= toPage; i++)
+                    data[i * PAGESIZE] = null; // null indicates a 'requested but not available yet'
+
+                onDataLoading.notify({ from: from, to: to });
+
+                req = $.jsonp({
+                    url: url,
+                    callbackParameter: "callback",
+                    cache: true,
+                    success: onSuccess,
+                    error: function () {
+                        onError(fromPage, toPage)
+                    }
+                });
+                req.fromPage = fromPage;
+                req.toPage = toPage;
+            }, 50);
+        }
+
+
+        function onError(fromPage, toPage) {
+            alert("error loading pages " + fromPage + " to " + toPage);
+        }
+
+        function onSuccess(tmp) {
+            var from = tmp.request.start, to = from + tmp.results.length;
+            data.length = parseInt(tmp.hits);
+
+            for (var i = 0; i < tmp.results.length; i++) {
+                var item = tmp.results[i];
+
+                data[from + i] = item;
+                data[from + i].index = from + i;
+            }
+
+            req = null;
+
+            onDataLoaded.notify({ from: from, to: to });
+        }
+
+
+        function reloadData(from, to) {
+            for (var i = from; i <= to; i++)
+                delete data[i];
+
+            ensureData(from, to);
+        }
+
+
+        function setSort(column, dir) {
+            sortcol = column;
+            sortdir = dir;
+            clear();
+        }
+
+        function setSearch(str) {
+            searchstr = str;
+            clear();
+        }
+
+
+        init();
+
+        return {
+            // properties
+            "data": data,
+
+            // methods
+            "clear": clear,
+            "isDataLoaded": isDataLoaded,
+            "ensureData": ensureData,
+            "reloadData": reloadData,
+            "setSort": setSort,
+            "setSearch": setSearch,
+
+            // events
+            "onDataLoading": onDataLoading,
+            "onDataLoaded": onDataLoaded
+        };
+    }
+
+    // Slick.Data.RemoteModel
+    $.extend(true, window, { Slick: { Data: { RemoteModel: RemoteModel } } });
+</script>
+
+
+@*PurchaseOrdList Scripting*@
+<script>
+    var grid, s;
+    var loader = new Slick.Data.RemoteModel();
+
+    var Priority = [{ val: 'Low', text: 'Low' }, { val: 'Normal', text: 'Normal' }, { val: 'High', text: 'High' }];
+
+    var prodColumn = [
+        { id: "OrderNo", name: "OrderNo", field: "DocNo", sortable: true, width: 150 },
+         { id: "Dim1", name: "Dim1", field: "Dimension1", width: 150 },
+         { id: "Date", name: "DocDate", field: "DocDate", width: 225 },
+         { id: "DueDate", name: "DueDate", field: "DueDate", width: 225 },
+         { id: "NDueDate", name: "New DueDate", field: "NewDueDate", width: 225, editor: Slick.Editors.Date },
+         { id: "Priority", name: "Priority", field: "Priority", width: 100, editor: Slick.Editors.DropDown, options: Priority, cssClass: "text-right", headerCssClass: "text-right", },
+    ];
+
+    var options = {
+        editable: true,
+        enableAddRow: false,
+        enableCellNavigation: true,
+    };
+    var loadingIndicator = null;
+
+    $(function () {
+        grid = new Slick.Grid("#PurchaseOrdList", loader.data, prodColumn, options);
+        grid.onViewportChanged.subscribe(function (e, args) {
+            var vp = grid.getViewport();
+            loader.ensureData(vp.top, vp.bottom);
+        });
+        grid.onSort.subscribe(function (e, args) {
+            loader.setSort(args.sortCol.field, args.sortAsc ? 1 : -1);
+            var vp = grid.getViewport();
+            loader.ensureData(vp.top, vp.bottom);
+        });
+
+        loader.onDataLoading.subscribe(function () {
+            if (!loadingIndicator) {
+                loadingIndicator = $("<span class='loading-indicator'><label>Buffering...</label></span>").appendTo(document.body);
+                var $g = $("#PurchaseOrdList");
+                loadingIndicator
+                        .css("position", "absolute")
+                        .css("top", $g.position().top + $g.height() / 2 - loadingIndicator.height() / 2)
+                        .css("left", $g.position().left + $g.width() / 2 - loadingIndicator.width() / 2);
+            }
+            loadingIndicator.show();
+        });
+        loader.onDataLoaded.subscribe(function (e, args) {
+            for (var i = args.from; i <= args.to; i++) {
+                grid.invalidateRow(i);
+            }
+            grid.updateRowCount();
+            grid.render();
+            loadingIndicator.fadeOut();
+        });
+
+        $("#prodSearch").keyup(function (e) {
+            if (e.which == 13) {
+                loader.setSearch($(this).val());
+                var vp = grid.getViewport();
+                loader.ensureData(vp.top, vp.bottom);
+            }
+        });
+        loader.setSearch($("#prodSearch").val());
+        loader.setSort("score", -1);
+        grid.setSortColumn("score", false);
+        // load the first page
+        grid.onViewportChanged.notify();
+
+        grid.onCellChange.subscribe(function (e, args) {
+            //$(qtyGrid.getFooterRow()).find('span#Total').text((getColumnTotal(qtyGrid.getColumns()[args.cell].name, qtyGrid.getData())).toFixed(2))
+            console.log('Changed');
+            var cl = args.grid.getColumns()[args.cell].name;
+
+            if (cl == 'Priority') {
+                $.ajax({
+                    type: 'POST',
+                    async: true,
+                    url: '/PurchaseOrderDueDateExtension/PriorityUpdate',
+                    data: { Id: args.item.PurchaseOrderHeadId, Priority: args.item.Priority },
+                    error: function (data) {
+                        alert('error in updating');
+                    }
+                });
+            }
+            else if (cl == 'New DueDate') {
+                $.ajax({
+                    type: 'POST',
+                    async: true,
+                    url: '/PurchaseOrderDueDateExtension/DueDateUpdate',
+                    data: { Id: args.item.PurchaseOrderHeadId, NewDueDate: args.item.NewDueDate },
+                    error: function (data) {
+                        alert('error in updating');
+                    }
+                });
+            }
+
+        });
+    })
+
+
+
+
+
+
+
+    //Functionality for search events
+    $("#qtySearch").keyup(function (e) {
+        Slick.GlobalEditorLock.cancelCurrentEdit();
+        // clear on Esc
+        if (e.which == 27) {
+            this.value = "";
+        }
+        searchString = this.value;
+        updateFilter();
+    });
+    //function updateFilter() {
+    //    dataView.setFilterArgs({
+    //        searchString: searchString
+    //    });
+    //    dataView.refresh();
+    //}
+
+    //// wire up model events to drive the grid
+    //dataView.onRowCountChanged.subscribe(function (e, args) {
+    //    qtyGrid.updateRowCount();
+    //    qtyGrid.render();
+    //});
+
+    //dataView.onRowsChanged.subscribe(function (e, args) {
+    //    qtyGrid.invalidateRows(args.rows);
+    //    qtyGrid.render();
+    //});
+
+    $(document).on("change", "input,select", function () {
+        Slick.GlobalEditorLock.commitCurrentEdit();
+    })
+
+    $(window).resize(function (e) {
+        grid.resizeCanvas();
+    })
+
+</script>

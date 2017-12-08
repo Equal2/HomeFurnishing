@@ -1,0 +1,124 @@
+﻿@model Surya.India.Model.ViewModels.PurchaseGoodsReceiptHeaderViewModel
+@{
+    ViewBag.Title = "Edit";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@using (Html.BeginForm("Edit", "PurchaseGoodsReceiptHeader", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(m=>m.PurchaseGoodsReceiptHeaderId)
+    @Html.HiddenFor(m=>m.PurchaseTransportGRId)
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h4>
+                <span style="font-family: Calibri,sans-serif,Verdana"> Edit Sale Order.</span>
+            </h4>
+        </div>
+        <div class="panel-info" style="padding-left:15px">
+            <div class="form-horizontal">
+                @Html.ValidationSummary(true)
+                <input type="hidden" name="Redirect" id="Redirect" value="@ViewBag.Redirect" />
+
+                <div class="form-group" style="margin-top:15px">
+                    @Html.LabelFor(model => model.DocTypeId, "Entry Type.*", new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.DropDownListFor(model => model.DocTypeId, new SelectList(ViewBag.DocTypeList as System.Collections.IEnumerable, "DocumentTypeId", "DocumentTypeName"), new { @class = "DDWidth" })
+                        @Html.ValidationMessageFor(model => model.DocTypeId)
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.DocDate, "Order Date.*", new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.DocDate)
+                        @Html.ValidationMessageFor(model => model.DocDate)
+                    </div>
+                </div>
+
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.DocNo, "Receipt No.*", new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.DocNo)
+                        @Html.ValidationMessageFor(model => model.DocNo)
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.SupplierDocNo, "Supplie Doc. No", new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.SupplierDocNo)
+                        @Html.ValidationMessageFor(model => model.SupplierDocNo)
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.SupplierId, "Supplier", new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.DropDownListFor(model => model.SupplierId, new SelectList(ViewBag.SupplierList as System.Collections.IEnumerable, "PersonId", "Name"))
+                        @Html.ValidationMessageFor(model => model.SupplierId)
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.GodownId, "Godown", new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.DropDownListFor(model => model.GodownId, new SelectList(ViewBag.GodownList as System.Collections.IEnumerable, "GodownId", "GodownName"))
+                        @Html.ValidationMessageFor(model => model.GodownId)
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.GateInId, "Gate Entry No.", new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(m => m.GateInId)
+                        @Html.ValidationMessageFor(model => model.GateInId)
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.RoadPermitFormId, "Road Permit Form", new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(m => m.RoadPermitFormId)
+                        @Html.ValidationMessageFor(model => model.RoadPermitFormId)
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.FormNoId, "Form No.", new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(m => m.FormNoId)
+                        @Html.ValidationMessageFor(model => model.FormNoId)
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.Remark, new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(m => m.Remark)
+                        @Html.ValidationMessageFor(model => model.Remark)
+                    </div>
+                </div>
+
+                
+                <hr />
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-10">
+                        <input type="submit" value="Save" class="btn btn-primary btn-sm CurveBorder" />
+                        <span style="font-family: Calibri,sans-serif,Verdana;font-size:large">
+                            @Html.ActionLink("Back", "Index", null, new { @class = "btn btn-primary btn-sm col-md-offset-1 CurveBorder ActionLinkPadding" })
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#DocTypeId").focus();
+    })
+
+
+</script>

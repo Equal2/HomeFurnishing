@@ -1,0 +1,99 @@
+﻿@model Model.ViewModels.CopyFromExistingProductConsumptionViewModel
+
+
+@using Core.Common
+
+<div class="modal-content">
+    <div class="modal-header" style="border-bottom: 1px solid #8E8888">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"> <span class="glyphicon glyphicon-remove"></span></button>
+        <h3>
+            <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-file black"></span>Copy From Consumption</span>
+        </h3>
+    </div>
+    <div>
+
+
+        @using (Html.BeginForm("CopyFromExisting", "ProductConsumptionHeader", FormMethod.Post, new { @class = "modal-form", id = "modform" }))
+        {
+            @Html.AntiForgeryToken()
+
+            <div class="form-horizontal modal-body">
+
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+
+                            @Html.LabelFor(model => model.FromProductId, "Copy From", new { @class = "control-label col-xs-4 " })
+                            <div class="col-xs-6">
+                                @Html.TextBoxFor(m => m.FromProductId, null, new { @class = "form-control col-xs-6 required" })
+                                @Html.ValidationMessageFor(m => m.FromProductId, "", new { @class = "text-danger" })
+                            </div>
+                        </div>                       
+                    </div>
+                    <div class="col-md-12">
+                        <div class="form-group">
+
+                            @Html.LabelFor(model => model.ToProductId, "To Product", new { @class = "control-label col-xs-4 " })
+                            <div class="col-xs-6">
+                                @Html.TextBoxFor(m => m.ToProductId, null, new { @class = "form-control col-xs-6 required" })
+                                @Html.ValidationMessageFor(m => m.ToProductId, "", new { @class = "text-danger" })
+                                <span id="ProductStatus"></span>
+                            </div>
+                        </div>                       
+                    </div>
+                </div>
+                <div class="modal-footer " style="padding: 0px 20px 0 20px; border-top:1px solid #8E8888">
+                    <button class="btn custom right" name="Command:submit" type="submit" id="submit"><h2 style="margin:0px"><span class="glyphicon glyphicon-floppy-disk black"></span> </h2></button>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+
+<script type="text/javascript">
+    CustomSelectFunction($("#FromProductId"), '/ComboHelpList/GetBom', '/ComboHelpList/SetSingleProducts', ' ', false, 0);
+    CustomSelectFunction($("#ToProductId"), '/ComboHelpList/GetFinishedMaterial', '/ComboHelpList/SetSingleProducts', ' ', false, 0);
+
+
+
+    $("#submit").on("click", function () {
+        var tes;
+        var productgroupname = $("#ToProductId").select2('data').text
+        $.ajax({
+            async:false,
+            cache: false,
+            type: "POST",
+            url: '/DuplicateDocumentCheck/DuplicateCheckForCreate',
+            dataType: 'json',
+            data: { table: 'ProductConsumption', docno: productgroupname , doctypeId: 0 },
+            success: function (data) {
+                stat = data.returnvalue;
+                if (data.returnvalue) {
+                    $('#ProductStatus').text('Consumption already exists.');
+                    tes= true;
+
+                }
+                else {
+                    $('#ProductStatus').text('');
+                    tes = false;
+                }
+            },
+            error: function (xhr, ajaxOptions, thrownError) {
+                alert('Failed to Check Validation.' + thrownError);
+            }
+        });
+        
+        if (tes) {
+            return false;
+        }
+        else
+        {
+            return;
+        }
+    });
+
+
+</script>

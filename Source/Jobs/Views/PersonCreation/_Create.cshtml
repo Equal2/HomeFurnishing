@@ -1,0 +1,310 @@
+﻿@model Model.ViewModels.PersonViewModel
+@using Core.Common
+
+<style type="text/css">
+    .cusleftnormal {
+        border-bottom-left-radius: 0pc !important;
+        border-top-left-radius: 0px !important;
+    }
+
+    .cusrightnormal {
+        border-bottom-right-radius: 0px !important;
+        border-top-right-radius: 0px !important;
+    }
+</style>
+
+<div class="modal-content">
+    <div class="modal-header" style="border-bottom: 1px solid #8E8888">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"> <span class="glyphicon glyphicon-remove"></span></button>
+        <h3>
+            <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-file black"></span> @ViewBag.Name</span>
+        </h3>
+    </div>
+    <div>
+        @Html.ValidationLog((string)TempData["CSEXCL"])
+        @using (Html.BeginForm("_CreatePost", "PersonCreation", FormMethod.Post, new { enctype = "multipart/form-data", id = "modformr2" }))
+        {
+
+            <div class="form-horizontal modal-body">
+
+                @Html.AntiForgeryToken()
+
+                @Html.HiddenFor(m => m.PersonID)
+                @Html.HiddenFor(m => m.DocTypeId)
+                @Html.HiddenFor(m => m.LedgerAccountGroupId)
+                @Html.HiddenFor(m => m.DivisionIds)
+                @Html.HiddenFor(m => m.SiteIds)
+                @Html.HiddenFor(m => m.PersonAddressID)
+                @Html.HiddenFor(m => m.AccountId)
+                @Html.HiddenFor(m => m.PersonRegistrationCstNoID)
+                @Html.HiddenFor(m => m.PersonRegistrationTinNoID)
+                @Html.HiddenFor(m => m.PersonRegistrationPanNoID)
+                @Html.HiddenFor(m => m.PersonRegistrationGstNoID)
+                @Html.HiddenFor(m => m.PersonRegistrationAadharNoID)
+                @Html.HiddenFor(m => m.CreatedBy)
+                @Html.HiddenFor(m => m.CreatedDate)
+
+
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Mobile, "Mobile", new { @class = "control-label col-xs-4 " })
+                            <div class="col-xs-7">
+                                @Html.TextBoxFor(model => model.Mobile, new { @class = "form-control col-xs-7" })
+                                @Html.ValidationMessageFor(model => model.Mobile, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Email, "Email", new { @class = "control-label col-xs-4 " })
+                            <div class="col-xs-7">
+                                @Html.TextBoxFor(model => model.Email, new { @class = "form-control col-xs-7" })
+                                @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Name, "Name", new { @class = "control-label col-xs-4 " })
+                            <div class="col-xs-7">
+                                @Html.TextBoxFor(model => model.Name, new { @class = "form-control col-xs-7" })
+                                @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Code, "Code", new { @class = "control-label col-xs-4 " })
+                            <div class="col-xs-7">
+                                @Html.TextBoxFor(model => model.Code, new { @class = "form-control col-xs-7" })
+                                @Html.ValidationMessageFor(model => model.Code, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Suffix, "Suffix", new { @class = "control-label col-xs-4 " })
+                            <div class="col-xs-7">
+                                @Html.TextBoxFor(model => model.Suffix, new { @class = "form-control col-xs-7" })
+                                @Html.ValidationMessageFor(model => model.Suffix, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Address, "Address", new { @class = "control-label col-xs-4 " })
+                            <div class="col-xs-7">
+                                @Html.TextAreaFor(m => m.Address, new { @class = "form-control col-xs-6 required" })
+                                @Html.ValidationMessageFor(model => model.Address, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.CityId, "City", new { @class = "control-label col-xs-4 " })
+                            <div class="col-xs-7">
+                                @Html.TextBoxFor(model => model.CityId, new { @class = "form-control col-xs-7" })
+                                @Html.ValidationMessageFor(model => model.CityId, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Zipcode, "Zip Code", new { @class = "control-label col-xs-4" })
+                            <div class="col-xs-7">
+                                @Html.TextBoxFor(m => m.Zipcode, new { @class = "form-control col-xs-7 height required" })
+                                @Html.ValidationMessageFor(model => model.Zipcode, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.PanNo, "PAN No", new { @class = "control-label col-xs-4" })
+                            <div class="col-xs-7">
+                                @Html.TextBoxFor(m => m.PanNo, new { @class = "form-control col-xs-7 height" })
+                                @Html.ValidationMessageFor(m => m.PanNo, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.CstNo, "Cst No", new { @class = "control-label col-xs-4" })
+                            <div class="col-xs-7">
+                                @Html.TextBoxFor(model => model.CstNo, null, new { @class = "form-control col-xs-7 " })
+                                @Html.ValidationMessageFor(m => m.CstNo, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.TinNo, "Tin No", new { @class = "control-label col-xs-4" })
+                            <div class="col-xs-7">
+                                @Html.TextBoxFor(m => m.TinNo, new { @class = "form-control col-xs-7 height" })
+                                @Html.ValidationMessageFor(m => m.TinNo, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.GstNo, "Gst No", new { @class = "control-label col-xs-4" })
+                            <div class="col-xs-7">
+                                @Html.TextBoxFor(model => model.GstNo, null, new { @class = "form-control col-xs-7 " })
+                                @Html.ValidationMessageFor(m => m.GstNo, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.AadharNo, "Aadhar No", new { @class = "control-label col-xs-4" })
+                            <div class="col-xs-7">
+                                @Html.TextBoxFor(model => model.AadharNo, null, new { @class = "form-control col-xs-7 " })
+                                @Html.ValidationMessageFor(m => m.AadharNo, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+
+                </div>
+
+                <div class="modal-footer " style="padding: 19px 20px 0 20px; border-top:1px solid #8E8888">
+                    <button class="btn custom left" name="Command:Edit" type="submit" id="submit"><h2 style="margin:0px"><span class="glyphicon glyphicon-floppy-disk black"></span> </h2></button>
+                </div>
+
+            </div>
+        }
+    </div>
+</div>
+
+
+
+<script type="text/javascript">
+
+
+    $(document).ready(function () {
+        //CustomSelectFunction($("#CityId"), '/ComboHelpList/GetCity', '/ComboHelpList/SetSingleCity', '', false, 0);
+        CustomSelectFunction($("#CityId"), '/ComboHelpList/GetCity', '/ComboHelpList/SetSingleCity', ' ', false, 0);
+    });
+
+    $('#submit').on("click", 'tr', function () {
+        window.opener.document.forms[0].getElementById('Mobile').value = $('#Mobile').text();
+    });
+
+
+    $("#Mobile").change(function () {
+        //Validate_Mobile();
+    });
+
+
+    $("#Email").change(function () {
+        //Validate_Email();
+    });
+
+
+    function Validate_Email() {
+        var ProcessProgress = $("#Email detail loading progress");
+        ProcessProgress.show();
+
+        $('button:submit').attr('disabled','disabled');
+        if ($("#Email").val() != 0 && $("#Email").val() != null && $("#Email").val() != "") {
+            $.ajax({
+                cache: false,
+                async: false,
+                type: "POST",
+                url: "@(Url.Action("GetEmailDetailJson"))",
+                data: { Email: $("#Email").val() },
+            success: function (data) {
+                if (data.length > 0)
+                {
+                    $("#PersonId").val(data[0].PersonId);
+                    $("#Mobile").val(data[0].Mobile);
+                    $("#Name").val(data[0].Name);
+                    $("#Address").val(data[0].Address);
+                    $("#CityId").select2("data", { id: data[0].CityId, text: data[0].CityName });
+                    $("#Suffix").val(data[0].Suffix);
+                    $("#Code").val(data[0].Code);
+                    $("#Zipcode").val(data[0].Zipcode);
+                    $("#PANNo").val(data[0].PANNo);
+                    $("#CstNo").val(data[0].CstNo);
+                    $("#TinNo").val(data[0].TinNo);
+                    $("#GstNo").val(data[0].GstNo);
+                    $("#AadharNo").val(data[0].AadharNo);
+                    $("#CreatedBy").val(data[0].CreatedBy);
+                    $("#CreatedDate").val(formatDate('d/m/Y', new Date(parseInt(data[0].CreatedDate.substr(6)))));
+                    $("#PersonAddressID").val(data[0].PersonAddressID);
+                    $("#AccountId").val(data[0].AccountId);
+                    $("#PersonRegistrationCstNoID").val(data[0].PersonRegistrationCstNoID);
+                    $("#PersonRegistrationTinNoID").val(data[0].PersonRegistrationTinNoID);
+                    $("#PersonRegistrationPANNoID").val(data[0].PersonRegistrationPANNoID);
+                    $("#PersonRegistrationGstNoID").val(data[0].PersonRegistrationGstNoID);
+                    $("#PersonRegistrationAadharNoID").val(data[0].PersonRegistrationAadharNoID);
+                }
+                //else {
+                //    $("#PersonId").val(0);
+                //    $("#Mobile").val(0);
+                //    $("#Name").val("");
+                //    $("#Address").val("");
+                //    $("#CityId").select2("data", { id: "", text: "" });
+                //    $("#Zipcode").val("");
+                //    $("#PANNo").val("");
+                //    $("#CstNo").val("");
+                //    $("#TinNo").val("");
+                //    $("#GstNo").val("");
+                //    $("#AadharNo").val("");
+                //    $("#PersonAddressID").val(0);
+                //    $("#AccountId").val(0);
+                //    $("#PersonRegistrationCstNoID").val(0);
+                //    $("#PersonRegistrationTinNoID").val(0);
+                //    $("#PersonRegistrationPANNoID").val(0);
+                //    $("#PersonRegistrationGstNoID").val(0);
+                //    $("#PersonRegistrationAadharNoID").val(0);
+                //}
+            },
+            error: function (xhr, ajaxOptions, thrownError) {
+                alert('Failed to retrieve Email Detail.' + thrownError);
+                ProcessProgress.hide();
+            }
+        });
+    }
+    else {
+        $("#PersonId").val(0);
+        $("#Mobile").val(0);
+        $("#Name").val("");
+        $("#Address").val("");
+        $("#CityId").select2("data", { id: "", text: "" });
+        $("#Suffix").val("");
+        $("#Code").val("");
+        $("#Zipcode").val("");
+        $("#PANNo").val("");
+        $("#CstNo").val("");
+        $("#TinNo").val("");
+        $("#GstNo").val("");
+        $("#AadharNo").val("");
+        $("#CreatedBy").val("");
+        $("#CreatedDate").val("");
+        $("#PersonAddressID").val(0);
+        $("#AccountId").val(0);
+        $("#PersonRegistrationCstNoID").val(0);
+        $("#PersonRegistrationTinNoID").val(0);
+        $("#PersonRegistrationPANNoID").val(0);
+        $("#PersonRegistrationGstNoID").val(0);
+        $("#PersonRegistrationAadharNoID").val(0);
+    }
+    $('button:submit').removeAttr('disabled');
+    }
+
+
+</script>

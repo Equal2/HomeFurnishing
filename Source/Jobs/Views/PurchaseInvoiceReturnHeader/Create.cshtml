@@ -1,0 +1,988 @@
+﻿@model Model.ViewModel.PurchaseInvoiceReturnHeaderViewModel
+@using Core.Common
+@{
+    ViewBag.Title = "Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style type="text/css">
+    .ui-autocomplete .m-name {
+        display: block;
+        margin-right: 1em;
+        font-size: small;
+    }
+
+    .ui-autocomplete .m-year {
+        display: block;
+        font-size: small;
+    }
+
+    .ui-autocomplete .rt-bar span {
+        display: block;
+        height: 1em;
+    }
+
+    .ui-widget {
+        font-family: Tahoma;
+    }
+</style>
+<!-- modal placeholder-->
+<div id='myModal' class='modal fade in'>
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div id='myModalContent'></div>
+        </div>
+    </div>
+</div>
+
+@using (Html.BeginForm("Post", "PurchaseInvoiceReturnHeader", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(m => m.SiteId)
+    @Html.HiddenFor(m => m.DivisionId)
+    @Html.HiddenFor(m => m.PurchaseInvoiceReturnHeaderId)
+    @Html.HiddenFor(m => m.DocTypeId)
+    @Html.HiddenFor(m => m.CreatedDate)
+    @Html.HiddenFor(m => m.Status)
+    <div class="panel panel-default">
+        <div class="panel-heading">
+
+            @CustomHelpers.RenderHeaderInfo(ViewBag.transactionType, (int?)ViewBag.PendingToSubmit, (int?)ViewBag.PendingToReview, ViewBag.Name)
+
+            @*@if (ViewBag.transactionType == "submit" || ViewBag.transactionType == "submitContinue")
+            {<h3 style="border-bottom:1px solid #e1dada;padding-bottom:10px;">
+                <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"> <span class="glyphicon glyphicon-file black"></span>Submit @ViewBag.Name</span>
+                <button type="submit" name="Command:Submit" class="btn btn-primary right" id="SubmitContinue" style="margin-left:5px;">Submit & Next<span class='badge'>@(ViewBag.PendingToSubmit != 0 ? ViewBag.PendingToSubmit : "")</span></button>
+                <input type="submit" value="Submit" name="Command:Submit" class="btn btn-primary right" style="width: 90px; background-color: #2980b9" />
+                <input type="hidden" id="IsContinue" name="IsContinue" value="" />
+            </h3>}
+            else if (ViewBag.transactionType == "review" || ViewBag.transactionType == "ReviewContinue")
+            {<h3 style="border-bottom:0px solid #e1dada;padding-bottom:0px;">
+                <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"> <span class="glyphicon glyphicon-file black"></span> Review @ViewBag.Name</span>
+                <button type="submit" name="Command:Review" class="btn btn-primary right" style="margin-left:5px" id="ReviewContinue">Review & Next<span class='badge'>@(ViewBag.PendingToReview != 0 ? ViewBag.PendingToReview : "")</span></button>
+                <button type="submit" class="btn btn-primary right" name="Command:Review">Review</button>
+                <input type="hidden" id="IsContinue" name="IsContinue" value="" />
+            </h3>}
+            else if (ViewBag.transactionType == "detail")
+            {
+                <h3>
+                    <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"> <span class="glyphicon glyphicon-file black"></span>@ViewBag.Name</span>
+                </h3>
+            }
+            else
+            {
+                <h3 style="border-bottom:1px solid #e1dada;padding-bottom:10px;">
+                    <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"> <span class="glyphicon glyphicon-file black"></span> @ViewBag.Name</span>
+                    <input type="submit" value="Save" class="btn btn-primary right" id="submit" style="width: 90px; background-color: #2980b9" />
+                </h3>
+                <hr style="margin-top:10px;margin-bottom:0px" />
+            }*@
+            @{
+                string EditAction = "";
+                if (Model.Status == (int)StatusConstants.Drafted || Model.Status == (int)StatusConstants.Import)
+                {
+                    EditAction = "Modify";
+                }
+                else if ((Model.Status == (int)StatusConstants.Submitted || Model.Status == (int)StatusConstants.Modified))
+                {
+                    EditAction = "ModifyAfter_Submit";
+                }
+                else
+                {
+                    EditAction = "DetailInformation";
+                }
+            }
+            <div class="panel-info">
+                <div class="btn-group">
+                    @Html.ActionLink(" ", "Create", "PurchaseInvoiceReturnHeader", new { @id = ViewBag.id }, new { @class = "cbtn btn-circle glyphicon glyphicon-plus toolbar", @title = "Add New", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", EditAction, "PurchaseInvoiceReturnHeader", new { @id = Model.PurchaseInvoiceReturnHeaderId, IndexType = ViewBag.IndexStatus }, new { @class = "cbtn btn-circle cbtn btn-circle glyphicon glyphicon-edit", @title = "Edit", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "GeneratePrints", "PurchaseInvoiceReturnHeader", new { Ids = Model.PurchaseInvoiceReturnHeaderId, DocTypeId = Model.DocTypeId }, new { @class = "cbtn btn-circle glyphicon glyphicon-print toolbar", @title = "Print", @data_toggle = "tooltip", @id = "PrintRecordC", target = "_blank" })
+                    @Html.ActionLink(" ", "PrevPage", "PurchaseInvoiceReturnHeader", new { DocId = @Model.PurchaseInvoiceReturnHeaderId, DocTypeId = Model.DocTypeId }, new { @class = "cbtn btn-circle glyphicon glyphicon-arrow-left toolbar", @title = "Prev Record", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "NextPage", "PurchaseInvoiceReturnHeader", new { DocId = @Model.PurchaseInvoiceReturnHeaderId, DocTypeId = Model.DocTypeId }, new { @class = "cbtn btn-circle glyphicon glyphicon-arrow-right toolbar", @title = "Next Record", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "Index", "PurchaseInvoiceReturnHeader", new { @id = ViewBag.id, IndexType = ViewBag.IndexStatus }, new { @class = "cbtn btn-circle glyphicon glyphicon-list", @title = "List", @data_toggle = "tooltip" })
+                </div>
+                <div class="btn-group">
+                    <a class="cbtn btn-circle glyphicon glyphicon-option-horizontal dropdown-toggle" title="More Option" aria-expanded="false" style="padding-top: 6px;padding-bottom: 6px;" href="#" data-toggle="dropdown" id="dropdownMenu1">
+                    </a>
+                    <ul class="dropdown-menu pull-right" aria-labelledby="dropdownMenu1">
+                        @if (Model.Status == (int)StatusConstants.Submitted && !Model.GatePassHeaderId.HasValue)
+                        {   
+                            <li><a id="GenGatePassC" href="@Url.Action("GenerateGatePass", "PurchaseInvoiceReturnHeader", new { Ids = @Model.PurchaseInvoiceReturnHeaderId, DocTypeId = Model.DocTypeId })"><span class="glyphicon glyphicon-log-out"> </span> Generate Gatepass</a></li>
+                        }
+                        <li><a id="DocHistory" data-modal="" href="@Url.Action("GetHistory", "LogHistory", new { Ids = Model.PurchaseInvoiceReturnHeaderId, DocTypeId = Model.DocTypeId })"><span class="glyphicon glyphicon-user"> </span> History</a></li>
+                        <li><a href="@Url.Action("Email", "PurchaseInvoiceReturnHeader")"><span class="glyphicon glyphicon-envelope"> </span> Email</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a target="_blank" href="@Url.Action("Report", "PurchaseInvoiceReturnHeader", new { @ViewBag.id })"><span class="glyphicon glyphicon-stats"> </span>&nbsp;&nbsp;Report</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="panel-info" style="padding-left:15px">
+            <div class="form-horizontal">
+                @Html.ValidationSummary(true)
+                @Html.HiddenFor(m => m.PurchaseInvoiceSettings.DocTypeGoodsReturnId)
+                <div>
+                    <h4 class="col-md-12 black">
+                        <span class="glyphicon glyphicon-align-justify"></span>
+                        1.Document Details
+                        @if (Model.GatePassHeaderId.HasValue)
+                        {
+                            <span class="label label-danger right">
+                                <span class="glyphicon glyphicon-log-out"></span>
+                                GPNo:@Model.GatePassDocNo,GPDate:@Model.GatePassDocDate.Value.ToString("dd/MMM/yyyy")
+                                @Html.ActionLink(" ", "DeleteGatePass", "PurchaseInvoiceReturnHeader", new { Id = @Model.PurchaseInvoiceReturnHeaderId }, new { @class = "glyphicon glyphicon-remove", @title = "GatePass", @data_toggle = "tooltip", @id = "GenGatePassD", @style = "color:white;opacity:0.4" })
+                            </span>
+                        }
+                    </h4>
+                    <div>
+                        <div>
+                            <div class="col-md-6">
+                                <div class="form-group" style="margin-top:15px">
+                                    @Html.LabelFor(model => model.DocDate, "Return Date", new { @class = "control-label col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextBoxFor(m => m.DocDate, "{0:dd/MMMM/yyyy}", new { @class = "datepickerWithNFD form-control col-xs-6 required" })
+                                        @Html.ValidationMessageFor(model => model.DocDate, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group" style="margin-top:15px">
+                                    @Html.LabelFor(model => model.DocNo, "Return No", new { @class = "control-label col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextBoxFor(m => m.DocNo, null, new { @class = "form-control col-xs-6 required" })
+                                        @Html.ValidationMessageFor(m => m.DocNo, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.SupplierId, "Supplier", new { @class = "control-label col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextBoxFor(m => m.SupplierId, null, new { @class = "form-control col-xs-6 required" })
+                                        @Html.ValidationMessageFor(m => m.SupplierId, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.SalesTaxGroupId, "Sales Tax Group", new { @class = "control-label col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.DropDownListFor(m => m.SalesTaxGroupId, new SelectList(ViewBag.SalesTaxGroupList as System.Collections.IEnumerable, "ChargeGroupPersonId", "ChargeGroupPersonName"), string.Empty, new { @class = "height form-control col-xs-6 required" })
+                                        @Html.ValidationMessageFor(m => m.SalesTaxGroupId, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.CurrencyId, "Currency", new { @class = "control-label col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.DropDownListFor(m => m.CurrencyId, new SelectList(ViewBag.CurrencyList as System.Collections.IEnumerable, "ID", "Name"), string.Empty, new { @class = "height form-control col-xs-6 required" })
+                                        @Html.ValidationMessageFor(m => m.CurrencyId, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.ReasonId, "Reason", new { @class = "control-label col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.DropDownListFor(m => m.ReasonId, new SelectList(ViewBag.ReasonList as System.Collections.IEnumerable, "ReasonId", "ReasonName"), string.Empty, new { @class = "height form-control col-xs-6 required" })
+                                        @Html.ValidationMessageFor(m => m.ReasonId, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+
+                        </div>
+                        <div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.GodownId, "Godown", new { @class = "control-label col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextBoxFor(m => m.GodownId, new { @class = "height form-control col-xs-6 required" })
+                                        @Html.ValidationMessageFor(m => m.GodownId, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.Remark, "Remark", new { @class = "control-label col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextAreaFor(m => m.Remark, new { @class = "form-control col-xs-6" })
+                                        @Html.ValidationMessageFor(m => m.Remark, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+
+                <hr />
+                <div class="row">
+                    <h4 class="col-md-12 black" style="margin-top:15px">
+                        <span class="glyphicon glyphicon-shopping-cart"></span>
+                        2.Products
+                    </h4>
+                </div>
+             
+                <div class="panel-info" style="height:40px;">
+                  <div class="btn-group" style="padding:5px 0 3px 0;margin:0px;font-weight:bold">
+                    <span class="glyphicon glyphicon-plus-sign"></span>
+                    @{string Action = "";
+                        if (Model.Status == (int)StatusConstants.Drafted)
+                        { Action = "CreateLine"; }
+                        else if (Model.Status == (int)StatusConstants.Submitted || Model.Status == (int)StatusConstants.Modified)
+                        { Action = "CreateLineAfter_Submit"; }
+                    }
+                    @Html.ActionLink("Add New Row ", "_Create", "PurchaseInvoiceReturnLine", new { id = @Model.PurchaseInvoiceReturnHeaderId, sid = @Model.SupplierId }, new { data_modal = "", id = "btnCreate", @class = "toolbar", @title = "Add New", @data_toggle = "tooltip", @data_detailDisabled = "true" })
+                    </div>
+                    <div class="btn-group right" style="padding-right:15px">
+                        <a class="cbtn btn-circle glyphicon glyphicon-link dropdown-toggle" aria-expanded="false" style="padding-top: 6px;padding-bottom: 6px;" href="#" data-toggle="dropdown" id="dropdownMenu2">
+                        </a>
+                        <ul class="dropdown-menu pull-right" aria-labelledby="dropdownMenu1">
+                            <li><a id="btnCreateF" data-modal="" href="@Url.Action("_ForInvoice", "PurchaseInvoiceReturnLine", new { id = @Model.PurchaseInvoiceReturnHeaderId, sid = @Model.SupplierId })"><span class="glyphicon glyphicon-user"> </span> For Invoice</a></li>
+                            <li><a id="btnCreateFP" data-modal="" href="@Url.Action("_ForReceipt", "PurchaseInvoiceReturnLine", new { id = @Model.PurchaseInvoiceReturnHeaderId, sid = @Model.SupplierId })"><span class="glyphicon glyphicon-user"> </span> For Receipt</a></li>
+                        </ul>
+                    </div>
+            </div>
+                <div style="padding-right:15px">
+
+
+                    <div class="panel panel-default" id="grid">
+                        <div class="panel-heading headrow" style="background-image: -webkit-linear-gradient(top, #428bca 0%, #428bca 100%);color:white">
+                            <div class="row grid-head">
+                                <div class="text-left block" style="width: 5%; ">
+                                    Srl.
+                                </div>
+                                <div class="block" style="width: 90%;">
+                                    <div class="row">
+                                        @*ProductInfo*@
+                                        <div class="block" style="width: 25%; ">
+                                            Product Name
+                                        </div>
+                                        <div class="block" style="width: 15%;">
+                                            Invoice No
+                                        </div>
+                                        @*Qty*@
+                                        <div class="text-right block" style="width: 10%;">
+                                            Return <br />Qty
+                                        </div>
+                                        @*Rate*@
+                                        <div class="text-right block" style="width: 10%; ">
+                                            Deal <br /> Qty
+                                        </div>
+
+                                        @*Amount*@
+                                        <div class="text-right block" style="width: 10%;">
+                                            Rate
+                                        </div>
+                                        <div class="col-sm-2 text-right">
+                                            Discount %
+                                        </div>
+                                        <div class="text-right block" style="width: 10%; ">
+                                            Amount
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="" style="width:5%">
+
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="panel-info" id="gbody">
+
+
+                        </div>
+                    </div>
+
+
+                    <div class="panel panel-default" id="gridcharges">
+                        <div class="panel-heading headrow" style="background-image: -webkit-linear-gradient(top, #428bca 0%, #428bca 100%);color:white">
+                            <div class="row grid-head">
+                                <div class="col-xs-1 text-left">
+                                    Srl.
+                                </div>
+                                <div class="col-xs-10">
+                                    <div class="row">
+
+                                        <div class="col-sm-2">
+                                            Charge
+                                        </div>
+
+                                        <div class="col-sm-3">
+                                            Calculate On
+                                        </div>
+                                        <div class="col-sm-2">
+                                            Add/Deduct
+                                        </div>
+                                        @*Rate*@
+                                        <div class="col-sm-2 text-right">
+                                            Rate
+                                        </div>
+                                        @*Amount*@
+                                        <div class="col-sm-3 text-right">
+                                            Amount
+                                        </div>
+                                        @*Remark*@
+
+                                    </div>
+                                </div>
+                                <div class="col-xs-1">
+
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="panel-info" id="gbodycharges">
+
+
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+
+@if ((ViewBag.Mode == "Add") || (ViewBag.Mode == "Edit"))
+{
+
+
+    <script type="text/javascript">
+
+        var id=@Model.PurchaseInvoiceReturnHeaderId;
+        if(id==null||id==0)
+        {
+            $(document).find('a#btnCreate').removeAttr('href').removeAttr('data-modal');
+            $(document).find('a#btnCreateF').removeAttr('href').removeAttr('data-modal');
+            $(document).find('a#btnCreateFP').removeAttr('href').removeAttr('data-modal');
+            $("#btnCreateF").attr('disabled','disabled');
+            $("#btnCreateFP").attr('disabled','disabled');
+        }
+
+        //Reloading the table contents on modal hide
+        $('#myModal').on('hidden.bs.modal', function () {
+            LoadProducts();
+            var id=@Model.PurchaseInvoiceReturnHeaderId;
+            LoadCharges(id,"Web.PurchaseInvoiceReturnHeaderCharges","Web.PurchaseInvoiceReturnLineCharges","/TaxCalculation/GetPIRHeaderChargeForEdit/");
+        });
+
+        $(document).ready(function(){
+            enableModalTransitions();
+        })
+
+        ////For Populating Modal PopUp on DoubleClick Of Row
+        //$('#gbody').on("dblclick",'.grid-body',function(){
+        //    var text = $(this).find(".id").val();
+        //    var editurl=$(this).find('a[edit]').attr('href');
+        //    $('#myModalContent').load(editurl, function () {
+        //        //alert('2');
+        //        $('#myModal').modal({
+        //            backdrop: 'static',
+        //            keyboard: true
+        //        }, 'show');
+
+        //        bindForm1(this);
+        //    });
+        //});
+
+        ////For Populating Modal PopUp on DoubleClick Of Row
+        //$('#gbodycharges').on("dblclick",'.grid-body',function(){
+        //    var text = $(this).find(".id").val();
+        //    var editurl="/TaxCalculation/GetPIRHeaderChargeForEdit/";
+        //    $('#myModalContent').load(editurl,{id:text,HeaderTable:"Web.PurchaseInvoiceReturnHeaderCharges",LineTable:"Web.PurchaseInvoiceReturnLineCharges"}, function () {
+        //        //alert('2');
+        //        $('#myModal').modal({
+        //            backdrop: 'static',
+        //            keyboard: true
+        //        }, 'show');
+
+        //        bindForm1(this);
+        //    });
+        //});
+
+        ////For Handling Modal PopUp on Clicking Delete Icon
+        //$('#gbody').on("click",'a[Detail]', function (e) {
+        //    $('#myModalContent').load(this.href, function (response, status, xhr) {
+        //        //alert('2');
+        //        if ( status == "error" ) {
+        //            var msg = "Sorry but there was an error: ";
+        //        }
+        //        else
+        //        {
+        //            $('#myModal').modal({
+        //                backdrop: 'static',
+        //                keyboard: true
+        //            }, 'show');
+
+        //            bindForm1(this);}
+        //    });
+        //    return false;
+        //});
+
+
+        ////For Handling Modal PopUp on Clicking Delete Icon
+        //$('#gbody').on("click",'a[delete]', function (e) {
+        //    $('#myModalContent').load(this.href, function () {
+        //        //alert('2');
+        //        $('#myModal').modal({
+        //            backdrop: 'static',
+        //            keyboard: true
+        //        }, 'show');
+
+        //        bindForm1(this);
+        //    });
+        //    return false;
+        //});
+
+
+       
+
+        ////To focus on the first element on modal load
+        //$('#myModal').on('shown.bs.modal', function () {
+        //    $("#ProductId").select2("focus");
+        //});       
+
+
+
+
+        //function PurchaseInvoiceReturnChargeModel() {
+        //    var self = this;
+        //    self.PurchaseInvoiceReturnHeaderId = $("#PurchaseInvoiceReturnHeaderId").val();
+        //    self.PurchaseInvoiceReturnLineId = $("#PurchaseInvoiceReturnLineId").val();
+        //    self.PurchaseInvoiceLineId = $("#PurchaseInvoiceLineId").val();
+        //    self.SupplierId = $("#SupplierId").val();
+        //    self.InvoiceBalQty = $("#InvoiceBalQty").val();
+        //    self.ProductId = $("#ProductId").val();
+        //    self.Specification = $("#Specification").val();
+        //    self.Dimension1Name = $("#Dimension1Name").val();
+        //    self.Dimension2Name = $("#Dimension2Name").val();
+        //    self.LotNo = $("#LotNo").val();
+        //    self.Qty = $("#Qty").val();
+        //    self.UnitId = $("#UnitId").val();
+        //    self.Rate = $("#Rate").val();
+        //    self.DiscountPer = $("#DiscountPer").val();
+        //    self.DealUnitId = $("#DealUnitId").val();
+        //    self.UnitConversionMultiplier = $("#UnitConversionMultiplier").val();
+        //    self.DealQty = $("#DealQty").val();
+        //    self.Amount = $("#Amount").val();
+        //    self.Remark = $("#Remark").val();
+
+        //    self.__RequestVerificationToken= $('[name=__RequestVerificationToken]').val();
+        //    var settings=new SettingsViewModel();
+        //    self.PurchInvoiceSettings=settings;
+
+        //    self.linecharges =charges;
+        //    self.footercharges=footercharges;
+        //}
+
+        //var charges;
+        //var footercharges;
+
+        //function SettingsViewModel(){
+        //    var self=this;
+        //    var settings;
+
+        //    self.CalculationId=$("#PurchInvoiceSettings_CalculationId").val();
+        //    self.isVisibleDimension1=$("#PurchInvoiceSettings_isVisibleDimension1").val();
+        //    self.isVisibleDimension2=$("#PurchInvoiceSettings_isVisibleDimension2").val();
+        //    self.isVisibleLotNo=$("#PurchInvoiceSettings_isVisibleLotNo").val();
+
+        //}
+
+
+        ////For posting the data through ajax and render the contents sent back from the server
+        //function bindForm1(dialog) {
+        //    //alert("binding1");
+        //    $('form#modform', dialog).submit(function () {
+
+        //        charges= AssignValuesToCharges();
+        //        footercharges=AssignValuesToFooter();
+
+        //        //alert(charges.length);
+        //        //alert(footercharges.length);
+        //        var request = new PurchaseInvoiceReturnChargeModel();
+
+        //        $.ajax({
+        //            contentType:'application/json',
+        //            //headers: headers,
+        //            url: this.action,
+        //            type: this.method,
+        //            data:JSON.stringify(request),
+        //            success: function (result) {
+        //                if (result.success) {
+        //                    $('#myModal').modal('hide');
+        //                    //Refresh
+        //                    //location.reload();
+        //                    //alert('Data Saved');
+        //                }else if(!result.success)
+        //                {
+        //                    $('#myModalContent').html(result);
+        //                    bindForm1();
+        //                }
+        //                else {
+        //                    $('#myModalContent').html(result);
+        //                    bindForm1();
+        //                }
+        //            }
+        //        });
+        //        return false;
+        //    });
+
+        //    $('form#modformcharges', dialog).submit(function () {
+        //        //alert('charges');
+
+        //        footercharges=AssignValuesToFooter();
+
+        //        $.ajax({
+        //            contentType:'application/json',
+        //            url: this.action,
+        //            type: this.method,
+        //            data:JSON.stringify(footercharges),
+        //            success: function (result) {
+        //                if (result.success) {
+        //                    $('#myModal').modal('hide');
+        //                    //Refresh
+        //                    //location.reload();
+        //                    //alert('Data Saved');
+        //                }else if(!result.success)
+        //                {
+        //                    $('#myModalContent').html(result);
+        //                    bindForm1();
+        //                }
+        //                else {
+        //                    $('#myModalContent').html(result);
+        //                    bindForm1();
+        //                }
+        //            }
+        //        });
+        //        return false;
+        //    });
+
+        //}
+
+
+        //$(function () {
+
+        //    $.ajaxSetup({ cache: false });
+
+        //    $("a[data-modalCustom]").on("click", function (e) {
+        //        // hide dropdown if any
+        //        if(this.href=="")
+        //        {
+        //            return false;
+        //        }
+        //        //alert(' Script');
+        //        $('#myModalContent').load(this.href, function () {
+        //            $('#myModal').modal({
+        //                backdrop: 'static',
+        //                keyboard: true
+        //            }, 'show');
+
+        //            bindForm1(this);
+        //        });
+
+        //        return false;
+        //    });
+        //});
+
+
+
+
+    </script>
+
+
+
+
+}
+
+
+
+
+
+
+
+<script type="text/javascript">
+
+    CustomSelectFunction($("#SupplierId"), '/ComboHelpList/GetSuppliers', '/ComboHelpList/SetSingleSupplier', ' ', false, 1);
+    CustomSelectFunction($("#GodownId"), '/ComboHelpList/GetSiteGodown', '/ComboHelpList/SetSingleGodown', ' ', false, 1);
+
+    $("#DocNo").on("change", function () {
+        $(this).DuplicateCheckForCreate({ name: 'PurchaseOrderHeader', value: $(this).val(), doctype: $("#DocTypeId").val() });
+    });
+
+</script>
+
+<script type="text/javascript">
+    var form_clean;
+    $(document).ready(function () {
+
+        //Calling the function to load the table data/ Line information
+        LoadProducts();
+
+        //Adding Hidden Input Fields
+        AddFields();
+
+
+        //Adding Charges on Doc Load
+        var id=@Model.PurchaseInvoiceReturnHeaderId;
+
+        LoadCharges(id,"Web.PurchaseInvoiceReturnHeaderCharges","Web.PurchaseInvoiceReturnLineCharges","/TaxCalculation/GetPIRHeaderChargeForEdit/");
+    });
+
+
+
+
+
+
+
+
+    function LoadProducts() {
+        var groupId=@Model.PurchaseInvoiceReturnHeaderId;
+        var status='@Model.Status';
+        var LineEditUrl;
+        var LineDeleteUrl;
+        if(status==StatusContstantsEnum.Drafted)
+        {
+            LineEditUrl="/PurchaseInvoiceReturnLine/_ModifyLine/";
+            LineDeleteUrl="/PurchaseInvoiceReturnLine/_DeleteLine/";
+        }
+        else if(status==StatusContstantsEnum.Submitted || status == StatusContstantsEnum.Modified)
+        {
+            LineEditUrl="/PurchaseInvoiceReturnLine/_ModifyLineAfterSubmit/";
+            LineDeleteUrl="/PurchaseInvoiceReturnLine/_DeleteLine_AfterSubmit/";
+        }
+        else {
+            LineEditUrl = "/PurchaseInvoiceReturnLine/_Detail/";
+            LineDeleteUrl = "/PurchaseInvoiceReturnLine/_Detail/";
+        }
+        var link="/PurchaseInvoiceReturnLine/Index/"+groupId;
+        var QtyCount=0;
+        var DealQtyCount=0;
+        var AmountCount=0;
+        var unit=true;
+        var dunit=true;
+        var prevunit;
+        var prevdunit;
+        var decimal=0;
+        var ddecimal=0;
+        $.ajax({
+            url: link,
+            type: "GET",
+            success: function (data) {
+                var row = ""
+                var srno=1;
+
+                if(data.length!=0)
+                {
+                    $.each(data, function (index, item) {
+                        row += " <div class='row crow grid-body' style='margin-left:0px;margin-right:0px'>"
+                            +"      <div class='row-index block'  style='width:5%'><a Detail='' href='/PurchaseInvoiceReturnLine/_Detail/"+item.PurchaseInvoiceReturnLineId+"'>"+srno+"</a><input type='hidden' class='id' value='"+item.PurchaseInvoiceReturnLineId+"' /></div>"
+                            +"          <div class='block'  style='width:90%'>"
+                            +"              <div class='row'>"
+                            +"                  <div class='block' style='width:25%'>"+(item.ProductName==null?" ":"<strong>"+item.ProductName+"</strong>")
+                            +"                      <br />"+(item.Specification==null?" ":item.Specification)
+                            +"                          <div>"+(item.Dimension1Name==null?" ":item.Dimension1Name+",")+(item.Dimension2Name==null?" ":item.Dimension2Name)+"</div>"
+                            +"                          <div>"+((item.DueDate==null)?" ":"<span title='DueDate' class='label label-danger' style='font-weight:bold'>"+formatDate('d/m/Y',new Date(parseInt(item.DueDate.substr(6))))+"</span>")
+                            +"                          </div>"
+                            +"                           <div>"+(item.ProductUidName==null?" ":"Product UID:"+item.ProductUidName)+"</div>"
+                            +              (item.Remark==null?" ":item.Remark)
+                            +"                  </div>"
+                            +"                  <div class='block'  style='width:15%'>"+(item.PurchaseInvoiceHeaderDocNo==null?" ":"<span title='DueDate' class='label label-danger' style='font-weight:bold'>"+item.PurchaseInvoiceHeaderDocNo)+"</span><br />"
+                            +"                      <div>"+(item.PurchaseGoodsRecieptHeaderDocNo==null?" ":item.PurchaseGoodsRecieptHeaderDocNo)
+                            +"                      </div>"
+                            +"                   </div>"
+                            +"                  <div class='text-right block'  style='width:10%'>"+(item.Qty==null?" ":item.Qty.toFixed(item.unitDecimalPlaces))+"<br />"
+                            +"                      <div><small>"+(item.UnitName==null?" ":item.UnitName)+"</small>"
+                            +"                      </div>"
+                            +"                   </div>"
+                            +"                  <div class='text-right block'  style='width:10%'>"+(item.DealQty==null?" ":item.DealQty.toFixed(item.DealunitDecimalPlaces))+"<br />"
+                            +"                      <div><small>"+(item.DealUnitName==null?" ":item.DealUnitName)+"</small>"
+                            +"                      </div>"
+                            +"                   </div>"
+                            +"                   <div class='text-right block'  style='width:10%'>"+(item.Rate==null?" ":item.Rate.toFixed(2))
+                            +"                   </div>"
+                            +"                  <div class='col-sm-2 text-right'>"+(item.DiscountPer==null?" ":item.DiscountPer.toFixed(2))
+                            +"                  </div>"
+                            +"                   <div class=' text-right block'  style='width:10%'>"+(item.Amount==null?" ":item.Amount.toFixed(2))
+                            +"                   </div>"
+                            +"              </div>"
+                            +"          </div>"
+                            +"      <div class='block'  style='width:5%'><a class='glyphicon glyphicon-trash icon-Cus-Size' data-modal='' data-detailDisabled='true' delete='' href='"+LineDeleteUrl+item.PurchaseInvoiceReturnLineId+"'></a><a  edit='' href='"+LineEditUrl+item.PurchaseInvoiceReturnLineId+"'></a>"
+                            +"      </div>"
+                            +"  </div>"
+                            +"<hr style='margin-top:0px;margin-bottom:0px'/>";
+                        QtyCount+=item.Qty;
+                        DealQtyCount+=item.DealQty;
+                        AmountCount+=item.Amount;
+                        if(srno!=1)
+                        {
+                            if(item.UnitName==prevunit && unit!=false)
+                            {}
+                            else
+                            {unit=false;}
+                            if(item.DealUnitName==prevdunit && dunit!=false)
+                            {}
+                            else
+                            {dunit=false;}
+                        }
+
+                        if(decimal<item.unitDecimalPlaces){decimal=item.unitDecimalPlaces;}
+                        if(ddecimal<item.DealunitDecimalPlaces){ddecimal=item.DealunitDecimalPlaces;}
+                        srno++;
+                        prevunit=item.UnitName;
+                        prevdunit=item.DealUnitName;
+                    });
+                    row+="<div class='row tfooter' style='padding-top:10px;'>"
+                        +"  <div class='block' style='width:5%'>"
+                        +"  </div>"
+                        +"  <div class='block' style='width:90%'>"
+                        +"      <div class='row'> "
+                        +"          <div class='block'  style='width:25%'><strong>Total</strong></div>"
+                        +"          <div class='block' style='width:15%'>"
+                        +"          </div>"
+                        +"          <div class='block text-right' style='width:10%'><strong>"
+                        +               ((unit==true)?QtyCount.toFixed(decimal)+"<br /><small>"+prevunit:QtyCount.toFixed(decimal))+"</small></strong>"
+                        +"          </div>"
+                        +"          <div class='block text-right' style='width:10%'><strong>"
+                        +               ((dunit==true)?DealQtyCount.toFixed(ddecimal)+"<br /><small>"+prevdunit:DealQtyCount.toFixed(ddecimal))+"</small></strong>"
+                        +"          </div>"
+                        +"          <div class='block text-right' style='width:10%'>"
+                        +"          </div>"
+                        +"                  <div class='col-sm-2 text-right'>"
+                        +"                  </div>"
+                        +"          <div class='block text-right' style='width:10%'><strong>"+AmountCount.toFixed(2)+"</strong>"
+                        +"          </div>"
+
+                        +"      </div>"
+                        +"  </div>"
+                        +"  <div class='block'  style='width:5%'>"
+                        +"  </div>"
+                        +"</div>"
+                }
+                else
+                {
+                    ;
+                }
+                $("#gbody").html(row);
+
+            },
+            error: function (result) {
+                alert("Error");
+            }
+        });
+    }
+
+
+
+
+</script>
+
+
+@if ((ViewBag.Mode != "Add") && (ViewBag.Mode != "Edit"))
+{
+    <script type="text/javascript">
+
+        $(document).ready(function(){
+            DisablePageNavigation();
+        })
+
+        //RemoveFields();
+
+        //function RemoveFields(){
+        //    //Disabling input fields
+        //    $(':input:not(:submit,#IsContinue)').attr('disabled','disabled');
+
+        //    //Removing all the events from the newly created lines
+        //    $('#gbody').unbind();
+
+        //    //Removing Add New Row ActionLink
+        //    $('a#btnCreate').parents('h5')[0].remove();
+
+
+        //    //Preventing the click event on newly created elements
+        //    $(document).on('click','#gbody a',function(event){
+        //        event.preventDefault();
+        //    })
+        //    //Removing the action link from the form so that the request will be redirected to the Submit function in the controller instead of the hardcoded path
+        //    $('form:last').prop('action','');
+        //}
+
+
+    </script>
+}
+
+@if ((Model.Status == (int)ActivityTypeContants.Modified || Model.Status == (int)ActivityTypeContants.Submitted)
+    && (ViewBag.transactionType == "submit" || ViewBag.transactionType == "submitContinue" || ViewBag.transactionType == "review" || ViewBag.transactionType == "ReviewContinue"))
+{
+    <script type="text/javascript">
+
+        var GatePassGen='@Model.PurchaseInvoiceSettings.SqlProcGatePass'
+        var GatePassId='@Model.GatePassHeaderId'
+        var TrancType='@ViewBag.transactionType'
+
+        $(document).ready(function(){
+            enableActivityLogReason(GatePassGen,GatePassId,TrancType);
+        })
+
+
+        //var href = '/ActivityLog/LogEditReason';
+
+        //var $btnClicked;
+
+        //$(':submit').bind('click', function () {
+        //    $btnClicked=$(this);
+        //    $('#myModalContent').load(href, function () {
+
+        //        $('#myModal').modal({
+        //            backdrop: 'static',
+        //            keyboard: true
+        //        }, 'show');
+
+        //        bindForm1(this);
+        //    });
+
+        //    return false;
+        //})
+
+        //function bindForm1(dialog) {
+
+        //    $('#modformr', dialog).submit(function () {
+
+        //        $.ajax({
+        //            url: this.action,
+        //            type: this.method,
+        //            data: $(this).serialize(),
+        //            success: function (result) {
+        //                if (result.success) {
+        //                    $('#myModal').modal('hide');
+
+        //                    $(':submit').unbind();
+
+        //                    $('input[name="UserRemark"]').val(result.UserRemark);
+
+        //                    if(GatePassGen && !GatePassId && (TrancType=="submit"||TrancType=="submitContinue"))
+        //                    {
+        //                        alertify.confirm('Generate GatePass ?').set({
+        //                            'closable': false, 'onok': function (onok) {
+
+        //                                $('input[name="GenGatePass"]').val('true');
+        //                                $btnClicked.trigger('click');
+
+        //                            }, 'oncancel': function (oncancel) {
+
+        //                                $('input[name="GenGatePass"]').val('false');
+        //                                $btnClicked.trigger('click');
+
+        //                            }
+        //                        }).setting('labels',{'ok':'Yes', 'cancel': 'No'});
+        //                    }
+        //                    else
+        //                    {
+        //                        $btnClicked.trigger('click');
+        //                    }
+
+        //                } else {
+        //                    $('#myModalContent').html(result);
+        //                    bindForm1();
+        //                }
+        //            }
+        //        });
+        //        return false;
+        //    });
+
+        //}
+
+    </script>
+}
+else if (Model.GatePassHeaderId == null && (ViewBag.transactionType == "submit" || ViewBag.transactionType == "submitContinue") && !string.IsNullOrEmpty(Model.PurchaseInvoiceSettings.SqlProcGatePass))
+{
+    <script type="text/javascript">
+
+        $(document).ready(function(){
+            prompGatePassGeneration();
+        })
+        
+        //$(':submit','form .panel.panel-default').one('click', function () {
+        //    $btnClicked=$(this);
+        //    var uChoice=false;
+        //    alertify.confirm('Generate GatePass ?').set({
+        //        'closable': false, 'onok': function (onok) {
+
+        //            $('input[name="GenGatePass"]').val('true');
+        //            $btnClicked.trigger('click');
+        //            uChoice=true;
+
+        //        }, 'oncancel': function (oncancel) {
+
+        //            $('input[name="GenGatePass"]').val('false');
+        //            $btnClicked.trigger('click');
+        //            uChoice=true;
+        //        }
+        //    }).setting('labels',{'ok':'Yes', 'cancel': 'No'});
+        //    return uChoice;
+        //})
+
+
+    </script>
+}
+
+@*<script type="text/javascript">
+    $('a#PrintRecord').click(function (e) {
+
+        var editiiid = $('#PurchaseInvoiceReturnHeaderId').val();
+
+        var Status = $('#Status').val();
+
+        var url;
+        if (Status == StatusContstantsEnum.Drafted) {
+            url = '@Url.Action("Print", "PurchaseInvoiceReturnHeader")' + "/" + editiiid;
+        }
+        else if (Status == StatusContstantsEnum.Submitted || Status == StatusContstantsEnum.Modified ) {
+            url = '@Url.Action("PrintAfter_Submit", "PurchaseInvoiceReturnHeader")' + "/" + editiiid;
+        }
+        else if (Status == StatusContstantsEnum.Closed ) {
+            url = '@Url.Action("PrintAfter_Approve", "PurchaseInvoiceReturnHeader")' + "/" + editiiid;
+        }
+        $(this).attr('href', url);
+        return;
+    })
+</script>*@
+@if (ViewBag.transactionType != null && (ViewBag.transactionType == "submitContinue" || ViewBag.transactionType == "ReviewContinue"))
+{
+    <script type="text/javascript">
+
+        $(document).ready(function(){
+            CreateTrasitionEffect();
+        })
+
+        //CreateTrasitionEffectForSubmit();
+
+        //function CreateTrasitionEffectForSubmit(){
+
+        //    //$('body').find('.container.body-content > div.row ').wrap("<div class='animsition' data-animsition-in='fade-in-right-lg' data-animsition-out='fade-out-left-lg' style='animation-duration: 1.5s; -webkit-animation-duration: 1.5s; opacity: 0;'> </div>");
+
+        //    $('body').find('form').filter(":last").wrapInner("<div class='animsition' data-animsition-in='fade-in-right-lg' data-animsition-out='fade-out-left-lg' style='animation-duration: 1.5s; -webkit-animation-duration: 1.5s; opacity: 0;'> </div>");
+
+        //    var script=document.createElement('script');
+
+        //    script.setAttribute('type','text/javascript');
+
+        //    script.text=" $(document).ready(function () {$('.animsition').animsition().one('animsition.start', function () {}).one('animsition.end', function () {$(this).find('.animsition-child').addClass('zoom-in').css({'opacity': 1});})});";
+
+        //    $('body').append(script);
+
+        //}
+    </script>
+}

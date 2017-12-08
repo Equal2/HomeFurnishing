@@ -1,0 +1,71 @@
+﻿@model List<Model.ViewModel.ImportErrors>
+@using System.Text.RegularExpressions
+@{
+    ViewBag.Title = "JobOrderTextImport";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Job Order Import</h2>
+
+<p style="font:bold"><b>Check These Fields</b> </p>
+@{
+    string StoreDomain = @System.Configuration.ConfigurationManager.AppSettings["StoreDomain"];  
+
+    //@*<ul>
+    //        <p style="font:bold">@ViewBag.Error</p>
+    //    </ul>*@
+}
+
+@foreach (var item in Model)
+{
+    <div>
+        @Html.DisplayFor(modelItem => item.ErrorText) :
+
+        @if (item.BarCodes != null)
+        { 
+            foreach (string BC in item.BarCodes.Split(',').ToList())
+            {
+
+                string url = StoreDomain + "/BarCodeHistory/Index?ProductUid=" + BC.Replace(" ", "");
+
+                <a href="@url" target="_blank">@BC,</a>
+
+            }
+        }
+    </div>
+
+}
+
+@*@foreach (string barcodes in "2624146, 2593427, 2564526, 2575831".Split(',').ToList())
+{
+    string url = StoreDomain + "/BarCodeHistory/Index?ProductUid=" + barcodes;
+
+    <a href="@url">@barcodes</a>
+}*@
+
+<div>
+    @Html.ActionLink("Go Back", "Index", "JobOrderTextImport", new { @id = ViewBag.id }, new { @class = "btn btn-primary btn-sm col-md-offset-0 CurveBorder ActionLinkPadding" })
+    @Html.ActionLink("Continue", "Continue", "JobOrderTextImport", new { @id = ViewBag.id, @ImportWarningRecords = "ChkVal" }, new { @class = "btn btn-primary btn-sm col-md-offset-0 CurveBorder ActionLinkPadding", @id = "Continue" })
+
+    <input type="checkbox" name="ChkIncludeRepeatedBarCodes" id="ChkIncludeRepeatedBarCodes" value="false">
+    <label for="ChkIncludeRepeatedBarCodes">Import Repeated Barcodes</label>
+</div>
+
+<script>
+    $("#Continue").on("click", function () {
+        var url = $('#Continue').attr("href")
+        if ($('#ChkIncludeRepeatedBarCodes').is(':checked') == true)
+        {
+            url = url.replace("ChkVal", "1");
+        }
+        else {
+            url = url.replace("ChkVal", "0");
+        }
+        //alert(url);
+        $('#Continue').attr("href", url)
+        return;
+    });
+</script>
+
+
+

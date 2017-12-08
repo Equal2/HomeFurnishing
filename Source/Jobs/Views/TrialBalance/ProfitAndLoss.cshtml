@@ -1,0 +1,309 @@
+﻿@{
+    ViewBag.Title = "Profit And Loss Statement";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<link href="~/Content/Slick/slick.grid.css" rel="stylesheet" />
+<link href="~/Content/Slick/css/smoothness/jquery-ui-1.8.16.custom.css" rel="stylesheet" />
+<link href="~/Content/Slick/slick-default-theme.css" rel="stylesheet" />
+
+<style type="text/css">
+    .slick-header-column.ui-state-default {
+        background-color: #428bca;
+        color: white;
+        height: 35px;
+        line-height: 35px;
+    }
+
+    .Bold 
+        {
+            font-weight: bold;
+            color:  black;
+                    font-size:14px;
+        }
+
+        .LineHight 
+        {
+         
+        height: 150px;
+        }
+
+    .Row_Total
+   {
+    font-weight: bold;
+    font-size:larger;
+    color:  black;
+    }
+
+    .slick-row.ui-widget-content, .slick-cell {
+        height: 30px;
+                font-size:14px;
+        line-height: 30px;
+    }
+
+    #myGrid * {
+        box-sizing: content-box !important;
+    }
+
+    .hidden {
+        display: none;
+    }
+
+    .sml {
+        width: 10% !important;
+    }
+
+    .md {
+        width: 15% !important;
+    }
+
+            .slick-cell.selected {
+background-color:rgba(0, 0, 0, 0);
+}
+
+              .rightMargin {
+      margin-right: 2px;
+    }
+</style>
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3>
+            <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-list black"></span> Profit And Loss Statement</span>
+            <span style="font-family: Calibri,sans-serif,Verdana;font-size:medium" class="black"> @ViewBag.FilterRemark </span>  
+
+            @Html.ActionLink(" ", "Create", "TrialBalanceSetting", null, new { @class = "cbtn btn-circle glyphicon glyphicon-cog toolbar right rightMargin",  @title = "List", @data_toggle = "tooltip" })
+            @Html.ActionLink(" ", " ", " ", null, new { @class = "cbtn btn-circle glyphicon glyphicon-refresh toolbar right rightMargin", @title = "Refresh Page", @data_toggle = "tooltip", @id = "RefreshPage" })
+            @Html.ActionLink(" ", "GeneratePrints", "TrialBalance", new { ActionName = "ProfitAndLoss" }, new { @class = "cbtn btn-circle glyphicon glyphicon-print toolbar right rightMargin", @title = "Print", @data_toggle = "tooltip", @id = "PrintRecord" })
+            <input type="text" id="txtSearch2" class="right toolbar small" placeholder="Search" style="height:25px;margin:5px;max-width:20%">
+        </h3>
+    </div>
+
+    <div class="panel-info tab" style="padding-left:0px">
+        <div style="width: 100%;">
+            <div id="myGrid" style="width: 100%; height: 450px; font-size: 11px; "></div>
+        </div>
+    </div>
+</div>
+
+<script src="~/Scripts/Slick/lib/jquery.event.drag-2.2.js"></script>
+<script src="~/Scripts/Slick/slick.core.js"></script>
+<script src="~/Scripts/Slick/slick.grid.js"></script>
+<script src="~/Scripts/Slick/slick.dataview.js"></script>
+<script src="~/Scripts/Slick/slick.rowselectionmodel.js"></script>
+
+<script>
+
+    var grid;
+    var columns;
+    var data;
+
+    //Columns Specification
+    columns =
+   [
+   { id: "DrParticular", name: "Particulars", field: "DrParticular",  headerCssClass: "Bold", width: 200, minWidth: 200 },
+   { id: "AmtDr", name: "Amount", field: "AmtDr", cssClass: "text-right", headerCssClass: "text-right Bold", width: 150, minWidth: 100, formatter: DecimalFormatter },
+   { id: "CrParticular", name: "Particulars", field: "CrParticular", headerCssClass: "Bold", width: 200, minWidth: 200 },
+   { id: "AmtCr", name: "Amount", field: "AmtCr", cssClass: "text-right", headerCssClass: "text-right Bold", width: 150, minWidth: 100, formatter: DecimalFormatter },
+    ];
+
+
+    function DecimalFormatter(row, cell, value, columnDef, dataContext) {
+
+        if (value == null || value == "") {
+
+            return "";
+
+        } else {
+
+            return Number(value).toFixed(2);
+
+        }
+
+    }
+
+    //Options Initialization
+    var options = {
+        editable: false,
+        enableCellNavigation: true,
+        enableColumnReorder: false,
+        forceFitColumns: true,
+        showFooterRow: false,
+        explicitInitialization: true
+    };
+
+    //Creating Custom FilterFunction that can be passed to slickgrid for search
+    var searchString = "";
+    function myFilter(item, args) {
+        if (args.searchString != "" && (item["DrParticular"]).toLowerCase().indexOf(args.searchString.toLowerCase()) == -1) {
+            return false;
+        }
+        return true;
+    }
+
+    //Instantiating the Grid
+    var dataView = new Slick.Data.DataView({ inlineFilters: true });
+
+
+    dataView.getItemMetadata = function (row)
+    {
+        var item = dataView.getItem(row);
+        if ( item["Sr"] == "20")
+        {
+            return { cssClasses: "Row_Total" };
+        }
+        else if (item["Sr"] == "10")
+        {
+            return { cssClasses: "Bold" };
+        }
+        else if (item["Sr"] == "8")
+        {
+            //return { cssClasses: "LineHight" };
+            //return {
+            //    "columns": {
+            //        "duration": {
+            //            "colspan": 3
+            //        }
+            //    }
+            //};
+
+    
+        }
+        return null;
+    }
+
+
+    //dataView.getItemMetadata = function (row) {
+    //    if (row % 2 === 1) {
+    //        return {
+    //            "columns": {
+    //                "duration": {
+    //                    "colspan": 3
+    //                }
+    //            }
+    //        };
+    //    } else {
+    //        return {
+    //            "columns": {
+    //                0: {
+    //                    "colspan": "*"
+    //                }
+    //            }
+    //        };
+    //    }
+    //};
+
+    grid = new Slick.Grid("#myGrid", dataView, columns, options);
+
+    //Adding Grid functionalities
+    grid.setSelectionModel(new Slick.RowSelectionModel());
+
+
+
+    //Functionality for search events
+    $("#txtSearch,#txtSearch2").keyup(function (e) {
+        Slick.GlobalEditorLock.cancelCurrentEdit();
+        // clear on Esc
+        if (e.which == 27) {
+            this.value = "";
+        }
+        searchString = this.value;
+        updateFilter();
+    });
+    function updateFilter() {
+        dataView.setFilterArgs({
+            searchString: searchString
+        });
+        dataView.refresh();
+    }
+
+    // wire up model events to drive the grid
+    dataView.onRowCountChanged.subscribe(function (e, args) {
+        grid.updateRowCount();
+        grid.render();
+    });
+
+    dataView.onRowsChanged.subscribe(function (e, args) {
+        grid.invalidateRows(args.rows);
+        grid.render();
+    });
+
+
+    //Data Fetching
+    $.ajax({
+        url: "/TrialBalance/_ProfitAndLoss",
+        async: true,
+        success: function (rest) {
+            data = rest.data;
+            InitializeGrid();
+        },
+        error: function () {
+            onError(fromPage, toPage)
+        }
+    });
+
+
+    //Initializing the Grid
+    function InitializeGrid() {
+        // initialize the model after all the events have been hooked up
+        dataView.beginUpdate();
+        dataView.setItems(data, "Sr");
+        dataView.setFilterArgs({
+            searchString: searchString
+        });
+        dataView.setFilter(myFilter);
+        dataView.endUpdate();
+
+        // if you don't want the items that are not visible (due to being filtered out
+        // or being on a different page) to stay selected, pass 'false' to the second arg
+        dataView.syncGridSelection(grid, true);
+
+        grid.init();
+
+    }
+
+    $('#myGrid').on('dblclick', '.ui-widget-content.slick-row', function ()
+    {
+        var cell = grid.getActiveCell();
+        var c = grid.getColumns()[cell.cell];
+       // alert(c.field.toString());
+        var id=0;
+        if (c.field.toString() == "CrParticular")
+        {
+            id = grid.getDataItem(grid.getSelectedRows()).CrGroupId;
+        }
+        else
+        {
+            id = grid.getDataItem(grid.getSelectedRows()).DrGroupId;
+        }
+        if (id != 0)
+        {
+            window.location.href = '/TrialBalance/GetLedgerGroupBalance/' + id;
+        }
+    });
+
+    //Functionality for Enter key navigation
+    grid.onKeyDown.subscribe(function (e) {
+        if (e.which == 13) {
+            var cell = grid.getActiveCell();
+            var c = grid.getColumns()[cell.cell];
+            // alert(c.field.toString());
+            var id = 0;
+            if (c.field.toString() == "CrParticular") {
+                id = grid.getDataItem(grid.getSelectedRows()).CrGroupId;
+            }
+            else {
+                id = grid.getDataItem(grid.getSelectedRows()).DrGroupId;
+            }
+            if (id != 0) {
+                window.location.href = '/TrialBalance/GetLedgerGroupBalance/' + id;
+            }
+        }
+    });
+
+    $(window).resize(function (e) {
+        grid.resizeCanvas();
+    })
+
+</script>

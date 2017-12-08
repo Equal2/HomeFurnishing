@@ -1,0 +1,481 @@
+﻿@model Model.ViewModel.RateListHeaderViewModel
+@using Core.Common
+@{
+    ViewBag.Title = "Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!-- modal placeholder-->
+<div id='myModal' class='modal fade in'>
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div id='myModalContent'></div>
+        </div>
+    </div>
+</div>
+
+
+@using (Html.BeginForm("Post", "RateListHeader", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            @if (ViewBag.transactionType == "submit")
+            {<h3 style="border-bottom:0px solid #e1dada;padding-bottom:0px;">
+                <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"> <span class="glyphicon glyphicon-file black"></span>Submit Rate List</span>
+                <input type="submit" value="Submit" name="Command:Submit" class="btn btn-primary right" style="width: 90px; background-color: #2980b9" />
+            </h3>}
+            else if (ViewBag.transactionType == "approve")
+            {<h3 style="border-bottom:0px solid #e1dada;padding-bottom:0px;">
+                <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"> <span class="glyphicon glyphicon-file black"></span>Approve Rate List</span>
+                <input type="submit" value="Approve" class="btn btn-primary right" name="Command:Approve" style="width: 90px; background-color: #2980b9" />
+            </h3>}
+
+            else
+            {
+                <h3 style="border-bottom:0px solid #e1dada;padding-bottom:0px;">
+                    <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"> <span class="glyphicon glyphicon-file black"></span> Rate List</span>
+                    <input type="submit" value="Save" class="btn btn-primary right" id="submit" style="width: 90px; background-color: #2980b9" />
+                    @Html.ActionLink("RateList", "RateListWizard", "RateListHeader", new { id = Model.RateListHeaderId }, new { @class = "btn btn-primary right right", @title = "RateList", @data_toggle = "tooltip", @style = "width: 90px; background-color: #2980b9 ; margin-right:10px" })
+                </h3>
+            }
+            <hr style="margin-top:0px;margin-bottom:0px" />
+
+            @{
+                string EditAction = "";
+                if (Model.Status == (int)StatusConstants.Drafted || Model.Status == (int)StatusConstants.Import)
+                {
+                    EditAction = "Modify";
+                }
+                else if ((Model.Status == (int)StatusConstants.Submitted || Model.Status == (int)StatusConstants.Modified))
+                {
+                    EditAction = "ModifyAfter_Submit";
+                }
+                else
+                {
+                    EditAction = "DetailInformation";
+                }
+            }
+
+            <div class="panel-info">
+                @*<h4 style="padding:5px 0 0 0;margin:0px">
+                    @Html.ActionLink(" ", " ", " ", null, new { @class = "glyphicon glyphicon-refresh toolbar", @title = "Refresh Page", @data_toggle = "tooltip", @id = "RefreshPage" })
+                    @Html.ActionLink(" ", "Create", "RateListHeader", null, new { @class = "glyphicon glyphicon-plus toolbar", @title = "Add New", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "History", "RateListHeader", null, new { @class = "glyphicon glyphicon-user toolbar", @title = "History", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "Print", "RateListHeader", new { id = @Model.RateListHeaderId }, new { @class = "glyphicon glyphicon-print toolbar", @title = "Print", @data_toggle = "tooltip", target = "_blank" })
+                    @Html.ActionLink(" ", "Email", "RateListHeader", null, new { @class = "glyphicon glyphicon-envelope toolbar", @title = "Email", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "PrevPage", "RateListHeader", new { id = @Model.RateListHeaderId }, new { @class = "glyphicon glyphicon-arrow-left toolbar", @title = "Prev Record", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "NextPage", "RateListHeader", new { id = @Model.RateListHeaderId }, new { @class = "glyphicon glyphicon-arrow-right toolbar", @title = "Next Record", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "Index", "RateListHeader", null, new { @class = "glyphicon glyphicon-list toolbar right", @title = "List", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "Report", "RateListHeader", null, new { @class = "glyphicon glyphicon-th toolbar right", @title = "Report", @data_toggle = "tooltip" })                   
+                </h4>*@
+                <div class="btn-group">
+                    @Html.ActionLink(" ", "Create", "RateListHeader", null, new { @class = "cbtn btn-circle glyphicon glyphicon-plus toolbar", @title = "Add New", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", EditAction, "RateListHeader", new { @id = Model.RateListHeaderId, IndexType = ViewBag.IndexStatus }, new { @class = "cbtn btn-circle glyphicon glyphicon-edit", @title = "Edit", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "Print", "RateListHeader", new { id = @Model.RateListHeaderId }, new { @class = "cbtn btn-circle glyphicon glyphicon-print toolbar", @title = "Print", @data_toggle = "tooltip", target = "_blank" })
+                    @Html.ActionLink(" ", "PrevPage", "RateListHeader", new { id = @Model.RateListHeaderId }, new { @class = "cbtn btn-circle glyphicon glyphicon-arrow-left toolbar", @title = "Prev Record", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "NextPage", "RateListHeader", new { id = @Model.RateListHeaderId }, new { @class = "cbtn btn-circle glyphicon glyphicon-arrow-right toolbar", @title = "Next Record", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "Index", "RateListHeader", null, new { @class = "cbtn btn-circle glyphicon glyphicon-list", @title = "List", @data_toggle = "tooltip" })
+                </div>
+                @*<div class="btn-group">
+                    <a class="cbtn btn-circle glyphicon glyphicon-option-horizontal dropdown-toggle" aria-expanded="false" style="padding-top: 6px;padding-bottom: 6px;" href="#" data-toggle="dropdown" id="dropdownMenu1">
+                    </a>
+                    <ul class="dropdown-menu pull-right" aria-labelledby="dropdownMenu1">                        
+                        <li><a href="@Url.Action("Email", "RateListHeader")"><span class="glyphicon glyphicon-envelope"> </span> Email</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a target="_blank" href="@Url.Action("Report", "RateListHeader", new { @ViewBag.id })"><span class="glyphicon glyphicon-th"> </span> Report</a></li>
+                    </ul>
+                </div>*@
+            </div>
+        </div>
+
+
+        <div class="panel-info" style="padding-left:15px">
+            <div class="form-horizontal">
+                @Html.ValidationSummary(true)
+                @Html.HiddenFor(m => m.RateListHeaderId)
+
+                @if (ViewBag.CloseDate == true)
+                {
+                    <div class="alert alert-danger" role="alert">Record is Closed at @Model.CloseDate</div>
+                }
+
+                <div class="row">
+                    <h4 class="col-md-12 black">
+                        <span class="glyphicon glyphicon-align-justify"></span>
+                        1.Rate List Details
+                    </h4>
+                    <div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group" style="margin-top:15px">
+                                    @Html.LabelFor(model => model.EffectiveDate, "Effective Date", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.EffectiveDate, "{0:dd/MMMM/yyyy}", new { @class = "datepickerWithNFD form-control col-xs-6 required" })
+                                        @Html.ValidationMessageFor(model => model.EffectiveDate, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <div class="col-md-6">
+                                <div class="form-group" style="margin-top:15px">
+                                    @Html.LabelFor(model => model.RateListName, "RateList Name", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.RateListName, new { @class = "form-control col-xs-6 required" })
+                                        @Html.ValidationMessageFor(m => m.RateListName, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.ProcessId, "Process", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.ProcessId, new { @class = "form-control col-xs-6" })
+                                        @Html.ValidationMessageFor(m => m.ProcessId, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.Description, "Description", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextAreaFor(m => m.Description, new { @class = "form-control col-xs-6" })
+                                        @Html.ValidationMessageFor(m => m.Description, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.CalculateWeightageOn, "Weightage", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.DropDownListFor(m => m.CalculateWeightageOn, new SelectList(ViewBag.CalculateWeightOnList as System.Collections.IEnumerable, "Value", "Text"), new { @class = "form-control col-xs-6 height" })
+                                        @Html.ValidationMessageFor(m => m.CalculateWeightageOn, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.WeightageGreaterOrEqual, "Weightage", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.WeightageGreaterOrEqual, new { @class = "form-control col-xs-6" })
+                                        @Html.ValidationMessageFor(m => m.WeightageGreaterOrEqual, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.DealUnitId, "Deal Unit", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.DropDownListFor(m => m.DealUnitId, new SelectList(ViewBag.DeliveryUnitList as System.Collections.IEnumerable, "UnitId", "UnitName"), new { @class = "form-control col-xs-6 height" })
+                                        @Html.ValidationMessageFor(m => m.DealUnitId, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.MinRate, "Min Rate", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.MinRate, new { @class = "form-control col-xs-6" })
+                                        @Html.ValidationMessageFor(m => m.MinRate, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.MaxRate, "Max Rate", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.MaxRate, new { @class = "form-control col-xs-6" })
+                                        @Html.ValidationMessageFor(m => m.MaxRate, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.PersonRateGroup, "Person Rate Group", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.PersonRateGroup, new { @class = "form-control col-xs-6" })
+                                        @Html.ValidationMessageFor(m => m.PersonRateGroup, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.ProductRateGroup, "Product Rate Group", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.ProductRateGroup, new { @class = "form-control col-xs-6" })
+                                        @Html.ValidationMessageFor(m => m.ProductRateGroup, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+
+        CustomSelectFunction($("#ProcessId"), '/ComboHelpList/GetProcess', '/ComboHelpList/SetSingleProcess', ' ', false, 1);
+        //CustomSelectFunction($("#PersonRateGroup"), '/ComboHelpList/GetPersonRateGroupSiteFilter', '/ComboHelpList/SetPersonRateGroup', ' ', true, 1, $("#ProcessId").val());
+        // CustomSelectFunction($("#ProductRateGroup"), '/ComboHelpList/GetProductRateGroup', '/ComboHelpList/SetProductRateGroup', ' ', true, 1, $("#ProcessId").val());
+        AddFields();
+        var URL = '/ComboHelpList/GetPersonRateGroupSiteFilter';
+        var URLP = '/ComboHelpList/GetProductRateGroup';
+
+        $("#PersonRateGroup").select2(
+         {
+             //Does the user have to enter any data before sending the ajax request
+             minimumInputLength: 1,
+             allowClear: true,
+             multiple: true,
+             ajax: {
+                 //How long the user has to pause their typing before sending the next request
+                 quietMillis: 1000,
+                 //The url of the json service
+                 url: URL,
+                 dataType: 'jsonp',
+                 //Our search term and what page we are on
+                 data: function (term, page) {
+                     return {
+                         pageSize: 20,
+                         pageNum: page,
+                         searchTerm: term,
+                         filter: $('#ProcessId').val()
+                     };
+                 },
+                 results: function (data, page) {
+                     //Used to determine whether or not there are more results available,
+                     //and if requests for more data should be sent in the infinite scrolling
+                     var more = (page * 20) < data.Total;
+                     return { results: data.Results, more: more };
+                 }
+             },
+             initSelection: function (element, callback) {
+
+                 var xval = element.val();
+                 if (xval != 0) {
+                     $.ajax({
+                         cache: false,
+                         type: "POST",
+                         url: '/ComboHelpList/SetPersonRateGroup',
+                         data: { Ids: element.val() },
+                         success: function (data) {
+                             callback(data);
+                         },
+                         error: function (xhr, ajaxOptions, thrownError) {
+                             alert('Failed to Retrive Qty' + thrownError);
+                         }
+                     })
+                 }
+                 //callback([{ id: "1", text: "arpit" }, { id: "2", text: "akash" }]);
+             }
+         });
+        $("#ProductRateGroup").select2(
+         {
+             //Does the user have to enter any data before sending the ajax request
+             minimumInputLength: 1,
+             allowClear: true,
+             multiple: true,
+             ajax: {
+                 //How long the user has to pause their typing before sending the next request
+                 quietMillis: 1000,
+                 //The url of the json service
+                 url: URLP,
+                 dataType: 'jsonp',
+                 //Our search term and what page we are on
+                 data: function (term, page) {
+                     return {
+                         pageSize: 20,
+                         pageNum: page,
+                         searchTerm: term,
+                         filter: $('#ProcessId').val()
+                     };
+                 },
+                 results: function (data, page) {
+                     //Used to determine whether or not there are more results available,
+                     //and if requests for more data should be sent in the infinite scrolling
+                     var more = (page * 20) < data.Total;
+                     return { results: data.Results, more: more };
+                 }
+             },
+             initSelection: function (element, callback) {
+
+                 var xval = element.val();
+                 if (xval != 0) {
+                     $.ajax({
+                         cache: false,
+                         type: "POST",
+                         url: '/ComboHelpList/SetProductRateGroup',
+                         data: { Ids: element.val() },
+                         success: function (data) {
+                             callback(data);
+                         },
+                         error: function (xhr, ajaxOptions, thrownError) {
+                             alert('Failed to Retrive Qty' + thrownError);
+                         }
+                     })
+                 }
+                 //callback([{ id: "1", text: "arpit" }, { id: "2", text: "akash" }]);
+             }
+         });
+
+    });
+
+
+
+    function AddFields() {
+        $('form:last').append($("<input type='hidden' name='UserRemark'></input>"))
+    }
+
+    var IsSaved = false;
+    var ValidationCount = 0;
+
+    $('form').submit(function (event) {
+
+        if (!IsSaved) {
+            if (!ValidateData()) {
+                return false;
+            }
+            IsSaved = true;
+            return IsSaved;
+        }
+        else {
+            return false;
+        }
+
+
+    });
+
+
+    function ValidateData() {
+        var DocId = '@Model.RateListHeaderId';
+        var TempValue;
+        var ValidationMessage = "";
+
+
+
+        //Checking for dulicate key value
+        if (DocId <= 0) {
+            TempValue = $('#RateListName').DuplicateCheckForCreate({ name: 'RateListHeader', value: $('#RateListName').val(), doctype: 0 });
+            if (TempValue) { ValidationMessage = $('#RateListName').val() + " already exist <br />"; }
+        }
+        else {
+            TempValue = $('#RateListName').DuplicateCheckForEdit({ name: 'RateListHeader', value: $('#RateListName').val(), doctype: 0, headerId: DocId });
+            if (TempValue) { ValidationMessage += $('#RateListName').val() + " already exist <br />"; }
+        }
+        if (TempValue) {
+            if ($('#validationerrormsg').length == 0) {
+                $('.panel-info').filter(':eq(1)').before('<div class="alert alert-danger" role="alert" id="validationerrormsg">' + ValidationMessage + '</div>');
+            }
+            else {
+                $('#validationerrormsg').html(ValidationMessage);
+            }
+        }
+        return (ValidationMessage == "");
+
+    }
+
+
+
+</script>
+
+
+@if ((ViewBag.Mode != "Add") && (ViewBag.Mode != "Edit"))
+{
+    <script type="text/javascript">
+
+        RemoveFields();
+
+        function RemoveFields() {
+            //Disabling input fields
+            $(':input:not(:submit)').attr('disabled', 'disabled');
+
+            //Removing all the events from the newly created lines
+            //$('#gbody').unbind();
+
+            //Removing Add New Row ActionLink
+            //$('a#btnCreate').parents('h5')[0].remove();
+
+
+            //Preventing the click event on newly created elements
+            //$(document).on('click', '#gbody a', function (event) {
+            //    event.preventDefault();
+            //})
+            //Removing the action link from the form so that the request will be redirected to the Submit function in the controller instead of the hardcoded path
+            $('form:last').prop('action', '');
+        }
+
+
+    </script>
+}
+
+@if (Model.Status == (int)ActivityTypeContants.Modified && ViewBag.transactionType == "submit")
+{
+    <script type="text/javascript">
+
+        var href = '/ActivityLog/LogEditReason'
+
+        $(':submit').bind('click', function () {
+            $('#myModalContent').load(href, function () {
+
+                $('#myModal').modal({
+                    backdrop: 'static',
+                    keyboard: true
+                }, 'show');
+
+                bindForm1(this);
+            });
+
+            return false;
+        })
+
+        function bindForm1(dialog) {
+
+            $('#modformr', dialog).submit(function () {
+
+                $.ajax({
+                    url: this.action,
+                    type: this.method,
+                    data: $(this).serialize(),
+                    success: function (result) {
+                        if (result.success) {
+                            $('#myModal').modal('hide');
+
+                            $(':submit').unbind();
+
+                            $('input[name="UserRemark"]').val(result.UserRemark);
+
+                            $(':submit[name="Command:Submit"]').trigger('click');
+
+                        } else {
+                            $('#myModalContent').html(result);
+                            bindForm1();
+                        }
+                    }
+                });
+                return false;
+            });
+
+        }
+
+    </script>
+}

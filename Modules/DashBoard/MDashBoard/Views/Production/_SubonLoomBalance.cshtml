@@ -1,0 +1,261 @@
+﻿
+@* @model MDashBoard.Models.Dataset *@
+@model MDashBoard.Models.SubProductionDataset
+
+<style type="text/css">
+    .cusleftnormal {
+        border-bottom-left-radius: 0pc !important;
+        border-top-left-radius: 0px !important;
+    }
+
+    .cusrightnormal {
+        border-bottom-right-radius: 0px !important;
+        border-top-right-radius: 0px !important;
+    }
+</style>
+
+
+@{
+    int I = DateTime.Now.Month;
+    string fromdate;
+
+    if (I < 4)
+    {
+        fromdate = "01/Apr/" + DateTime.Now.AddYears(-1).Year.ToString();
+    }
+    else
+    {
+        fromdate = "01/Apr/" + DateTime.Now.Year.ToString();
+    }
+
+}
+@{
+    double? TotalProduction=0;
+    string Icon = null;
+    string Maxdate=null;
+    string Mindate=null;
+    string LinkMonth = null;
+    string LinkJobWorker = null;
+    string LinkCinstruction = null;
+
+    Maxdate = Model.MinMaxDate.FirstOrDefault().MaxDate;
+    Mindate = Model.MinMaxDate.FirstOrDefault().MinDate;
+    
+    if(Model.Month.Count >0)
+    {
+        TotalProduction = Model.Month.Sum(m => m.Area);
+    }
+    else if (Model.Jobworker.Count > 0)
+    {
+        TotalProduction = Model.Jobworker.Sum(m => m.Area);
+        }
+    else if(Model.Construction.Count>0)
+    {
+        TotalProduction = Model.Construction.Sum(m => m.Area);
+    }
+
+
+
+    if (Model.Month.Count==0)
+    {
+        Icon = "glyphicon glyphicon-calendar";
+        LinkJobWorker = "/Production/OnLoomName?Type=Month&Month=" + ViewBag.Title + "&Construction=" + "&Jobworker=";
+        LinkCinstruction = "/Production/OnLoomName?Type=Month&Month=" + ViewBag.Title + "&Jobworker=" + "&Construction="; 
+    }
+    else if (Model.Jobworker.Count==0)
+    {
+        Icon = "ion ion-person";
+        LinkCinstruction = "/Production/OnLoomName?Type=Name&Month=&Jobworker=" + ViewBag.Title + "&Construction=";
+        LinkMonth = "/Production/OnLoomName?Type=Name&Jobworker=" + ViewBag.Title + "&Construction=&Month="; 
+    }
+    else if (Model.Construction.Count== 0)
+    {
+        Icon = "glyphicon glyphicon-tags";
+        LinkMonth = "/Production/OnLoomName?Type=Construction&Jobworker=&Construction=" + ViewBag.Title + "&Month=";
+        LinkJobWorker = "/Production/OnLoomName?Type=Construction&Month=&Construction=" + ViewBag.Title + "&Jobworker=";
+    }
+ 
+ 
+    @* Mindate = Model.Month.First().Month;
+     Maxdate = Model.Month.Last().Month;
+    TotalProduction = Model.Month.Sum(m => m.Value);
+
+     TotalProduction = Model.Month.Sum(m => m.Area);*@
+
+    
+
+}
+
+
+
+@functions
+{
+   
+ public string SpanColor(double? Value,double? Total)
+    {
+     string Color = null;
+     double? divided = 0;
+     //divided = (Value / Total) * 100;
+     divided =double.Parse(string.Format("{0:0}", (Value / Total) * 100).ToString());
+         
+     if (divided > 0 && divided <= 25)
+     {
+         Color ="bg-red";
+     }
+     else if (divided > 25 && divided <= 50)
+     {
+         Color = "bg-yellow";
+     }
+     else if (divided > 50 && divided <= 75)
+     {
+         Color = "bg-blue";
+     }
+     else if (divided > 75 && divided <= 100)
+     {
+         Color = "bg-green";
+     }
+   return Color; 
+ }
+}
+
+<div class="modal-content">    
+
+    <div class="modal-header" style="border-bottom: 1px solid #8E8888; padding-top: 8px; padding-bottom: 8px;">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"> <span class="glyphicon glyphicon-remove"></span></button>
+        <div class='@Icon' style="font-size:3.2em;width:auto;height:auto;float:left;">
+        </div>
+        <!--<div style="float:right"><a href="/Production/odalPage/" data-modal=""><span class="glyphicon glyphicon-arrow-left"></span></a></div>-->
+
+        <div>
+            <span class="info-box-number">On Loom Balance >> @ViewBag.Title&nbsp;&nbsp;&nbsp;(@string.Format("{0:0}", TotalProduction).ToString() Sq.Yard)</span>
+            <span class="info-box-text">@Mindate  To @Maxdate<a href="/Production/OnLoomBalance/" data-modal=""><span class="glyphicon glyphicon-backward" style="float:right;font-size:1.5em"></span></a></span>
+        </div>
+
+    </div>
+    <div class="modal-body">
+        <div class="row">
+            @if(Model.Month.Count >0)
+            { 
+            <div class="col-md-6">
+                <!-- Widget: user widget style 1 -->
+                <div class="box box-widget widget-user-2">
+                    <!-- Add the bg color to the header using any of the bg-* classes -->
+                    <div class="widget-user-header @ViewBag.Color" style="padding-bottom: 4px;padding-top: 4px;">
+                        <div class="widget-user-image">
+                            <!-- <img class="img-circle" src="../dist/img/user7-128x128.jpg" alt="User Avatar">-->
+                            <div class="glyphicon glyphicon-calendar" style="font-size: 2.5em; width: auto; height: auto; float: left;">
+                            </div>
+                        </div>
+                        <!-- /.widget-user-image -->
+                        <h4><span class="text-bold">Month</span></h4>
+                        <!--<h3 class="widget-user-username" style="font-weight:bold">Month</h3>
+        <h5 class="widget-user-desc">Production &nbsp;(Sq.Yard)</h5>-->
+                    </div>
+
+                    <div class="box-footer no-padding">
+                        <ul class="nav nav-stacked">
+                            @foreach (var item in Model.Month.ToList())
+                        {
+                                
+                                <li>
+                                    
+                                        <a href="@(LinkMonth + item.Month)" class="small-box-footer" data-modal="">
+                                            <div class="row">
+                                                <div class="col-md-5 col-xs-5">@item.Month</div>
+                                                <div class="col-md-2 col-xs-2"><span class="badge @SpanColor(item.Area, TotalProduction)">@string.Format("{0:0}", (item.Area / TotalProduction) * 100).ToString()%</span></div>
+                                                <div class="col-md-5 col-xs-5" style="text-align:right">@string.Format("{0:0}", item.Area).ToString()</div>
+                                            </div>
+                                        </a>
+</li>
+
+                        }
+                        </ul>
+                    </div>
+                </div>
+                <!-- /.widget-user -->
+            </div>
+            }
+            <!-- /.col -->
+            @if(Model.Jobworker.Count>0)
+            { 
+            <div class="col-md-6">
+                <!-- Widget: user widget style 1 -->
+                <div class="box box-widget widget-user-2">
+                    <!-- Add the bg color to the header using any of the bg-* classes -->
+                    <div class="widget-user-header @ViewBag.Color" style="padding-bottom: 4px;padding-top: 4px;">
+                        <div class="widget-user-image">
+                            <!-- <img class="img-circle" src="../dist/img/user7-128x128.jpg" alt="User Avatar">-->
+                            <div class="ion ion-person" style="font-size:3em;width:auto;height:auto;float:left;">
+                            </div>
+                        </div>
+                        <!-- /.widget-user-image
+        <h3 class="widget-user-username" style="font-weight:bold">Job Worker</h3>-->
+                        <h4><span class="text-bold">Buyer</span></h4>
+                    </div>
+                    <div class="box-footer no-padding">
+                        <ul class="nav nav-stacked" id="Temp1">
+
+                            @foreach (var item in Model.Jobworker.ToList())
+                        {
+                              
+                                <li><a href="@(LinkJobWorker + item.Jobworker)" class="small-box-footer" data-modal="">
+    <div class="row">
+        <div class="col-md-5 col-xs-5">@item.Jobworker</div>
+        <div class="col-md-2 col-xs-2"><span class="badge @SpanColor(item.Area, TotalProduction)">@string.Format("{0:00}", (item.Area / TotalProduction) * 100).ToString()%</span></div>
+        <div class="col-md-5 col-xs-5" style="text-align:right">@string.Format("{0:0}", item.Area).ToString()</div>
+    </div>
+</a></li>
+                                                    }
+
+
+
+                        </ul>
+                    </div>
+                </div>
+                <!-- /.widget-user -->
+            </div>
+            }
+
+            <!-- /.col -->
+            @if(Model.Construction.Count >0)
+            { 
+            <div class="col-md-6">
+                <!-- Widget: user widget style 1 -->
+                <div class="box box-widget widget-user-2">
+                    <!-- Add the bg color to the header using any of the bg-* classes -->
+                    <div class="widget-user-header @ViewBag.Color" style="padding-bottom: 4px;padding-top: 4px;">
+                        <div class="widget-user-image">
+                            <div class="glyphicon glyphicon-tags" style="font-size:2.5em;width:auto;height:auto;float:left;">
+                            </div>
+                        </div>
+                        <!-- /.widget-user-image  pull-right badge bg-blue
+        <h3 class="widget-user-username" style="font-weight:bold">Construction</h3>-->
+                        <div style="margin-left:48px">
+                            <h4><span class="text-bold">Construction</span></h4>
+                        </div>
+                    </div>
+                    <div class="box-footer no-padding">
+                        <ul class="nav nav-stacked">
+
+                            @foreach (var item in Model.Construction.ToList())
+                        {
+                                <li><a href="@(LinkCinstruction + item.ProductCategoryName)" class="small-box-footer" data-modal="">
+    <div class="row">
+        <div class="col-md-5 col-xs-5">@item.ProductCategoryName</div>
+        <div class="col-md-2 col-xs-2"><span class="badge @SpanColor(item.Area, TotalProduction)">@string.Format("{0:00}", (item.Area / TotalProduction) * 100).ToString()%</span></div>
+        <div class="col-md-5 col-xs-5" style="text-align:right">@string.Format("{0:0}", item.Area).ToString()</div>
+    </div>
+</a></li>
+                        }
+
+                        </ul>
+                    </div>
+                </div>
+                <!-- /.widget-user -->
+            </div>
+            }
+
+            <!-- /.col -->
+        </div>
+    </div>
+</div>

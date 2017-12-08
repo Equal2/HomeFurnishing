@@ -1,0 +1,118 @@
+﻿@using Core.Common;
+@using Model.ViewModels;
+@using GridMvc.Html;
+@model IQueryable<Model.ViewModels.ProductIndexViewModel>
+       
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<!-- modal placeholder-->
+<div id='myModal' class='modal fade in'>
+    <div class="modal-dialog  modal-lg">
+        <div class="modal-content">
+            <div id='myModalContent'></div>
+        </div>
+    </div>
+</div>
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3>
+            <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-list black"></span> @ViewBag.Name List</span>
+        </h3>
+        <hr style="margin-top:0px;margin-bottom:0px" />
+        @*<input type="hidden" class="DocType_Id" value="@ViewBag.id">*@
+        <div class="panel-info">
+            @*<h4 style="padding:5px 0 0 0;margin:0px">
+                @Html.ActionLink(" ", " ", " ", null, new { @class = "glyphicon glyphicon-refresh toolbar", @title = "Refresh Page", @data_toggle = "tooltip", @id = "RefreshPage" })
+                @Html.ActionLink(" ", "CreateMaterial", "Product", new { id=@ViewBag.id}, new { @class = "glyphicon glyphicon-plus toolbar", @title = "Add New", @data_toggle = "tooltip" })               
+                @Html.ActionLink(" ", "DeleteMaterial", "Product", null, new { @class = "glyphicon glyphicon-trash toolbar", @title = "Delete", @data_toggle = "tooltip", @id = "DeleteRecord" , @data_modal=""})
+                @Html.ActionLink(" ", "Report", "Product", null, new { @class = "glyphicon glyphicon-stats toolbar right", @title = "Report", @data_toggle = "tooltip", target = "_blank" })
+                @Html.ActionLink(" ", "MaterialIndex", "Product", new { id = @ViewBag.id }, new { @class = "glyphicon glyphicon-list toolbar right", @title = "List", @data_toggle = "tooltip" })
+                @Html.ActionLink(" ", "", "", null, new { @class = "glyphicon glyphicon-export toolbar right", @title = "Export", @data_toggle = "tooltip" })
+            </h4>*@
+            <div class="btn-group">
+                @Html.ActionLink(" ", "ChooseType", "Product", new { id = @ViewBag.id }, new { @class = "cbtn btn-circle glyphicon glyphicon-plus toolbar", @title = "Add New", @data_toggle = "tooltip", @data_modal = "" })
+                @*@Html.ActionLink(" ", "CreateMaterial", "Product", new { id = @ViewBag.id }, new { @class = "cbtn btn-circle glyphicon glyphicon-plus toolbar", @title = "Add New", @data_toggle = "tooltip" })*@
+                @*@Html.ActionLink(" ", "GeneratePrints", "Product", null, new { @class = "cbtn btn-circle glyphicon glyphicon-print toolbar", @title = "Print", @data_toggle = "tooltip", @id = "PrintRecordI", target = "_blank" })*@
+                @Html.ActionLink(" ", "DeleteMaterial", "Product", null, new { @class = "cbtn btn-circle glyphicon glyphicon-trash toolbar", @title = "Delete", @data_toggle = "tooltip", @id = "DeleteRecord", @data_modalDelete = "" })
+
+            </div>
+            <div class="btn-group">
+                <a class="cbtn btn-circle glyphicon glyphicon-option-horizontal dropdown-toggle" aria-expanded="false" style="padding-top: 6px;padding-bottom: 6px;" href="#" data-toggle="dropdown" id="dropdownMenu1">
+                </a>
+                <ul class="dropdown-menu pull-right" aria-labelledby="dropdownMenu1">
+                    <li><a href="@Url.Action("Create", "ProductTypeSettings", new { @id = @ViewBag.id })"><span class="glyphicon glyphicon-cog"> </span>&nbsp;&nbsp;Settings</a></li>
+                    <li role="separator" class="divider"></li>
+                    @if (ViewBag.ImportMenuId != null)
+                    {
+                        <li><a href="@Url.Action("Import", "Product", new { @id = @ViewBag.id })"><span class="glyphicon glyphicon-import"> </span>&nbsp;&nbsp;Import</a></li>
+                    }
+                    <li><a href="@Url.Action("Report", "Product")"><span class="glyphicon glyphicon-stats"> </span> Report</a></li>
+                </ul>
+            </div>
+
+
+            <div class="btn-group toolbar right">
+                <a class="cbtn btn-circle glyphicon glyphicon-option-horizontal dropdown-toggle" aria-expanded="false" style="padding-top: 6px;padding-bottom: 6px;" href="#" data-toggle="dropdown" id="FilterType">
+                </a>
+                <ul class="dropdown-menu pull-right" aria-labelledby="FilterType">
+                    <li><a href="@Url.Action("MaterialIndex", "Product", new { @id = @ViewBag.id })"><span class="glyphicon glyphicon-list"> </span>&nbsp;&nbsp;All</a></li>
+                    <li><a href="@Url.Action("MaterialIndex", "Product", new { @id = @ViewBag.id, IndexFilterParameter = IndexFilterParameterConstants.Active })"><span class="glyphicon glyphicon-list"> </span>&nbsp;&nbsp;Active</a></li>
+                    <li><a href="@Url.Action("MaterialIndex", "Product", new { @id = @ViewBag.id, IndexFilterParameter = IndexFilterParameterConstants.InActive })"><span class="glyphicon glyphicon-list"> </span>&nbsp;&nbsp;Inactive</a></li>
+                    <li><a href="@Url.Action("MaterialIndex", "Product", new { @id = @ViewBag.id, IndexFilterParameter = IndexFilterParameterConstants.Discontinue })"><span class="glyphicon glyphicon-list"> </span>&nbsp;&nbsp;Discontinue</a></li>
+                </ul>
+            </div>
+
+        </div>
+    </div>
+    <div class="panel panel-body"  style="padding-left:5px;padding-top:2px">
+ 
+        @Html.Grid(Model).Columns(columns =>
+   {
+       columns.Add(m => m.ProductId, true);/*.Css("Header_Id")*/
+       //columns.Add().Encoded(false).Sanitized(false).SetWidth("5%").RenderValueAs(m => CustomHelpers.RenderCheckBox());
+       columns.Add(foo => foo.ProductName).Sortable(true).Titled("Name").Format("{0:dd/MMM/yyyy}").Filterable(true);
+       columns.Add(foo => foo.ProductCode).Sortable(true).Titled("Code").Format("{0:dd/MMM/yyyy}").Filterable(true);
+       columns.Add(foo => foo.ProductGroupName).Sortable(true).Titled("Product Group").Format("{0:dd/MMM/yyyy}").Filterable(true);
+       columns.Add(m => m.IsActive).Sortable(true).Titled("Is Active").Filterable(true);
+       columns.Add(true).RenderValueAs(m => "<a href='/Product/EditMaterial/" + m.ProductId + "' hidden class='RecEditurl'></a><a href='/Product/DeleteMaterial/" + m.ProductId + "' hidden class='RecDelurl'></a>");
+   }).WithPaging(25).EmptyText("No records found.")
+    </div>
+</div>
+<script type="text/javascript">
+
+    $('table.grid-table td').dblclick(function () {
+        var $this = $(this);
+        var row = $this.closest("tr");
+        var editid = row.find('[data-name="ProductId"]').text();
+        var url = '@Url.Action("EditMaterial", "Product")' + "/" + editid;
+        window.location.href = url;
+
+    });
+
+    //$('a#DeleteRecord').click(function (e) {
+      
+    //    var tes = DeleteValidation();
+    //    if (!tes) {
+    //        e.stopImmediatePropagation();
+    //        return false;
+    //    }
+    //    var editiiid = $('table.grid-table .grid-row.grid-row-selected').find('[data-name="ProductId"]').text();
+
+
+    //    var url = '/Product/DeleteMaterial/' + editiiid;
+    //    $(this).attr('href', url);
+    //    return;
+    //});
+    //$('#myModal').on('shown.bs.modal', function () {
+    //    $("#Reason").focus();
+    //});
+
+
+    $(document).ready(function () {
+        //Calling the function to load the table data/ Line information
+        enableModalTransitions();
+    });
+</script>

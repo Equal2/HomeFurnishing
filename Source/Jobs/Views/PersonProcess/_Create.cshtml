@@ -1,0 +1,88 @@
+﻿
+@model Model.ViewModels.PersonProcessViewModel
+@using Core.Common
+
+<div class="modal-content">
+    <div class="modal-header" style="border-bottom: 1px solid #8E8888">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"> <span class="glyphicon glyphicon-remove"></span></button>
+        <h3>
+            <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-file black"></span> Person Process Detail</span>
+        </h3>
+    </div>
+    <div>
+        @using (Html.BeginForm("_CreatePost", "PersonProcess", FormMethod.Post, new { enctype = "multipart/form-data", id = "modform" }))
+        {
+            @Html.AntiForgeryToken()
+
+            @Html.HiddenFor(model => model.PersonId)
+            @Html.HiddenFor(m => m.PersonProcessId)
+
+            <div class="form-horizontal modal-body">
+
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })               
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.ProcessId, "Process", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.ProcessId, new { @class = "form-control required" })
+                                @Html.ValidationMessageFor(model => model.ProcessId, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.PersonRateGroupId, "Rate Group", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.PersonRateGroupId, new { @class = "form-control required" })
+                                @Html.ValidationMessageFor(model => model.PersonRateGroupId, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                </div>             
+
+                <div class="modal-footer " style="padding: 19px 20px 0 20px; border-top:1px solid #8E8888">
+                    <button class="btn custom left" name="Command:Edit" type="submit"><h2 style="margin:0px" id="submit"><span class="glyphicon glyphicon-floppy-disk black"></span> </h2></button>
+                    <button class="btn custom" name="Command:Delete" id="delete" type="submit"><h2 style="margin:0px"><span class="glyphicon glyphicon-trash black"></span> </h2></button>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            
+            
+            
+            CustomSelectFunction($("#ProcessId"), '/ComboHelpList/GetProcess', '/ComboHelpList/SetSingleProcess', ' ', false, 0);
+            CustomSelectFunction($("#PersonRateGroupId"), '/ComboHelpList/GetPersonRateGroup', '/ComboHelpList/SetSinglePersonRateGroup', ' ', false, 0);
+
+            $("#ProcessId").select2('focus');
+
+            var id=@Model.PersonProcessId;
+            
+            $('#delete','.modal-content').click(function (e) {
+                
+                if(id>0)
+                {
+                    
+                    var url = '/PersonProcess/DeletePost';
+                    
+                    $('form#modform').attr('action',url);                    
+                    return;
+                }
+                else
+                {
+                    
+                    return false;
+                }
+            })
+        });
+
+    </script>
+
+   

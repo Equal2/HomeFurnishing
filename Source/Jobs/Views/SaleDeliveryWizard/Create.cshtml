@@ -1,0 +1,193 @@
+﻿@model Model.ViewModels.SaleDeliveryHeaderViewModel
+@using Core.Common
+@{
+    ViewBag.Title = "Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!-- modal placeholder-->
+<div id='myModal' class='modal fade in'>
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div id='myModalContent'></div>
+        </div>
+    </div>
+</div>
+
+
+@using (Html.BeginForm("Post", "SaleDeliveryWizard", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(m => m.SiteId)
+    @Html.HiddenFor(m => m.Status)
+    @Html.HiddenFor(m => m.DivisionId)
+    @Html.HiddenFor(m => m.SaleDeliveryHeaderId)
+    @Html.HiddenFor(m => m.DocTypeId)
+    @Html.HiddenFor(m => m.CreatedDate)
+    @Html.HiddenFor(m => m.ProcessId)
+
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 style="border-bottom:0px solid #e1dada;padding-bottom:0px;">
+                <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"> <span class="glyphicon glyphicon-file black"></span> Sale Delivery Details</span>
+                <input type="submit" value="Save" class="btn btn-primary right" id="submit" style="width: 90px; background-color: #2980b9" />
+            </h3>
+            <hr style="margin-top:0px;margin-bottom:0px" />
+        </div>
+
+
+        <div class="panel-info" style="padding-left:15px">
+            <div class="form-horizontal">
+                @Html.ValidationSummary(true)
+                <div class="row">
+                    <h4 class="col-md-12 black">
+                        <span class="glyphicon glyphicon-align-justify"></span>
+                        1.Document Details
+                    </h4>
+                    <div>
+                        <div class="row">
+
+                            <div class="col-md-6">
+                                <div class="form-group" style="margin-top:15px">
+                                    @Html.LabelFor(model => model.DocDate, "Delivery Date", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.DocDate, "{0:dd/MMMM/yyyy}", new { @class = "datepickerWithNFD form-control col-xs-6 required" })
+                                        @Html.ValidationMessageFor(model => model.DocDate, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group" style="margin-top:15px">
+                                    @Html.LabelFor(model => model.DocNo, "Delivery No", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.DocNo, null, new { @class = "form-control col-xs-6 required" })
+                                        @Html.ValidationMessageFor(m => m.DocNo, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                            
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.SaleToBuyerId, "Party", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.SaleToBuyerId, new { @class = "form-control col-xs-6 ", @readonly = "true" })
+                                        @Html.ValidationMessageFor(model => model.SaleToBuyerId, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.DeliverToPerson, "Deliver To Person", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.DeliverToPerson, new { @class = "form-control col-xs-6 " })
+                                        @Html.ValidationMessageFor(model => model.DeliverToPerson, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.DeliverToPersonReference, "Relation With Person", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.DeliverToPersonReference, new { @class = "form-control col-xs-6 " })
+                                        @Html.ValidationMessageFor(model => model.DeliverToPersonReference, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.ShipToPartyAddress, "Delivery Address", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextAreaFor(m => m.ShipToPartyAddress, new { @class = "form-control col-xs-6" })
+                                        @Html.ValidationMessageFor(m => m.ShipToPartyAddress, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.Remark, "Remark", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextAreaFor(m => m.Remark, new { @class = "form-control col-xs-6" })
+                                        @Html.ValidationMessageFor(m => m.Remark, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<script type="text/javascript">
+
+        $(document).ready(function () {
+            CustomSelectFunction($("#SaleToBuyerId"), '/SaleDeliveryHeader/GetCustomPerson', '/ComboHelpList/SetSinglePerson', ' ', false, 0,$('#DocTypeId').val());
+        });
+
+
+        var IsSaved=false;
+        var ValidationCount=0;
+
+        $('form').submit(function(event){
+
+            if(!IsSaved)
+            {
+                if(!ValidateData() || !ValidateCostCenter())
+                {
+                    return false;
+                }
+                IsSaved=true;
+                return IsSaved;
+            }
+            else
+            {
+                return false;
+            }
+
+
+        });
+
+
+        function ValidateData() {
+            var DocId=@Model.SaleDeliveryHeaderId;
+            var TempValue;
+            var ValidationMessage="";
+
+
+
+            //Checking for dulicate key value
+            if(DocId<=0)
+            {
+                TempValue= $('#DocNo').DuplicateCheckForCreate({ name: 'JobOrders', value: $('#DocNo').val(), doctype: $('#DocTypeId').val() });
+                if (TempValue){ ValidationMessage=$('#DocNo').val() + " already exist <br />";}
+            }
+            else
+            {
+                TempValue = $('#DocNo').DuplicateCheckForEdit({ name: 'JobOrders', value: $('#DocNo').val(), doctype: $('#DocTypeId').val(),headerId:DocId });
+                if (TempValue) {ValidationMessage+=$('#DocNo').val() + " already exist <br />";}
+            }
+            if(TempValue)
+            {
+                if($('#validationerrormsg').length==0){
+                    $('.panel-info').filter(':eq(1)').before('<div class="alert alert-danger" role="alert" id="validationerrormsg">'+ValidationMessage+'</div>');}
+                else
+                {
+                    $('#validationerrormsg').html(ValidationMessage);
+                }
+            }
+
+
+            return  (ValidationMessage=="");
+
+        }
+
+</script>

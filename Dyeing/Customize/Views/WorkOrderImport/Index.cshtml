@@ -1,0 +1,67 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@ViewBag.ProductTypeId
+
+
+@using (Html.BeginForm("WorkOrderImport", "WorkOrderImport", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+    
+    <input type="hidden" name="id" value="@ViewBag.id" />
+    
+    <div class="panel panel-default">
+        <div class="panel-heading">
+
+            <h3>
+                <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"> <span class="glyphicon glyphicon-export black"></span>Work Order Import</span>
+              
+            </h3>
+
+            <hr style="margin-top:0px;margin-bottom:0px" />
+
+            <div class="panel-info">
+                <h4 style="padding:5px 0 0 0;margin:0px">
+                    @Html.ActionLink(" ", " ", " ", null, new { @class = "glyphicon glyphicon-refresh toolbar", @title = "Refresh Page", @data_toggle = "tooltip", @id = "RefreshPage" })
+                    @Html.ActionLink(" ", "ReturnToRoute", "WorkOrderImport", new { @id = ViewBag.id }, new { @class = "glyphicon glyphicon-list toolbar right", @title = "List", @data_toggle = "tooltip" })
+                </h4>
+            </div>
+
+        </div>
+        <div class="panel-info" style="padding-left:15px">
+            <div class="form-horizontal">
+
+                
+                <h4 class="black">Fill Pending Dyeing Orders:</h4><p>
+                    <table class="table table-responsive table-hover" style="max-width:60%">
+                        <tr style="border-bottom:thin solid #dbd1d1" class="danger">
+                            <td>
+                                Dyeing Order No
+                            </td>
+                            <td colspan="2">
+                                <input class="form-control required" data-val="true" id="DyeingOrderNo" name="DyeingOrderNo" type="text">
+                            </td>
+                        </tr>
+                    </table>
+                </p>
+
+                <div class="form-group">
+                    <div class="col-md-10">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <input type="submit" value="Upload" class="btn btn-primary fileinput-button" id="submit" style="width: 90px; background-color: #2980b9" />
+                            </div>
+                        </div>
+                        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+}
+
+<script type="text/javascript">
+    CustomSelectFunction($("#DyeingOrderNo"), '/WorkOrderImport/GetJobOrder', '/WorkOrderImport/SetJobOrders', ' ', true, 0, 0);
+ </script>

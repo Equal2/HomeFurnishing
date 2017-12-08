@@ -1,0 +1,102 @@
+﻿@model IQueryable<Model.ViewModel.JobInvoiceAmendmentHeaderIndexViewModel>
+@using Core.Common
+@using GridMvc.Html;
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    string ControllerName = (string)ViewContext.RouteData.Values["controller"];
+    string IndexStatus = (string)ViewBag.IndexStatus;
+}
+
+<!-- modal placeholder-->
+<div id='myModal' class='modal fade in'>
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div id='myModalContent'></div>
+        </div>
+    </div>
+</div>
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3>
+            <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-list black"></span> @ViewBag.Name List </span>
+        </h3>
+        <hr style="margin-top:0px;margin-bottom:0px" />
+        <input type="hidden" class="DocType_Id" value="@ViewBag.id">
+        <div class="panel-info">
+            <div class="btn-group">
+                @Html.ActionLink(" ", "Create", "JobInvoiceAmendmentHeader", new { @id = @ViewBag.id }, new { @class = "cbtn btn-circle glyphicon glyphicon-plus", @title = "Add New", @data_toggle = "tooltip" })
+                @*@if (ViewBag.AdminSetting == "True")
+                {
+                    @Html.ActionLink(" ", "GetHistory", "LogHistory", null, new { @class = "cbtn btn-circle glyphicon glyphicon-user toolbar", @title = "History", @data_toggle = "tooltip", @id = "DocHistoryI" })
+                }*@
+                @if (ViewBag.SqlProcDocumentPrint != null)
+                {
+                @Html.ActionLink(" ", "GeneratePrints", "JobInvoiceAmendmentHeader", null, new { @class = "cbtn btn-circle glyphicon glyphicon-print", @title = "Print", @data_toggle = "tooltip", @id = "PrintRecordI", target = "_blank" })                
+                }
+                @Html.ActionLink(" ", "Remove", "JobInvoiceAmendmentHeader", null, new { @class = "cbtn btn-circle glyphicon glyphicon-trash hidden-xs", @title = "Delete", @data_toggle = "tooltip", @id = "DeleteRecord", @data_modalDelete = ""})
+            </div>
+            <div class="btn-group">
+                <a class="cbtn btn-circle glyphicon glyphicon-option-horizontal dropdown-toggle" aria-expanded="false" style="padding-top: 6px;padding-bottom: 6px;" href="#" title="More Option" data-toggle="dropdown" id="dropdownMenu1">
+                </a>
+                <ul class="dropdown-menu pull-right" aria-labelledby="dropdownMenu1">
+                    @if (ViewBag.ExportMenuId != null)
+                    {
+                    <li><a href="@Url.Action("Export", "JobInvoiceAmendmentHeader", new { @id = @ViewBag.id })"><span class="glyphicon glyphicon-export"> </span>&nbsp;&nbsp;Export</a></li>
+                    }
+                    @if (ViewBag.ImportMenuId != null)
+                    {
+                    <li><a href="@Url.Action("Import", "JobInvoiceAmendmentHeader", new { @id = @ViewBag.id })"><span class="glyphicon glyphicon-import"> </span>&nbsp;&nbsp;Import</a></li>
+                    }
+                    @if (ViewBag.WizardId != null)
+                    {
+                    <li><a href="@Url.Action("Wizard", "JobInvoiceAmendmentHeader", new { @id = @ViewBag.id })"><span class="glyphicon glyphicon-random"> </span> Wizard</a></li>
+                    }
+                    @if (ViewBag.AdminSetting == "True")
+                    {
+                    <li><a href="@Url.Action("CreateJobInvoiceAmendment", "JobInvoiceSettings", new { @id = @ViewBag.id })"><span class="glyphicon glyphicon-cog"> </span> Settings</a></li>
+                    }
+                    <li role="separator" class="divider"></li>
+                    <li><a id="DocHistoryI" href="@Url.Action("GetHistory", "LogHistory", new {  })"><span class="glyphicon glyphicon-user"> </span> History</a></li>
+                    <li><a target="_blank" href="@Url.Action("Report", "JobInvoiceAmendmentHeader", new { @ViewBag.id })" ><span class="glyphicon glyphicon-stats"> </span> Report</a></li>
+                </ul>
+            </div>
+
+            <div class="btn-group right">
+                @CustomHelpers.RenderIconStatusFilters(ViewBag.PendingToSubmit, ViewBag.PendingToReview, ControllerName, ViewBag.id, ViewBag.IndexStatus)
+            </div>
+
+            @*<h4 style="padding:5px 0 0 0;margin:0px">
+                @Html.ActionLink(" ", "Create", "JobInvoiceAmendmentHeader", new { @id = @ViewBag.id }, new { @class = "glyphicon glyphicon-plus toolbar", @title = "Add New", @data_toggle = "tooltip" })
+                @Html.ActionLink(" ", "GeneratePrints", "JobInvoiceAmendmentHeader", null, new { @class = "glyphicon glyphicon-print toolbar", @title = "Print", @data_toggle = "tooltip", @id = "PrintRecordI", target = "_blank" })
+                @Html.ActionLink(" ", "Remove", "JobInvoiceAmendmentHeader", null, new { @class = "glyphicon glyphicon-trash toolbar", @title = "Delete", @data_toggle = "tooltip", @id = "DeleteRecord", @data_modalDelete = "" })
+                @Html.ActionLink(" ", "Report", "JobInvoiceAmendmentHeader", new { @id = @ViewBag.id }, new { @class = "glyphicon glyphicon-stats toolbar right", @title = "Report", @data_toggle = "tooltip", target = "_blank" })
+                @Html.ActionLink(" ", "Wizard", "JobInvoiceAmendmentHeader", new { @id = @ViewBag.id }, new { @class = "glyphicon glyphicon-import toolbar right", @title = "Wizard", @data_toggle = "tooltip" })
+                @Html.ActionLink(" ", "", "", null, new { @class = "glyphicon glyphicon-export toolbar right", @title = "Export", @data_toggle = "tooltip" })
+                @Html.ActionLink(" ", "CreateJobInvoiceAmendment", "JobInvoiceSettings", new { @id = @ViewBag.id }, new { @class = "glyphicon glyphicon-cog toolbar right", @title = "Default Settings", @data_toggle = "tooltip" })
+                @Html.ActionLink(" ", "Index", "JobInvoiceAmendmentHeader", new { @id = @ViewBag.id }, new { @class = "glyphicon glyphicon-import toolbar right", @title = "Import", @data_toggle = "tooltip" })
+            </h4>*@
+        </div>
+        @*<hr style="margin-top: 5px; margin-bottom: 5px; border-top: 1px solid #706f6f; " />
+
+      @CustomHelpers.RenderStatusFilters(ViewBag.PendingToSubmit, ViewBag.PendingToReview, ControllerName, ViewBag.id, ViewBag.IndexStatus)*@
+
+    </div>
+    <div class="panel-info" style="padding-left: 5px; padding-top: 2px; font-size: 12px">
+        @Html.Grid(Model).Columns(columns =>
+           {
+               columns.Add(foo => foo.JobInvoiceAmendmentHeaderId, true).Css("Header_Id");
+               columns.Add(m => m.Status, true);
+               columns.Add().Encoded(false).Sanitized(false).SetWidth("5%").RenderValueAs(m => CustomHelpers.RenderCheckBox());
+               columns.Add(foo => foo.DocDate).Sortable(true).Titled("Amendment Date").Format("{0:dd/MMM/yyyy}").Filterable(true);
+               columns.Add(foo => foo.DocNo).Titled("Amendment No").Sortable(true).Filterable(true);
+               columns.Add(m => m.Remark).Titled("Remark").Sortable(true).Filterable(true);
+               columns.Add().Titled("Status").RenderValueAs(m => CustomHelpers.RenderStatus(m.Status));
+               columns.Add().Titled("").Encoded(false).Sanitized(false).RenderValueAs(m => CustomHelpers.RenderUserImage(m.ModifiedBy)).Titled("User").SetWidth("5%").Css("UserImageIndex");
+               columns.Add().Sanitized(false).Encoded(false).RenderValueAs(m => CustomHelpers.RenderActionColumn(ControllerName, m.JobInvoiceAmendmentHeaderId, m.Status, m.Reviewed, m.ReviewCount, (string)ViewBag.IndexStatus)).SetWidth(20).Css("icon-Cus-Size");
+               columns.Add(true).RenderValueAs(m => CustomHelpers.RenderHEDActionLink(ControllerName, m.JobInvoiceAmendmentHeaderId, m.Status, IndexStatus));
+           }).WithPaging(25).EmptyText("No records found.")
+
+    </div>
+</div>

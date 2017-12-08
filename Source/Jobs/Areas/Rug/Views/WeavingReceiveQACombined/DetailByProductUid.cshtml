@@ -1,0 +1,972 @@
+﻿@model Model.ViewModel.WeavingReceiveQACombinedViewModel_ByProductUid
+@using Core.Common
+@{
+    ViewBag.Title = "Barcode Info";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<!-- modal placeholder-->
+<div id='myModal' class='modal fade in'>
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div id='myModalContent'></div>
+        </div>
+    </div>
+</div>
+
+@using (Html.BeginForm("DetailByProductUid", "WeavingReceiveQACombined", FormMethod.Get, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()    
+    
+    @Html.HiddenFor(m => m.JobReceiveSettings.ProcessId)
+    @Html.HiddenFor(m => m.JobReceiveLineId)
+    @Html.HiddenFor(m => m.JobReceiveHeaderId)
+    @Html.HiddenFor(m => m.JobReceiveQALineId)
+    @Html.HiddenFor(m => m.JobReceiveQAHeaderId)
+    @Html.HiddenFor(m => m.DocTypeId)
+    @Html.HiddenFor(m => m.DivisionId)
+    @Html.HiddenFor(m => m.SiteId)
+    @Html.HiddenFor(m => m.ProcessId)
+    @Html.HiddenFor(m => m.UnitId)
+    @Html.HiddenFor(m => m.ProductId)
+    @Html.HiddenFor(m => m.ProductUidId)
+    @Html.HiddenFor(m => m.UnitDecimalPlaces)
+    @Html.HiddenFor(m => m.DealUnitDecimalPlaces)
+    @Html.HiddenFor(m => m.DimensionUnitDecimalPlaces)
+    @Html.HiddenFor(m => m.BalanceQty)
+    @Html.HiddenFor(m => m.XRate)
+
+    
+
+
+
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3>
+                <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"> <span class="glyphicon glyphicon-file black"></span> Barcode Info</span>
+            </h3>
+        </div>
+        <div class="panel-info" style="padding-left:15px">
+            <div class="form-horizontal">
+                @Html.ValidationSummary(true)
+                <div class="col-md-6">
+                    <div class="form-group" style="margin-top:15px">
+                        @Html.LabelFor(model => model.ProductUidId, "Barcode", new { @class = "control-label col-md-4 col-sm-2" })
+                        @Html.HiddenFor(m => m.DocumentTypeSettings.ProductUidCaption)
+                        <div class="col-md-7 col-sm-10">
+                            @Html.TextBoxFor(m => m.ProductUidName, new { @class = "form-control " })
+                            @Html.ValidationMessageFor(m => m.ProductUidName, "", new { @class = "text-danger" })
+                            <span id="ProductUidValidation"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group" style="margin-top:10px">
+                        <button class="btn custom" name="Command:Edit" type="submit" id="submit"><h2 style="margin:0px" title="Get Barcode Info"><span class="glyphicon glyphicon-arrow-right  black"></span> </h2></button>
+                        @*@Html.LabelFor(model => model.Message, model => model.Message, new { @class = "control-label col-md-4 col-sm-2" })*@
+                        @*@Html.Label(model => model.Message)*@
+                        <label>@Html.DisplayFor(item => item.Message)</label>
+                    </div>
+                </div>
+
+                @*@Html.TextBoxFor(m => m.Message , null, new { @class = "form-control", @readonly = "true" })*@
+
+                <div>
+                    <h4 class="col-md-12 black">
+                        <span class="glyphicon glyphicon-align-justify"></span>
+                        Product Details
+                    </h4>
+                    <div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.ProductCategoryName, "Category", new { @class = "control-label col-md-4 col-sm-2" })
+                                <div class="col-md-7 col-sm-10">
+                                    @Html.TextBoxFor(m => m.ProductCategoryName, null, new { @class = "form-control", @readonly = "true" })
+                                    @Html.ValidationMessageFor(m => m.ProductCategoryName, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.ProductQualityName, "Quality", new { @class = "control-label col-md-4 col-sm-2" })
+                                <div class="col-md-7 col-sm-10">
+                                    @Html.TextBoxFor(m => m.ProductQualityName, null, new { @class = "form-control", @readonly = "true" })
+                                    @Html.ValidationMessageFor(m => m.ProductQualityName, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.ProductGroupName, "Design", new { @class = "control-label col-md-4 col-sm-2" })
+                                <div class="col-md-7 col-sm-10">
+                                    @Html.TextBoxFor(m => m.ProductGroupName, null, new { @class = "form-control", @readonly = "true" })
+                                    @Html.ValidationMessageFor(m => m.ProductGroupName, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+                        </div>
+
+                        @{var formatedQty = String.Format("{0:0}", Model.Qty);}
+                        @{var formatedDealQty = String.Format("{0:0.0000}", Model.DealQty);}
+                        @{var formatedWeight = String.Format("{0:0.000}", Model.Weight);}
+                        @{var formatedRate = String.Format("{0:0.00}", Model.Rate);}
+                        @{var formatedAmount = String.Format("{0:0.00}", Model.Amount);}
+                        @{var formatedNetAmount = String.Format("{0:0.00}", Model.NetAmount );}
+                        @{var formatedTDS = String.Format("{0:0.00}", Model.TDSCom );}
+                        @{var formatedOrderLength = String.Format("{0:0.00}", Model.OrderLength);}
+                        @{var formatedOrderWidth = String.Format("{0:0.00}", Model.OrderWidth);}
+
+                        @{var formatedLength = String.Format("{0:0.00}", Model.Length);}
+                        @{var formatedWidth = String.Format("{0:0.00}", Model.Width);}
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.OrderLength, "Order Size (W X L)", new { @class = "control-label col-md-4 col-sm-2" })
+                                <div class="col-md-7 col-sm-10">
+                                    <div class="col-xs-5" style="padding:0px">
+                                        @Html.TextBoxFor(m => m.OrderLength, formatedOrderLength, new { @class = "form-control ", @readonly = "true" })
+                                        @Html.ValidationMessageFor(m => m.OrderLength, "", new { @class = "text-danger" })
+                                    </div>
+                                    <div class="col-xs-2" style="padding:5px;text-align:center;font-weight:bold">
+                                        X
+                                    </div>
+                                    <div class="col-xs-5" style="padding:0px">
+                                        @Html.TextBoxFor(m => m.OrderWidth, formatedOrderWidth, new { @class = "form-control ", @readonly = "true" })
+                                        @Html.ValidationMessageFor(m => m.OrderWidth, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.ColourName , "Colour", new { @class = "control-label col-md-4 col-sm-2" })
+                                <div class="col-md-7 col-sm-10">
+                                    @Html.TextBoxFor(m => m.ColourName, null, new { @class = "form-control", @readonly = "true" })
+                                    @Html.ValidationMessageFor(m => m.ColourName, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <h4 class="col-md-12 black">
+                        <span class="glyphicon glyphicon-align-justify"></span>
+                        Bazar Details
+                    </h4>
+                    <div>
+                        <div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.SiteName, "Site", new { @class = "control-label col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextBoxFor(m => m.SiteName, null, new { @class = "form-control required", @readonly = "true" })
+                                        @Html.ValidationMessageFor(m => m.SiteName, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.JobWorkerId, "Job Worker", new { @class = "control-label col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextBoxFor(m => m.JobWorkerId, new { @class = "form-control ", @readonly = "true" })
+                                        @Html.ValidationMessageFor(m => m.JobWorkerId, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.DocDate, "Bazar Date", new { @class = "control-label col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextBoxFor(m => m.DocDate, "{0:dd/MMMM/yyyy}", new { @class = "datepickerWithNFD form-control required", @readonly = "true" })
+                                        @Html.ValidationMessageFor(model => model.DocDate, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.DocNo, "Bazar No.", new { @class = "control-label col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextBoxFor(m => m.DocNo, null, new { @class = "form-control required", @readonly = "true" })
+                                        @Html.ValidationMessageFor(m => m.DocNo, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr style="margin-bottom:0px" />
+                        <div>
+
+                            <div>
+                                <div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            @Html.LabelFor(model => model.JobOrderHeaderDocNo, "Order No.", new { @class = "control-label col-md-4 col-sm-2" })
+                                            @Html.HiddenFor(m => m.DocumentTypeSettings.ContraDocTypeCaption)
+                                            <div class="col-md-7 col-sm-10">
+                                                @Html.TextBoxFor(m => m.JobOrderHeaderDocNo, null, new { @class = "form-control", @readonly = "true" })
+                                                @Html.ValidationMessageFor(m => m.JobOrderHeaderDocNo, "", new { @class = "text-danger" })
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            @Html.LabelFor(model => model.CostcenterName, "Cost center", new { @class = "control-label col-md-4 col-sm-2" })
+                                            <div class="col-md-7 col-sm-10">
+                                                @Html.TextBoxFor(m => m.CostcenterName, new { @class = "form-control ", @readonly = "true" })
+                                                @Html.ValidationMessageFor(m => m.CostcenterName, "", new { @class = "text-danger" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                                                       
+
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            @Html.LabelFor(model => model.Qty, "Qty", new { @class = "control-label col-md-4 col-sm-2" })
+                                            <div class="col-md-7 col-sm-10">
+                                                @Html.TextBoxFor(m => m.Qty, formatedQty, new { @class = "form-control ", @readonly = "true" })
+                                                @Html.ValidationMessageFor(m => m.Qty, "", new { @class = "text-danger" })
+                                                <span id="ExcessStockQty"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            @Html.LabelFor(model => model.Length, "Actual Size (W X L)", new { @class = "control-label col-md-4 col-sm-2", @readonly = "true" })
+                                            <div class="col-md-7 col-sm-10">
+                                                <div class="col-xs-5" style="padding:0px">
+                                                    @Html.TextBoxFor(m => m.Length, formatedLength, new { @class = "form-control ", @readonly = "true" })
+                                                    @Html.ValidationMessageFor(m => m.Length, "", new { @class = "text-danger" })
+                                                </div>
+                                                <div class="col-xs-2" style="padding:5px;text-align:center;font-weight:bold">
+                                                    X
+                                                </div>
+                                                <div class="col-xs-5" style="padding:0px">
+                                                    @Html.TextBoxFor(m => m.Width, formatedWidth, new { @class = "form-control ", @readonly = "true" })
+                                                    @Html.ValidationMessageFor(m => m.Width, "", new { @class = "text-danger" })
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            @Html.LabelFor(model => model.DealQty,  "Deal Qty", new { @class = "control-label col-md-4 col-sm-2" })
+                                            <div class="col-md-7 col-sm-10" style="padding:0px">
+                                                <div class="col-xs-7" style="padding-right:0px">
+                                                    @Html.TextBoxFor(m => m.DealQty, formatedDealQty, new { @class = "form-control", @readonly = "true" })
+                                                    @Html.ValidationMessageFor(m => m.DealQty, "", new { @class = "text-danger" })
+                                                </div>
+                                                @*<div class="col-xs-5" style="padding-left:0px">
+                                                    @Html.DropDownListFor(model => model.DealUnitId, new SelectList(ViewBag.DeliveryUnitList as System.Collections.IEnumerable, "UnitId", "UnitName"), new { @class = "form-control height cusrightnormal required", @readonly = "true" })
+                                                    @Html.ValidationMessageFor(model => model.DealUnitId, "", new { @class = "text-danger", @readonly = "true" })
+                                                </div>*@
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+                                    <div class="col-md-6" >
+                                        <div class="form-group">
+                                            @Html.LabelFor(model => model.Weight,  "Weight", new { @class = "control-label col-md-4 col-sm-2", @readonly = "true" })
+                                            <div class="col-md-7 col-sm-10">
+                                                @Html.TextBoxFor(m => m.Weight, formatedWeight, new { @class = "form-control", @readonly = "true" })
+                                                @Html.ValidationMessageFor(m => m.Weight, "", new { @class = "text-danger" })
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <h4 class="col-md-12 black">
+                        <span class="glyphicon glyphicon-align-justify"></span>
+                        Other Details
+                    </h4>
+                    <div>
+                        <div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.Rate, "Rate", new { @class = "control-label col-md-4 col-sm-2", @readonly = "true" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextBoxFor(m => m.Rate, formatedRate, new { @class = "form-control", @readonly = "true" })
+                                        @Html.ValidationMessageFor(m => m.Rate, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.Amount, "Amount", new { @class = "control-label col-md-4 col-sm-2", @readonly = "true" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextBoxFor(m => m.Amount, formatedAmount, new { @class = "form-control", @readonly = "true" })
+                                        @Html.ValidationMessageFor(m => m.Amount, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.TDSCom, "Comm/TDS", new { @class = "control-label col-md-4 col-sm-2", @readonly = "true" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextBoxFor(m => m.TDSCom, formatedTDS, new { @class = "form-control", @readonly = "true" })
+                                        @Html.ValidationMessageFor(m => m.TDSCom, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.NetAmount, "Net Amt", new { @class = "control-label col-md-4 col-sm-2", @readonly = "true" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextBoxFor(m => m.NetAmount, formatedNetAmount, new { @class = "form-control", @readonly = "true" })
+                                        @Html.ValidationMessageFor(m => m.NetAmount, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.PaymentSlipNo, "Payment Slip No", new { @class = "control-label col-md-4 col-sm-2", @readonly = "true" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextBoxFor(m => m.PaymentSlipNo, null, new { @class = "form-control", @readonly = "true" })
+                                        @Html.ValidationMessageFor(m => m.PaymentSlipNo, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.PONo , "Loomed PO", new { @class = "control-label col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextBoxFor(m => m.PONo, null, new { @class = "form-control", @readonly = "true" })
+                                        @Html.ValidationMessageFor(m => m.PONo, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.InvoiceNo, "Invoice No", new { @class = "control-label col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextBoxFor(m => m.InvoiceNo, null, new { @class = "form-control", @readonly = "true" })
+                                        @Html.ValidationMessageFor(m => m.InvoiceNo, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.RollNo , "Roll No", new { @class = "control-label col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextBoxFor(m => m.RollNo, null, new { @class = "form-control", @readonly = "true" })
+                                        @Html.ValidationMessageFor(m => m.RollNo, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.InvoiceParty, "Dispached For PO", new { @class = "control-label col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextBoxFor(m => m.InvoiceParty, null, new { @class = "form-control", @readonly = "true" })
+                                        @Html.ValidationMessageFor(m => m.InvoiceParty, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+
+                <hr />
+                <div class="row">
+                    <h4 class="col-md-12 black" style="margin-top:15px">
+                        <span class="glyphicon glyphicon-shopping-cart"></span>
+                        Penalty Detail
+                    </h4>
+                </div>
+                <div style="padding-right:15px">
+                    <div class="panel panel-default" id="grid">
+                        <div class="panel-heading headrow">
+                            <div class="row grid-head">
+                                <div class="block" style="width:5%">
+                                    Srl.
+                                </div>
+                                <div class="block" style="width:90%">
+                                    <div class="row">
+                                        @*ProductInfo*@
+                                        <div class="block" style="width:32%">
+                                            Reason
+                                        </div>
+                                        @*PopContext*@
+                                        <div class="block text-right" style="width:20%">
+                                            Amount
+                                        </div>
+                                        @*Qty*@
+                                        <div class="block" style="width:15%">
+                                            Remark
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="block" style="width:5%">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel-info" id="gbody">
+
+                        </div>
+                    </div>
+
+
+
+                    <div style="display:@(Model.JobReceiveSettings.isVisibleConsumptionDetail ? "" : "none")">
+                        <div class="row">
+                            <h4 class="col-md-12 black" style="margin-top:15px">
+                                <span class="glyphicon glyphicon-shopping-cart"></span>
+                                Consumption
+                            </h4>
+                        </div>
+                        <div style="padding-right:15px">
+                            <div class="panel panel-default" id="grid">
+                                <div class="panel-heading headrow">
+                                    <div class="row grid-head">
+                                        <div class="text-left block" style="width: 5%; ">
+                                            Srl.
+                                        </div>
+                                        <div class="block" style="width: 90%;">
+                                            <div class="row">
+                                                @*ProductInfo*@
+                                                <div class="block" style="width: 20%; ">
+                                                    CostCenter
+                                                </div>
+                                                <div class="block" style="width: 55%; ">
+                                                    Product Name
+                                                </div>
+                                                @*Qty*@
+                                                <div class="text-right block" style="width: 10%;">
+                                                    Qty
+                                                </div>
+                                                @*Rate*@
+                                                <div class="block" style="width: 15%; ">
+                                                    Unit
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="" style="width:5%">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="panel-info" id="gbodyconsumption">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+                </div>
+    </div>
+}
+
+
+
+
+<script type="text/javascript">
+    $(document).ready(function () {
+
+        //Calling the function to load the table data/ Line information
+        LoadProducts();
+        LoadConsumption();
+        //RoundDimensions();
+
+        //Adding Hidden Input Fields
+        AddFields();
+
+    });
+
+
+    CustomSelectFunction($("#JobReceiveById"), '/ComboHelpList/GetEmployeeWithProcess', '/ComboHelpList/SetSingleEmployee', ' ', false, 0, $('#ProcessId').val());
+    CustomSelectFunction($("#JobWorkerId"), '/ComboHelpList/GetPersonWithProcess', '/ComboHelpList/SetSinglePerson', ' ', false, 0, $('#ProcessId').val());
+    CustomSelectFunction($("#GodownId"), '/ComboHelpList/GetGodown', '/ComboHelpList/SetSingleGodown', ' ', false, 0);
+    var DocTypeId = $('#DocTypeId').val();
+    CustomSelectFunctionForJobOrderLine($("#JobOrderLineId"), '/WeavingReceiveQACombined/GetCustomProduct', '/WeavingReceiveQACombined/SetSingleJobOrderLine', ' ', false, 0, $("#DocTypeId").val(),$("#JobWorkerId").val());
+
+
+    function CustomSelectFunctionForJobOrderLine(ElementId, GetAction, SetAction, placehold, IsMultiple,MinLength,filter,PersonId) {
+        var geturl = GetAction;
+        //The url we will send our get request to
+        var attendeeUrl = GetAction;
+        var pageSize = 20;
+
+        ElementId.select2(
+        {
+
+            placeholder: placehold,
+            //Does the user have to enter any data before sending the ajax request
+            minimumInputLength: MinLength,
+            allowClear: true,
+            multiple: IsMultiple,
+            ajax: {
+                //How long the user has to pause their typing before sending the next request
+                quietMillis: 500,
+                //The url of the json service
+                url: attendeeUrl,
+                dataType: 'jsonp',
+                //Our search term and what page we are on
+                data: function (term, page) {
+                    return {
+                        pageSize: pageSize,
+                        pageNum: page,
+                        searchTerm: term,
+                        filter:filter,
+                        PersonId:PersonId,
+                    };
+                },
+                results: function (data, page) {
+                    //Used to determine whether or not there are more results available,
+                    //and if requests for more data should be sent in the infinite scrolling
+                    var more = (page * pageSize) < data.Total;
+                    return { results: data.Results, more: more };
+                }
+            },
+            initSelection: function (element, callback) {
+
+                var xval = element.val();
+                if (xval != 0)
+                {
+                    $.ajax({
+                        cache: false,
+                        type: "POST",
+                        url: SetAction,
+                        data: { Ids: element.val() },
+                        success: function (data) {
+                            callback(data);
+                        },
+                        error: function (xhr, ajaxOptions, thrownError) {
+                            alert('Failed to Retrive Qty' + thrownError);
+                        }
+                    })
+                }
+                //callback([{ id: "1", text: "arpit" }, { id: "2", text: "akash" }]);
+            }
+        });
+    }
+
+
+    var id=@Model.JobReceiveQALineId;
+    if(id==null||id==0)
+    {
+        $(document).find('a#btnCreate').removeAttr('href').removeAttr('data-modal');
+        $("#btnCreateF").attr('disabled','disabled');
+        $("#btnCreateFR").attr('disabled','disabled');
+    }
+    $("#JobOrderLineId").select2('focus');
+
+
+
+
+    //Loading the Table data or Line Information
+    function LoadProducts() {
+        var DomainName='@System.Configuration.ConfigurationManager.AppSettings["AdminSetupDomain"]';
+        var SelectedRecord='@ViewBag.DocLineId';
+        var groupId=@Model.JobReceiveQALineId;
+        var status='@Model.Status';
+        var LineEditUrl;
+        var LineDeleteUrl;
+        if(status==StatusContstantsEnum.Drafted)
+        {
+            LineEditUrl="/JobReceiveQAPenalty/_ModifyLine/";
+            LineDeleteUrl="/JobReceiveQAPenalty/_DeleteLine/";
+        }
+        else if(status==StatusContstantsEnum.Submitted || status == StatusContstantsEnum.Modified )
+        {
+            LineEditUrl="/JobReceiveQAPenalty/_ModifyLineAfterSubmit/";
+            LineDeleteUrl="/JobReceiveQAPenalty/_DeleteLine_AfterSubmit/";
+        }
+        var link="/JobReceiveQAPenalty/Index/"+groupId;
+        var QtyCount=0;
+        var InspectedQtyCount=0;
+        var PenaltyCount=0;
+        var unit=true;
+        var prevunit;
+        var decimal=0;
+        var DealQty=0;
+        var AmountCount = 0;
+        $.ajax({
+            url: link,
+            type: "GET",
+            success: function (data) {
+                var row = ""
+                var srno=1;
+                if(data.length!=0)
+                {
+                    $('#JobWorkerId').attr('readonly','true');
+
+                    $.each(data, function (index, item) {
+
+                        row += " <div class='row crow grid-body' style='margin-left:0px;margin-right:0px'id='"+item.JobReceiveQAPenaltyId+"'>"
+                            +"      <div class='row-index block'  style='width:5%'>"+srno+"<input type='hidden' class='id' value='"+item.JobReceiveQAPenaltyId+"' /></div>"
+                            +"          <div class='block'  style='width:90%'>"
+                            +"              <div class='row'>"
+                            +"                   <div class='block' style='width:32%'>"+(item.ReasonName==null?" ":"<strong>"+item.ReasonName+"</strong>")
+                            +"                   </div>"
+                            +"                   <div class='text-right block'  style='width:20%'>"+(item.Amount==null?" ":item.Amount)+"<br />"
+                            +"                   </div>"
+                            +"                   <div class='block'  style='width:10%'>"+(item.Remark==null?" ":item.Remark)
+                            +"                   </div>"
+                            +"              </div>"
+                            +"          </div>"
+                            +"  </div>"
+                            +"<hr style='margin-top:0px;margin-bottom:0px'/>";
+                        AmountCount+=item.Amount;                        
+                        
+                        
+                        srno++;
+
+                    });
+
+                    row+="<div class='row tfooter' style='padding-top:10px;margin-left:0px;margin-right:0px'>"
+                        +"  <div class='block' style='width:5%'>"
+                        +"  </div>"
+                        +"  <div class='block' style='width:90%'>"
+                        +"      <div class='row'> "
+                        +"          <div class='block'  style='width:32%'><strong>Total</strong></div>"
+                        +"          <div class='block text-right' style='width:20%'><strong>"
+                        +               (AmountCount.toFixed(decimal))+"</strong>"
+                        +"          </div>"
+                        +"          <div class='block text-right' style='width:10%'><strong>"
+                        +"          </strong></div>"
+                        +"      </div>"
+                        +"  </div>"
+                        +"  <div class='block'  style='width:5%'>"
+                        +"  </div>"
+                        +"</div>"
+                }
+                else
+                {
+
+                }
+                $("#gbody").html(row);
+                if(SelectedRecord && SelectedRecord!=0)
+                {
+                    var Id="#"+SelectedRecord
+                    NavigateToLineRecord(Id);}
+            },
+            error: function (result) {
+                alert("Error");
+            }
+        });
+    }
+
+
+    function LoadConsumption() {
+        var groupId=@Model.JobReceiveHeaderId;
+        var link="/WeavingReceiveQACombined/ConsumptionIndex/"+groupId;
+        var QtyCount=0;
+        var DealQtyCount=0;
+        var AmountCount=0;
+        var unit=true;
+        var dunit=true;
+        var prevunit;
+        var prevdunit;
+        var decimal=0;
+        var DUdecimal=0;
+        $.ajax({
+            url: link,
+            type: "GET",
+            success: function (data) {
+                var row = ""
+                var srno=1;
+
+                if(data.length!=0)
+                {
+                    $.each(data, function (index, item) {
+                        row += " <div class='row crow grid-body' style='margin-left:0px;margin-right:0px'>"
+                            +"      <div class='row-index block'  style='width:5%'>"+srno+"<input type='hidden' class='id' value='"+item.JobOrderLineId+"' /></div>"
+                            +"          <div class='block'  style='width:90%'>"
+                            +"              <div class='row'>"
+                            +"                  <div class='block' style='width:20%'>"+(item.CostCenterName==null?" ":"<strong>"+item.CostCenterName+"</strong>")
+                            +"                  </div>"
+                            +"                   <div class='block' style='width:55%'>"+(item.ProductName==null?" ":"<strong>"+item.ProductName+"</strong>")
+                            +"                           <div>"+(item.Dimension1Name==null?" ":item.Dimension1Name+",")+(item.Dimension2Name==null?" ":item.Dimension2Name)+(item.Dimension3Name==null?" ":item.Dimension3Name)+(item.Dimension4Name==null?" ":item.Dimension4Name)+"</div>"
+                            +"                   </div>"
+                            +"                  <div class='text-right block'  style='width:10%'>"+(item.Qty==null?" ":item.Qty.toFixed(item.UnitDecimalPlaces))+"<br />"
+                            +"                   </div>"
+                            +"                   <div class='block'  style='width:15%'>"+(item.UnitName==null?" ":item.UnitName)
+                            +"                   </div>"
+                            +"              </div>"
+                            +"          </div>"
+                            +"  </div>"
+                            +"<hr style='margin-top:0px;margin-bottom:0px'/>";
+                        QtyCount+=item.Qty;
+                        if(srno!=1)
+                        {
+                            if(item.UnitName==prevunit && unit!=false)
+                            {}
+                            else
+                            {unit=false;}
+                        }
+
+                        if(decimal- parseInt(item.UnitDecimalPlaces) < 0){decimal=item.UnitDecimalPlaces;}
+                        srno++;
+                        prevunit=item.UnitName;
+                    });
+                    row+="<div class='row tfooter' style='padding-top:10px;margin-left:0px;margin-right:0px'>"
+                        +"  <div class='block' style='width:5%'>"
+                        +"  </div>"
+                        +"  <div class='block' style='width:90%'>"
+                        +"      <div class='row'> "
+                        +"          <div class='block'  style='width:30%'><strong>Total</strong></div>"
+                        +"          <div class='block' style='width:20%'>"
+                        +"          </div>"
+                        +"          <div class='block text-right' style='width:20%'><strong>"
+                        +               "</strong>"
+                        +"          </div>"
+                        +"          <div class='block text-right' style='width:15%'><strong>"
+                        +              (QtyCount.toFixed(decimal))+"</strong>"
+                        +"          </div>"
+                        +"          <div class='block' style='width:15%'><strong>"
+                        +               ((unit==true)?prevunit:"")+"</strong>"
+                        +"          </div>"
+                        +"      </div>"
+                        +"  </div>"
+                        +"  <div class='block'  style='width:5%'>"
+                        +"  </div>"
+                        +"</div>"
+                }
+                else
+                {
+                    ;
+                }
+                $("#gbodyconsumption").html(row);
+
+            },
+            error: function (result) {
+                alert("Error");
+            }
+        });
+    };
+
+</script>
+
+
+@if ((ViewBag.Mode != "Add") && (ViewBag.Mode != "Edit"))
+{
+    <script type="text/javascript">
+        //$(document).ready(function(){
+        //    DisablePageNavigation();
+        //})
+
+        RemoveFields();
+
+        function RemoveFields(){
+            //Disabling input fields
+            $(':input:not(:submit)').attr('disabled','disabled');
+
+            //Removing all the events from the newly created lines
+            $('#gbody').unbind();
+
+            //Removing Add New Row ActionLink
+            $('a#btnCreate').parents('h5')[0].remove();
+
+            $('a#btnCreateF').remove();
+
+
+            //Preventing the click event on newly created elements
+            $(document).on('click','#Result a',function(event){
+                event.preventDefault();
+            })
+            //Removing the action link from the form so that the request will be redirected to the Submit function in the controller instead of the hardcoded path
+            $('form:last').prop('action','');
+        }
+
+    </script>
+}
+
+@if ((Model.Status == (int)ActivityTypeContants.Modified || Model.Status == (int)ActivityTypeContants.Submitted)
+    && (ViewBag.transactionType == "submit" || ViewBag.transactionType == "submitContinue" || ViewBag.transactionType == "review" || ViewBag.transactionType == "ReviewContinue"))
+{
+    <script type="text/javascript">
+
+        $(document).ready(function(){
+            enableActivityLogReason();
+        })
+
+
+    </script>
+}
+@if (ViewBag.transactionType != null && (ViewBag.transactionType == "submitContinue" || ViewBag.transactionType == "ReviewContinue"))
+{
+    <script type="text/javascript">
+      
+        $(document).ready(function(){
+            CreateTrasitionEffect();
+        })
+
+    </script>
+}
+
+<script type="text/javascript">
+    var decimalplaces=0;
+    var dealunitdecimalplaces=0;
+
+    $('#Qty').focusout(function(){
+        $(this).val((parseFloat($(this).val())).toFixed($('#UnitDecimalPlaces').val()));
+        Calculation();
+        ValidateData();
+        return;
+    });
+
+
+
+    $('#DealQty,#Qty,#PenaltyRate,#Rate').keyup(function(){
+        Calculation();
+    });
+
+    $("#DealUnitId").change(GetUnitConversionMultiplier);
+
+    $('#Length,#Width').keyup(function(){
+        GetUnitConversionMultiplier();
+        Calculation();
+    });
+
+    $('#Length,#Width').focusout(function(){
+        RoundDimensions();
+    });
+
+    function RoundDimensions()
+    {
+        if ($('#Length').val() != 0)
+        {
+            $('#Length').val(parseFloat($('#Length').val()).toFixed($('#DimensionUnitDecimalPlaces').val()));
+        }
+
+        if ($('#Width').val() != 0)
+        {
+            $('#Width').val(parseFloat($('#Width').val()).toFixed($('#DimensionUnitDecimalPlaces').val()));
+        }
+
+
+    }
+
+    $('#Qty').focusout(function(){
+        ValidateData();
+    });
+
+    function Calculation()
+    {
+        if ($('#UnitConversionMultiplier').val() != 0) {
+            //$('#DealQty').val(parseFloat($('#Qty').val() * $('#UnitConversionMultiplier').val()).toFixed($('#DealUnitDecimalPlaces').val()));
+            $('#DealQty').val($('#Qty').val() * $('#UnitConversionMultiplier').val());
+        }
+
+        if($('#PenaltyRate').val() && $('#PenaltyRate').val() >0)
+            $('#PenaltyAmt').val(($('#PenaltyRate').val() * parseFloat($('#Qty').val() * $('#UnitConversionMultiplier').val())).toFixed(2))
+
+
+        if($('#DealQty').val() > 0 && $('#Rate').val() >0)
+        {
+            $('#Amount').val(($('#DealQty').val() * $('#Rate').val()).toFixed(2));
+        }
+
+    }
+
+    function ValidateData()
+    {
+
+        var ValidationMessage = "";
+
+
+        if(!ValidationMessage=="")
+        {
+            $('#submit', '.modal-body').attr('disabled', 'disabled');
+            if (!$('#modform').find('.modal-body #errormsg').length) {
+                $('#modform').find('.modal-body').prepend("<div class='alert alert-danger'><span id=errormsg >"+ValidationMessage+"</span></div>")
+            }
+            else
+                $('#modform').find('.modal-body #errormsg').text(ValidationMessage);
+        }
+        else
+        {
+            $('#submit', '.modal-body').removeAttr('disabled');
+            $('#modform').find('#errormsg').parent().remove();
+        }
+
+        return(ValidationMessage=="");
+
+
+    }
+
+    function GetUnitConversionMultiplier() {
+        if ($("#Length").val() > 0 && $("#Width").val() > 0 && ($("#Length").val() != $("#OrderLength").val() || $("#Width").val() != $("#OrderWidth").val())) {
+        //if ($("#Length").val() > 0 && $("#Width").val() > 0) {
+                $.ajax({
+                    cache: false,
+                    type: "POST",
+                    async: false,
+                    url: "@(Url.Action("GetUnitConversionMultiplier"))",
+                    data: { ProductId: $("#ProductId").val(),Length: $("#Length").val(),Width: $("#Width").val(),Height: $("#Height").val(),ToUnitId: $("#DealUnitId").val()},
+                success: function (data) {
+                    if (data) {
+                        $('#UnitConversionMultiplier').val(0);
+                        $('#DealQty').val(data * $("#Qty").val());
+
+                    }
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    alert('Failed to retrieve product details.' + thrownError);
+                }
+            });
+            $('#DealUnitId').attr('readonly', 'true');
+            $('#UnitConversionMultiplier').attr('readonly', 'true');
+            $('#DealQty').attr('readonly', 'true');
+    }
+    else if ($("#UnitId").val() == $("#DealUnitId").val())
+    {
+        $("#UnitConversionMultiplier").val(1);
+        Calculation.call();
+        $('#DealUnitId').removeAttr('readonly');
+        $('#UnitConversionMultiplier').removeAttr('readonly');
+        $('#DealQty').removeAttr('readonly');
+    }
+    else
+    {
+        $.ajax({
+            cache: false,
+            type: "POST",
+            url: "@(Url.Action("GetUnitConversionDetailJson"))",
+            data: { ProductId: $("#ProductId").val(), UnitId: $("#UnitId").val(), DeliveryUnitId: $("#DealUnitId").val(), JobOrderLineId: $("#JobOrderLineId").val() },
+
+        success: function (data) {
+            $("#UnitConversionMultiplier").val(data[0].Value);
+            Calculation.call();
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            alert('Failed to retrieve Unit conversion details.' + thrownError);
+        }
+        });
+        $('#DealUnitId').removeAttr('readonly');
+        $('#UnitConversionMultiplier').removeAttr('readonly');
+        $('#DealQty').removeAttr('readonly');
+    }
+    }
+
+
+
+
+
+</script>

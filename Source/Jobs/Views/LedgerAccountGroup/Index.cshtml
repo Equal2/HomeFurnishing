@@ -1,0 +1,155 @@
+﻿@model IEnumerable<Model.Models.LedgerAccountGroup>
+@using GridMvc.Html;
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    string ControllerName = (string)ViewContext.RouteData.Values["controller"];
+}
+<!-- modal placeholder-->
+<div id='myModal' class='modal fade in'>
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div id='myModalContent'></div>
+        </div>
+    </div>
+</div>
+@*<div class="container" id="alert" style="display:none">
+    <div class="col-md-5 col-md-offset-4">
+        <div class='alert alert-danger alert-dismissable'> <button type='button' class='close' data-dismiss='alert' aria-hidden='true'>&times; </button><div id="message">Error ! Please select a record to Delete.</div> </div>
+    </div>
+</div>*@
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3>
+            <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-list black"></span> Ledger Account Group List</span>
+        </h3>
+        <hr style="margin-top:0px;margin-bottom:0px" />
+
+        <div class="panel-info">
+           @*<h4 style="padding:5px 0 0 0;margin:0px">
+                @Html.ActionLink(" ", " ", " ", null, new { @class = "glyphicon glyphicon-refresh toolbar", @title = "Refresh Page", @data_toggle = "tooltip", @id = "RefreshPage" })
+                @Html.ActionLink(" ", "Create", "LedgerAccountGroup", null, new { @class = "glyphicon glyphicon-plus toolbar", @title = "Add New", @data_toggle = "tooltip" })
+                @Html.ActionLink(" ", "Print", "LedgerAccountGroup", null, new { @class = "glyphicon glyphicon-print toolbar", @title = "Print", @data_toggle = "tooltip" ,@id="PrintRecord"})
+                @Html.ActionLink(" ", "Delete", "LedgerAccountGroup", null, new { @class = "glyphicon glyphicon-trash toolbar", @title = "Delete", @data_toggle = "tooltip", @id = "DeleteRecord" , @data_modal="" })
+                @Html.ActionLink(" ", "Report", "LedgerAccountGroup", null, new { @class = "glyphicon glyphicon-stats toolbar right", @title = "Report", @data_toggle = "tooltip", target = "_blank" })
+                @Html.ActionLink(" ", "Index", "LedgerAccountGroup", null, new { @class = "glyphicon glyphicon-list toolbar right", @title = "List", @data_toggle = "tooltip" })     
+                @Html.ActionLink(" ", "", "", null, new { @class = "glyphicon glyphicon-export toolbar right", @title = "Export", @data_toggle = "tooltip" })           
+            </h4>*@
+            <div class="btn-group">
+               @Html.ActionLink(" ", "Create", "LedgerAccountGroup", null, new { @class = "cbtn btn-circle glyphicon glyphicon-plus toolbar", @title = "Add New", @data_toggle = "tooltip" })
+                @Html.ActionLink(" ", "Print", "LedgerAccountGroup", null, new { @class = "cbtn btn-circle glyphicon glyphicon-print toolbar", @title = "Print", @data_toggle = "tooltip", @id = "PrintRecord" })
+                @*@Html.ActionLink(" ", "Delete", "LedgerAccountGroup", null, new { @class = "cbtn btn-circle glyphicon glyphicon-trash toolbar", @title = "Delete", @data_toggle = "tooltip", @id = "DeleteRecord", @data_modal = "" })*@
+                @Html.ActionLink(" ", "Remove", "LedgerAccountGroup", null, new { @class = "cbtn btn-circle glyphicon glyphicon-trash toolbar", @title = "Delete", @data_toggle = "tooltip", @id = "DeleteRecord", @data_modalDelete = "" })
+            </div>
+            <div class="btn-group">
+                <a class="cbtn btn-circle glyphicon glyphicon-option-horizontal dropdown-toggle" aria-expanded="false" style="padding-top: 6px;padding-bottom: 6px;" href="#" data-toggle="dropdown" id="dropdownMenu1">
+                </a>
+                <ul class="dropdown-menu pull-right" aria-labelledby="dropdownMenu1">
+                    <li><a href="@Url.Action("Report", "LedgerAccountGroup", new {  })" target = "_blank"><span class="glyphicon glyphicon-stats"> </span> Report</a></li>                   
+                </ul>
+         </div>
+        </div>
+    </div>
+    <div class="panel-info" style="padding-left:5px;padding-top:2px">
+        @Html.Grid(Model).Columns(columns =>
+           {
+               columns.Add(foo => foo.LedgerAccountGroupId, true);
+               columns.Add(foo => foo.LedgerAccountGroupName).Sortable(true).Titled("Name").Filterable(true).Css("modal-link");
+               columns.Add(m => m.IsSystemDefine).Sortable(true).Titled("System Defined");
+               columns.Add(m => m.IsActive).Sortable(true).Titled("Is Active").Filterable(true);
+               columns.Add(true).RenderValueAs(m => CustomHelpers.RenderHEDActionLink(ControllerName, m.LedgerAccountGroupId, 0, "All"));
+           }).WithPaging(25).EmptyText("No records found.")
+    </div>
+</div>
+
+<script type="text/javascript">
+
+    $('table.grid-table td').dblclick(function () {
+        var $this = $(this);
+        var row = $this.closest("tr");
+        var editid = row.find('[data-name="LedgerAccountGroupId"]').text();
+        var url = '@Url.Action("Edit", "LedgerAccountGroup")' + "/" + editid;
+        window.location.href = url;
+
+    });
+
+    $('a#DeleteRecord').click(function (e) {
+        var tes = DeleteValidation();
+        if (!tes)
+        {
+            e.stopImmediatePropagation();
+            return false;
+        }        
+        var editiiid = $('table.grid-table .grid-row.grid-row-selected').find('[data-name="LedgerAccountGroupId"]').text();
+        var url = '/LedgerAccountGroup/Delete/' + editiiid;
+        $(this).attr('href', url);
+        return;
+    });
+
+    //$('#PrintRecord').click(function () {
+    //    //window.print();
+    //    window.open('data:application/vnd.ms-excel,' + encodeURIComponent($('table.grid-table').html()));
+    //    return false;
+    //})
+
+
+    $('#myModal').on('shown.bs.modal', function () {
+        $("#Reason").focus();
+    });
+
+
+    //$(document).ready(function () {
+
+    //    function exportTableToCSV($table, filename) {
+
+    //        var $rows = $table.find('tr:has(td)'),
+
+    //            // Temporary delimiter characters unlikely to be typed by keyboard
+    //            // This is to avoid accidentally splitting the actual contents
+    //            tmpColDelim = String.fromCharCode(11), // vertical tab character
+    //            tmpRowDelim = String.fromCharCode(0), // null character
+
+    //            // actual delimiter characters for CSV format
+    //            colDelim = '","',
+    //            rowDelim = '"\r\n"',
+
+    //            // Grab text from table into CSV formatted string
+    //            csv = '"' + $rows.map(function (i, row) {
+    //                var $row = $(row),
+    //                    $cols = $row.find('td');
+
+    //                return $cols.map(function (j, col) {
+    //                    var $col = $(col),
+    //                        text = $col.text();
+
+    //                    return text.replace('"', '""'); // escape double quotes
+
+    //                }).get().join(tmpColDelim);
+
+    //            }).get().join(tmpRowDelim)
+    //                .split(tmpRowDelim).join(rowDelim)
+    //                .split(tmpColDelim).join(colDelim) + '"',
+
+    //            // Data URI
+    //            csvData = 'data:application/csv;charset=utf-8,' + encodeURIComponent(csv);
+
+    //        $(this)
+    //            .attr({
+    //                'download': filename,
+    //                'href': csvData,
+    //                'target': '_blank'
+    //            });
+    //    }
+
+    //    // This must be a hyperlink
+    //    $("#PrintRecord").on('click', function (event) {
+    //        // CSV
+    //        exportTableToCSV.apply(this, [$('.table.grid-table'), 'export.csv']);
+
+    //        // IF CSV, don't do event.preventDefault() or return false
+    //        // We actually need this to be a typical hyperlink
+    //    });
+    //});
+
+
+</script>

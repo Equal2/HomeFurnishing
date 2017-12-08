@@ -1,0 +1,26 @@
+﻿@model List<Customize.Controllers.ImportErrors>
+@{
+    ViewBag.Title = "WorkOrderImport";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Work Order Import</h2>
+
+<p style="font:bold"><b>Check These Fields</b> </p>
+@{
+    string StoreDomain = @System.Configuration.ConfigurationManager.AppSettings["StoreDomain"];
+}
+
+@foreach (var item in Model)
+{
+    <div>
+        @Html.DisplayFor(modelItem => item.ErrorText) :
+    </div>
+
+}
+
+
+@Html.ActionLink("Go Back", "Index", "WorkOrderImport", new { @id = ViewBag.id }, new { @class = "btn btn-primary btn-sm col-md-offset-0 CurveBorder ActionLinkPadding" })
+@Html.ActionLink("Continue", "Continue", "WorkOrderImport", new { @id = ViewBag.id }, new { @class = "btn btn-primary btn-sm col-md-offset-0 CurveBorder ActionLinkPadding" })
+
+

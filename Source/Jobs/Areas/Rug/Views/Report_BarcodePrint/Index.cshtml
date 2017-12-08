@@ -1,0 +1,36 @@
+﻿@model IEnumerable<Model.Models.ReportHeader>
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<span style="font-family: Calibri,sans-serif,Verdana;font-size:large">
+    @Html.ActionLink("Create New", "Create")
+</span>
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h4>
+            <span style="font-family: Calibri,sans-serif,Verdana">ReportHeader List</span>
+        </h4>
+
+    </div>
+    <div class="panel-info" style="padding-left:5px;padding-top:2px">
+
+        @Html.Grid(Model).Columns(columns =>
+           {                          
+               columns.Add(foo => foo.ReportHeaderId, true);
+               columns.Add(foo => foo.ReportName).Sortable(true).Titled("Name").Filterable(true).Css("modal-link");
+               columns.Add().Sortable(true).Titled("Detail").Encoded(false).Sanitized(false).RenderValueAs(m => Html.ActionLink("Line", "Index", "ReportLine", new { id = m.ReportHeaderId }, null));
+               columns.Add().Sortable(true).Titled("Report").Encoded(false).Sanitized(false).RenderValueAs(m => Html.ActionLink("Report", "ReportLayout", "ReportLayout", new { name = m.ReportName }, null));             
+               columns.Add().Encoded(false).Sanitized(false).RenderValueAs(d => @Html.ActionLink(" ", "Edit", "ReportHeader", new { id = d.ReportHeaderId }, new { @class = "rowEditBlue" }));
+               columns.Add().Encoded(false).Sanitized(false).RenderValueAs(d => @Html.ActionLink(" ", "Delete", "ReportHeader", new { id = d.ReportHeaderId}, new { @class = "rowDeleteBlue" }));
+
+              
+           }).WithPaging(25).EmptyText("No records found.")
+
+
+    </div>
+</div>
+

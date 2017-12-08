@@ -1,0 +1,445 @@
+﻿@model Model.ViewModels.ManufacturerViewModel
+
+@{
+    ViewBag.Title = "Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!-- modal placeholder-->
+<div id='myModal' class='modal fade in'>
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div id='myModalContent'></div>
+        </div>
+    </div>
+</div>
+
+
+<script src="~/Scripts/Jasny/jasny-bootstrap.min.js"></script>
+<link href="~/Content/jasny/jasny-bootstrap.min.css" rel="stylesheet" />
+
+@using (Html.BeginForm("Create", "Manufacturer", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(m => m.PersonId)
+    @Html.HiddenFor(m => m.CreatedBy)
+    @Html.HiddenFor(m => m.CreatedDate)
+    @Html.HiddenFor(m=>m.ImageFileName)
+    @Html.HiddenFor(m=>m.ImageFolderName)
+
+
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3>
+                <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"> <span class="glyphicon glyphicon-file black"></span>Manufacturer</span>
+                <input type="submit" value="Save" class="btn btn-primary right" id="submit" style="width: 90px; background-color: #2980b9" />
+            </h3>
+            <hr style="margin-top:0px;margin-bottom:0px" />
+
+            <div class="panel-info">
+                @*<h4 style="padding:5px 0 0 0;margin:0px">
+                    @Html.ActionLink(" ", " ", " ", null, new { @class = "glyphicon glyphicon-refresh toolbar", @title = "Refresh Page", @data_toggle = "tooltip", @id = "RefreshPage" })
+                    @Html.ActionLink(" ", "Create", "Manufacturer", null, new { @class = "glyphicon glyphicon-plus toolbar", @title = "Add New", @data_toggle = "tooltip"})
+                    @Html.ActionLink(" ", "History", "Manufacturer", null, new { @class = "glyphicon glyphicon-user toolbar", @title = "History", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "Print", "Manufacturer", null, new { @class = "glyphicon glyphicon-print toolbar", @title = "Print", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "Email", "Manufacturer", null, new { @class = "glyphicon glyphicon-envelope toolbar", @title = "Email", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "PrevPage", "Manufacturer", new { id = @Model.PersonId }, new { @class = "glyphicon glyphicon-arrow-left toolbar", @title = "Prev Record", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "NextPage", "Manufacturer", new { id = @Model.PersonId }, new { @class = "glyphicon glyphicon-arrow-right toolbar", @title = "Next Record", @data_toggle = "tooltip" })*@
+                    @*@Html.ActionLink(" ", " ", " ", null, new { @class = "glyphicon glyphicon-trash toolbar", @title = "Delete", @data_toggle = "tooltip" })*@
+                    @*@Html.ActionLink(" ", "Index", "Manufacturer", null, new { @class = "glyphicon glyphicon-list toolbar right", @title = "List", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "Report", "Manufacturer", null, new { @class = "glyphicon glyphicon-th toolbar right", @title = "Report", @data_toggle = "tooltip" })
+              </h4>*@
+                <div class="btn-group">
+                    @Html.ActionLink(" ", "Create", "Manufacturer", null, new { @class = "cbtn btn-circle glyphicon glyphicon-plus toolbar", @title = "Add New", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "Print", "Manufacturer", null, new { @class = "cbtn btn-circle glyphicon glyphicon-print toolbar", @title = "Print", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "PrevPage", "Manufacturer", new { id = @Model.PersonId }, new { @class = "cbtn btn-circle glyphicon glyphicon-arrow-left toolbar", @title = "Prev Record", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "NextPage", "Manufacturer", new { id = @Model.PersonId }, new { @class = "cbtn btn-circle glyphicon glyphicon-arrow-right toolbar", @title = "Next Record", @data_toggle = "tooltip" })
+                </div>
+                <div class="btn-group">
+                    <a class="cbtn btn-circle glyphicon glyphicon-option-horizontal dropdown-toggle" aria-expanded="false" style="padding-top: 6px;padding-bottom: 6px;" href="#" data-toggle="dropdown" id="dropdownMenu1">
+                    </a>
+                    <ul class="dropdown-menu pull-right" aria-labelledby="dropdownMenu1">
+                        <li><a href="@Url.Action("Email", "Manufacturer")"><span class="glyphicon glyphicon-envelope"> </span> Email</a></li>
+                        <li><a href="@Url.Action("Index", "Manufacturer")"><span class="glyphicon glyphicon-list"> </span> List</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="@Url.Action("Report", "Manufacturer")"><span class="glyphicon glyphicon-th"> </span> Report</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="panel-info" style="padding-left:15px">
+            <div class="form-horizontal">
+                @Html.ValidationSummary(true)
+
+                <div>
+                    <h4 class="col-md-12 black">
+                        <span class="glyphicon glyphicon-align-justify"></span>
+                        1.Personal Details
+                    </h4>
+                    <div>
+                        <div>
+                            <div class="col-md-6">
+                                <div>
+                                    <div class="col-md-12">
+                                        <div class="form-group" style="margin-top:15px">
+                                            @Html.LabelFor(model => model.Name, "Name", new { @class = "control-label col-md-4 col-sm-2" })
+                                            <div class="col-md-7 col-sm-10">
+                                                @Html.TextBoxFor(model => model.Name, null, new { @class = "form-control col-xs-6 required" })
+                                                @Html.ValidationMessageFor(m => m.Name)
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            @Html.LabelFor(model => model.Suffix, "Suffix", new { @class = "control-label col-md-4 col-sm-2" })
+                                            <div class="col-md-7 col-sm-10">
+                                                @Html.TextBoxFor(m => m.Suffix, null, new { @class = "form-control col-xs-6 required" })
+                                                @Html.ValidationMessageFor(m => m.Suffix)
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <div>
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            @Html.LabelFor(model => model.Code, "Code", new { @class = "control-label col-md-4 col-sm-2" })
+                                            <div class="col-md-7 col-sm-10">
+                                                @Html.TextBoxFor(m => m.Code, null, new { @class = "form-control col-xs-6 required" })
+                                                @Html.ValidationMessageFor(model => model.Code)
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            @Html.LabelFor(model => model.Description, "Description", new { @class = "control-label col-md-4 col-sm-2" })
+                                            <div class="col-md-7 col-sm-10">
+                                                @Html.TextAreaFor(model => model.Description, new { @class = "form-control col-xs-6 " })
+                                                @Html.ValidationMessageFor(model => model.Description)
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <div class="col-md-12">
+                                        <div class="form-group" >
+                                            @Html.LabelFor(model => model.IsActive, "Is Active", new { @class = "control-label col-md-4 col-sm-2" })
+                                            <div class="col-md-7 col-sm-10" style=" padding-top:4px">
+                                                @Html.CheckBoxFor(m => m.IsActive, new { @class = "checkbox col-xs-1" })
+                                                @Html.ValidationMessageFor(model => model.IsActive)
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div>
+                                    <div class="col-md-offset-4 col-md-8">
+                                        <div class="fileinput fileinput-new" data-provides="fileinput">
+                                            <div class="fileinput-new thumbnail" style="width: 200px; height: 150px;">
+                                                <img src="~/Uploads/@(Model.ImageFolderName)/Medium/@(Model.ImageFileName)" alt="...">
+                                            </div>
+                                            <div class="fileinput-preview fileinput-exists thumbnail" style="max-width: 200px; max-height: 150px;"></div>
+                                            <div >
+                                                <span class="btn btn-default btn-file" style="background-color: transparent; color: black; font-family:Arial; border-radius:5px">
+                                                    <span id="Select" class="fileinput-new">Select</span>
+                                                    <span id="Change" class="fileinput-exists">Change</span>
+                                                    <input type="file" name="upload">
+                                                </span>
+                                                <a href="#" class="btn btn-default fileinput-exists" style="background-color: transparent; color: black; font-family: Arial; border-radius: 5px" data-dismiss="fileinput">Remove</a>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+
+
+               
+
+
+
+
+                <hr />
+                <div class="row">
+                    <h4 class="col-md-12 black" style="margin-top:15px">
+                        <span class="glyphicon glyphicon-shopping-cart"></span>
+                        2.Document Details
+                    </h4>
+                </div>
+
+                <div class="panel-info">
+                    <h5 style="padding:5px 0 3px 0;margin:0px;font-weight:bold">
+                        <span class="glyphicon glyphicon-plus-sign"></span>
+                        @Html.ActionLink("Add New Row ", "_Create", "PersonDocument", new { id = @Model.PersonId }, new { data_modal = "", id = "btnCreate", @class = "toolbar", @title = "Add New", @data_toggle = "tooltip" })
+                    </h5>
+                </div>
+
+                <div style="padding-right:15px">
+                    <table class="table table-hover ctable">
+                        <thead id="header">
+                        </thead>
+
+                        <tbody id="Result"></tbody>
+                    </table>
+                </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            </div>
+        </div>
+    </div>
+}
+
+<script type="text/javascript">
+
+
+</script>
+
+<script type="text/javascript">
+    var form_clean;
+    $(document).ready(function () {
+
+        //Calling the function to load the table data/ Line information
+        LoadPersonDocument();
+
+
+        form_clean = $("form").serialize();
+
+
+        //For maintaining the data change on the form
+        //To enable of disable save button based on the data changed
+        $("input,select").change(function () {
+            var form_dirty = $("form").serialize();
+            if (form_clean != form_dirty) {
+                $("#submit").removeAttr('disabled');
+            }
+            else
+            {
+                // alert('same form');
+                $("#submit").attr({ "disabled": "disabled" })
+            }
+        });
+    });
+
+
+    var id=@Model.PersonId;
+    if(id==null||id==0)
+    {
+        $(document).find('a#btnCreate').removeAttr('href').removeAttr('data-modal');
+    }
+
+
+
+    //Reloading the table contents on modal hide
+    $('#myModal').on('hidden.bs.modal', function () {
+        LoadPersonDocument();
+    });
+
+
+    //To focus on the first element on modal load
+    $('#myModal').on('shown.bs.modal', function () {
+        $("#Name").select2("focus");
+    });
+
+
+
+    //Loading the Table data or Line Information
+    function LoadPersonDocument() {
+        var groupId=@Model.PersonId;
+        
+        var link="/PersonDocument/Index/"+groupId;
+        $.ajax({
+            url: link,
+            type: "GET",
+            success: function (data) {
+                var row = ""
+                var srno=1;
+                var head="<tr style='background-color:#428bca'>  <th style='width:10px'><input type='hidden'  /></th> <th style='width:10px'>Serial</th><th class='center' style='width:50px'>Name</th>   <th class='center' style='width:50px'>Description</th>      <th style='width:10px'></th>       <th style='width:10px'></th>  </tr>"
+                if(data.length!=0)
+                {
+                    $.each(data, function (index, item) {
+                        row += "<tr><td><input type='hidden' class='id' value='" + item.PersonDocumentID + "'/></td> <td>"+ srno +"</td> <td>" + item.Name + "</td>        <td>"+((item.Description==null)?" ":item.Description)+"</td>          <td><a class=' hidden' Modify href='/PersonDocument/_Edit/"+item.PersonDocumentID+"' ></a></td>       <td><a class='glyphicon glyphicon-trash' data-modal='' delete='' href='/PersonDocument/_Edit/"+item.PersonDocumentID+"' ></a></td>  </tr>";
+                        srno++;
+                    });
+                }
+                else
+                {
+                    row+="<tr><td>No Items Found.</td></tr>";
+                }
+                $("#header").html(head);
+                $("#Result").html(row);
+            },
+            error: function (result) {
+                alert("Error");
+            }
+        });
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+    //For Populating Modal PopUp on DoubleClick Of Row
+    $('#Result').on("dblclick",'tr',function(){
+        var text = $(this).find(".id").val();
+        var editurl=$(this).find('a[Modify]').attr('href');
+
+
+        $('#myModalContent').load(editurl, function () {
+            //alert('2');
+            $('#myModal').modal({
+                backdrop: 'static',
+                keyboard: true
+            }, 'show');
+
+            bindForm1(this);
+        });
+    });
+
+
+
+
+    //For Handling Modal PopUp on Clicking Delete Icon
+    $('#Result').on("click",'a[delete]', function (e) {
+        $('#myModalContent').load(this.href, function () {
+            //alert('2');
+            $('#myModal').modal({
+                backdrop: 'static',
+                keyboard: true
+            }, 'show');
+
+            bindForm1(this);
+        });
+        return false;
+    });
+
+
+
+
+    //For posting the data through ajax and render the contents sent back from the server
+    function bindForm1(dialog) {
+        $('form', dialog).submit(function () {
+            //alert(this.action);
+            $.ajax({
+                url: this.action,
+                type: this.method,
+                data: $(this).serialize(),
+                success: function (result) {
+                    if (result.success) {
+                        $('#myModal').modal('hide');
+                        //Refresh
+                        //location.reload();
+                        //alert('Data Saved');
+                    }else if(!result.success)
+                    {
+                        $('#myModalContent').html(result);
+                        bindForm1();
+                    }
+                    else {
+                        $('#myModalContent').html(result);
+                        bindForm1();
+                    }
+                }
+            });
+            return false;
+        });
+
+    }
+
+    
+    var IsSaved=false;
+    var ValidationCount=0;
+
+    $('form').submit(function(event){
+
+        if(!IsSaved)
+        {
+            if(!ValidateData())
+            {
+                return false;
+            }
+            IsSaved=true;
+            return IsSaved;
+        }
+        else
+        {
+            return false;
+        }
+
+
+    });
+
+
+    function ValidateData() {
+        var DocId=@Model.PersonId;
+        var TempValue;
+        var ValidationMessage="";
+
+
+
+        //Checking for dulicate key value
+        if(DocId<=0)
+        {
+            TempValue= $('#Code').DuplicateCheckForCreate({ name: 'Person', value: $('#Code').val(), doctype: 0 });
+            if (TempValue){ ValidationMessage=$('#Code').val() + " already exist <br />";}
+        }
+        else
+        {
+            test = $('#Code').DuplicateCheckForEdit({ name: 'Person', value: $('#Code').val(), doctype: 0,headerId:DocId });
+            if (TempValue) {ValidationMessage+=$('#Code').val() + " already exist <br />";}
+        }
+        if(TempValue)
+        {
+            if($('#validationerrormsg').length==0){
+                $('.panel-info').filter(':eq(1)').before('<div class="alert alert-danger" role="alert" id="validationerrormsg">'+ValidationMessage+'</div>');}
+            else
+            {
+                $('#validationerrormsg').html(ValidationMessage);
+            }
+        }
+        return  (ValidationMessage=="");
+
+    }
+
+
+
+</script>
+
+
+
+
+

@@ -1,0 +1,245 @@
+﻿@model Model.ViewModels.SaleOrderLineViewModel
+@using Core.Common
+@{
+    ViewBag.Title = "Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<style type="text/css">
+    .select2-container {
+        width: 300px;
+    }
+</style>
+
+@using (Html.BeginForm("Create", "SaleOrderLine", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(model => model.SaleOrderHeaderId)
+    @Html.HiddenFor(m=>m.UnitId)
+    @Html.HiddenFor(m=>m.UnitConversionMultiplier)
+    
+    <script>
+        $(document).ready(function () {
+
+            CustomSelectFunction($("#ProductId"), '/ComboHelpList/GetProducts', '/ComboHelpList/SetSingleProducts', 'Enter Product Name', false, 3);
+
+        });
+
+    </script>
+
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h4>
+                <span style="font-family: Calibri,sans-serif,Verdana"> Create Sale Order Line(Order No:@ViewBag.DocNo)</span>
+            </h4>
+        </div>
+        <div class="panel-info" style="padding-left:15px">
+            <div class="form-horizontal">
+                @Html.ValidationSummary(true)
+
+                <div class="form-group" style="margin-top:15px">
+                    @Html.LabelFor(model => model.ProductId, "Product*", new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.TextBoxFor(a => a.ProductId)
+                        @*<input type='hidden' name='ProductId' id='ProductId' style="width:300px;" />*@
+                        @Html.ValidationMessageFor(model => model.ProductId)
+                        <span id="status"></span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.Specification, new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.Specification)
+                        @Html.ValidationMessageFor(model => model.Specification)
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.DueDate, new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.DueDate)
+                        @Html.ValidationMessageFor(model => model.DueDate)
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.Qty,"Qty*", new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.Qty)
+                        @Html.ValidationMessageFor(model => model.Qty)
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.DealUnitId, "Delivery Unit*", new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.DropDownListFor(model => model.DealUnitId, new SelectList(ViewBag.DeliveryUnitList as System.Collections.IEnumerable, "UnitId", "UnitName"))
+                        @Html.ValidationMessageFor(model => model.DealUnitId)
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.DealQty,"Delivery Qty*", new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.DealQty)
+                        @Html.ValidationMessageFor(model => model.DealQty)
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.Rate, new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.Rate)
+                        @Html.ValidationMessageFor(model => model.Rate)
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.Amount, new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.Amount)
+                        @Html.ValidationMessageFor(model => model.Amount)
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.SalesTaxGroupId, new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.TextBoxFor(m => m.SalesTaxGroupId, new { @readonly = true })
+                        @Html.ValidationMessageFor(model => model.SalesTaxGroupId)
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.Remark, new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.Remark)
+                        @Html.ValidationMessageFor(model => model.Remark)
+                    </div>
+                </div>
+
+                <hr />
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-10">
+                        @*<input type="submit" id="btnSave" name="Command" value="Save Line Detail" class="btn-primary xxlarge" />*@
+                        <input type="submit" id="btnSave" name="Command" value="Save" class="btn btn-primary btn-sm CurveBorder" />
+                        <span style="font-family: Calibri,sans-serif,Verdana;font-size:large">
+                            @Html.ActionLink("Back", "Index", new { id = @Model.SaleOrderHeaderId }, new { @class = "btn btn-primary btn-sm col-md-offset-1 CurveBorder ActionLinkPadding" })
+                        </span>
+                        @if (ViewBag.Status == (int)StatusConstants.Drafted)
+                        {
+                            <input type="submit" id="btnSave" name="Command" value="Submit" class="btn btn-primary btn-sm CurveBorder col-md-offset-1" />
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<script type="text/javascript">
+    $(function () {
+
+        $("#DeliveryQty,#Rate,#Amount,#Qty").keyup(Calculation);
+        $("#DeliveryUnitId").change(GetUnitConversionMultiplier);
+        $("#ProductId").change(GetProductDetail);
+        $("#ProductId").change(CheckForValidation);
+
+
+
+        function GetProductDetail() {
+            var ProcessProgress = $("#Product detail loading progress");
+            ProcessProgress.show();
+            if ($("#ProductId").val() != 0 || $("#ProductId").val() != NULL) {
+                $.ajax({
+                    cache: false,
+                    type: "POST",
+                    url: "@(Url.Action("GetProductDetailJson"))",
+                    data: { ProductId: $("#ProductId").val() },
+                    success: function (data) {
+                        $("#Rate").val(data[0].StandardCost);
+                        $("#UnitId").val(data[0].UnitId);
+                        $("#DeliveryUnitId").val(data[0].UnitId);
+                        GetUnitConversionMultiplier.call();
+                        Calculation.call();
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        alert('Failed to retrieve product details.' + thrownError);
+                        ProcessProgress.hide();
+                    }
+                });
+            }
+
+        }
+
+        function CheckForValidation() {                
+            if ($("#ProductId").val() != 0||$("#ProductId").val() !=NULL)
+            {
+                $.ajax({
+                    cache: false,
+                    type: "POST",
+                    url: "@(Url.Action("CheckForValidation"))",
+                    data: { ProductId: $("#ProductId").val(), SaleOrderHeaderId: $("#SaleOrderHeaderId").val() },
+                success: function (data) {
+                    var status = data;
+                    if (data.returnvalue)
+                        $("#status").text("The Product Already exists in this order");
+                    else
+                        $("#status").text(" ");
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    alert('Failed to Check Validation.' + thrownError);                        
+                }
+            });
+        }
+
+    }
+
+        function GetUnitConversionMultiplier() {
+
+            if ($("#UnitId").val() == $("#DeliveryUnitId").val()) {
+                $("#UnitConversionMultiplier").val(1);
+                Calculation.call();
+            }
+
+            else {
+                var ProcessProgress = $("#Unit conversion detail loading progress");
+                ProcessProgress.show();
+                $.ajax({
+                    cache: false,
+                    type: "POST",
+                    url: "@(Url.Action("GetUnitConversionDetailJson"))",
+                    data: { ProductId: $("#ProductId").val(), UnitId: $("#UnitId").val(), DeliveryUnitId: $("#DeliveryUnitId").val() },
+
+                success: function (data) {
+                    $("#UnitConversionMultiplier").val(data[0].Value);
+                    Calculation.call();
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    alert('Failed to retrieve Unit conversion details.' + thrownError);
+                    ProcessProgress.hide();
+                }
+            });
+        }
+    }
+
+
+        function Calculation() {
+            if ($('#UnitConversionMultiplier').val() != 0) {
+                $('#DeliveryQty').val($('#Qty').val() * $('#UnitConversionMultiplier').val())
+            }
+            //$('#DeliveryQty').val($('#Qty').val())
+
+            $('#Amount').val($('#DeliveryQty').val() * $('#Rate').val());
+        }
+
+
+
+    });
+    </script>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#ProductId").select2("focus");
+    })
+</script>

@@ -1,0 +1,118 @@
+INSERT INTO Web.People (Name, Suffix, Code, Description, Phone, Mobile, Email, IsActive, Tags, ImageFolderName, ImageFileName, CreatedBy, ModifiedBy, CreatedDate, ModifiedDate, OMSId, ApplicationUser_Id)
+SELECT DispName AS Name, ManualCode AS Suffix, ManualCode AS Code, NULL AS Description, 
+SubString(Phone,1,11) AS Phone, 
+SubString(Mobile,1,10) AS Mobile, 
+EMail, 
+CASE WHEN IsNull(Status,'Active') = 'Active' THEN 1 ELSE 0 END AS IsActive, NULL AS Tags,
+NULL AS ImageFolderName, NULL AS ImageFileName, H.EntryBy AS CreatedBy, H.EntryBy AS ModifiedBy, 
+IsNull(H.EntryDate,getdate()) AS CreatedDate, IsNull(H.EntryDate,getdate()) AS ModifiedDate, 
+NULL AS OMSId, NULL AS ApplicationUser_Id
+FROM SubGroup H 
+--WHERE H.ManualCode IN ('306024')
+WHERE H.SubCode = 'R100002103'
+
+
+
+INSERT INTO Web.BusinessEntities  
+(  
+PersonID ,  
+ParentId ,  
+TdsCategoryId ,  
+TdsGroupId ,  
+GuarantorId ,  
+SalesTaxGroupPartyId ,  
+IsSisterConcern ,  
+PersonRateGroupId ,  
+ServiceTaxCategoryId ,  
+CreaditDays ,  
+CreaditLimit ,  
+DivisionIds ,  
+SiteIds   
+)  
+
+SELECT  H.PersonID,
+(SELECT TOP 1 PersonId From   Web.People Where Name = Parent.DispName ) As ParentId,  
+(Select TdsCategoryId From   Web.TdsCategories Where TdsCategoryName = Tc.Name ) As TdsCategoryId,  
+(Select TdsGroupId From   Web.TdsGroups Where TdsGroupName = Td.Name ) As TdsGroupId,  
+Null As GuarantorId,  
+(Select SalesTaxGroupPartyId From   Web.SalesTaxGroupParties Where SalesTaxGroupPartyName = IsNull(S.Description,'Local') ) As SalesTaxGroupPartyId,  
+IsNull(Sg.SisterConcernYn,0)   As IsSisterConcern,  
+Null As PersonRateGroupId ,  
+Null As ServiceTaxCategoryId ,  
+Sg.CreditDays As CreaditDays ,  
+Sg.CreditLimit As CreaditLimit ,  
+Null As DivisionIds ,  
+Null As SiteIds 
+FROM Web.People H 
+LEFT JOIN SubGroup Sg ON 'Person-' + Convert(NVARCHAR,H.PersonID) = Sg.OMSId
+LEFT JOIN City C ON Sg.CityCode = C.CityCode
+LEFT JOIN PostingGroupSalesTaxParty S ON Sg.SalesTaxPostingGroup = S.Description 
+LEFT JOIN SubGroup Parent On Sg.Parent = Parent.SubCode 
+LEFT JOIN TdsCat Tc ON Sg.TDS_Catg = Tc.Code
+LEFT JOIN TDSCat_Description Td ON Sg.TDSCat_Description = Td.Code
+WHERE PersonID NOT IN (SELECT PersonID FROM Web.BusinessEntities)
+
+
+
+
+
+
+
+
+INSERT INTO   Web.PersonAddresses  
+(  
+PersonId,  
+AddressType,  
+Address,  
+CityId,  
+AreaId,  
+Zipcode,  
+CreatedBy,  
+ModifiedBy,  
+CreatedDate,  
+ModifiedDate  
+)  
+Select  
+PersonId  ,  
+'Office',  
+IsNull(Sg.Add1,'') + ' ' + IsNull(Sg.Add2,'') + ' ' + IsNull(Sg.Add3,'') AS PersonAddress,  
+(Select CityId From   Web.Cities Where CityName = C.CityName) As CityId,  
+Null As AreaId,  
+IsNull(Sg.PIN,'.'),  
+Sg.EntryBy AS CreatedBy, Sg.EntryBy AS ModifiedBy, 
+IsNull(Sg.EntryDate,getdate()) AS CreatedDate, IsNull(Sg.EntryDate,getdate()) AS ModifiedDate
+FROM Web.People H 
+LEFT JOIN SubGroup Sg ON 'Person-' + Convert(NVARCHAR,H.PersonID) = Sg.OMSId
+LEFT JOIN City C ON Sg.CityCode = C.CityCode
+WHERE PersonID NOT IN (SELECT PersonID FROM Web.PersonAddresses)
+
+
+
+INSERT INTO   Web.PersonContacts  
+(  
+PersonContactTypeId,  
+PersonId,  
+ContactId,  
+CreatedBy,  
+ModifiedBy,  
+CreatedDate,  
+ModifiedDate  
+)  
+Select   
+(SELECT PersonContactTypeId  FROM   Web.PersonContactTypes WHERE PersonContactTypeName = 'Office'),  
+PersonId  ,  
+PersonId  ,  
+Sg.EntryBy AS CreatedBy, Sg.EntryBy AS ModifiedBy, 
+IsNull(Sg.EntryDate,getdate()) AS CreatedDate, IsNull(Sg.EntryDate,getdate()) AS ModifiedDate
+FROM Web.People H 
+LEFT JOIN SubGroup Sg ON 'Person-' + Convert(NVARCHAR,H.PersonID) = Sg.OMSId
+LEFT JOIN City C ON Sg.CityCode = C.CityCode
+WHERE PersonID NOT IN (SELECT PersonID FROM Web.PersonContacts)
+
+
+
+UPDATE SubGroup
+SET SubGroup.OMSId = 'Person-'  + COnvert(NVARCHAR,Web.People.PersonId)
+FROM Web.People 
+WHERE SubGroup.DispName = Web.People.Name AND SubGroup.ManualCode = Web.People.Code
+AND SubCode IN ('D100001627', 'K100001532', 'R100001262', 'R100001612')

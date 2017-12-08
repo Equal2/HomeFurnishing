@@ -1,0 +1,169 @@
+﻿@model Model.Models.LedgerAccountGroup
+
+@{
+    ViewBag.Title = "Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@using (Html.BeginForm("Post", "LedgerAccountGroup", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(model => model.LedgerAccountGroupId)
+    @Html.HiddenFor(model => model.LedgerAccountNature)
+    @Html.HiddenFor(model => model.LedgerAccountType)
+    <div class="panel panel-default">
+
+        <div class="panel-heading">
+
+            <h3>
+                <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-file black"></span> Ledger Account Group</span>
+                @if (@Model.IsSystemDefine)
+                {
+                    <input type="submit" value="Save" class="btn btn-primary right" id="submit" style="width: 90px; background-color: #2980b9;margin-left:20px" disabled="disabled" />
+                    <span style="font-family: Calibri,sans-serif,Verdana; font-weight:bold ;font-size: large" class="text-danger right "><span class="glyphicon glyphicon-floppy-remove"></span> System Defined</span>
+                }
+                else
+                {
+                    <input type="submit" value="Save" class="btn btn-primary right" id="submit" style="width: 90px; background-color: #2980b9" />
+                }
+            </h3>
+            <hr style="margin-top:0px;margin-bottom:0px" />
+
+            <div class="panel-info">
+                <h4 style="padding:5px 0 0 0;margin:0px">
+                    @Html.ActionLink(" ", " ", " ", null, new { @class = "glyphicon glyphicon-refresh toolbar", @title = "Refresh Page", @data_toggle = "tooltip", @id = "RefreshPage" })
+                    @Html.ActionLink(" ", "Create", "LedgerAccountGroup", null, new { @class = "glyphicon glyphicon-plus toolbar", @title = "Add New", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "History", "LedgerAccountGroup", null, new { @class = "glyphicon glyphicon-user toolbar", @title = "History", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "PrevPage", "LedgerAccountGroup", new { id = @Model.LedgerAccountGroupId }, new { @class = "glyphicon glyphicon-arrow-left toolbar", @title = "Prev Record", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "NextPage", "LedgerAccountGroup", new { id = @Model.LedgerAccountGroupId }, new { @class = "glyphicon glyphicon-arrow-right toolbar", @title = "Next Record", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "Index", "LedgerAccountGroup", null, new { @class = "glyphicon glyphicon-list toolbar right", @title = "List", @data_toggle = "tooltip" })
+                </h4>
+            </div>
+
+        </div>
+        <div class="panel-info" style="padding-left:15px">
+
+            <div class="form-horizontal">
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group" style="margin-top:15px">
+                            @Html.LabelFor(model => model.LedgerAccountGroupName, " Name", new { @class = "control-label col-xs-4" })
+                            <div class="col-xs-6">
+                                @Html.TextBoxFor(m => m.LedgerAccountGroupName, null, new { @class = "form-control col-xs-6 required" })
+                                @Html.ValidationMessageFor(m => m.LedgerAccountGroupName, null, new { @class = "has-error" })
+                            </div>
+                        </div>
+                    </div>
+                    @*<div class="col-md-6">
+                        <div class="form-group" style="margin-top:15px">
+                            @Html.LabelFor(model => model.LedgerAccountNature, "Nature", new { @class = "control-label col-xs-4" })
+                            <div class="col-xs-6">
+                                @Html.DropDownList("LedgerAccountNature", null,string.Empty, new { @class = "form-control col-xs-6 height" })
+                                @Html.ValidationMessageFor(m => m.LedgerAccountNature, null, new { @class = "has-error" })
+                            </div>
+                        </div>
+                    </div>*@
+
+                    <div class="col-md-6" style="margin-top:15px">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.ParentLedgerAccountGroupId, "Under Group", new { @class = "control-label col-xs-4" })
+                            <div class="col-xs-6">
+                                @Html.TextBoxFor(m => m.ParentLedgerAccountGroupId, null, new { @class = "form-control col-xs-6 required" })
+                                @Html.ValidationMessageFor(m => m.ParentLedgerAccountGroupId, null, new { @class = "has-error" })
+                            </div>
+                        </div>
+                    </div>
+                   
+                </div>
+                <div class="row">
+                    
+                    @*<div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.LedgerAccountType, "Type", new { @class = "control-label col-xs-4" })
+                            <div class="col-xs-6">
+                                @Html.DropDownList("LedgerAccountType", null,string.Empty, new { @class = "form-control col-xs-6 height" })
+                                @Html.ValidationMessageFor(m => m.LedgerAccountType, null, new { @class = "has-error" })
+                            </div>
+                        </div>
+                    </div>*@
+
+
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.IsActive, "Is Active", new { @class = "control-label col-xs-4" })
+                            <div class="col-xs-6" style=" padding-top:4px">
+                                @Html.CheckBoxFor(m => m.IsActive, new { @class = "checkbox col-xs-1" })
+                                @Html.ValidationMessageFor(model => model.IsActive)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                @*<hr />
+                    <div class="form-group">
+                        <div class="col-md-offset-2 col-md-10">
+                            <input type="submit" value="Create" class="btn btn-primary btn-sm CurveBorder height" style=" border-color: #606264" />
+                        </div>
+                    </div>*@
+            </div>
+        </div>
+    </div>
+
+    }
+<script type="text/javascript">
+
+    CustomSelectFunction($("#ParentLedgerAccountGroupId"), '/ComboHelpList/GetLedgerAccountGroups', '/ComboHelpList/SetSingleLedgerAccountGroup', ' ', false, 0);
+
+    $("#ParentLedgerAccountGroupId").change(GetParentLedgerAccountGroupDetail);
+
+
+    function GetParentLedgerAccountGroupDetail() {
+        var ProcessProgress = $("#Product detail loading progress");
+        ProcessProgress.show();
+        if ($("#ParentLedgerAccountGroupId").val() != 0 && $("#ParentLedgerAccountGroupId").val() != null) {
+            $.ajax({
+                cache: false,
+                type: "POST",
+                url: "@(Url.Action("GetParentGroupDetailJson"))",
+                data: { ParentLedgerGroupId: $("#ParentLedgerAccountGroupId").val() },
+            success: function (data) {
+                if (data != null)
+                {
+                    $("#LedgerAccountNature").val(data.LedgerAccountNature)
+                    $("#LedgerAccountType").val(data.LedgerAccountType)
+                }
+            },
+            error: function (xhr, ajaxOptions, thrownError) {
+                alert('Failed to retrieve product details.' + thrownError);
+            }
+        });
+    }
+        else {
+                $("#LedgerAccountNature").val('')
+                $("#LedgerAccountType").val('')
+        }
+    }
+
+     $(":submit").on("click", function () {
+         var mpoid=@Model.LedgerAccountGroupId;
+         var tes;
+         if(mpoid<=0)
+         {
+             tes= $('#LedgerAccountGroupName').DuplicateCheckForCreate({ name: 'LedgerAccountGroup', value: $('#LedgerAccountGroupName').val(), doctype: 0 });
+         }
+         else
+         {
+             tes = $('#LedgerAccountGroupName').DuplicateCheckForEdit({ name: 'LedgerAccountGroup', value: $('#LedgerAccountGroupName').val(), doctype: 0,headerId:mpoid });
+         }
+         if (tes) {
+             return false;
+         }
+         else
+         {
+             return;
+         }
+     });
+
+</script>

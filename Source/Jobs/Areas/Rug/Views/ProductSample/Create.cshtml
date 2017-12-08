@@ -1,0 +1,157 @@
+﻿@model Presentation.ViewModels.ProductSamplePhotoViewModel
+@{
+    ViewBag.Title = "Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@using (Html.BeginForm("Create", "ProductSample",  FormMethod.Post, new { enctype = "multipart/form-data" })) 
+{
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true)
+    @Html.HiddenFor(m=>m.ProductType.ProductTypeId)
+    @Html.HiddenFor(m=>m.ProductType.ProductTypeName)
+    @helper RenderMandatory(Model.Models.ProductTypeAttribute h)
+    {
+        if(h.IsMandatory==true)
+        {
+            <span style="font-size:x-large">*</span>
+        }
+    }
+
+    <div class="panel panel-default" style="padding:5px">
+
+        <div class="panel panel-heading">
+
+            <h4>
+                <span style="font-family: Calibri,sans-serif,Verdana">Provide Sample Details</span>
+            </h4>
+
+        </div>
+        @Html.BootStrapValidationSummary()
+           
+            <div class="panel panel-info" style="padding:5px">
+
+                <div class="row">
+                    <div class="col-lg-5">
+                       
+                            <div class="form-horizontal">
+
+                                <div class="form-group">
+                                    @Html.Label("", "Contacted Employee", new { @class = "control-label col-md-6" })
+                                    <div class="col-md-6">
+                                        @Html.DropDownListFor(model => model.PersonID, new SelectList(ViewBag.PersonList as System.Collections.IEnumerable, "PersonID", "Name"),"Select Person", new { style = "width: 250px;height:25px" })
+                                        @Html.ValidationMessageFor(m=>m.PersonID)
+                                    </div>
+                                </div>
+
+
+
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.SampleName, new { @class = "control-label col-md-6" })
+                                    <div class="col-md-6">
+                                        @Html.TextBoxFor(model => model.SampleName,null, new { @style = "width:250px" })
+                                        @Html.ValidationMessageFor(model => model.SampleName)
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.SampleDescription, new { @class = "control-label col-md-6" })
+                                    <div class="col-md-6">
+                                        @Html.TextAreaFor(model => model.SampleDescription, new { @style = "width:250px;height:100px" })
+                                        @Html.ValidationMessageFor(model => model.SampleDescription)
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.File, new { @class = "control-label col-md-6" })
+                                    <div class="col-md-6">
+                                        @Html.TextBoxFor(x => x.File, new { type = "file", multiple = "true" })
+                                        @Html.ValidationMessageFor(x => x.File)
+                                    </div>
+                                    <div class="col-md-6">
+                                        @Html.Label("File size should not exceed 4MB")
+                                    </div>
+                                </div>
+
+                                @*<div class="form-group">
+                            @Html.LabelFor(model => model.ProductPicture, new { @class = "control-label col-md-2" })
+                            <div class="col-md-10">
+                                <input type="file" name="FileUpload1" multiple="true" />
+                                @Html.EditorFor(model => model.ProductPicture)
+                                @Html.ValidationMessageFor(model => model.ProductPicture)
+                            </div>
+                        </div>*@
+
+                              
+
+                            </div>
+                      
+                    </div>
+                    <input type="hidden" id="hdnId" name="hdnId" />
+                    <div class="col-lg-4">
+                        <div class="form-group" style="margin-left:35px;">
+                            
+                            @Html.Grid(Model.ProductType.ProductTypeAttributes).Columns(columns =>
+                        {
+                            columns.Add(m => m.IsMandatory, true);                    
+                            columns.Add(m => m.ProductType.ProductTypeId, true);
+                            columns.Add(foo => foo.ProductTypeAttributeId, true);
+                            columns.Add(foo => foo.Name).Titled("Fill Sample Attribute Details").SetWidth(50);
+                            columns.Add().Encoded(false).Sanitized(false).SetWidth(200).Titled("Value").RenderValueAs(o => @<input data-cantidad="@o.ProductTypeAttributeId" type="text" class="ProdAttributeValue" value="@o.DefaultValue" />);
+                            columns.Add().Encoded(false).Sanitized(false).RenderValueAs(m=>RenderMandatory(m));
+                        }).EmptyText("No records found.").WithPaging(25);
+
+                        </div>
+                    </div>
+                </div>
+
+           
+    </div>
+
+       
+
+        <div class="panel panel-info" style="padding:15px">
+
+            <div class="form-group">
+                
+                <input id="btn" type="submit" value="Create" name="action:CreateSample" class="btn btn-primary" />
+                    @Html.ActionLink("Back to List", "Index", null, new { @class = "btn btn-primary" })
+              
+            </div>
+
+        </div>
+
+    </div>
+
+}
+@*@using (Html.BeginForm("Upload", "Product", new{ Id = @ViewBag.ProductTypeId }, FormMethod.Post, new { enctype = "multipart/form-data"}))
+{
+    <input type="file" name="file" /> 
+}*@
+
+@*<div>
+    @Html.ActionLink("Back to List", "Index", "ProductSample")
+</div>*@
+
+
+<script type="text/javascript">
+
+    $(function () {
+
+        $('#btn').click(function () {
+            debugger;
+            var attrValues = [];
+            var str;
+            $('.ProdAttributeValue').each(function () {
+                attrValues.push({ value: $(this).attr('data-cantidad'), value: $(this).val() });
+
+                str = $(this).attr('data-cantidad') + ',' + $(this).val() + ':' + str;
+
+            });
+
+            $('#hdnId').val(str);
+
+        });
+    });
+</script>
+

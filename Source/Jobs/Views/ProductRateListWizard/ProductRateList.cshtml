@@ -1,0 +1,320 @@
+﻿@{
+    ViewBag.Title = "Product RateList";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<link href="~/Content/DataTables/css/dataTables.bootstrap.css" rel="stylesheet" />
+<link href="~/Content/DataTables/css/scroller.bootstrap.min.css" rel="stylesheet" />
+<link href="~/Content/ModalImage.css" rel="stylesheet" />
+
+<script src="~/Scripts/DataTables/jquery.dataTables.min.js"></script>
+<script src="~/Scripts/DataTables/dataTables.scroller.js"></script>
+<style type="text/css">
+    .DTHidden {
+        display: none;
+    }
+
+    .TextRight {
+        text-align: right;
+    }
+
+    .dataTable {
+        font-size: 13px !important;
+        line-height: 1;
+    }
+
+    table.dataTable tbody td {
+        padding: 2px 10px;
+    }
+
+    .Filters.fSelected.label {
+        display: inline-block;
+    }
+
+    .Filters.fSelected .label-danger {
+        border-radius: 10px;
+    }
+
+    .Filters.fSelected strong {
+        padding: 5px;
+    }
+</style>
+
+<!-- modal placeholder-->
+<div id='myModal' class='modal fade in'>
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div id='myModalContent'></div>
+        </div>
+    </div>
+</div>
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3>
+            <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"> <span class="glyphicon glyphicon-file black"></span>@ViewBag.Name</span>
+            @Html.ActionLink(" ", "Filters", "ProductRateListWizard", null, new { data_modalCustom = "", id = "btnCreateF", @class = "glyphicon glyphicon-filter toolbar right", @title = "Filters", @data_toggle = "tooltip" })
+        </h3>
+    </div>
+
+    <div class="panel-info" style="padding-left:15px">
+        <div class="form-horizontal">
+            @Html.ValidationSummary(true)
+
+            <div class="row">
+                <div>
+
+                </div>
+            </div>
+        </div>
+        <hr style="margin-top:0px;margin-bottom:0px" />
+
+        <div style="margin:20px;">
+
+
+            <div class="Filters fSelected" id="sFilter">
+                @*<strong>JobOrder:</strong>
+                    <span class="label label-danger">
+                        Star
+                    </span>*@
+
+            </div>
+
+            <table id="example" class="table table-striped display" cellspacing="0" width="100%">
+                <thead style="background: #428bca;color:white">
+                    <tr>
+                        <th>Product Name</th>
+                        <th>Colour Ways</th>
+                        <th>Sample/Design</th>
+                        <th>Collection</th>
+                        <th>Construction</th>
+                        <th>Rate</th>
+                        <th>Image</th>
+                        <th>ProductId</th>
+                    </tr>
+                </thead>
+                <tfoot>
+                    <tr>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- The Modal -->
+<div id="myImgModal" class="Imgmodal">
+
+
+    <!-- Modal Content (The Image) -->
+    <div class="Imgcontainer" style="
+    width: 600px;
+    height: 600px;
+    margin-left: auto;
+    margin-right: auto;
+">
+        <!-- The Close Button -->
+        @*<span class="close" onclick="document.getElementById('myModal').style.display='none'">&times;</span>*@
+
+        <img class="Imgmodal-content" id="img01" style="max-width: 100%; max-height: 100%; width: auto; height: auto">
+    </div>
+</div>
+
+<script type="text/javascript">
+    var selected = [];
+    var RatLHId = '@ViewBag.RateListHeaderId';
+    var ImageDomain = '@System.Configuration.ConfigurationManager.AppSettings["ImageDomPath"]';
+    var Filters = new AssignFilters();
+    Filters.WizardType = "@ViewBag.Type";
+    Filters.SOD = "@ViewBag.SOD";
+    Filters.DisContinued = "@ViewBag.DisContinued";
+    $('#sFilter').html(GenerateFiltersForHtml());
+
+    var eXRate = 0;
+
+    $(document).ready(function () {
+
+        var tab = $('#example').DataTable({
+            serverSide: true,
+            ordering: false,
+            searchDelay: 1000,
+            ajax: {
+                "url": "/ProductRateListWizard/AjaxGetJsonProductData/",
+                "type": "POST",
+                "data": function (d) {                    
+                    d.WizardType = Filters.WizardType ? Filters.WizardType : null;
+                    d.ProductCategory = Filters.ProductCategory.length > 0 ? $.map(Filters.ProductCategory, function (val, i) { return (val.id) }).join(',') : "";
+                    d.ProductCollection = Filters.ProductCollection.length > 0 ? $.map(Filters.ProductCollection, function (val, i) { return (val.id) }).join(',') : "";
+                    d.SOD = Filters.SOD ? Filters.SOD : null;
+                    d.DisContinued = Filters.DisContinued ? Filters.DisContinued : null;
+                },
+            },
+            columns: [
+                 { "data": "ProductName", "width": "12%" },
+                 { "data": "ProductName", "width": "12%" },
+                 { "data": "SampleName", "width": "12%" },
+                 { "data": "ProductCollectionName", "width": "12%" },
+                 { "data": "ProductCategoryName", "width": "12%" },
+                 { "data": "Rate", "width": "10%", className: "TextRight", "render": function (data, type, row) { return '<input style="width:100%;" class="Rate TextRight"  type="text" value="' + (row.Rate==null? '' : row.Rate ) + '" name="Rate' + row.ProductGroupId + '" id="Rate' + row.ProductGroupId + '" />'; }, "sortable": false },
+                 { "data": "ImageFileName", "width": "10%", className: "TextRight", "render": function (data, type, row) { return '<div width:50%> <img style="width:50px;height:50px;cursor:pointer" src="' + ImageDomain + '/Uploads/' + row.ImageFolderName + '/Thumbs/' + row.ImageFileName + '"  onerror="this.src=\'\'" /></div>'; }, "sortable": false },
+                 { "data": "ProductId" },
+            ],
+            columnDefs: [
+   { "targets": 7, "searchable": false, className: "DTHidden", },
+            ],
+            scrollY: "400px",
+            dom: 'ftirp',
+            scroller: {
+                loadingIndicator: true,
+                serverWait: 1000,
+            },
+            language: {
+                "loadingRecords": "Please wait - loading..."
+            },
+            scrollCollapse: true,
+            //ForRowSelecting in ServerSideLogic--Commented cuz not needed in this entry point
+        });
+
+        var Imgmodal = document.getElementById('myImgModal');
+
+        var modalImg = document.getElementById("img01");
+
+
+        $(document).on('click', 'img', function () {
+            if ($(this).attr('src')) {
+
+                Imgmodal.style.display = "block";
+                modalImg.src = $(this).attr('src').replace("/Thumbs", "");
+                modalImg.alt = this.alt;
+            }
+        });
+
+        $(document).click(function (e) {
+            if (($('#myModal').has(e.target).length == 0) && ($('td').has(e.target).length == 0)) {
+                Imgmodal.style.display = "none";
+            }
+        });
+
+        $(document).on('change', ' td > input', function () {
+
+            if ($(this).val())
+                eXRate = $(this).val();
+
+            var td = $(this).closest('td').get(0);
+            var JData = $(this).closest('tr');
+            var Rate = JData.find('.Rate').val();
+
+            if (Rate && Rate > 0) {
+                var data = tab.rows(JData).data();
+                $.ajax({
+                    url: '/ProductRateListWizard/UpdateProductRate',
+                    type: "POST",
+                    data: { ProductId: data[0].ProductId,Rate:Rate,RateListHeaderId:RatLHId },
+                    success: function (result) {
+                        if (result.Success == true) {
+
+                        }
+                        else if (!result.Success) {
+                            alert('Something went wrong');
+                        }
+                    },
+                    error: function () {
+
+                    },
+                });
+            }
+            return true;
+        });
+
+        $(document).on('focusin', ' td > input', function () {
+
+            if (eXRate && !$(this).val())
+                $(this).val(eXRate);
+
+        })
+
+
+
+    });
+
+    $(function () {
+
+        $("a[data-modalCustom]").on("click", function (e) {
+            // hide dropdown if any
+            if (this.href == "") {
+                return false;
+            }
+
+            var data = new GenerateFiltersForParameter();
+            $.ajax({
+                url: this.href,
+                type: "POST",
+                data: data,
+                success: function (result) {
+                    $('#myModalContent').html(result);
+                    $('#myModal').modal({
+                        backdrop: 'static',
+                        keyboard: true
+                    }, 'show');
+
+                    bindForm1('#myModalContent');
+                },
+            });
+            return false;
+        });
+    });
+
+    function bindForm1(dialog) {
+        $('form#modform', dialog).submit(function () {
+            Filters = new AssignFilters();
+            $('#myModal').modal('hide');
+            $('#sFilter').html(GenerateFiltersForHtml());
+            var tab = $('#example').DataTable();
+            tab.ajax.reload();
+
+            return false;
+
+        });
+    }
+
+    function AssignFilters() {
+        var self = this;
+
+        self.WizardType = $('#WizardType', '.modal-body').val();
+        self.ProductCategory = $('#ProductCategory', '.modal-body').select2('data');
+        self.ProductCollection = $('#ProductCollection', '.modal-body').select2('data');
+        self.SOD = $('#SOD', '.modal-body').val();
+        self.DisContinued = $('#DisContinued', '.modal-body').val();
+
+    }
+
+    function GenerateFiltersForParameter() {
+        var self = this;
+
+        self.WizardType = Filters.WizardType ? Filters.WizardType : null;
+        self.ProductCategory = Filters.ProductCategory.length > 0 ? $.map(Filters.ProductCategory, function (val, i) { return (val.id) }).join(',') : "";
+        self.ProductCollection = Filters.ProductCollection.length > 0 ? $.map(Filters.ProductCollection, function (val, i) { return (val.id) }).join(',') : "";
+        self.SOD = Filters.SOD ? Filters.SOD : null;
+        self.DisContinued = Filters.DisContinued ? Filters.DisContinued : null;
+    }
+
+    function GenerateFiltersForHtml() {
+
+        var html = "";
+        html += Filters.WizardType ? "<strong>Type:</strong> <span class='label label-danger'> " + Filters.WizardType + " </span>" : "";
+        html += Filters.ProductCategory.length > 0 ? "<strong>Construction:</strong>" + $.map(Filters.ProductCategory, function (val, i) { return ("<span class='label label-danger'>" + val.text + "</span>") }).join(' ') : "";
+        html += Filters.ProductCollection.length > 0 ? "<strong>Collection:</strong>" + $.map(Filters.ProductCollection, function (val, i) { return ("<span class='label label-danger'>" + val.text + "</span>") }).join(' ') : "";
+        html += Filters.SOD ? "<strong>SOD:</strong> <span class='label label-danger'> " + Filters.SOD + " </span>" : "";
+        html += Filters.DisContinued ? "<strong>DisContinued:</strong> <span class='label label-danger'> " + Filters.DisContinued + " </span>" : "";
+        return html;
+    }
+
+</script>

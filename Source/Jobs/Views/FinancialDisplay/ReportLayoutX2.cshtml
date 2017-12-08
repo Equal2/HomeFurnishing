@@ -1,0 +1,62 @@
+﻿@model Model.ViewModels.ReportMasterViewModel
+@using System.Text.RegularExpressions
+
+@{
+    ViewBag.Title = Model.ReportHeader.ReportName;
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style type="text/css">
+    .grid {
+        width: 1000px;
+        height: 250px;
+    }
+</style>
+
+
+
+
+
+<!doctype html>
+<html ng-app="app">
+<head>
+
+
+
+    <script src="~/Scripts/angular.js"></script>
+    <script src="~/Scripts/angular-touch.js"></script>
+    <script src="~/Scripts/angular-animate.js"></script>
+    <script src="~/Scripts/app.js"></script>
+
+    <script src="http://ui-grid.info/release/ui-grid-unstable.js"></script>
+
+
+    <link rel="stylesheet" href="http://ui-grid.info/release/ui-grid-unstable.css" type="text/css">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.3.0/css/font-awesome.css" type="text/css">
+
+    <script src="~/Scripts/ui-grid.js"></script>
+    <link href="~/Content/ui-grid.css" rel="stylesheet" />
+    <link rel="stylesheet" href="main.css" type="text/css">
+</head>
+<body>
+    <div ng-controller="MainCtrl">
+
+        <div ui-grid="gridOptions" class="grid"></div> <br />
+        <div>
+
+            <button type=button id="btn1" name="btn" ng-click="addData()">Load Columns</button>
+        </div><br />
+        <div>
+
+            <button type=button id="btn1" name="btn" ng-click="myfunc()">Rebind Data</button>
+        </div>
+    </div>
+
+
+
+</body>
+</html>
+
+
+

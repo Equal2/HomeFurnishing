@@ -1,0 +1,77 @@
+﻿@model Model.Models.ProductSample
+
+@{
+    ViewBag.Title = "Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@using (Html.BeginForm("EditReviewedSample", "ProductSample", FormMethod.Post, new { enctype = "multipart/form-data" })) 
+{
+    @Html.AntiForgeryToken()    
+    @Html.ValidationSummary(true)
+    @Html.HiddenFor(m=>m.ProductSampleId)  
+    @Html.HiddenFor(m=>m.CreatedDate)
+    
+     <div class="panel panel-default" style="padding:5px">
+
+        <div class="panel panel-heading">
+
+            <h4>
+                <span style="font-family: Calibri,sans-serif,Verdana">Edit Sample</span>
+            </h4>
+
+        </div>
+        <div class="panel panel-info" style="padding:15px">
+            <p>
+                <div class="form-horizontal">
+
+                    <div class="form-group">
+                        @Html.Label("", "Contacted Employee", new { @class = "control-label col-md-2" })
+                        <div class="col-md-10">
+                            @Html.DropDownListFor(Model => Model.PersonID, new SelectList(ViewBag.PersonList as System.Collections.IEnumerable, "PersonID", "Name"), "PersonID", "Name")
+                            @Html.ValidationMessageFor(m=>m.PersonID)
+                        </div>
+                    </div>
+
+
+
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.SampleName, new { @class = "control-label col-md-2" })
+                        <div class="col-md-10">
+                            @Html.EditorFor(model => model.SampleName)
+                            @Html.ValidationMessageFor(model => model.SampleName)
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.SampleDescription, new { @class = "control-label col-md-2" })
+                        <div class="col-md-10">
+                            @Html.TextAreaFor(model => model.SampleDescription)
+                            @Html.ValidationMessageFor(model => model.SampleDescription)
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.ProductPicture, new { @class = "control-label col-md-2" })
+                        <div class="col-md-10">
+                            <input type="file" name="FileUpload1" multiple="true" />
+                            @*@Html.EditorFor(model => model.ProductPicture)*@
+                            @Html.ValidationMessageFor(model => model.ProductPicture)
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-md-offset-2 col-md-10">
+                            <input type="submit" value="Edit" class="btn btn-primary" />
+                            @Html.ActionLink("Back to List", "Index", "ProductSample", null, new { @class = "btn btn-primary" })
+                        </div>
+                    </div>
+                </div>
+            </p>
+        </div>
+    </div>
+    
+   
+}
+
+

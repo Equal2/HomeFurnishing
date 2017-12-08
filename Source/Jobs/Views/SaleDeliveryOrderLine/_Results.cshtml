@@ -1,0 +1,265 @@
+﻿@model Model.ViewModel.SaleDeliveryMasterDetailModel
+@using Core.Common
+
+
+<style type="text/css">
+    #gbody-modal {
+        height: 250px;
+        overflow-y: scroll;
+        width: 100%;
+    }
+</style>
+
+
+<div class="modal-content">
+    <div class="modal-header" style="border-bottom: 1px solid #8E8888">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"> <span class="glyphicon glyphicon-remove"></span></button>
+        <h3>
+            <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-file black"></span> Orders & Quantities</span>
+        </h3>
+    </div>
+    <div>
+        @using (Html.BeginForm("_ResultsPost", "SaleDeliveryOrderLine", FormMethod.Post, new { enctype = "multipart/form-data", id = "modform" }))
+        {
+            @Html.ValidationLog((string)TempData["CSEXCL"])
+            @Html.AntiForgeryToken()
+
+            <div class="form-horizontal modal-body">
+
+                <div style="padding-right:15px">
+                    <div class="row">
+                        <div class="form-horizontal">
+                            @Html.ValidationSummary(true)
+
+                            <div class="panel panel-default" id="grid">
+                                <div class="panel-heading headrow" style="background-image: -webkit-linear-gradient(top, #428bca 0%, #428bca 100%);color:white">
+                                    <div class="row grid-head">
+                                        <div class="block text-left" style="width:5%">
+                                            Srl.
+                                        </div>
+                                        <div class="block" style="width:92%">
+                                            <div class="row">
+
+                                                <div class="block" style="width:25%">
+                                                    Product Name
+                                                </div>
+
+                                                <div class="block" style="width:15%">
+                                                    Sale Order
+                                                </div>
+
+                                                <div class="text-right block" style="width:20%">
+                                                    Order Qty
+                                                </div>
+
+                                                <div class="block text-right" style="width:20%">
+                                                    Delivery Qty
+                                                </div>
+
+                                                <div class="block text-right" style="width:20%">
+                                                    Remark
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="panel-info" id="gbody-modal" style="max-height:250px;overflow-y:scroll">
+
+                                    @{
+            decimal OrderQty = 0;
+            decimal CancelQty = 0;
+            int MaxUnitDecPlaces = 0;
+                                    }
+
+                                    @for (int i = 0; i < Model.SaleDeliveryOrderLineViewModel.Count(); i++)
+                                    {
+
+                                        if (MaxUnitDecPlaces < Model.SaleDeliveryOrderLineViewModel[i].UnitDecimalPlaces)
+                                        {
+                                            MaxUnitDecPlaces = Model.SaleDeliveryOrderLineViewModel[i].UnitDecimalPlaces;
+                                        }
+
+
+                                        <div class='row crow grid-body' style='margin-left:0px;margin-right:0px'>
+
+
+                                            <div class='block row-index' style='width:5%'>
+                                                @Html.HiddenFor(m => Model.SaleDeliveryOrderLineViewModel[i].ProductId)
+                                                @Html.HiddenFor(m => Model.SaleDeliveryOrderLineViewModel[i].ProductName)
+                                                @Html.HiddenFor(m => Model.SaleDeliveryOrderLineViewModel[i].SaleOrderLineId)
+                                                @Html.HiddenFor(m => Model.SaleDeliveryOrderLineViewModel[i].SaleDeliveryOrderHeaderId)
+                                                @Html.HiddenFor(m => Model.SaleDeliveryOrderLineViewModel[i].SaleOrderDocNo)
+                                                @Html.HiddenFor(m => Model.SaleDeliveryOrderLineViewModel[i].BalanceQty)
+                                                @Html.HiddenFor(m => Model.SaleDeliveryOrderLineViewModel[i].UnitName)
+                                                @Html.HiddenFor(m => Model.SaleDeliveryOrderLineViewModel[i].UnitDecimalPlaces, new { @class = "unitDecPlaces" })
+
+                                                @(i + 1)
+                                            </div>
+                                            <div class='block pull-middle' style='width:94%'>
+
+                                                <div class='row'>
+
+                                                    <div class='block' style='width:25%'>
+                                                        <strong> @Model.SaleDeliveryOrderLineViewModel[i].ProductName</strong>
+                                                    </div>
+                                                    <div>
+                                                        <div class='block' style='width:15%'>
+                                                            @(Model.SaleDeliveryOrderLineViewModel[i].SaleOrderDocNo)
+                                                        </div>
+
+                                                        <div class='block text-right pull-middle' style='width:20%'>
+                                                            <span class="label label-warning">Qty:@string.Format("{" + "0:0.".PadRight(@Model.SaleDeliveryOrderLineViewModel[i].UnitDecimalPlaces + 4, '0') + "}", Model.SaleDeliveryOrderLineViewModel[i].BalanceQty)</span>
+                                                            <input type="hidden" value="@Model.SaleDeliveryOrderLineViewModel[i].BalanceQty" class="OrderBalanceQty" />
+                                                            <br />
+                                                            <small>@Model.SaleDeliveryOrderLineViewModel[i].UnitName</small>
+                                                            @{OrderQty += Model.SaleDeliveryOrderLineViewModel[i].BalanceQty;}
+                                                        </div>
+
+                                                        <div class='block text-right pull-middle' style='width:20%'>
+                                                            @Html.TextBoxFor(m => Model.SaleDeliveryOrderLineViewModel[i].Qty, new { @class = "form-control text-right CancelQty" })
+                                                            @{CancelQty += Model.SaleDeliveryOrderLineViewModel[i].Qty;}
+                                                        </div>
+                                                        <div class='block pull-middle' style='width:20%'>
+                                                            @Html.TextBoxFor(m => Model.SaleDeliveryOrderLineViewModel[i].Remark, new { @class = "form-control" })
+                                                        </div>
+
+                                                    </div>
+
+                                                </div>
+
+                                            </div>
+
+                                        </div>
+                                        <hr style='margin-top:0px;margin-bottom:0px' />
+
+                                    }
+
+
+
+                                </div>
+                            </div>
+
+                            <div class="row grid-head" style="margin-left:0px;margin-right:0px">
+                                <div class="block text-left" style="width:5%">
+
+                                </div>
+                                <div class="block" style="width:92%">
+                                    <div class="row">
+                                        @*ProductInfo*@
+                                        <div class='block' style='width:25%'>
+                                            <strong>Total</strong>
+
+                                        </div>
+                                        <div class='block text-center' style='width:15%'>
+
+                                        </div>
+                                        @*Qty*@
+                                        <div class='block text-right' style='width:20%'>
+                                            @string.Format("{" + "0:0.".PadRight(MaxUnitDecPlaces + 4, '0') + "}", OrderQty)
+                                        </div>
+                                        <div class='block text-right' style='width:20%'>
+                                            <strong><span id="CancelQty">@string.Format("{" + "0:0.".PadRight(MaxUnitDecPlaces + 4, '0') + "}", CancelQty)</span></strong>
+                                        </div>
+                                        <div class='block text-right' style='width:20%'>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+
+
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer " style="padding: 19px 20px 0 20px; border-top:1px solid #8E8888">
+                    <button class="btn custom" name="Command:Edit" type="submit" id="submit"><h2 style="margin:0px" title="Proceed"><span class="glyphicon glyphicon-floppy-disk black black"></span> </h2></button>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+
+
+
+
+<script type="text/javascript">
+
+    var reset = false;
+    var IsSaved = false;
+    var ValidationCount = 0;
+
+    $('#modform').bind('submit', function (event) {
+
+        if (!IsSaved) {
+            if (!ValidateData()) {
+                return false;
+            }
+            IsSaved = true;
+            $('button:submit').attr('disabled', 'disabled');
+            return IsSaved;
+        }
+        else {
+            return false;
+        }
+
+
+    });
+
+
+    function ValidateData() {
+        var ValidationMessage = "";
+
+        //Client Side Validaion.....
+
+        return (ValidationMessage == "");
+
+    }
+
+
+
+
+    $('.CancelQty').change(function () {
+
+        var $Block = $(this).closest('div.row');
+
+        if (($Block.find('.OrderBalanceQty').val() - $(this).val()) < 0) {
+            if (!$('#modform').find('.modal-body #errormsg').length) {
+                $('#submit', '.modal-body').attr("disabled", "disabled");
+                $('#modform').find('.modal-body').prepend("<div class='alert alert-danger'><span id=errormsg >Qty exceeding Balance Qty</span></div>")
+            }
+            else {
+                $('#modform').find('#errormsg').text("Qty exceeding Required Qty");
+            }
+        }
+        else {
+            $('#submit', '.modal-body').removeAttr("disabled");
+            if ($('#modform').find('.modal-body #errormsg').length) {
+                $('#modform').find('#errormsg').parent().remove();
+            }
+
+        }
+        CalculateTotal();
+
+    });
+
+
+    function CalculateTotal() {
+        var Qty = 0;
+        var unitDecPlaces = 0;
+        $('.row.crow.grid-body', '.modal-body').each(function () {
+
+            if ($(this).find('input.CancelQty').val()) {
+                Qty += (parseFloat($(this).find('input.CancelQty').val()));
+
+            }
+            if (unitDecPlaces < parseFloat($(this).find('input.unitDecPlaces').val()))
+                unitDecPlaces = parseFloat($(this).find('input.unitDecPlaces').val());
+
+        })
+        $('#CancelQty', '.modal-body').text(Qty.toFixed(unitDecPlaces));
+    }
+
+</script>

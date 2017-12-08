@@ -1,0 +1,109 @@
+﻿@model IEnumerable< Model.Models.ProductSamplePhoto>
+
+
+<link href="~/Content/Carouselstyle.css" rel="stylesheet" />
+<link href="~/Content/jcarousel.basic.css" rel="stylesheet" />
+<script src="~/Scripts/jquery-1.10.2.js"></script>
+<script src="~/Scripts/jquery.jcarousel.min.js"></script>
+<script src="~/Scripts/jcarousel.basic.js"></script>
+<script src="~/Scripts/jquery.fancybox.js"></script>
+<link href="~/Content/jquery.fancybox.css" rel="stylesheet" />
+@{
+    ViewBag.Title = "Image";
+    Layout = null;
+}
+
+@*@{
+    byte[] photo = Model.ProductPicture;
+    string imageSrc = null;
+    if (photo != null)
+    {
+        MemoryStream ms = new MemoryStream();
+        ms.Write(photo, 0, photo.Length); // strip out 78 byte OLE header (don't need to do this for normal images)
+        string imageBase64 = Convert.ToBase64String(ms.ToArray());
+        imageSrc = string.Format("data:image/gif;base64,{0}", imageBase64);
+    }
+}*@
+ 
+    @*<img src="@imageSrc" alt="Product Photo" border="0" height="600" width="450" />*@
+
+<div class="wrapper">
+     @*<div class="jcarousel-wrapper">
+        <div class="jcarousel">
+            <ul>
+                @foreach(var item in Model)
+                {
+                    byte[] photo = item.File;
+                    
+                    string imageSrc = null;
+                    if (photo != null)
+                    {
+                        MemoryStream ms = new MemoryStream();
+                        ms.Write(photo, 0, photo.Length); // strip out 78 byte OLE header (don't need to do this for normal images)
+                        string imageBase64 = Convert.ToBase64String(ms.ToArray());
+                        imageSrc = string.Format("data:image/gif;base64,{0}", imageBase64);
+                    }
+                    
+                    <li><img src="@imageSrc" alt="" border="0" height="400" width="600" /></li>
+                }
+            </ul>
+        </div>
+
+        <a href="#" class="jcarousel-control-prev">&lsaquo;</a>
+        <a href="#" class="jcarousel-control-next">&rsaquo;</a>
+
+        <p class="jcarousel-pagination">
+
+        </p>
+    </div>*@
+    <div style="padding-top:25px">
+        @foreach (var item in Model)
+        {
+            byte[] photo = item.File;
+
+            string imageSrc = null;
+            if (photo != null)
+            {
+                MemoryStream ms = new MemoryStream();
+                ms.Write(photo, 0, photo.Length); // strip out 78 byte OLE header (don't need to do this for normal images)
+                string imageBase64 = Convert.ToBase64String(ms.ToArray());
+                imageSrc = string.Format("data:image/gif;base64,{0}", imageBase64);
+            }
+
+            <a class="fancybox" rel="gallery1" href="@imageSrc">
+                <img src="@imageSrc" alt="" style="max-height:200px;max-width:200px" />
+            </a>
+
+        }
+
+    </div>
+    
+    @if (ViewBag.Redirect == "CheckApprovedRejectedSampleStatus")
+    {
+        @Html.ActionLink("Back to List", "CheckApprovedRejectedSampleStatus","ProductSample")
+    }
+    else if(ViewBag.Redirect=="ListPhysicalSamplePendingToReview")
+    {
+        @Html.ActionLink("Back to List", "ListPhysicalSamplePendingToReview","ProductSample")
+    }
+    
+    else
+    { 
+    @Html.ActionLink("Back to List", "Index")
+    }
+
+
+</div>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $(".fancybox").fancybox({
+            helpers: {
+                overlay: {
+                    css: {
+                        'background': 'rgba(58, 42, 45, 0.95)'
+                    }
+                }
+            }
+        });
+    });
+</script>

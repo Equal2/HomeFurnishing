@@ -1,0 +1,353 @@
+﻿@model Model.ViewModel.JobInvoiceSummaryDetailViewModel
+@using Core.Common
+@{
+    ViewBag.Title = "Summary";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style type="text/css">
+    .ValidationError {
+        border: 1px solid red;
+    }
+</style>
+
+<!-- modal placeholder-->
+@using (Html.BeginForm("PostSummary", "WeavingInvoice", FormMethod.Post, new { enctype = "multipart/form-data", id = "Summary" }))
+{
+    @Html.AntiForgeryToken()
+
+
+    <div class="panel panel-default">
+        <div class="panel-heading">
+
+            <h3 style="border-bottom:0px solid #e1dada;padding-bottom:0px;">
+                <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"> <span class="glyphicon glyphicon-file black"></span> @ViewBag.Name- @ViewBag.DocNo</span>
+                <input type="submit" value="Save" class="btn btn-primary right" id="submit" style="width: 90px; background-color: #2980b9" />
+            </h3>
+
+            <hr style="margin-top:10px;margin-bottom:0px" />
+
+            <div class="panel-info">
+                <h4 style="padding:5px 0 0 0;margin:0px">
+                    @Html.ActionLink(" ", " ", " ", null, new { @class = "glyphicon glyphicon-refresh toolbar", @title = "Refresh Page", @data_toggle = "tooltip", @id = "RefreshPage" })
+                    <a href="@ViewBag.Url" class="glyphicon glyphicon-list toolbar right"></a>
+                </h4>
+            </div>
+        </div>
+        <div class="panel-info" style="padding-left:15px">
+            <div class="form-horizontal">
+                @Html.ValidationSummary(true)
+                @Html.HiddenFor(m => Model.JobInvoiceHeaderId)
+
+
+                <div class="row">
+
+                    <h4 class="col-md-12 black">
+                        <span class="glyphicon glyphicon-align-justify"></span>
+                        1.Invoice Details
+                    </h4>
+                    <div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group" style="margin-top:15px">
+                                    @Html.LabelFor(model => model.DocDate, "Invoice Date", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.DocDate, "{0:dd/MMMM/yyyy}", new { @class = "datepickerWithNFD form-control required", @readonly = true })
+                                        @Html.ValidationMessageFor(model => model.DocDate, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group" style="margin-top:15px">
+                                    @Html.LabelFor(model => model.DocNo, "Invoice No.", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.DocNo, null, new { @class = "form-control required", @readonly = true })
+                                        @Html.ValidationMessageFor(m => m.DocNo, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <hr />
+                <div class="row">
+                    <h4 class="col-md-12 black" style="margin-top:15px">
+                        <span class="glyphicon glyphicon-shopping-cart"></span>
+                        2.Summary
+                    </h4>
+                </div>
+
+
+
+
+                <div class="row Custom-Summary" style="padding-right:15px">
+
+                    <div class="panel panel-default" id="grid">
+
+                        <div class="panel-heading headrow" style="background-image: -webkit-linear-gradient(top, #428bca 0%, #428bca 100%);color:white">
+                            <div class="row grid-head">
+                                <div class="text-left block" style="width: 5%; ">
+                                    Srl.
+                                </div>
+                                <div class="block" style="width: 95%;">
+                                    <div class="row">
+                                        @*ProductInfo*@
+                                        <div class="block" style="width: 10%; ">
+                                            Barcode
+                                        </div>
+                                        @if (Model.ProcessId == 43 || Model.ProcessId == 2008)
+                                        {
+                                                <div class="block" style="width: 17%;">
+                                                    Cost Center
+                                                </div>
+                                        }
+                                        <div class="block" style="width: 25%;">
+                                            Job Worker
+                                        </div>
+                                        <div class="block text-right" style="width: 10%;">
+                                            Amount
+                                        </div>
+                                        <div class="block text-right" style="width: 11%;">
+                                            Advance Adjusted
+                                        </div>
+                                        @if (Model.ProcessId ==43 || Model.ProcessId == 2008)
+                                        {
+                                        <div class="block text-right" style="width: 11%;">
+                                            Tana
+                                        </div>
+                                        }
+
+                                        <div class="block text-right" style="width: 12%;">
+                                            Tds Adjusted
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+
+                        <div class="panel-info">
+
+                            @{int count = 0;
+                            decimal TotalInvoiceAmount = 0;
+                            decimal TotalAdvanceAdjusted = 0;
+                            decimal TotalTanaAmount = 0;
+                            decimal TotalTdsAdjusted = 0;
+                            bool IsRepeatedPerson = false;
+                            bool IsRepeatedCostCenter = false;
+                            }
+                            @for (int i = 0; i < Model.JobInvoiceSummaryViewModel.Count(); i++)
+                            {
+                                count++;
+                                IsRepeatedPerson = false;
+                                IsRepeatedCostCenter = false;
+
+                                <div class="row crow @(Model.JobInvoiceSummaryViewModel[i].ValidationError?"ValidationError":"")" style="margin:0px; padding: 0px;padding-top:5px;padding-bottom:5px;">
+                                    @Html.HiddenFor(m => Model.JobInvoiceSummaryViewModel[i].JobInvoiceLineId)
+                                    @Html.HiddenFor(m => Model.JobInvoiceSummaryViewModel[i].ProductUidId)
+                                    @Html.HiddenFor(m => Model.JobInvoiceSummaryViewModel[i].CostCenterId)
+                                    @Html.HiddenFor(m => Model.JobInvoiceSummaryViewModel[i].PersonId)
+                                    @Html.HiddenFor(m => Model.JobInvoiceSummaryViewModel[i].InvoiceAmount)
+                                    @Html.HiddenFor(m => Model.JobInvoiceSummaryViewModel[i].AdvanceAmount)
+                                    @Html.HiddenFor(m => Model.JobInvoiceSummaryViewModel[i].TdsAmount)
+
+                                    @if ( i > 0)
+                                    {
+                                        if (Model.JobInvoiceSummaryViewModel[i].PersonId == Model.JobInvoiceSummaryViewModel[i-1].PersonId)
+                                        {
+                                            IsRepeatedPerson = true;
+                                        }
+                                        if (Model.JobInvoiceSummaryViewModel[i].CostCenterId == Model.JobInvoiceSummaryViewModel[i - 1].CostCenterId)
+                                        {
+                                            IsRepeatedCostCenter = true;
+                                        }
+                                    }
+
+                                    <div class="block" style="width:5%">
+                                        @count
+                                    </div>
+                                    <div class="block" style="width:95%">
+                                        <div class="row">
+                                            <div class="block" style="width:10%">
+                                                <span> @Model.JobInvoiceSummaryViewModel[i].ProductUidName </span>
+                                            </div>
+                                            @if (Model.ProcessId == 43 || Model.ProcessId == 2008)
+                                            {
+                                                                                        <div class="block" style="width: 17%">
+                                                                                            <span> @(IsRepeatedCostCenter ? "" : Model.JobInvoiceSummaryViewModel[i].CostCenterName) </span>
+                                                                                            <br /> <span> @(IsRepeatedCostCenter ? "" : "Advance : " + string.Format("{" + "0:0.".PadRight(2 + 4, '0') + "}", Model.JobInvoiceSummaryViewModel[i].AdvanceAmount)) </span>
+                                                                                            @*<span> @Model.JobInvoiceSummaryViewModel[i].CostCenterName </span>
+                                                                                            <br /> <span> Advance : <span class="AdvanceSum">@string.Format("{" + "0:0.".PadRight(2 + 4, '0') + "}", Model.JobInvoiceSummaryViewModel[i].AdvanceAmount)</span></span>*@
+                                                                                        </div>
+                                            }
+                                            <div class="block" style="width: 25%">
+                                                <span> @(IsRepeatedPerson ? "" : Model.JobInvoiceSummaryViewModel[i].PersonName) </span>
+                                                <br /> <span> @(IsRepeatedPerson ? "" : "Tds : " + string.Format("{" + "0:0.".PadRight(2 + 4, '0') + "}", Model.JobInvoiceSummaryViewModel[i].TdsAmount)) </span>
+                                                @*<br /> <span> Tds : <span class="TdsSum">@string.Format("{" + "0:0.".PadRight(2 + 4, '0') + "}", Model.JobInvoiceSummaryViewModel[i].TdsAmount)</span></span>*@
+                                            </div>
+                                            <div class="block text-right" style="width:10%">
+                                                <span> @string.Format("{" + "0:0.".PadRight(2 + 4, '0') + "}", Model.JobInvoiceSummaryViewModel[i].InvoiceAmount)</span>
+                                            </div>
+                                            <div class="block text-right" style="width:11%">
+                                                @Html.TextBoxFor(m => Model.JobInvoiceSummaryViewModel[i].AdvanceAdjusted, "{" + "0:0.".PadRight(2 + 4, '0') + "}", new { @class = "form-control AdvanceAdjusted text-right" })
+                                                @Html.ValidationMessageFor(m => Model.JobInvoiceSummaryViewModel[i].AdvanceAdjusted, "", new { @class = "text-danger" })
+                                            </div>
+                                            @if (Model.ProcessId == 43 || Model.ProcessId == 2008)
+                                            {
+                                                <div class="block text-right" style="width:11%">
+                                                    @Html.TextBoxFor(m => Model.JobInvoiceSummaryViewModel[i].TanaAmount, "{" + "0:0.".PadRight(2 + 4, '0') + "}", new { @class = "form-control TanaAmount text-right" })
+                                                    @Html.ValidationMessageFor(m => Model.JobInvoiceSummaryViewModel[i].TanaAmount, "", new { @class = "text-danger" })
+                                                </div>
+                                            }
+
+                                            <div class="block text-right" style="width:12%">
+                                                @Html.TextBoxFor(m => Model.JobInvoiceSummaryViewModel[i].TdsAdjusted, "{" + "0:0.".PadRight(2 + 4, '0') + "}", new { @class = "form-control TdsAdjusted text-right" })
+                                                @Html.ValidationMessageFor(m => Model.JobInvoiceSummaryViewModel[i].TdsAdjusted, "", new { @class = "text-danger" })
+                                            </div>
+                                            @{TotalInvoiceAmount += Model.JobInvoiceSummaryViewModel[i].InvoiceAmount;}
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <hr style="margin:0px" />
+                            }
+
+                        </div>
+                    </div>
+
+                    <div class="row grid-head" style="margin:0px">
+                        <div class="text-left block" style="width: 5%; ">
+
+                        </div>
+                        <div class="block" style="width: 95%;">
+                            <div class="row">
+                                @*ProductInfo*@
+                                <div class="block" style="width: 10%; ">
+                                    <strong>Total</strong>
+                                </div>
+                                <div class="block" style="width: 17%; ">
+                                </div>
+                                <div class="block" style="width: 25%; ">
+                                </div>
+                                <div class="block text-right" style="width: 10%;">
+                                    @string.Format("{" + "0:0.".PadRight(2 + 4, '0') + "}", TotalInvoiceAmount)
+                                </div>
+                                <div class="block text-right" id="TotalAdvanceAdjusted" style="width: 11%;">
+                                    @string.Format("{" + "0:0.".PadRight(2 + 4, '0') + "}", TotalAdvanceAdjusted)
+                                </div>
+                                @if (Model.ProcessId == 43 || Model.ProcessId == 2008)
+                                {
+                                <div class="block text-right" id="TotalTanaAmount" style="width: 11%;">
+                                    @string.Format("{" + "0:0.".PadRight(2 + 4, '0') + "}", TotalTanaAmount)
+                                </div>
+                                }
+                                <div class="block text-right" id="TotalTdsAdjusted" style="width: 12%;">
+                                    @string.Format("{" + "0:0.".PadRight(2 + 4, '0') + "}", TotalTdsAdjusted)
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+}
+
+<script type="text/javascript">
+    CustomSelectFunction($("#JobWorkerId"), '/ComboHelpList/GetJobWorkers', '/ComboHelpList/SetSinglePerson', ' ', false, 1);
+
+    $('input.AdvanceAdjusted,input.TanaAmount,input.TdsAdjusted').keydown(function (e) 
+    {
+        switch (e.which) {
+            case 37: // left
+                break;
+
+            case 38: // up
+                //alert("up")
+                break;
+
+            case 39: // right
+                break;
+
+            case 40: // down
+                e.preventDefault();
+                var inputs = $(this).closest('form').find(':input:visible');
+                inputs.eq(inputs.index(this) + 3).focus();
+                break;
+
+            default: return; // exit this handler for other keys
+        }
+        e.preventDefault(); // prevent the default action (scroll / move caret)
+    });
+
+
+
+
+    $('input.AdvanceAdjusted,input.TanaAmount,input.TdsAdjusted').change(function () {
+        $(this).val(eval($(this).val()));
+        CalculateTotal();
+    })
+
+
+    function CalculateTotal() {
+        var TotAdvanceAdjusted = 0;
+        $('.row.crow').each(function () {
+            if ($(this).find('input.AdvanceAdjusted').val()) {
+                TotAdvanceAdjusted += parseFloat($(this).find('input.AdvanceAdjusted').val());
+            }
+        })
+        $('div#TotalAdvanceAdjusted').text(TotAdvanceAdjusted.toFixed(2));
+
+
+        var TotTanaAmount = 0;
+        $('.row.crow').each(function () {
+            if ($(this).find('input.TanaAmount').val()) {
+                TotTanaAmount += parseFloat($(this).find('input.TanaAmount').val());
+            }
+        })
+        $('div#TotalTanaAmount').text(TotTanaAmount.toFixed(2));
+
+
+        var TotTdsAdjusted = 0;
+        $('.row.crow').each(function () {
+            if ($(this).find('input.TdsAdjusted').val()) {
+                TotTdsAdjusted += parseFloat($(this).find('input.TdsAdjusted').val());
+            }
+        })
+        $('div#TotalTdsAdjusted').text(TotTdsAdjusted.toFixed(2));
+
+
+
+    }
+
+    var Lock = false;
+    $('input:submit').click(function () {
+        if (!Lock) {
+            Lock = true;
+            $.ajax({
+                url: $('form#Summary').attr('action'),
+                type: "POST",
+                data: $('form#Summary').serialize(),
+                success: function (result) {
+                    if (result.Success) {
+                        Lock = false;
+                        window.location.href = result.Url;
+                    } else {
+                        Lock = false;
+                        alert("Error in Updating.");
+                    }
+                },
+                error: function () {
+                    Lock = false;
+                }
+            });
+        }
+        return false;
+    })
+
+</script>

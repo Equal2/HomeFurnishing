@@ -1,0 +1,49 @@
+﻿@using GridMvc.Html
+@model IEnumerable<Model.Models.Employee>
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+</br>
+@*<p>
+
+    </p>*@
+
+        @*<span style="font-family: Calibri,sans-serif,Verdana; font-size: large">
+            
+                
+                    @Html.ActionLink("Create New", "EmployeeCreate")
+
+                
+            </span>*@
+
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h4>
+            <span style="font-family: Calibri,sans-serif,Verdana">Employee Index List.</span>
+        </h4>
+
+    </div>
+    <div class="panel-info" style="padding-left:5px;padding-top:2px">
+        @Html.Grid(Model).Columns(columns =>
+           {
+               columns.Add(foo => foo.PersonID, true);
+               //columns.Add(foo => foo.PersonType, true).Sortable(true).Titled("Person Type").Filterable(true).SetWidth(80);
+               columns.Add(foo => foo.Name).Sortable(true).Titled("Name").Filterable(true).SetWidth(80);
+               columns.Add(m => m.Mobile).Titled("Mobile").SetWidth(80);
+               columns.Add(m => m.Email).Titled("Email").SetWidth(80);
+               //columns.Add(m=>m.PersonAddresses.)
+               //columns.Add(foo => foo.Code).Titled("Code").SetWidth(30);
+               columns.Add(foo => foo.Active).Titled("Active?").SetWidth(30);
+               // columns.Add().Encoded(false).Sanitized(false).SetWidth(20).RenderValueAs(d => @Html.ActionLink("Employee Contects", "SupplierIndex", "PersonContect", new { id = d.PersonID }, new { @class = "modal-link" }));
+               columns.Add().Encoded(false).Sanitized(false).SetWidth(20).RenderValueAs(d => @Html.ActionLink(" ", "EmployeeEdit", "Person", new { id = d.PersonID }, new { @class = "rowEditBlue" }));
+               columns.Add().Encoded(false).Sanitized(false).SetWidth(20).RenderValueAs(d => @Html.ActionLink(" ", "DeleteEmployee", "Person", new { id = d.PersonID }, new { @class = "rowDeleteBlue" }));
+
+           }).WithPaging(25)
+    </div>
+</div>
+
+
+

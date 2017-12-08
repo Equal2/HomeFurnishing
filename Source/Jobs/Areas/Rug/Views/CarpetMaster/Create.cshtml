@@ -1,0 +1,920 @@
+﻿@model Model.ViewModels.CarpetMasterViewModel
+
+@{
+    ViewBag.Title = "Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!-- modal placeholder-->
+<div id='myModal' class='modal fade in'>
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div id='myModalContent'></div>
+        </div>
+    </div>
+</div>
+<link href="~/Content/jasny/jasny-bootstrap.min.css" rel="stylesheet" />
+<script src="~/Scripts/Jasny/jasny-bootstrap.min.js"></script>
+<style type="text/css">
+    .icon-Cus-Size {
+        font-size: 1.3em !important;
+    }
+</style>
+
+
+@using (Html.BeginForm("Edit", "CarpetMaster", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+    @*@Html.HiddenFor(m => m.DivisionId)*@
+    @Html.HiddenFor(m => m.SiteId)
+    @Html.HiddenFor(m => m.ProductGroupId)
+    @Html.HiddenFor(m => m.ImageFileName)
+    @Html.HiddenFor(m => m.ImageFolderName)
+    @Html.HiddenFor(m => m.IsSample)
+    @Html.HiddenFor(m => m.ProductSupplierId)
+    @Html.HiddenFor(m => m.CarpetSkuSettings.PerimeterSizeTypeId)
+
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3>
+                <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-file black"></span> @((ViewBag.Sample == false) ? ("Design") : ("Design Sample"))</span>
+                <input type="submit" value="Save" class="btn btn-primary right" id="submit" style="width: 90px; background-color: #2980b9" />
+            </h3>
+            <hr style="margin-top:0px;margin-bottom:0px" />
+            <div class="panel-info">
+                <div class="btn-group">
+                    @Html.ActionLink(" ", "ChooseType", "CarpetMaster", new { sample = @ViewBag.Sample }, new { @class = "cbtn btn-circle glyphicon glyphicon-plus toolbar", @title = "Add New", @data_toggle = "tooltip", @data_modal = "" })
+                    @Html.ActionLink(" ", "Print", "CarpetMaster", null, new { @class = "cbtn btn-circle glyphicon glyphicon-print toolbar", @title = "Print", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "PrevPage", "CarpetMaster", new { id = @Model.ProductGroupId, name = @Model.ProductGroupName, sample = @ViewBag.Sample }, new { @class = "cbtn btn-circle glyphicon glyphicon-arrow-left toolbar", @title = "Prev Record", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "NextPage", "CarpetMaster", new { id = @Model.ProductGroupId, name = @Model.ProductGroupName, sample = @ViewBag.Sample }, new { @class = "cbtn btn-circle glyphicon glyphicon-arrow-right toolbar", @title = "Next Record", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "Index", "CarpetMaster", new { id = @ViewBag.SampleId }, new { @class = "cbtn btn-circle glyphicon glyphicon-list", @title = "List", @data_toggle = "tooltip" })
+                </div>
+                <div class="btn-group">
+                    <a class="cbtn btn-circle glyphicon glyphicon-option-horizontal dropdown-toggle" aria-expanded="false" style="padding-top: 6px;padding-bottom: 6px;" href="#" data-toggle="dropdown" id="dropdownMenu1">
+                    </a>
+                    <ul class="dropdown-menu pull-right" aria-labelledby="dropdownMenu1">                       
+                        <li><a id="DocHistory" data-modal="" href="@Url.Action("History", "CarpetMaster", new { })"><span class="glyphicon glyphicon-user"> </span> History</a></li>
+                        <li><a href="@Url.Action("Email", "CarpetMaster")"><span class="glyphicon glyphicon-envelope"> </span> Email</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a target="_blank" href="@Url.Action("Report", "CarpetMaster")"><span class="glyphicon glyphicon-th"> </span> Report</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="panel-info" style="padding-left:15px">
+            <div class="form-horizontal">
+                @Html.ValidationSummary(true, " ", new { @class = "text-danger" })
+
+                <div class="row">
+                    <h4 class="col-md-12 black" style="margin-top:15px">
+                        <span class="glyphicon glyphicon-align-justify"></span>
+                        Basic Detail
+                    </h4>
+                    <div>
+                        <div>
+                            <div class="col-md-6">
+                                <div>
+                                    <div class="col-md-12">
+                                        <div class="form-group" style="margin-top:15px">
+                                            @Html.LabelFor(model => model.ProductGroupName, "Design Name", new { @class = "control-label  col-md-4 col-sm-2" })
+                                            <div class="col-md-7 col-sm-10">
+                                                @Html.TextBoxFor(model => model.ProductGroupName, null, new { @class = "form-control col-xs-6 height required", @readonly = true })
+                                                @Html.ValidationMessageFor(model => model.ProductGroupName, null, new { @class = "text-danger" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            @Html.LabelFor(model => model.IsActive, "Is Active", new { @class = "control-label  col-md-4 col-sm-2" })
+                                            <div class="col-md-7 col-sm-10" style=" padding-top:4px">
+                                                @Html.CheckBoxFor(m => m.IsActive, new { @class = "checkbox col-xs-1" })
+                                                @Html.ValidationMessageFor(model => model.IsActive)
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            @Html.LabelFor(model => model.ProductCategoryId, "Construction", new { @class = "control-label  col-md-4 col-sm-2 " })
+                                            <div class="col-md-7 col-sm-10">
+                                                @Html.TextBoxFor(m => m.ProductCategoryId, null, new { @class = "form-control col-xs-6 required" })
+                                                @Html.ValidationMessageFor(model => model.ProductCategoryId, null, new { @class = "text-danger" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="col-md-6">
+
+                                <div>
+                                    <div class="col-md-offset-4 col-md-8">
+                                        <div class="fileinput fileinput-new" data-provides="fileinput">
+                                            <div class="fileinput-new thumbnail" style="width: 200px; height: 150px;">
+                                                <img src="~/Uploads/@(Model.ImageFolderName)/Medium/@(Model.ImageFileName)" alt="...">
+                                            </div>
+                                            <div class="fileinput-preview fileinput-exists thumbnail" style="max-width: 200px; max-height: 150px;"></div>
+                                            <div>
+                                                <span class="btn btn-default btn-file" style="background-color: transparent; color: black; font-family:Arial; border-radius:5px">
+                                                    <span id="Select" class="fileinput-new">Select</span>
+                                                    <span id="Change" class="fileinput-exists">Change</span>
+                                                    <input type="file" name="upload">
+                                                </span>
+                                                <a href="#" class="btn btn-default fileinput-exists" style="background-color: transparent; color: black; font-family: Arial; border-radius: 5px" data-dismiss="fileinput">Remove</a>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <hr style="margin-top:0px;margin-bottom:0px;" />
+                <div>
+                    <h4 class="col-md-12 black" style="margin-top:15px">
+                        <span class="glyphicon glyphicon-align-justify"></span>
+                        Specification
+                    </h4>
+                    <div>
+                        <div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.ProductCollectionId, "Collection", new { @class = "control-label col-md-4 col-sm-2 " })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextBoxFor(m => m.ProductCollectionId, null, new { @class = "form-control col-xs-6 required" })
+                                        @Html.ValidationMessageFor(model => model.ProductCollectionId, null, new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.ProductQualityId, "Quality", new { @class = "control-label col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextBoxFor(m => m.ProductQualityId, null, new { @class = "form-control col-xs-6 required" })
+                                        @Html.ValidationMessageFor(model => model.ProductQualityId, null, new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="col-md-6" style="display:@(Model.CarpetSkuSettings.isVisibleProductDesign ? "" : "none")">
+                                @Html.HiddenFor(m => m.CarpetSkuSettings.isVisibleProductDesign)
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.ProductDesignId, "Colour Ways", new { @class = "control-label col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextBoxFor(m => m.ProductDesignId, null, new { @class = "form-control col-xs-6 required" })
+                                        @Html.ValidationMessageFor(model => model.ProductDesignId, null, new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6" style="display:@(Model.CarpetSkuSettings.isVisibleProductStyle ? "" : "none")">
+                                @Html.HiddenFor(m => m.CarpetSkuSettings.isVisibleProductStyle)
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.ProductStyleId, "Style", new { @class = "control-label col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextBoxFor(m => m.ProductStyleId, null, new { @class = "form-control col-xs-6" })
+                                        @Html.ValidationMessageFor(model => model.ProductStyleId, null, new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="col-md-6" style="display:@(Model.CarpetSkuSettings.isVisibleColour ? "" : "none")">
+                                @Html.HiddenFor(m => m.CarpetSkuSettings.isVisibleColour)
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.ColourId, "Colour", new { @class = "control-label col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextBoxFor(m => m.ColourId, null, new { @class = "form-control col-xs-6 required" })
+                                        @Html.ValidationMessageFor(model => model.ColourId, null, new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6" style="display:@(Model.CarpetSkuSettings.isVisibleProductManufacturer ? "" : "none")">
+                                @Html.HiddenFor(m => m.CarpetSkuSettings.isVisibleProductManufacturer)
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.ProductManufacturerId, "Designer", new { @class = "control-label col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextBoxFor(m => m.ProductManufacturerId, new { @class = "form-control col-xs-6" })
+                                        @Html.ValidationMessageFor(model => model.ProductManufacturerId, null, new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                    </div>
+                </div>
+
+                <hr style="margin-top:0px;margin-bottom:0px;" />
+                <div>
+                    <h4 class="col-md-12 black" style="margin-top:15px">
+                        <span class="glyphicon glyphicon-align-justify"></span>
+                        Production Detail
+                    </h4>
+                    <div>
+                        <div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.ProcessSequenceHeaderId, "Process Seq.", new { @class = "control-label col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextBoxFor(m => m.ProcessSequenceHeaderId, null, new { @class = "form-control col-xs-6 required" })
+                                        @Html.ValidationMessageFor(model => model.ProcessSequenceHeaderId, null, new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6" style="display:@(Model.CarpetSkuSettings.isVisibleProductDesignPattern ? "" : "none")">
+                                @Html.HiddenFor(m => m.CarpetSkuSettings.isVisibleProductDesignPattern)
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.ProductDesignPatternId, "Design Pattern", new { @class = "control-label col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextBoxFor(m => m.ProductDesignPatternId, null, new { @class = "form-control col-xs-6 required" })
+                                        @Html.ValidationMessageFor(model => model.ProductDesignPatternId, null, new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="col-md-6" style="display:@(Model.CarpetSkuSettings.isVisibleContent ? "" : "none")">
+                                @Html.HiddenFor(m => m.CarpetSkuSettings.isVisibleContent)
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.ContentId, "Content", new { @class = "control-label col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextBoxFor(m => m.ContentId, null, new { @class = "form-control col-xs-6 required" })
+                                        @Html.ValidationMessageFor(model => model.ContentId, null, new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.FaceContentId, "Face Content", new { @class = "control-label col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextBoxFor(m => m.FaceContentId, null, new { @class = "form-control col-xs-6 required" })
+                                        @Html.ValidationMessageFor(model => model.FaceContentId, null, new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="col-md-6" style="display:@(Model.CarpetSkuSettings.isVisibleGrossWeight ? "" : "none")">
+                                @Html.HiddenFor(m => m.CarpetSkuSettings.isVisibleGrossWeight)
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.GrossWeight, "Pile Weight", new { @class = "control-label col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextBoxFor(m => m.GrossWeight, null, new { @class = "form-control col-xs-6 " })
+                                        @Html.ValidationMessageFor(model => model.GrossWeight, null, new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div>
+                            <div class="col-md-6" style="display:@(Model.CarpetSkuSettings.isVisibleProductionRemark ? "" : "none")">
+                                @Html.HiddenFor(m => m.CarpetSkuSettings.isVisibleProductionRemark)
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.ProductionRemark, "Remark", new { @class = "control-label col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextBoxFor(m => m.ProductionRemark, new { @class = "form-control col-xs-6" })
+                                        @Html.ValidationMessageFor(model => model.ProductionRemark, null, new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <hr style="margin-top:0px;margin-bottom:0px;" />
+                <div style="display:@(Model.CarpetSkuSettings.isVisibleOriginCountry || Model.CarpetSkuSettings.isVisibleInvoiceGroup ? "" : "none")">
+                    <h4 class="col-md-12 black" style="margin-top:15px">
+                        <span class="glyphicon glyphicon-align-justify"></span>
+                        Shipping Detail
+                    </h4>
+                    <div>
+                        <div>
+                            <div class="col-md-6" style="display:@(Model.CarpetSkuSettings.isVisibleOriginCountry ? "" : "none")">
+                                @Html.HiddenFor(m => m.CarpetSkuSettings.isVisibleOriginCountry)
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.OriginCountryId, "Origin", new { @class = "control-label col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextBoxFor(m => m.OriginCountryId, null, new { @class = "form-control col-xs-6 required" })
+                                        @Html.ValidationMessageFor(model => model.OriginCountryId, null, new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6" style="display:@(Model.CarpetSkuSettings.isVisibleInvoiceGroup ? "" : "none")">
+                                @Html.HiddenFor(m => m.CarpetSkuSettings.isVisibleInvoiceGroup)
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.ProductInvoiceGroupId, "Invoice Group", new { @class = "control-label col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextBoxFor(m => m.ProductInvoiceGroupId, null, new { @class = "form-control col-xs-6 " })
+                                        @Html.ValidationMessageFor(model => model.ProductInvoiceGroupId, null, new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="col-md-6" style="display:@(Model.CarpetSkuSettings.isVisibleDrawbackTarrif ? "" : "none")">
+                                @Html.HiddenFor(m => m.CarpetSkuSettings.isVisibleDrawbackTarrif)
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.DrawBackTariffHeadId, "Drawback Tariff", new { @class = "control-label col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextBoxFor(m => m.DrawBackTariffHeadId, null, new { @class = "form-control col-xs-6" })
+                                        @Html.ValidationMessageFor(model => model.DrawBackTariffHeadId, null, new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6" style="display:@(Model.CarpetSkuSettings.isVisibleStandardCost ? "" : "none")">
+                                @Html.HiddenFor(m => m.CarpetSkuSettings.isVisibleStandardCost)
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.StandardCost, "Standard Cost", new { @class = "control-label col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextBoxFor(m => m.StandardCost, null, new { @class = "form-control col-xs-6" })
+                                        @Html.ValidationMessageFor(model => model.StandardCost, null, new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="col-md-6" style="display:@(Model.CarpetSkuSettings.isVisibleStandardWeight ? "" : "none")">
+                                @Html.HiddenFor(m => m.CarpetSkuSettings.isVisibleStandardWeight)
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.StandardWeight, "Finished Weight(PSF)", new { @class = "control-label col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextBoxFor(m => m.StandardWeight, null, new { @class = "form-control col-xs-6" })
+                                        @Html.ValidationMessageFor(model => model.StandardWeight, null, new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6" style="display:@(Model.CarpetSkuSettings.isVisibleSalesTaxProductCode ? "" : "none")">
+                                @Html.HiddenFor(m => m.CarpetSkuSettings.isVisibleSalesTaxProductCode)
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.SalesTaxProductCodeId, (Model.CarpetSkuSettings.SalesTaxProductCodeCaption ?? "Sales Tax Product Code"), new { @class = "control-label col-md-4 col-sm-2" })
+                                    @Html.HiddenFor(m => m.CarpetSkuSettings.SalesTaxProductCodeCaption)
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextBoxFor(m => m.SalesTaxProductCodeId, null, new { @class = "form-control col-xs-6" })
+                                        @Html.ValidationMessageFor(model => model.SalesTaxProductCodeId, null, new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <hr style="margin-top:0px;margin-bottom:0px;" />
+                <div style="display:@(Model.CarpetSkuSettings.isVisibleSupplierDetail ? "" : "none")">
+                    <h4 class="col-md-12 black" style="margin-top:15px">
+                        <span class="glyphicon glyphicon-align-justify"></span>
+                        Default Supplier Details
+                    </h4>
+                    <div>
+                        <div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.SupplierId, "Supplier", new { @class = "control-label col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextBoxFor(m => m.SupplierId, new { @class = "form-control col-xs-6" })
+                                        @Html.ValidationMessageFor(model => model.SupplierId, null, new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.LeadTime, "LeadTime", new { @class = "control-label col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextBoxFor(m => m.LeadTime, null, new { @class = "form-control col-xs-6" })
+                                        @Html.ValidationMessageFor(model => model.LeadTime, null, new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.MinimumOrderQty, "Min Qty", new { @class = "control-label col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextBoxFor(m => m.MinimumOrderQty, new { @class = "form-control col-xs-6" })
+                                        @Html.ValidationMessageFor(model => model.MinimumOrderQty, null, new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.MaximumOrderQty, "Max Qty", new { @class = "control-label col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextBoxFor(m => m.MaximumOrderQty, new { @class = "form-control col-xs-6" })
+                                        @Html.ValidationMessageFor(model => model.MaximumOrderQty, null, new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div >
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.Cost, "Cost", new { @class = "control-label col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextBoxFor(m => m.Cost, new { @class = "form-control col-xs-6" })
+                                        @Html.ValidationMessageFor(model => model.Cost, null, new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+
+                <hr style="margin-top:0px;margin-bottom:0px;" />
+                <div>
+                    <h4 class="col-md-12 black" style="margin-top:15px">
+                        <span class="glyphicon glyphicon-align-justify"></span>
+                        Other Detail
+                    </h4>
+                    <div>
+                        <div>
+                            <div class="col-md-6" style="display:@(Model.CarpetSkuSettings.isVisibleSample ? "" : "none")">
+                                @Html.HiddenFor(m => m.CarpetSkuSettings.isVisibleSample)
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.SampleId, "Sample", new { @class = "control-label col-md-4 col-sm-2 " })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextBoxFor(m => m.SampleId, null, new { @class = "form-control col-xs-6 " })
+                                        @Html.ValidationMessageFor(model => model.SampleId, null, new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6" style="display:@(Model.CarpetSkuSettings.isVisibleCounterNo ? "" : "none")">
+                                @Html.HiddenFor(m => m.CarpetSkuSettings.isVisibleCounterNo)
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.CounterNo, "Counter No", new { @class = "control-label col-md-4 col-sm-2 " })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextBoxFor(model => model.CounterNo, null, new { @class = "form-control col-xs-6" })
+                                        @Html.ValidationMessageFor(model => model.CounterNo, null, new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="col-md-6" style="display:@(Model.CarpetSkuSettings.isVisibleTags ? "" : "none")">
+                                @Html.HiddenFor(m => m.CarpetSkuSettings.isVisibleTags)
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.Tags, "Tags", new { @class = "control-label col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextBoxFor(m => m.Tags, null, new { @class = "form-control col-xs-6" })
+                                        @Html.ValidationMessageFor(model => model.Tags, null, new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6" style="display:@(Model.CarpetSkuSettings.isVisibleDivision ? "" : "none")">
+                                @Html.HiddenFor(m => m.CarpetSkuSettings.isVisibleDivision)
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.DivisionId, "Division", new { @class = "control-label col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.DropDownListFor(model => model.DivisionId, new SelectList(ViewBag.DivisionList as System.Collections.IEnumerable, "DivisionId", "DivisionName"), new { @class = "form-control col-xs-7 height required" })
+                                        @Html.ValidationMessageFor(m => m.DivisionId)
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div>
+                            <div class="col-md-6" style="display:@(Model.CarpetSkuSettings.isVisibleTraceType ? "" : "none")">
+                                @Html.HiddenFor(m => m.CarpetSkuSettings.isVisibleTraceType)
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.TraceType, "Trace Type", new { @class = "control-label col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.DropDownList("TraceType", null, new { @class = "form-control col-xs-6 height" })
+                                        @Html.ValidationMessageFor(model => model.TraceType, null, new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6" style="display:@(Model.CarpetSkuSettings.isVisibleMapType ? "" : "none")">
+                                @Html.HiddenFor(m => m.CarpetSkuSettings.isVisibleMapType)
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.MapType, "Map Type", new { @class = "control-label col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.DropDownList("MapType", null, new { @class = "form-control col-xs-6 height" })
+                                        @Html.ValidationMessageFor(m => m.MapType)
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+
+
+                        <div>
+
+                            @if (Model.ProductTypeAttributes != null)
+                            {
+                                for (int i = 0; i < Model.ProductTypeAttributes.Count; i++)
+                                {
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            @Html.Label(Model.ProductTypeAttributes[i].Name, new { @class = "control-label col-md-4 col-sm-2" })
+                                            @Html.HiddenFor(m => Model.ProductTypeAttributes[i].Name)
+                                            @Html.HiddenFor(m => Model.ProductTypeAttributes[i].ProductAttributeId)
+                                            @Html.HiddenFor(m => Model.ProductTypeAttributes[i].ProductTypeAttributeId)
+                                            @if (Model.ProductTypeAttributes[i].DataType == "List")
+                                            {
+                                                List<SelectListItem> tem = new List<SelectListItem>();
+                                                foreach (string item in (Model.ProductTypeAttributes[i].ListItem).Split(',').ToList())
+                                                {
+                                                    tem.Add(new SelectListItem { Text = item, Value = item, Selected = (Model.ProductTypeAttributes[i].DefaultValue == item ? true : false) });
+                                                }
+
+
+                                                <div class="col-md-7 col-sm-10">
+                                                    @Html.DropDownListFor(m => Model.ProductTypeAttributes[i].DefaultValue, new SelectList(tem as System.Collections.IEnumerable, "Value", "Text", Model.ProductTypeAttributes[i].DefaultValue), new { @class = "form-control col-xs-6 height" })
+                                                    @*<input type="text" name="@(item.Name)s" value=@item.DefaultValue class="form-control col-xs-6" />*@
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <div class="col-md-7 col-sm-10">
+                                                    @Html.TextBoxFor(m => Model.ProductTypeAttributes[i].DefaultValue, new { @class = "form-control col-xs-6" })
+                                                    @*<input type="text" name="@(item.Name)s" value=@item.DefaultValue class="form-control col-xs-6" />*@
+                                                </div>
+                                            }
+
+
+                                        </div>
+                                    </div>
+                                }
+                            }
+                        </div>
+                    </div>
+                </div>
+
+
+
+
+
+
+
+
+
+
+
+                <hr />
+                <div class="row">
+                    <h4 class="col-md-12 black" style="margin-top:15px">
+                        <span class="glyphicon glyphicon-align-justify"></span>
+                        Carpet Sizes
+                    </h4>
+                </div>
+
+                <div class="panel-info">
+                    <h5 style="padding:5px 0 3px 0;margin:0px;font-weight:bold">
+                        <span class="glyphicon glyphicon-plus-sign"></span>
+                        @Html.ActionLink("Add New Row ", "AddSize", "CarpetMaster", Model, new { data_modal = "", id = "btnCreate", @class = "toolbar", @title = "Add New", @data_toggle = "tooltip" })
+                    </h5>
+                </div>
+                <div style="padding-right:15px">
+                    <table class="table table-hover ctable">
+                        <thead id="header">
+                        </thead>
+
+                        <tbody id="Result"></tbody>
+                    </table>
+                </div>
+
+                <hr />
+                <div class="row">
+                    <h4 class="col-md-12 black" style="margin-top:15px">
+                        <span class="glyphicon glyphicon-align-justify"></span>
+                        Product Processes
+                    </h4>
+                </div>
+                <div style="padding-right:15px">
+                    <table class="table table-hover ctable">
+                        <thead id="ProdProcheader">
+                        </thead>
+
+                        <tbody id="ProdProcResult"></tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+    </div>
+}
+
+<script type="text/javascript">
+    $(function()
+    {
+        var TitleCase= '@Session["TitleCase"]';
+        //alert(TitleCase);
+        $('#ProductGroupName').focusout(function() {
+            if (TitleCase=="UpperCase")
+            this.value = this.value.toUpperCase() ;
+        });
+    });
+    
+
+
+</script>
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+
+        CustomSelectFunction($("#ProductCategoryId"), '/ComboHelpList/GetProductConstruction', '/ComboHelpList/SetSingleProductConstruction', ' ', false, 0);
+        CustomSelectFunction($("#ProductCollectionId"), '/ComboHelpList/GetRugCollection', '/ComboHelpList/SetSingleRugCollection', ' ', false, 0);
+        CustomSelectFunction($("#ProductQualityId"), '/ComboHelpList/GetRugQuality', '/ComboHelpList/SetSingleRugQuality', ' ', false, 0);
+        CustomSelectFunction($("#ProductDesignId"), '/ComboHelpList/GetColourWays', '/ComboHelpList/SetSingleColourWays', ' ', false, 0);
+        CustomSelectFunction($("#ProductInvoiceGroupId"), '/ComboHelpList/GetProductInvoiceGroup', '/ComboHelpList/SetSingleProductInvoiceGroup', ' ', false, 0);
+        CustomSelectFunction($("#ProductStyleId"), '/ComboHelpList/GetProductStyle', '/ComboHelpList/SetSingleProductStyle', ' ', false, 0);
+        CustomSelectFunction($("#ProductManufacturerId"), '/ComboHelpList/GetProductManufacturer', '/ComboHelpList/SetSingleProductManufacturer', ' ', false, 0);
+        CustomSelectFunction($("#DrawBackTariffHeadId"), '/ComboHelpList/GetProductDrawBackTarrif', '/ComboHelpList/SetSingleProductDrawBackTarrif', ' ', false, 0);
+        CustomSelectFunction($("#ProcessSequenceHeaderId"), '/ComboHelpList/GetProductProcessSequence', '/ComboHelpList/SetSingleProductProcessSequence', ' ', false, 0);
+        CustomSelectFunction($("#OriginCountryId"), '/ComboHelpList/GetCountry', '/ComboHelpList/SetSingleCountry', ' ', false, 0);
+        CustomSelectFunction($("#ProductDesignPatternId"), '/ComboHelpList/GetProductDesignPatterns', '/ComboHelpList/SetSingleProductDesignPattern', ' ', false, 0);
+        CustomSelectFunction($("#DescriptionOfGoodsId"), '/ComboHelpList/GetProductDescriptionOfGoods', '/ComboHelpList/SetSingleProductDescriptionOfGoods', ' ', false, 0);
+        CustomSelectFunction($("#ContentId"), '/ComboHelpList/GetProductContentHeader', '/ComboHelpList/SetSingleProductContentHeaders', ' ', false, 0);
+        CustomSelectFunction($("#FaceContentId"), '/ComboHelpList/GetProductContentHeader', '/ComboHelpList/SetSingleProductContentHeaders', ' ', false, 0);
+        CustomSelectFunction($("#SampleId"), '/ComboHelpList/GetProducts', '/ComboHelpList/SetSingleProducts', ' ', false, 0);
+        CustomSelectFunction($("#SupplierId"), '/ComboHelpList/GetSuppliers', '/ComboHelpList/SetSingleSupplier', ' ', false, 0);
+        CustomSelectFunction($("#ColourId"), '/ComboHelpList/GetColours', '/ComboHelpList/SetSingleColour', ' ', false, 0);
+        CustomSelectFunction($("#SalesTaxProductCodeId"), '/ComboHelpList/GetSalesTaxProductCodes', '/ComboHelpList/SetSingleSalesTaxProductCode', ' ', false, 0);
+        $("#Tags").select2({tags: true,tokenSeparators: [',', ' ']});
+        //Calling the function to load the table data/ Line information
+        LoadProducts();
+        //LoadProductProcesses();
+
+        form_clean = $("form").serialize();
+
+        var id=@Model.ProductGroupId;
+        if(id==null||id==0)
+        {
+            $(document).find('a#btnCreate').removeAttr('href').removeAttr('data-modal');
+        }
+
+
+
+        //Preventing and Duplicate DocCheck Double Click Post
+
+
+        var IsSaved=false;
+        var ValidationCount=0;
+
+        $('form').submit(function(event){
+            if(!IsSaved)
+            {
+                if(!ValidateData())
+                {
+                    return false;
+                }
+                IsSaved=true;
+                return IsSaved;
+            }
+            else
+            {
+                return false;
+            }
+
+
+        });
+
+
+        function ValidateData() {
+            var DocId=@Model.ProductGroupId;
+            var TempValue;
+            var ValidationMessage="";
+
+
+
+            //Checking for dulicate key value
+            if(DocId<=0)
+            {
+                TempValue= $('#ProductGroupName').DuplicateCheckForCreate({ name: 'ProductGroup', value: $('#ProductGroupName').val(), doctype: 0 });
+                if (TempValue){ ValidationMessage=$('#ProductGroupName').val() + " already exist <br />";}
+            }
+            else
+            {
+                test = $('#ProductGroupName').DuplicateCheckForEdit({ name: 'ProductGroup', value: $('#ProductGroupName').val(), doctype: 0,headerId:DocId });
+                if (TempValue) {ValidationMessage+=$('#ProductGroupName').val() + " already exist <br />";}
+            }
+            if(TempValue)
+            {
+                if($('#validationerrormsg').length==0){
+                    $('.panel-info').filter(':eq(1)').before('<div class="alert alert-danger" role="alert" id="validationerrormsg">'+ValidationMessage+'</div>');}
+                else
+                {
+                    $('#validationerrormsg').html(ValidationMessage);
+                }
+            }
+            return  (ValidationMessage=="");
+
+        }
+
+
+        //End For Double Click Post Validation
+
+
+    })
+
+
+
+    //Reloading the table contents on modal hide
+    $('#myModal').on('hidden.bs.modal', function () {
+        LoadProducts();
+        //LoadProductProcesses();
+    });
+
+
+    //To Focus on the first element on modal load
+    $('#myModal').on('shown.bs.modal', function () {
+        $("#StandardSizeId").select2("focus");
+    });
+
+
+    $("#ProductCategoryId").change(GetProductCategoryDetail);
+
+    function GetProductCategoryDetail() {
+        var ProcessProgress = $("#Product detail loading progress");
+        ProcessProgress.show();
+        if ($("#ProductCategoryId").val() != 0 && $("#ProductCategoryId").val() != null) {
+            $.ajax({
+                cache: false,
+                type: "POST",
+                url: "@(Url.Action("GetProductCategoryDetailJson"))",
+                data: { ProductCategoryId: $("#ProductCategoryId").val() },
+            success: function (data) {
+                if (data != null)
+                {
+                    if (data.DefaultSalesTaxProductCodeId != null)
+                    {
+                        $("#SalesTaxProductCodeId").select2('data', { id: data.DefaultSalesTaxProductCodeId, text: data.DefaultSalesTaxProductCodeName });
+                    }
+                    else{
+                        $("#SalesTaxProductCodeId").select2('data', { id: '', text: '' });
+                    }
+                }
+                else{
+                    $("#SalesTaxProductCodeId").select2('data', { id: '', text: '' });
+                }
+            },
+            error: function (xhr, ajaxOptions, thrownError) {
+                alert('Failed to retrieve product details.' + thrownError);
+            }
+        });
+    }}
+
+
+    //Loading the Table data or Line Information
+    function LoadProducts() {
+        var groupId=@Model.ProductGroupId;
+        var link="/Rug/ProductSize/IndexForProductGroup/"+groupId;
+        $.ajax({
+            url: link,
+            type: "GET",
+            dataType: "json",
+            success: function (data) {
+                var row = ""
+                var srno=1;
+                var head="<tr style='background-color:#428bca'>  <th><input type='hidden'  /></th> <th style='width:5%'>Sr.No</th><th class='center' style='width:20%'>Product Name</th>   <th class='center' style='width:15%'>StandardSize</th> <th class='center' style='width:15%'>Manufacturing Size</th> <th style='width:15%'>Finishing Size</th> <th style='width:15%'>Shape</th>  <th style='width:10%'></th>       <th style='width:5%'></th>  </tr>"
+                if(data.length!=0)
+                {
+                    $.each(data, function (index, item) {
+                        row += "<tr><td><input type='hidden' class='id' value='" + item.ProductId + "'/></td> <td>"+srno+"</td> <td>" + item.ProductName + "</td><td>" + ((item.ProductStandardSizeName==null)?" ":item.ProductStandardSizeName )+ "</td><td>" + ((item.ProductManufacturingSizeName==null)?" ":item.ProductManufacturingSizeName ) + "</td><td> "+((item.FinishingSizeName==null)?" ":item.FinishingSizeName )+"</td>  <td> "+((item.ShapeName==null)?" ":item.ShapeName )+"</td> <td style='padding-top:0px;padding-bottom:0px'> <div><a class='glyphicon glyphicon-scale icon-Cus-Size'  data-toggle='tooltip' title='Unit Conversion' href='/Rug/UnitConversion/Index/"+item.ProductId+"' > </a> <a class='glyphicon glyphicon-user icon-Cus-Size'  data-toggle='tooltip' title='Buyer' href='/Rug/ProductBuyer/Index/"+item.ProductId+"' > </a></div></td>       <td style='padding-top:0px;padding-bottom:0px'><a class='glyphicon glyphicon-trash icon-Cus-Size' data-modal='' delete='' href='/Rug/CarpetMaster/EditSize/"+item.ProductId+"' data-toggle='tooltip' title='Delete'></a></td>  </tr>";
+                        srno++;
+                    });
+                    LoadProductProcesses();
+                }
+                else
+                {
+                    $('#ProductGroupName').removeAttr('readonly');
+                    row+="<tr><td>No Items Found.</td></tr>";
+                }
+                $("#header").html(head);
+                $("#Result").html(row);
+            },
+            error: function (result) {
+                alert("Error");
+            }
+        });
+    }
+
+    //Loading the Table data or Line Information
+    function LoadProductProcesses() {
+        var groupId=@Model.ProductGroupId;
+        var link="/Rug/CarpetMaster/ProductProcessIndex/"+groupId;        
+            $.ajax({
+                url: link,
+                type: "GET",
+                dataType: "json",
+                success: function (data) {
+                    var row = ""
+                    var srno=1;
+                    var head="<tr style='background-color:#428bca'>  <th><input type='hidden'  /></th> <th style='width:5%'>Sr.No</th><th class='center' style='width:30%'>Process</th>   <th class='center' style='width:30%'>Product Rate Group</th> <th class='center' style='width:30%'>Instructions</th> <th style='width:5%'></th>  </tr>"
+                    if(data.length!=0)
+                    {
+                        $.each(data, function (index, item) {
+                            row += "<tr><td><input type='hidden' class='id' value='" + item.ProductProcessId + "'/></td> <td>"+srno+"</td> <td>" + item.ProcessName + "</td><td>" + ((item.ProudctRateGroupName==null)?" ":item.ProudctRateGroupName )+ "</td><td>" + ((item.Instructions==null)?" ":item.Instructions ) + "</td>  <td style='padding-top:0px;padding-bottom:0px'><a class='' data-modal='' edit='' href='/Rug/CarpetMaster/EditProductProcess/"+item.ProductProcessId+"' data-toggle='tooltip' title='edit'></a></td>  </tr>";
+                            srno++;
+                        });
+
+                    }
+                    $("#ProdProcheader").html(head);
+                    $("#ProdProcResult").html(row);
+                },
+                error: function (result) {
+                    alert("Error");
+                }
+            });
+    }
+
+
+    //For Populating Modal PopUp on DoubleClick Of Row
+    $('#Result').on("dblclick",'tr',function(){
+        var text = $(this).find(".id").val();
+        var editurl=$(this).find('a[delete]').attr('href');
+        $('#myModalContent').load(editurl, function () {
+            //alert('2');
+            $('#myModal').modal({
+                backdrop: 'static',
+                keyboard: true
+            }, 'show');
+
+            bindForm1(this);
+        });
+    });
+
+    //For Populating Modal PopUp on DoubleClick Of Row
+    $('#ProdProcResult').on("dblclick",'tr',function(){
+        var text = $(this).find(".id").val();
+        var editurl=$(this).find('a[edit]').attr('href');
+        $('#myModalContent').load(editurl, function () {
+            //alert('2');
+            $('#myModal').modal({
+                backdrop: 'static',
+                keyboard: true
+            }, 'show');
+
+            bindForm1(this);
+        });
+    });
+
+
+    //For Handling Modal PopUp on Clicking Delete Icon
+    $('#Result').on("click",'a[delete]', function (e) {
+        $('#myModalContent').load(this.href, function () {
+            //alert('2');
+            $('#myModal').modal({
+                backdrop: 'static',
+                keyboard: true
+            }, 'show');
+
+            bindForm1(this);
+        });
+        return false;
+    });
+
+
+    //For posting the data through ajax and render the contents sent back from the server
+    function bindForm1(dialog) {
+        $('form', dialog).submit(function () {
+            //alert('inside test');
+            $.ajax({
+                url: this.action,
+                type: this.method,
+                data: $(this).serialize(),
+                success: function (result) {
+                    if (result.success) {
+                        $('#myModal').modal('hide');
+                        //Refresh
+                        //location.reload();
+                        //alert('Data Saved');
+                    }else if(!result.success)
+                    {
+                        $('#myModalContent').html(result);
+                        bindForm1();
+                    }
+                    else {
+                        $('#myModalContent').html(result);
+                        bindForm1();
+                    }
+                }
+            });
+            return false;
+        });
+
+    }
+
+    $(document).ready(function(){
+        enableModalTransitions();
+    })
+
+</script>

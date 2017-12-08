@@ -1,0 +1,609 @@
+﻿@{
+    ViewBag.Title = "Order Cancel";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<link href="~/Content/DataTables/css/jquery.dataTables.min.css" rel="stylesheet" />
+<link href="~/Content/DataTables/css/scroller.bootstrap.min.css" rel="stylesheet" />
+
+<script src="~/Scripts/DataTables/jquery.dataTables.min.js"></script>
+<script src="~/Scripts/DataTables/dataTables.scroller.js"></script>
+<style type="text/css">
+    .DTHidden {
+        display: none;
+    }
+
+    .TextRight {
+        text-align: right;
+    }
+
+    .dataTable {
+        font-size: 13px !important;
+        line-height: 1;
+    }
+
+    table.dataTable tbody td {
+        padding: 2px 10px;
+    }
+
+    .Filters.fSelected.label {
+        display: inline-block;
+    }
+
+    .Filters.fSelected .label-danger {
+        border-radius: 10px;
+    }
+
+    .Filters.fSelected strong {
+        padding: 5px;
+    }
+
+    .dataTables_scrollBody {
+        min-height: 55px;
+    }
+</style>
+
+<!-- modal placeholder-->
+<div id='myModal' class='modal fade in'>
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div id='myModalContent'></div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" style="font-size:13px">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="exampleModalLabel">Summary</h4>
+            </div>
+            <div class="modal-body" id="SelectedSummary">
+                <div class="row" style="margin-left:0px;margin-right:0px;margin-bottom:7px">
+                    <div class='row-index block' style='width:5%'>  <strong>Sr</strong>  </div>
+                    <div class='block' style='width:93%'>
+
+                        <div class='block' style='width:25%'>
+                            <strong>Product</strong>
+                        </div>
+                        <div class='block' style='width: 25%'>
+                            <strong>Order</strong>
+                        </div>
+                        <div class='block' style='width:20%'>
+                            <strong>JobWorker</strong>
+                        </div>
+                        <div class='block text-right' style='width:15%'>
+                            <strong>Balance Qty</strong>
+                        </div>
+                        <div class='block text-right' style='width:15%'>
+                            <strong>InspectionQty</strong>
+                        </div>
+                    </div>
+                </div>
+                <div id="SummaryContent" style="max-height:350px;overflow-y:scroll">
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3>
+            <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"> <span class="glyphicon glyphicon-file black"></span>@ViewBag.Name</span>
+            @Html.ActionLink(" ", "ConfirmedJobReceives", "JobReceiveQAWizard", null, new { @class = "glyphicon glyphicon-hand-right toolbar right", @title = "Proceed", @data_toggle = "tooltip", @id = "Proceed" })
+            <a href="#" class="glyphicon glyphicon-shopping-cart toolbar right" id="CartSum"></a>
+            @Html.ActionLink(" ", "Filters", "JobReceiveQAWizard", null, new { data_modalCustom = "", id = "btnCreateF", @class = "glyphicon glyphicon-filter toolbar right", @title = "Filters", @data_toggle = "tooltip" })
+        </h3>
+    </div>
+
+    <div class="panel-info" style="padding-left:15px">
+        <div class="form-horizontal">
+            @Html.ValidationSummary(true)
+
+            <div class="row">
+                <div>
+                    <div class="row">
+
+                        <div class="col-md-6">
+                            <div class="form-group" style="margin-top:15px">
+                                @Html.Label("QA By", new { @class = "control-label col-xs-4" })
+                                <div class="col-xs-6">
+                                    @Html.TextBox(" ", "", new { @class = "form-control col-xs-6 height required", @id = "QAById" })
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group" style="margin-top:15px">
+                                @Html.Label("QA Remark", new { @class = "control-label col-xs-4" })
+                                <div class="col-xs-6">
+                                    @Html.TextBox(" ", "", new { @class = "form-control col-xs-6 required", id = "Remark" })
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <hr style="margin-top:0px;margin-bottom:0px" />
+
+        <div style="margin:20px;">
+
+
+            <div class="Filters fSelected" id="sFilter">
+
+            </div>
+
+            <table id="example" class="display" cellspacing="0" width="100%">
+                <thead style="background: #428bca;color:white">
+                    <tr>
+                        <th>DocDate</th>
+                        <th>DocNo</th>
+                        <th>JobWorker</th>
+                        <th>Barcode</th>
+                        <th>Product</th>
+                        <th>Dim.1</th>
+                        <th>Dim.2</th>
+                        <th>ProductGroup</th>
+                        <th>BalanceQty</th>
+                        <th>Ins.Qty</th>
+                        <th>Pass Qty</th>
+                        <th>Penalty</th>
+                        <th>Remark</th>
+                        <th>JobWorkerId</th>
+                        <th>JobReceiveLineId</th>
+                    </tr>
+                </thead>
+                <tfoot>
+                    <tr>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+
+    var selected = [];
+
+    $(document).ready(function () {
+
+        var ProcId = '@ViewBag.ProcId';
+
+        CustomSelectFunction($("#QAById"), '/ComboHelpList/GetEmployeeWithProcess', '/ComboHelpList/SetSingleEmployee', ' ', false, 1, ProcId);
+
+        var Id = '@ViewBag.Id';
+        var Filters = new AssignFilters();
+        var eXInspectionQty = 0;
+
+
+        var tab = $('#example').DataTable({
+            serverSide: false,
+            ordering: false,
+            searchDelay: 1000,
+            columns: [
+              { "data": "SOrderDate", "width": "12%", "sortable": false },
+                 { "data": "OrderNo", "width": "12%", "sortable": false },
+                 { "data": "JobWorkerName", "width": "13%", "sortable": false },
+                 { "data": "ProductUidName", "width": "13%", "sortable": false },
+                 { "data": "ProductName", "width": "13%", "sortable": false },
+                 { "data": "Dimension1Name", "width": "10%", "sortable": false },
+                 { "data": "Dimension2Name", "width": "10%", "sortable": false },
+                 { "data": "ProductGroupName", "width": "10%", "sortable": false },
+                 { "data": "BalanceQty", "width": "10%", className: "TextRight", "sortable": false },
+                 { "data": "InspectionQty", "width": "10%", className: "TextRight", "render": function (data, type, row) { return '<input style="width:100%;" class="InspectionQty TextRight"  type="text" name="InspectionQty' + row.PurchaseInvoiceLineId + '" id="InspectionQty' + row.PurchaseInvoiceLineId + '" value="' + row.InspectionQty + '" />'; }, "sortable": false },
+                 { "data": "Qty", "width": "10%", className: "TextRight", "render": function (data, type, row) { return '<input style="width:100%;" class="Qty TextRight"  type="text" name="Qty' + row.PurchaseInvoiceLineId + '" id="Qty' + row.PurchaseInvoiceLineId + '" value="' + row.Qty + '" />'; }, "sortable": false },
+                 { "data": "PenaltyAmount", "width": "10%", className: "TextRight", "render": function (data, type, row) { return '<input style="width:100%;" class="PenaltyAmount TextRight"  type="text" name="PenaltyAmount' + row.PurchaseInvoiceLineId + '" id="PenaltyAmount' + row.PurchaseInvoiceLineId + '" value="' + row.PenaltyAmount + '" />'; }, "sortable": false },
+                 { "data": "Remark", "width": "10%", "render": function (data, type, row) { return '<input style="width:100%;" class="Remark TextRight"  type="text" name="Remark' + row.PurchaseInvoiceLineId + '" id="Remark' + row.PurchaseInvoiceLineId + '"  />'; }, "sortable": false },
+                 { "data": "JobReceiveLineId" },
+                 { "data": "JobWorkerId" },
+            ],
+            columnDefs: [
+   { "targets": 13, "searchable": false, className: "DTHidden", }, { "targets": 14, "searchable": false, className: "DTHidden", },
+   { "visible": false, "targets": 2 }, { "visible": false, "targets": 0 }, { "visible": false, "targets": 1 }
+            ],
+            scrollY: "250px",
+            dom: 'ftirp',
+            scroller: {
+                loadingIndicator: true,
+            },
+            language: {
+                "loadingRecords": "Please wait - loading..."
+            },
+            scrollCollapse: true,
+            drawCallback: function (settings) {
+                var api = this.api();
+                var rows = api.rows().nodes();
+                var jw = null;
+                var dd = null;
+                var dn = null;
+
+                var aData = api.columns([0, 1, 2]).data();
+
+                $.each(aData[0], function (i, group) {
+                    if (jw !== group || dd !== aData[1][i] || dn !== aData[2][i]) {
+                        $(rows).eq(i).before(
+                            '<tr class="group" style="background:#A1A9A9;height:30px"><td colspan="10">' + group + ", " + aData[1][i] + ", " + aData[2][i] + '</td></tr>'
+                        );
+
+                        jw = group;
+                        dd = aData[1][i];
+                        dn = aData[2][i];
+                    }
+                });
+            },
+        });
+
+        $('#example tbody').on('change', 'input', function () {
+
+            if ($(this).val() && $(this).hasClass('InspectionQty'))
+                eXInspectionQty = $(this).val();
+
+            var validation = false;
+
+            var Rec = tab.row($(this).closest('tr')).data();
+
+            var index = GetIndexOfId(selected, Rec.JobReceiveLineId);
+
+
+            if ($(this).val() && ($(this).val() != 0 || $(this).hasClass('Qty'))) {
+                if ($(this).hasClass('InspectionQty') && $(this).val() <= Rec.BalanceQty && Rec.Qty <= Rec.BalanceQty)
+                    validation = true;
+                else if ($(this).hasClass('Qty') && $(this).val() <= Rec.BalanceQty && Rec.InspectionQty > 0 && Rec.InspectionQty <= Rec.BalanceQty)
+                    validation = true;
+                else if (Rec.InspectionQty > 0 && Rec.InspectionQty <= Rec.BalanceQty && Rec.Qty <= Rec.BalanceQty && !$(this).hasClass('InspectionQty') && !$(this).hasClass('Qty'))
+                    validation = true;
+                else
+                    $(this).addClass('text-danger');
+            }
+
+
+
+            if (validation) {
+
+                if ($(this).hasClass('text-danger'))
+                    $(this).removeClass('text-danger');
+
+                if (index === -1) {
+                    if ($(this).hasClass('InspectionQty'))
+                        selected.push({ Id: Rec.JobReceiveLineId, InspectionQty: $(this).val(), Qty: Rec.Qty, PenaltyAmount: Rec.PenaltyAmount, JobWorkerId: Rec.JobWorkerId, Remark: Rec.Remark });
+                    else if ($(this).hasClass('Qty'))
+                        selected.push({ Id: Rec.JobReceiveLineId, InspectionQty: Rec.InspectionQty, Qty: $(this).val(), PenaltyAmount: Rec.PenaltyAmount, JobWorkerId: Rec.JobWorkerId, Remark: Rec.Remark });
+                    else if ($(this).hasClass('PenaltyAmount'))
+                        selected.push({ Id: Rec.JobReceiveLineId, InspectionPenaltyAmount: Rec.InspectionPenaltyAmount, PenaltyAmount: $(this).val(), PenaltyAmount: Rec.PenaltyAmount, JobWorkerId: Rec.JobWorkerId, Remark: Rec.Remark });
+                } else {
+                    if ($(this).hasClass('InspectionQty'))
+                        selected[index].InspectionQty = $(this).val();
+                    else if ($(this).hasClass('Qty'))
+                        selected[index].Qty = $(this).val();
+                    else if ($(this).hasClass('PenaltyAmount'))
+                        selected[index].PenaltyAmount = $(this).val();
+                    else if ($(this).hasClass('Remark'))
+                        selected[index].Remark = $(this).val();
+                }
+                if (!$(this).closest('tr').hasClass('selected'))
+                    $(this).closest('tr').addClass('selected');
+            }
+            else if (index >= 0) {
+
+                selected.splice(index, 1);
+                $(this).closest('tr').removeClass('selected');
+            }
+
+            if ($(this).hasClass('InspectionQty'))
+                Rec.InspectionQty = $(this).val();
+            else if ($(this).hasClass('Qty'))
+                Rec.Qty = $(this).val();
+            else if ($(this).hasClass('PenaltyAmount'))
+                Rec.PenaltyAmount = $(this).val();
+            else if ($(this).hasClass('Remark'))
+                Rec.Remark = $(this).val();
+        });
+
+
+        $('#example tbody').on('click', 'tr', function (e) {
+            if (e.target.nodeName == "INPUT") {
+
+            }
+            else {
+                $(this).find('input.InspectionQty').trigger('change');
+            }
+        });
+
+        $(document).on('focusin', ' td > input', function () {
+
+            if (eXInspectionQty && (!$(this).val() || $(this).val() == 0) && $(this).hasClass('InspectionQty'))
+                $(this).val(eXInspectionQty).trigger('change');
+
+        })
+
+        var Processed = false;
+        $('a#Proceed').click(function () {
+
+            //alert($(this).attr('href'));
+
+            if ($('#Remark').val() && $('#QAById').val() && !Processed) {
+
+                Processed = true;
+                $.ajax({
+                    url: $(this).attr('href'),
+                    type: "POST",
+                    data: { ConfirmedList: GetSelectedData(), DocTypeId: Id, UserRemark: $('#Remark').val(), QAById: $('#QAById').val(), },
+                    success: function (result) {
+                        if (result.Success == true) {
+                            UpdateDataTable(result);
+                        } else if (result.Success == "URL") {
+                            window.location.href = result.Data;
+                        }
+                        else if (!result.Success) {
+                            alertify.error(message = result.Data, wait = '0')
+                        }
+                        else { }
+
+                        Processed = false;
+                    },
+                });
+            }
+            else if(!Processed) {
+                alertify.error(message = "Please check mandatory fields", wait = '0')                
+                return false;
+            }          
+            return false;
+        });
+
+        function GetSelectedData() {
+            var arr = [];
+
+            $.each(selected, function (index, value) {
+                arr.push({ JobReceiveLineId: value.Id, InspectionQty: value.InspectionQty, PenaltyAmount: value.PenaltyAmount, Qty: value.Qty, JobWorkerId: value.JobWorkerId, Remark: value.Remark });
+            })
+
+            return arr;
+        }
+
+        function GenerateSummaryString() {
+            var Summary = "";
+            Summary += "<div class='row' style='margin:0px'>"
+
+            var test = tab.rows('.selected').data();
+            var List = "";
+            var srno = 1;
+            var QtyTotal = 0;
+            var AmtTotal = 0;
+            $.each(test, function (index, value) {
+
+                Summary += " <div class='row crow grid-body' style='margin:0px;padding:0px'>"
+                    + "      <div class='row-index block'  style='width:5%'>" + srno + "</div>"
+                    + "          <div class='block'  style='width:95%'>"
+                    + "                  <div class='block' style='width:25%'>" + (value.ProductName == null ? " " : "<strong>" + value.ProductName + "</strong>")
+                    + "                  <div>" + (value.Dimension1Name == null ? " " : value.Dimension1Name + ",") + (value.Dimension2Name == null ? " " : value.Dimension2Name + ",") + "</div>"
+                    + "                  <div>" + value.ProductGroupName + "</div>"
+                    + "                  </div>"
+                    + "                  <div class='block' style='width:25%'>" + (value.OrderNo == null ? " " : "<strong>" + value.OrderNo + "</strong>")
+                    + "                  <div> " + value.SOrderDate + " </div>"
+                    + "                  </div>"
+                    + "                  <div class='block'  style='width:20%'>" + (value.JobWorkerName == null ? " " : value.JobWorkerName) + "</span>"
+                    + "                   </div>"
+                    + "                  <div class='block text-right'  style='width:15%'>" + (value.BalanceQty == null ? " " : value.BalanceQty) + ""
+                    + "                   </div>"
+                    + "                  <div class='block text-right'  style='width:15%'>" + (value.InspectionQty == null ? " " : value.InspectionQty) + ""
+                    + "                   </div>"
+                    + "          </div>"
+                    + "  </div>"
+                    + "<hr style='margin-top:0px;margin-bottom:0px'/>";
+                srno++;
+            });
+            Summary += "</div>"
+
+            $('#SummaryContent').html(Summary);
+        }
+
+
+        $(document).on('hidden.bs.modal', function (e) {
+            $('#SummaryContent').html("");
+            $('#QtyTotal').html(0);
+            $('#AmtTotal').html(0);
+        })
+
+
+        function GetIndexOfId(array, Id) {
+            var index = -1;
+            array.some(function (entry, i) {
+                if (entry.Id == Id) {
+                    index = i;
+                    return true;
+                }
+            });
+            return index;
+        }
+
+        $('#CartSum').click(function () {
+            GenerateSummaryString();
+            $('#exampleModal').modal('toggle');
+        })
+
+
+        $(function () {
+
+            $("a[data-modalCustom]").on("click", function (e) {
+                // hide dropdown if any
+                if (this.href == "") {
+                    return false;
+                }
+
+                var data = new GenerateFiltersForParameter();
+                $.ajax({
+                    url: this.href,
+                    type: "POST",
+                    data: data,
+                    success: function (result) {
+                        $('#myModalContent').html(result);
+                        $('#myModal').modal({
+                            backdrop: 'static',
+                            keyboard: true
+                        }, 'show');
+
+                        bindForm1('#myModalContent');
+                    },
+                });
+                return false;
+            });
+        });
+
+        function bindForm1(dialog) {
+            $('form#modform', dialog).submit(function () {
+                Filters = new AssignFilters();
+                $('#sFilter').html(GenerateFiltersForHtml());
+
+                var Data = [];
+
+                var datatable = $('#example').dataTable().api();
+
+                $.ajax({
+                    url: "/JobReceiveQAWizard/AjaxGetJsonData/",
+                    data: {
+                        DocType: Id,
+                        FromDate: Filters.FromDate ? Filters.FromDate : null,
+                        ToDate: Filters.ToDate ? Filters.ToDate : null,
+                        JobReceiveHeaderId: Filters.JobReceiveHeaderId.length > 0 ? $.map(Filters.JobReceiveHeaderId, function (val, i) { return (val.id) }).join(',') : "",
+                        JobWorkerId: Filters.JobWorkerId.length > 0 ? $.map(Filters.JobWorkerId, function (val, i) { return (val.id) }).join(',') : "",
+                        ProductId: Filters.ProductId,
+                        Dimension1Id: Filters.Dimension1Id.length > 0 ? $.map(Filters.Dimension1Id, function (val, i) { return (val.id) }).join(',') : "",
+                        Dimension2Id: Filters.Dimension2Id.length > 0 ? $.map(Filters.Dimension2Id, function (val, i) { return (val.id) }).join(',') : "",
+                        ProductGroupId: Filters.ProductGroupId,
+                        ProductCategoryId: Filters.ProductCategoryId,
+                        //Sample: Filters.Sample,
+                        BalanceQty: Filters.BalanceQty ? Filters.BalanceQty : null,
+                        InspectionQty: Filters.InspectionQty ? Filters.InspectionQty : 0,
+                        MultiplierGT: Filters.MultiplierGT ? Filters.MultiplierGT : null,
+                        MultiplierLT: Filters.MultiplierLT ? Filters.MultiplierLT : null,
+                    },
+                    type: "POST",
+                    success: function (result) {
+                        if (result.Success) {
+
+                            $('#myModal').modal('hide');
+
+                            selected = [];
+                            datatable.clear();
+                            datatable.rows.add(result.Data);
+                            datatable.draw();
+                            //tab.rows().every(function (rowIdx, tableLoop, rowLoop) {
+                            //    var data = this.data();
+                            //    var indx = GetIndexOfId(selected, data.JobReceiveLineId);
+                            //    if (data.JobReceiveLineId && data.BalanceQty >= data.InspectionQty && data.InspectionQty != 0 && indx === -1) {
+                            //        $(this.node()).addClass('selected');
+                            //        selected.push({ Id: data.JobReceiveLineId, InspectionQty: data.InspectionQty, JobWorkerId: data.JobWorkerId });
+                            //    }
+                            //});
+                        }
+                        else {
+                            //$("body").CustomNotify({ message: "No of records exceeding 1000. Check the filters." })
+                            if (!$('#modform').find('.modal-body #errormsg').length)
+                                $('#modform').find('.modal-body').prepend("<div class='alert alert-danger'><span id=errormsg >" + result.Message + " Check the filters.</span></div>")
+                            else
+                                $('#errormsg').text(result.Message)
+                        }
+                    }
+                });
+
+                //tab.ajax.reload();
+
+                return false;
+
+
+            });
+        }
+
+        function AssignFilters() {
+            var self = this;
+
+            self.FromDate = $('#FromDate', '.modal-body').val();
+            self.ToDate = $('#ToDate', '.modal-body').val();
+            self.JobReceiveHeaderId = $('#JobReceiveHeaderId', '.modal-body').select2('data');
+            self.JobWorkerId = $('#JobWorkerId', '.modal-body').select2('data');
+            self.ProductId = $('#ProductId', '.modal-body').val();
+            self.Dimension1Id = $('#Dimension1Id', '.modal-body').select2('data');
+            self.Dimension2Id = $('#Dimension2Id', '.modal-body').select2('data');
+            self.ProductGroupId = $('#ProductGroupId', '.modal-body').val();
+            self.ProductCategoryId = $('#ProductCategoryId', '.modal-body').val();
+            //self.Sample = $('#Sample', '.modal-body').val();
+            self.BalanceQty = $('#BalanceQty', '.modal-body').val();
+            self.MultiplierGT = $('#MultiplierGT', '.modal-body').val();
+            self.MultiplierLT = $('#MultiplierLT', '.modal-body').val();
+            self.InspectionQty = $('#InspectionQty', '.modal-body').val() || 0;
+        }
+
+        function GenerateFiltersForParameter() {
+
+            var self = this;
+            self.DocTypeId = Id;
+            self.FromDate = Filters.FromDate ? Filters.FromDate : null;
+            self.ToDate = Filters.ToDate ? Filters.ToDate : null;
+            self.JobReceiveHeaderId = Filters.JobReceiveHeaderId.length > 0 ? $.map(Filters.JobReceiveHeaderId, function (val, i) { return (val.id) }).join(',') : "";
+            self.JobWorkerId = Filters.JobWorkerId.length > 0 ? $.map(Filters.JobWorkerId, function (val, i) { return (val.id) }).join(',') : "";
+            self.ProductId = Filters.ProductId;
+            self.Dimension1Id = Filters.Dimension1Id.length > 0 ? $.map(Filters.Dimension1Id, function (val, i) { return (val.id) }).join(',') : "";
+            self.Dimension2Id = Filters.Dimension2Id.length > 0 ? $.map(Filters.Dimension2Id, function (val, i) { return (val.id) }).join(',') : "";
+            self.ProductGroupId = Filters.ProductGroupId;
+            self.ProductCategoryId = Filters.ProductCategoryId;
+            //self.Sample = Filters.Sample;
+            self.BalanceQty = Filters.BalanceQty ? Filters.BalanceQty : null;
+            self.MultiplierGT = Filters.MultiplierGT ? Filters.MultiplierGT : null;
+            self.MultiplierLT = Filters.MultiplierLT ? Filters.MultiplierLT : null;
+            self.InspectionQty = Filters.InspectionQty ? Filters.InspectionQty : 0;
+
+        }
+
+        function GenerateFiltersForHtml() {
+
+            var html = "";
+
+            html += Filters.FromDate ? "<strong>FromDate:</strong> <span class='label label-danger'> " + Filters.FromDate + " </span>" : "";
+            html += Filters.ToDate ? "<strong>ToDate:</strong> <span class='label label-danger'> " + Filters.ToDate + " </span>" : "";
+            html += Filters.JobReceiveHeaderId.length > 0 ? "<strong>JobReceive:</strong>" + $.map(Filters.JobReceiveHeaderId, function (val, i) { return ("<span class='label label-danger'>" + val.text + "</span>") }).join(' ') : "";
+            html += Filters.JobWorkerId.length > 0 ? "<strong>JobWorker:</strong>" + $.map(Filters.JobWorkerId, function (val, i) { return ("<span class='label label-danger'>" + val.text + "</span>") }).join(' ') : "";
+            html += Filters.ProductId != "" ? "<strong>Product:</strong> <span class='label label-danger'>" + Filters.ProductId + "</span>" : "";
+            html += Filters.Dimension1Id.length > 0 ? "<strong>Dimension1:</strong>" + $.map(Filters.Dimension1Id, function (val, i) { return ("<span class='label label-danger'>" + val.text + "</span>") }).join(' ') : "";
+            html += Filters.Dimension2Id.length > 0 ? "<strong>Dimension2:</strong>" + $.map(Filters.Dimension2Id, function (val, i) { return ("<span class='label label-danger'>" + val.text + "</span>") }).join(' ') : "";
+            html += Filters.ProductGroupId != "" ? "<strong>ProductGroup:</strong> <span class='label label-danger'>" + Filters.ProductGroupId + "</span>" : "";
+            html += Filters.ProductCategoryId != "" ? "<strong>ProductCategory:</strong> <span class='label label-danger'>" + Filters.ProductCategoryId + "</span>" : "";
+            //html += Filters.Sample != "" ? "<strong>Sample:</strong> <span class='label label-danger'>" + Filters.Sample + "</span>" : "";
+            html += Filters.BalanceQty ? "<strong>BalanceQty:</strong> <span class='label label-danger'> " + Filters.BalanceQty + " </span>" : "";
+            html += Filters.InspectionQty != 0 ? "<strong>InspectionQty:</strong> <span class='label label-danger'> " + Filters.InspectionQty + " </span>" : "";
+            html += Filters.MultiplierGT ? "<strong>Multiplier >:</strong> <span class='label label-danger'> " + Filters.MultiplierGT + " </span>" : "";
+            html += Filters.MultiplierLT ? "<strong>Multiplier <:</strong> <span class='label label-danger'> " + Filters.MultiplierLT + " </span>" : "";
+
+            return html;
+        }
+
+        $('#CartSum').on('hidden.bs.modal', function (e) {
+            $('#SummaryContent').html("");
+            $('#QtyTotal').html(0);
+            $('#AmtTotal').html(0);
+        })
+
+    });
+</script>

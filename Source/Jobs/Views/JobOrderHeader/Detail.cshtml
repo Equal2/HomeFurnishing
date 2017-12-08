@@ -1,0 +1,219 @@
+﻿@model Model.ViewModel.JobOrderHeaderViewModel
+
+@{
+    ViewBag.Title = "Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<style type="text/css">
+    .CurveBorder {
+        border-radius: 5px;
+        width: 8em;
+        height: 3em;
+    }
+</style>
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h4>
+            <span style="font-family: Calibri,sans-serif,Verdana">
+                @if (ViewBag.transactionType == "submit")
+                {<h2>Submit Purchase Indent</h2>}
+                else if (ViewBag.transactionType == "approve")
+                {<h2>Approve Purchase Indent</h2>}
+                else if (ViewBag.transactionType == "delete")
+                {<h2>Delete Purchase Indent</h2>}
+                else
+                {<h2>Purchase Indent Detail</h2>}
+            </span>
+        </h4>
+
+    </div>
+    <div class="panel-info" style="padding-left:15px">
+        @using (Html.BeginForm())
+        {
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="Redirect" id="Redirect" value="@ViewBag.Redirect" />
+            <div class="row">
+                <div class="col-md-6">
+                    <hr />
+                    <dl class="dl-horizontal">
+                        @Html.HiddenFor(m => m.JobOrderHeaderId)
+                        @Html.HiddenFor(m => m.JobOrderHeaderViewModelWithLog.JobOrderHeaderId)
+                        @Html.HiddenFor(m => m.JobOrderHeaderViewModelWithLog.DocNo)
+                        <dt>
+                            @Html.DisplayNameFor(model => model.JobOrderHeaderViewModelWithLog.DocumentTypeName)    :
+                        </dt>
+
+                        <dd>
+                            @Html.DisplayFor(model => model.JobOrderHeaderViewModelWithLog.DocumentTypeName)
+                        </dd>
+
+                        <dt>
+                            @Html.DisplayNameFor(model => model.JobOrderHeaderViewModelWithLog.DocDate)    :
+                        </dt>
+
+                        <dd>
+                            @Html.DisplayFor(model => model.JobOrderHeaderViewModelWithLog.DocDate)
+                        </dd>
+
+                        <dt>
+                            @Html.DisplayNameFor(model => model.JobOrderHeaderViewModelWithLog.DocNo)    :
+                        </dt>
+
+                        <dd>
+                            @Html.DisplayFor(model => model.JobOrderHeaderViewModelWithLog.DocNo)
+                        </dd>                      
+
+                        <dt>
+                            @Html.DisplayNameFor(model => model.JobOrderHeaderViewModelWithLog.DepartmentName)    :
+                        </dt>
+
+                        <dd>
+                            @Html.DisplayFor(model => model.JobOrderHeaderViewModelWithLog.DepartmentName)
+                        </dd>
+
+                        <dt>
+                            @Html.DisplayNameFor(model => model.JobOrderHeaderViewModelWithLog.DueDate)    :
+                        </dt>
+
+                        <dd>
+                            @Html.DisplayFor(model => model.JobOrderHeaderViewModelWithLog.DueDate)
+                        </dd>
+
+                        <dt>
+                            @Html.DisplayNameFor(model => model.JobOrderHeaderViewModelWithLog.Remark)    :
+                        </dt>
+
+                        <dd>
+                            @Html.DisplayFor(model => model.JobOrderHeaderViewModelWithLog.Remark)
+                        </dd>
+
+                    
+                        @if (ViewBag.transactionType == "delete")
+                        {
+                            <dt>
+                                Delete Reason*
+                            </dt>
+
+                            <dd>
+                                @Html.EditorFor(model => model.JobOrderHeaderViewModelWithLog.LogReason)<span style="font-family:'Arial Rounded MT'">Min 20 Characters</span>
+                                @Html.ValidationMessageFor(m => m.JobOrderHeaderViewModelWithLog.LogReason)
+                            </dd>
+                        }
+
+                    </dl>
+                </div>
+           
+            </div>
+
+            var objLine = Model.JobOrderLineViewModel.FirstOrDefault();
+            <table class="table">
+                <tr>
+                    <th>
+                        @Html.DisplayNameFor(model => objLine.Product)
+                    </th>
+                    <th>
+                        <div class="text-right">
+                            @Html.DisplayNameFor(model => objLine.Qty)
+                        </div>
+                    </th>                  
+
+
+                    <th>
+                        <div class="text-right">
+                            @Html.DisplayNameFor(model => objLine.DueDate)
+                        </div>
+                    </th>
+                    <th>
+                        <div class="text-right">
+                            @Html.DisplayNameFor(model => objLine.Remark)
+                        </div>
+                    </th>
+
+
+                </tr>
+
+
+                @{decimal TotalQty = 0;}               
+
+                @foreach (var item in Model.JobOrderLineViewModel)
+                {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.ProductName)
+                        </td>
+                        <td>
+                            <div class="text-right">
+                                @Html.DisplayFor(modelItem => item.Qty)
+                            </div>
+                        </td>
+
+                        <td>
+                            <div class="text-right">
+                                @Html.DisplayFor(modelItem => item.DueDate)
+                            </div>
+                        </td>
+                        <td>
+                            <div class="text-right">
+                                @Html.DisplayFor(modelItem => item.Remark)
+                            </div>
+                        </td>
+                    </tr>
+
+                    TotalQty = TotalQty + System.Convert.ToDecimal(Html.DisplayFor(modelItem => item.Qty).ToString());                  
+                }
+                <tr>
+                    <td>
+                        <b>Totals :</b>
+                    </td>
+                    <td class="text-right">
+                        <b>@TotalQty</b>
+                    </td>
+
+                    <td></td>
+                    <td class="text-right">
+                       
+                    </td>                   
+                    
+
+
+                </tr>
+            </table>
+
+
+            <hr />
+            <div class="form-actions no-color">
+                @if (ViewBag.transactionType == "submit")
+                {
+                    <input type="submit" name="Command:Submit" value="Submit" class="btn btn-primary btn-sm CurveBorder" />
+                    <span style="font-family: Calibri,sans-serif,Verdana;font-size:large">
+
+                        @Html.ActionLink("Back", "Index", null, new { @class = "btn btn-primary btn-sm col-md-offset-1 CurveBorder ActionLinkPadding" })
+                    </span>
+                }
+
+                else if (ViewBag.transactionType == "approve")
+                {
+                    <input type="submit" name="Command:Approve" value="Approve" class="btn btn-primary btn-sm CurveBorder" />
+                    <span style="font-family: Calibri,sans-serif,Verdana;font-size:large">
+
+                        @Html.ActionLink("Back", "Index", null, new { @class = "btn btn-primary btn-sm col-md-offset-1 CurveBorder ActionLinkPadding" })
+                    </span>
+                }
+                else if (ViewBag.transactionType == "delete")
+                {
+                    <input type="submit" name="Command:Delete" value="Delete" class="btn btn-primary btn-sm CurveBorder" />
+                    <span style="font-family: Calibri,sans-serif,Verdana;font-size:large">
+
+                        @Html.ActionLink("Back", "Index", null, new { @class = "btn btn-primary btn-sm col-md-offset-1 CurveBorder ActionLinkPadding" })
+                    </span>
+                }
+                else
+                {
+                    <span style="font-family: Calibri,sans-serif,Verdana;font-size:large">
+                        @Html.ActionLink("Back", "Index", null, new { @class = "btn btn-primary btn-sm col-md-offset-0 CurveBorder ActionLinkPadding" })
+                    </span>
+                }
+            </div>
+        }
+    </div>
+</div>

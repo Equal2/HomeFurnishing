@@ -1,0 +1,171 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@ViewBag.ProductTypeId
+
+
+@using (Html.BeginForm("PhysicalStockAdjustment", "PhysicalStockAdjustment", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+    
+    <input type="hidden" name="id" value="@ViewBag.id" />
+    <input type="hidden" name="ContraDocTypeId" id="ContraDocTypeId" value="@ViewBag.ContraDocTypeIds" />
+
+    <div class="panel panel-default">
+        <div class="panel-heading">
+
+            <h3>
+                <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"> <span class="glyphicon glyphicon-export black"></span>Physical Stock Adjustment</span>
+              
+            </h3>
+
+            <hr style="margin-top:0px;margin-bottom:0px" />
+
+            <div class="panel-info">
+                <h4 style="padding:5px 0 0 0;margin:0px">
+                    @Html.ActionLink(" ", " ", " ", null, new { @class = "glyphicon glyphicon-refresh toolbar", @title = "Refresh Page", @data_toggle = "tooltip", @id = "RefreshPage" })
+                    @Html.ActionLink(" ", "ReturnToRoute", "PhysicalStockAdjustment", new { @id = ViewBag.id }, new { @class = "glyphicon glyphicon-list toolbar right", @title = "List", @data_toggle = "tooltip" })
+                </h4>
+            </div>
+
+        </div>
+        <div class="panel-info" style="padding-left:15px">
+            <div class="form-horizontal">
+
+                
+                <h4 class="black">Fill Dispatch Details:</h4><p>
+                    <table class="table table-responsive table-hover" style="max-width:60%">
+
+
+
+                        <tr style="border-bottom:thin solid #dbd1d1" class="danger">
+                            <td>
+                                Doc Date
+                            </td>
+                            <td colspan="2">
+                                <input class="datepickerWithNFD form-control required" data-val="true" id="DocDate" name="DocDate" type="text" >
+                            </td>
+                        </tr>
+
+                        <tr style="border-bottom:thin solid #dbd1d1" class="danger">
+                            <td>
+                                Godown
+                            </td>
+                            <td colspan="2">
+                                <input class="form-control required" data-val="true" id="GodownId" name="GodownId" type="text" value="@(ViewBag.GodownId ?? String.Empty)">
+                            </td>
+                        </tr>
+
+                        <tr style="border-bottom:thin solid #dbd1d1" class="danger">
+                            <td>
+                                Physical Stock Dates
+                            </td>
+                            <td colspan="2">
+                                <input class="form-control required" data-val="true" id="DateList" name="DateList" type="text">
+                            </td>
+                        </tr>
+
+                        <tr style="border-bottom:thin solid #dbd1d1" class="danger">
+                            <td>
+                                Remark
+                            </td>
+                            <td colspan="2">
+                                <input class="form-control" data-val="true" id="Remark" name="Remark" type="text">
+                            </td>
+                        </tr>
+
+
+                    </table>
+                </p>
+
+                <div class="form-group">
+                    <div class="col-md-10">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <input type="submit" value="Upload" class="btn btn-primary fileinput-button" id="submit" style="width: 90px; background-color: #2980b9" />
+                            </div>
+                        </div>
+
+                        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+}
+
+<script type="text/javascript">
+    CustomSelectFunction($("#GodownId"), '/ComboHelpList/GetGodown', '/ComboHelpList/SetSingleGodown', ' ', false, 0);
+    //CustomSelectFunction2($('#DateList'), '/ComboHelpList/GetSelect2Data', '/ComboHelpList/SetSelct2Data', ' ', true, 0, this.SqlProcGetSet)
+    $("#GodownId").change(function () {
+        GetDateList($("#DateList"), '/PhysicalStockAdjustment/GetDateList', '/PhysicalStockAdjustment/SetDateList', ' ', true, 0);
+        });
+    
+    
+
+    function GetDateList(Id, GetAction, SetAction, placehold, multiple, length) {
+        
+        var geturl = GetAction;
+        //The url we will send our get request to
+        var attendeeUrl = GetAction;
+        var pageSize = 20;
+        var ContraDocTypeId = $("#ContraDocTypeId").val();
+        var GodownId = $("#GodownId").val();
+        Id.select2(
+        {
+
+            placeholder: placehold,
+            //Does the user have to enter any data before sending the ajax request
+            minimumInputLength: length,
+            allowClear: true,
+            multiple: multiple,
+            ajax: {
+                //How long the user has to pause their typing before sending the next request
+                quietMillis: 150,
+                //The url of the json service
+                url: attendeeUrl,
+                dataType: 'jsonp',
+                //Our search term and what page we are on
+                data: function (term, page) {
+                    return {
+                        pageSize: pageSize,
+                        pageNum: page,
+                        searchTerm: term,
+                        filter : 0,
+                        ContraDocTypeId: ContraDocTypeId,
+                        GodownId: GodownId
+                    };
+                },
+                results: function (data, page) {
+                    //Used to determine whether or not there are more results available,
+                    //and if requests for more data should be sent in the infinite scrolling
+                    var more = (page * pageSize) < data.Total;
+                    return { results: data.Results, more: more };
+                }
+            },
+            initSelection: function (element, callback) {
+
+                var xval = element.val();
+                if (xval != 0) {
+                    $.ajax({
+                        cache: false,
+                        type: "POST",
+                        url: SetAction,
+                        data: { Ids: element.val() },
+                        success: function (data) {
+                            callback(data);
+                        },
+                        error: function (xhr, ajaxOptions, thrownError) {
+                            alert('Failed to Retrive Qty' + thrownError);
+                        }
+                    })
+                }
+                //callback([{ id: "1", text: "arpit" }, { id: "2", text: "akash" }]);
+            }
+        });
+    }
+ </script>
+
+

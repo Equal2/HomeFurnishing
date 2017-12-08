@@ -1,0 +1,129 @@
+﻿@model Model.Models.ProductSampleApproval
+
+@{
+    ViewBag.Title = "CreateMapping";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@using (Html.BeginForm())
+{ 
+<style>
+    .select2-container {
+        width: 300px;
+    }
+</style>
+<script>
+    $(document).ready(function () {
+
+        //The url we will send our get request to
+        var attendeeUrl = '@Url.Action("GetProducts", "PurchaseOrderLine")';
+        var pageSize = 20;
+
+        $('#Product_ProductId').select2(
+        {
+            placeholder: 'Enter Product name',
+            //Does the user have to enter any data before sending the ajax request
+            minimumInputLength: 3,
+            allowClear: true,
+            ajax: {
+                //How long the user has to pause their typing before sending the next request
+                quietMillis: 150,
+                //The url of the json service
+                url: attendeeUrl,
+                dataType: 'jsonp',
+                //Our search term and what page we are on
+                data: function (term, page) {
+                    return {
+                        pageSize: pageSize,
+                        pageNum: page,
+                        searchTerm: term
+                    };
+                },
+                results: function (data, page) {
+                    //Used to determine whether or not there are more results available,
+                    //and if requests for more data should be sent in the infinite scrolling
+                    var more = (page * pageSize) < data.Total;
+                    return { results: data.Results, more: more };
+                }
+            }
+        });
+
+    });
+
+</script>
+
+
+<div class="panel panel-default">
+    @Html.ValidationSummary(true)
+    @Html.HiddenFor(m=>m.ProductSampleApprovalId)
+    @Html.HiddenFor(m=>m.ProductSampleShipment.ProductSamplePhotoApproval.ProductSample.ProductSampleId)
+    @Html.HiddenFor(m => m.ProductSampleShipment.ProductSamplePhotoApproval.ProductSample.SampleName)
+    @Html.HiddenFor(m=>m.ProductSampleShipment.ProductSamplePhotoApproval.ProductSample.Supplier.PersonID)
+    @Html.HiddenFor(m => m.ProductSampleShipment.ProductSamplePhotoApproval.ProductSample.Supplier.Name)
+    @Html.HiddenFor(m => m.ProductSampleShipment.ProductSamplePhotoApproval.ProductSample.Supplier.Code)
+    <div class="panel-heading">
+
+        <h4>
+            <span style="font-family: Calibri,sans-serif,Verdana"> Create Product Mapping(@ViewBag.SampleName).</span>
+        </h4>
+
+    </div>
+    <div class="panel-info" style="padding-left:15px">
+        <div class="form-horizontal">
+
+            <div class="form-group" style="margin-top:15px">
+                @Html.LabelFor(model => model.Product_ProductId, new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                  @*  @Html.DropDownListFor(m => m.Product_ProductId, new SelectList(ViewBag.ProductList as System.Collections.IEnumerable, "ProductId", "ProductName"), string.Empty)*@
+                    @Html.TextBoxFor(m=>m.Product_ProductId)
+                    <span style="font-family: Calibri,sans-serif,Verdana;font-size:large">
+                        @Html.ActionLink(" Create New Product", "Create", "Product", new { id = @ViewBag.ProductTypeId, ProductSampleId=Model.ProductSampleShipment.ProductSamplePhotoApproval.ProductSample.ProductSampleId }, null)
+
+                    </span>
+                   
+                    @Html.ValidationMessageFor(model => model.Product_ProductId)
+                    <span id="status"></span>
+                </div>
+            </div>
+
+            
+            <div class="form-group">
+                <div class="col-md-offset-2 col-md-10">
+                    <input type="submit" value="Map" class="btn-primary xxlarge" />
+                    <span style="font-family: Calibri,sans-serif,Verdana;font-size:large">
+                        |@Html.ActionLink("Back to List", "Index")
+
+                    </span>
+                </div>
+            </div>
+            
+
+            </div>
+        </div>
+</div>
+
+}
+<script type="text/javascript">
+
+    $("#Product_ProductId").change(function () {
+
+        var productId = $("#Product_ProductId").val();
+        
+        $.ajax({
+            cache:false,
+            type:"POST",
+            url:"@(Url.Action("GetProductStatus"))",
+            data:{ProductId:productId},
+            success:function(data){
+                $("#status").text(data);        
+            }
+
+        })
+
+
+        }
+
+
+    )
+
+
+</script>

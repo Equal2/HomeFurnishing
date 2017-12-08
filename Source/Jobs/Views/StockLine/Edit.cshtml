@@ -1,0 +1,102 @@
+﻿@model Surya.India.Model.ViewModels.PurchaseIndentLineViewModel
+
+
+@{
+    ViewBag.Title = "Edit";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+@using (Html.BeginForm("Edit", "PurchaseIndentLine", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.HiddenFor(model => model.PurchaseIndentLineId)
+    @Html.HiddenFor(model => model.PurchaseIndentHeaderId)
+    @Html.AntiForgeryToken()
+
+
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h4>
+                <span style="font-family: Calibri,sans-serif,Verdana"> Edit Sale Order Line(@ViewBag.DocNo)</span>
+            </h4>
+        </div>
+        <div class="panel-info" style="padding-left:15px">
+            <div class="form-horizontal">
+                @Html.ValidationSummary(true)
+
+                <div class="form-group" style="margin-top:15px">
+                    @Html.LabelFor(model => model.ProductId, new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.TextBoxFor(a => a.ProductId)
+                        @*<input type='hidden' name='ProductId' id='ProductId' style="width:300px;" />*@
+                        @Html.ValidationMessageFor(model => model.ProductId)
+                        <span id="status"></span>
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-top:15px">
+                    @Html.LabelFor(model => model.MaterialPlanLineId, "Material Plans", new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(a => a.MaterialPlanLineId)
+                        @Html.ValidationMessageFor(model => model.MaterialPlanLineId)
+                        <span id="status"></span>
+                    </div>
+                </div>
+              
+                <div class="form-group">
+                    @Html.LabelFor(model => model.Qty, new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.Qty)
+                        @Html.ValidationMessageFor(model => model.Qty)
+                    </div>
+                </div>
+
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.DueDate, new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.DueDate)
+                        @Html.ValidationMessageFor(model => model.DueDate)
+                    </div>
+                </div>
+               
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.Remark, new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.Remark)
+                        @Html.ValidationMessageFor(model => model.Remark)
+                    </div>
+                </div>
+
+                <hr />
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-10">
+                        <input type="submit" value="Save" class="btn btn-primary btn-sm CurveBorder" />
+                        <span style="font-family: Calibri,sans-serif,Verdana;font-size:large">
+                           @Html.ActionLink("Back", "Index", new { Id = @Model.PurchaseIndentHeaderId }, new { @class = "btn btn-primary btn-sm col-md-offset-1 CurveBorder ActionLinkPadding" })
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<style>
+    .select2-container {
+        width: 300px;
+    }
+</style>
+
+<script>
+    $(document).ready(function () {
+
+        //For using Select2(selecting multiple items)
+        //MyFunction(elementId, string GetURL, string SetURL, string Placeholder, boolean Multiselect)
+
+        CustomSelectFunction($("#ProductId"), '/ComboHelpList/GetProducts', '/ComboHelpList/SetSingleProducts', 'Enter Product Name', false, 3);
+        $("#ProductId").select2("focus");
+
+    });
+</script>

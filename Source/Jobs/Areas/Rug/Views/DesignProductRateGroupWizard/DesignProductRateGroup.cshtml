@@ -1,0 +1,311 @@
+﻿@{
+    ViewBag.Title = "Design RateList";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@*<link href="~/Content/DataTables/css/dataTables.bootstrap.css" rel="stylesheet" />*@
+<link href="~/Content/DataTables/css/dataTables.bootstrap.min.css" rel="stylesheet" />
+<link href="~/Content/DataTables/css/scroller.bootstrap.min.css" rel="stylesheet" />
+
+<script src="~/Scripts/DataTables/jquery.dataTables.min.js"></script>
+@*<script src="~/Scripts/DataTables/dataTables.scroller.js"></script>*@
+<script src="~/Scripts/DataTables/dataTables.scroller.min.js"></script>
+<style type="text/css">
+    .DTHidden {
+        display: none;
+    }
+
+    .TextRight {
+        text-align: right;
+    }
+
+    .dataTable {
+        font-size: 13px !important;
+        line-height: 1;
+    }
+
+    table.dataTable tbody td {
+        padding: 2px 10px;
+    }
+
+    .Filters.fSelected.label {
+        display: inline-block;
+    }
+
+    .Filters.fSelected .label-danger {
+        border-radius: 10px;
+    }
+
+    .Filters.fSelected strong {
+        padding: 5px;
+    }
+</style>
+
+<!-- modal placeholder For Image-->
+<div id='myModalForImage' class='modal fade in'>
+    <div class="modal-dialog modal-sm" style="max-width:450px;max-height:500px">
+        <div class="modal-content">
+            <div id='myModalContentForImage'>
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="gridSystemModalLabel">Preview</h4>
+                </div>
+                <div class="modal-body">
+
+                    <img src="~/Images/DefaultUser.png" style="margin-left:auto;margin-right:auto;display:block;width:100%;height:auto" id="zImage" />
+
+                </div>
+                <div class="modal-footer">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- modal placeholder-->
+<div id='myModal' class='modal fade in'>
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div id='myModalContent'></div>
+        </div>
+    </div>
+</div>
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3>
+            <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"> <span class="glyphicon glyphicon-file black"></span>@ViewBag.Name</span>
+            @Html.ActionLink(" ", "Filters", "DesignProductRateGroupWizard", null, new { data_modalCustom = "", id = "btnCreateF", @class = "glyphicon glyphicon-filter toolbar right", @title = "Filters", @data_toggle = "tooltip" })
+        </h3>
+    </div>
+
+    <div class="panel-info" style="padding-left:15px">
+        <div class="form-horizontal">
+            @Html.ValidationSummary(true)
+
+            <div class="row">
+                <div>
+
+                </div>
+            </div>
+        </div>
+        <hr style="margin-top:0px;margin-bottom:0px" />
+
+        <div style="margin:20px;">
+
+
+            <div class="Filters fSelected" id="sFilter">
+                @*<strong>JobOrder:</strong>
+                    <span class="label label-danger">
+                        Star
+                    </span>*@
+
+            </div>
+
+            <table id="example" class="table table-striped display" cellspacing="0" width="100%">
+                <thead style="background: #428bca;color:white">
+                    <tr>
+                        <th>Design Name</th>
+                        <th>Colour Ways</th>
+                        <th>Sample/Design</th>
+                        <th>Collection</th>
+                        <th>Construction</th>
+                        <th>Product RateGroup</th>
+                        <th>Image</th>
+                        <th>ProductGroupId</th>
+                    </tr>
+                </thead>
+                <tfoot>
+                    <tr>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    var selected = [];
+    var RatLHId = '@ViewBag.RateListHeaderId';
+    var Filters = new AssignFilters();
+    Filters.WizardType = "@ViewBag.WizardType";
+    Filters.SOD = "@ViewBag.SOD";
+    $('#sFilter').html(GenerateFiltersForHtml());
+
+    var HelpList = JSON.parse('@Html.Raw(Json.Encode(ViewBag.List))');
+
+    $(document).ready(function () {
+
+        var tab = $('#example').DataTable({
+            serverSide: true,
+            ordering: false,
+            searchDelay: 1000,
+            deferRender: false,
+            ajax: {
+                "url": "/DesignProductRateGroupWizard/AjaxGetJsonProductDesignData/",
+                "type": "POST",
+                "data": function (d) {
+                    d.WizardType = Filters.WizardType ? Filters.WizardType : null;
+                    d.ProductCategory = Filters.ProductCategory.length > 0 ? $.map(Filters.ProductCategory, function (val, i) { return (val.id) }).join(',') : "";
+                    d.ProductCollection = Filters.ProductCollection.length > 0 ? $.map(Filters.ProductCollection, function (val, i) { return (val.id) }).join(',') : "";
+                    d.SOD = Filters.SOD ? Filters.SOD : null;
+                    d.RateListHeaderId = RatLHId;
+                },
+            },
+            columns: [
+                 { "data": "ProductGroupName", "width": "11%" },
+                 { "data": "ProductDesignName", "width": "11%" },
+                 { "data": "SampleName", "width": "11%" },
+                 { "data": "ProductCollectionName", "width": "12%" },
+                 { "data": "ProductCategoryName", "width": "12%" },
+                 {
+                     "data": "ProductRateGroupId", "width": "13%", className: "TextRight", "render": function (data, type, row) {
+                         var select = '<select class="ProductRateGroupId" style="width:75%" name="' + row.ProductGroupId + '"><option value="">  </option>';
+                         $.each(HelpList, function (i, val) {
+                             select += '<option value="' + val.Id + '" ' + (row.ProductRateGroupId == val.Id ? 'selected' : '') + '>' + val.PropFirst + '</option>'
+                         })
+                         select += '</select>';
+                         return select;
+                         //return '<input style="width:100%;" class="ProductRateGroupId TextRight"  type="text" value="' + (row.ProductRateGroupId == null ? '' : row.ProductRateGroupId) + '" name="ProductRateGroupId' + row.ProductGroupId + '" id="ProductRateGroupId' + row.ProductGroupId + '" />';
+                     }, "sortable": false
+                 },
+                 { "data": "ImageFileName", "width": "10%", className: "TextRight", "render": function (data, type, row) { return '<div width:50%> <img style="width:50px;height:50px;cursor:pointer" ' + (row.ImageFolderName ? 'src="https://192.168.2.110:44309/Uploads/' + row.ImageFolderName + '/Thumbs/' + row.ImageFileName + '"' : 'src=""') + ' /></div>'; }, "sortable": false },
+                 { "data": "ProductGroupId" },
+            ],
+            columnDefs: [
+   { "targets": 7, "searchable": false, className: "DTHidden", },
+            ],
+            scrollY: "400px",
+            dom: 'ftirp',
+            scroller: {
+                loadingIndicator: true,
+                serverWait: 1000,
+            },
+            language: {
+                "loadingRecords": "Please wait - loading..."
+            },
+            scrollCollapse: true,
+            //ForRowSelecting in ServerSideLogic--Commented cuz not needed in this entry point
+        });
+
+        $(document).on('click', '#example img', function () {
+            if ($(this).attr('src')) {
+
+                $('#zImage').attr("src", $(this).attr('src').replace("/Thumbs", ""));
+
+
+
+                $('#myModalForImage').modal();
+            }
+        })
+
+        $(document).on('change', ' td > select', function () {
+
+            var td = $(this).closest('td').get(0);
+            var JData = $(this).closest('tr');
+            var ProductRateGroupId = JData.find('.ProductRateGroupId').val();
+
+            if (ProductRateGroupId && ProductRateGroupId > 0) {
+                var data = tab.rows(JData).data();
+                $.ajax({
+                    url: '/DesignProductRateGroupWizard/UpdateDesignRate',
+                    type: "POST",
+                    data: { ProductGroupId: data[0].ProductGroupId, ProductRateGroupId: ProductRateGroupId, RateListHeaderId: RatLHId },
+                    success: function (result) {
+                        if (result.Success == true) {
+
+                        }
+                        else if (!result.Success) {
+                            alert('Something went wrong');
+                        }
+                    },
+                    error: function () {
+
+                    },
+                });
+            }          
+
+            return true;
+        });
+
+    });
+
+    $(function () {
+
+        $("a[data-modalCustom]").on("click", function (e) {
+            // hide dropdown if any
+            if (this.href == "") {
+                return false;
+            }
+
+            var data = new GenerateFiltersForParameter();
+            $.ajax({
+                url: this.href,
+                type: "POST",
+                data: data,
+                success: function (result) {
+                    $('#myModalContent').html(result);
+                    $('#myModal').modal({
+                        backdrop: 'static',
+                        keyboard: true
+                    }, 'show');
+
+                    bindForm1('#myModalContent');
+                },
+            });
+            return false;
+        });
+    });
+
+    function bindForm1(dialog) {
+        $('form#modform', dialog).submit(function () {
+            Filters = new AssignFilters();
+            $('#myModal').modal('hide');
+            $('#sFilter').html(GenerateFiltersForHtml());
+            var tab = $('#example').DataTable();
+            tab.ajax.reload();
+
+            return false;
+
+        });
+    }
+
+    function AssignFilters() {
+        var self = this;
+
+        self.WizardType = $('#WizardType', '.modal-body').val();
+        self.ProductCategory = $('#ProductCategory', '.modal-body').select2('data');
+        self.ProductCollection = $('#ProductCollection', '.modal-body').select2('data');
+        self.SOD = $('#SOD', '.modal-body').val();
+
+    }
+
+    function GenerateFiltersForParameter() {
+        var self = this;
+
+        self.WizardType = Filters.WizardType ? Filters.WizardType : null;
+        self.ProductCategory = Filters.ProductCategory.length > 0 ? $.map(Filters.ProductCategory, function (val, i) { return (val.id) }).join(',') : "";
+        self.ProductCollection = Filters.ProductCollection.length > 0 ? $.map(Filters.ProductCollection, function (val, i) { return (val.id) }).join(',') : "";
+        self.SOD = Filters.SOD ? Filters.SOD : null;
+    }
+
+    function GenerateFiltersForHtml() {
+
+        var html = "";
+        html += Filters.WizardType ? "<strong>Type:</strong> <span class='label label-danger'> " + Filters.WizardType + " </span>" : "";
+        html += Filters.ProductCategory.length > 0 ? "<strong>Construction:</strong>" + $.map(Filters.ProductCategory, function (val, i) { return ("<span class='label label-danger'>" + val.text + "</span>") }).join(' ') : "";
+        html += Filters.ProductCollection.length > 0 ? "<strong>Collection:</strong>" + $.map(Filters.ProductCollection, function (val, i) { return ("<span class='label label-danger'>" + val.text + "</span>") }).join(' ') : "";
+        html += Filters.SOD ? "<strong>SOD:</strong> <span class='label label-danger'> " + Filters.SOD + " </span>" : "";
+        return html;
+    }
+
+</script>

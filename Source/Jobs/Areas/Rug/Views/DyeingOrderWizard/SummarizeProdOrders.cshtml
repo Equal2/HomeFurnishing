@@ -1,0 +1,287 @@
+﻿@{
+    ViewBag.Title = "Dyeing Order Wizard";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<link href="~/Content/DataTables/css/jquery.dataTables.min.css" rel="stylesheet" />
+
+<script src="~/Scripts/DataTables/jquery.dataTables.min.js"></script>
+@*<script src="~/Scripts/DataTables/dataTables.scroller.js"></script>*@
+<script src="~/Scripts/DataTables/dataTables.scroller.min.js"></script>
+
+<style type="text/css">
+    .DTHidden {
+        display: none;
+    }
+
+    .TextRight {
+        text-align: right;
+    }
+
+    .dataTable {
+        font-size: 13px !important;
+        line-height: 1;
+    }
+
+    table.dataTable tbody td {
+        padding: 2px 10px;
+    }
+
+    .popover {
+        max-width: 450px !important;
+        overflow-y: scroll !important;
+        max-height: 300px !important;
+    }
+
+    .dataTables_scrollBody {
+        min-height: 50px;
+    }
+
+    .qtyExceeded > td {
+        background-color: #e8d4d3 !important;
+    }
+</style>
+
+
+@*<input type="button" id="button" />*@
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3>
+            <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-list black"></span> Dyeing Plan List</span>
+            @Html.ActionLink(" ", "ConfirmProdOrderList", "DyeingOrderWizard", null, new { @class = "glyphicon glyphicon-hand-right toolbar right", @title = "Proceed", @data_toggle = "tooltip", @id = "Proceed" })
+            @Html.ActionLink(" ", "CreateDyeingOrder", "DyeingOrderWizard", null, new { @class = "glyphicon glyphicon-hand-left toolbar right", @style = "margin-right:10px", @title = "Previous", @data_toggle = "tooltip", @id = "Precede" })
+        </h3>
+        <hr style="margin-top:0px;margin-bottom:0px" />
+    </div>
+
+    <div class="panel-info tab" style="padding-left:5px;padding-top:20px">
+        <input type="checkbox" id="cProdOrders" />Cancel Balance ProdOrders
+        <table id="example" class="display" cellspacing="0" width="100%">
+            <thead style="background: #428bca;color:white">
+                <tr>
+                    <th>OrderNo</th>
+                    <th>OrderDate</th>
+                    <th>Buyer</th>
+                    <th>Design</th>
+                    <th>Products</th>
+                    <th>Shades</th>
+                    <th>BalQty</th>
+                    <th>Qty</th>
+                    <th>Rate</th>
+                    <th>Excess-%</th>
+                    <th>ProdOrderLineId</th>
+                </tr>
+            </thead>
+            <tfoot>
+                <tr>
+                    <th colspan="6" style="text-align:right"></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+</div>
+
+
+<script type="text/javascript">
+
+    var rSelected = [];
+    var AllowedPerc = '@ViewBag.AllowedPerc'
+
+    $(document).ready(function () {
+        var tab = $('#example').DataTable({
+            ajax: "/DyeingOrderWizard/GetProdOrdersForSummary",
+            scrollY: "300px",
+            scrollCollapse: true,
+            scroller: true,
+            columns: [
+                { "data": "ProdOrderNo", "width": "6%" },
+                { "data": "ProdOrderDate", "width": "6%" },
+                { "data": "BuyerCode", "width": "10%" },
+                { "data": "Dimension2Name", "width": "11%" },
+                { "data": "ProductList", "width": "20%" },
+                { "data": "Dimension1List", "width": "19%" },
+                { "data": "BalanceQty", "width": "7%" },
+                { "data": "Qty", className: "TextRight", "width": "7%", "render": function (data, type, row) { return '<input style="width:100%;text-align:right" class="Qty"  type="text" name="Qty' + row.ProdOrderLineId + '" id="Qty' + row.ProdOrderLineId + '" value="' + data + '"/>'; } },
+                { "data": "Rate", className: "TextRight", "width": "7%", "render": function (data, type, row) { return '<input style="width:100%;text-align:right" class="Rate"  type="text" name="Rate' + row.ProdOrderLineId + '" id="Rate' + row.ProdOrderLineId + '" value="' + data + '"/>'; } },
+                { "data": "Excess", className: "TextRight Excess", "width": "7%", "render": function (data, type, row) { return ''; } },
+                { "data": "ProdOrderLineId", "searchable": false, className: "DTHidden", }
+            ],
+            dom: 'T<"clear">frti',
+            TableTools: {
+                "sRowSelect": "os",
+                "aButtons": [
+                "select_all", "select_none"
+                ]
+            },
+            rowCallback: function (row, data, index) {
+                $(row).addClass('rSelected');
+            },
+            initComplete: function (settings, json) {
+                CalculateTotal();
+            }
+        });
+
+        //$('#example tbody').on('click', 'tr', function (e) {
+        //    if (e.target.nodeName != "INPUT") {
+        //        var Rec = tab.row($(this)).data();
+
+        //        if (Rec.Qty > Rec.BalanceQty) {
+        //            $(this).closest('tr').removeClass('rSelected');
+        //        }
+        //        else
+        //            $(this).closest('tr').toggleClass('rSelected');
+
+        //        CalculateTotal();
+        //    }
+        //});
+
+        function CalculateTotal() {
+            var table = $('#example').DataTable();
+
+
+            var intVal = function (i) {
+                return typeof i === 'string' ?
+                    i.replace(/[\$,]/g, '') * 1 :
+                    typeof i === 'number' ?
+                    i : 0;
+            };
+
+            // Total over all pages
+            total = table
+                .column(5)
+                .data()
+                .reduce(function (a, b) {
+                    return intVal(a) + intVal(b);
+                }, 0);
+
+
+            function CheckTotal() {
+                var Qty = 0;
+                $.each(table.rows('.rSelected').data(), function (index, value) {
+                    Qty += parseFloat(value.Qty);
+                })
+                return Qty.toFixed(3);
+            }
+
+
+
+            $(table.column(4).footer()).html(
+                     CheckTotal() + 'KG ( ' + total.toFixed(3) + 'KG total)'
+               );
+        }
+
+
+        $('#example tbody').on('change', 'input.Qty', function () {
+            CalculateTotal();
+        });
+
+
+        $('#example tbody').on('keyup', 'input', function () {
+
+            var validation = false;
+
+            var Rec = tab.row($(this).closest('tr')).data();
+
+            if ($(this).hasClass('Qty')) {
+                var MaxQty = Rec.BalanceQty + ((Rec.BalanceQty * AllowedPerc) / 100);
+                var BaseQty = Rec.BalanceQty;
+                var Perc = ((($(this).val() - BaseQty) / BaseQty) * 100).toFixed(2);
+
+                var LabelClass = "";
+                if ($(this).val() <= BaseQty)
+                    LabelClass = "label label-info";
+                else if ($(this).val() > BaseQty && $(this).val() <= MaxQty)
+                    LabelClass = "label label-warning";
+                else
+                    LabelClass = "label label-danger";
+                if ($(this).val() != BaseQty)
+                    var Html = "<span class='" + LabelClass + "'>" + Perc + " %</span>";
+                else
+                    var Html = "";
+
+                $(this).closest('tr').find('td.Excess').html(Html);
+
+                if ($(this).val() >= 0) {
+                    if (AllowedPerc == 0) {
+                        if ($(this).hasClass('Qty') && ($(this).val() > Rec.BalanceQty)) {
+                            $(this).closest('tr').addClass('text-danger qtyExceeded');
+                            $(this).closest('tr').removeClass('rSelected');
+                        }
+                        else { $(this).closest('tr').addClass('rSelected'); $(this).closest('tr').removeClass('text-danger').removeClass('qtyExceeded'); }
+                    }
+                    else if (AllowedPerc > 0) {
+
+                        if ($(this).hasClass('Qty') && ($(this).val() > MaxQty)) {
+                            $(this).closest('tr').addClass('text-danger qtyExceeded');
+                            $(this).closest('tr').removeClass('rSelected');
+                        }
+                        else { $(this).closest('tr').addClass('rSelected'); $(this).closest('tr').removeClass('text-danger').removeClass('qtyExceeded'); }
+                    }
+                }
+            }
+            //else if ($(this).val() == 0) {
+            //    $(this).closest('tr').removeClass('rSelected');
+            //}
+
+
+            if ($(this).hasClass('Qty'))
+                Rec.Qty = $(this).val();
+
+            if ($(this).hasClass('Rate'))
+                Rec.Rate = $(this).val();
+
+            //CalculateTotal();
+        });
+
+        function GetIndexOfId(array, Id) {
+            var index = -1;
+            array.some(function (entry, i) {
+                if (entry.Id == Id) {
+                    index = i;
+                    return true;
+                }
+            });
+            return index;
+        }
+
+
+        $('a#Proceed').click(function () {
+
+            var table = $("#example").DataTable();
+            var test = table.rows('.rSelected').data();
+            var List = [];
+            $.each(test, function (index, value) {
+                List.push({ ProdOrderLineId: value.ProdOrderLineId, Qty: value.Qty, Rate: value.Rate });
+            })
+
+            var Errorrec = table.rows('.qtyExceeded').data();
+
+            //alert($(this).attr('href'));
+            if (!Errorrec.length)
+                $.ajax({
+                    url: $(this).attr('href'),
+                    type: "POST",
+                    data: { ProdOrderLineId: List, CancelBalProdOrdrs: $('#cProdOrders').is(":checked") },
+                    success: function (result) {
+                        if (result.Success == true) {
+
+                        } else if (result.Success == "URL") {
+                            window.location.href = result.Data;
+                        }
+                        else if (!result.Success) {
+                            alert('Something went wrong');
+                        }
+                        else { }
+                    },
+                });
+
+            return false;
+
+        });
+    });
+
+</script>

@@ -1,0 +1,1796 @@
+﻿@model Model.ViewModel.JobInvoiceHeaderViewModel
+@using Core.Common
+@{
+    ViewBag.Title = "Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<script src="~/Scripts/JSTable/jspdf.debug.js"></script>
+<script src="~/Scripts/JSTable/faker.min.js"></script>
+<script src="~/Scripts/JSTable/jspdf.plugin.autotable.js"></script>
+<script src="~/Scripts/JSTable/examples.js"></script>
+
+<style type="text/css">
+    .ui-autocomplete .m-name {
+        display: block;
+        margin-right: 1em;
+        font-size: small;
+    }
+
+    .ui-autocomplete .m-year {
+        display: block;
+        font-size: small;
+    }
+
+    .ui-autocomplete .rt-bar span {
+        display: block;
+        height: 1em;
+    }
+
+    .ui-widget {
+        font-family: Tahoma;
+    }
+</style>
+<!-- modal placeholder-->
+<div id='myModal' class='modal fade in'>
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div id='myModalContent'></div>
+        </div>
+    </div>
+</div>
+
+@using (Html.BeginForm("Post", "JobInvoiceHeader", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(m => m.SiteId)
+    @Html.HiddenFor(m => m.Status)
+    @Html.HiddenFor(m => m.DivisionId)
+    @Html.HiddenFor(m => m.JobInvoiceHeaderId)
+    @Html.HiddenFor(m => m.JobInvoiceSettings.isVisibleHeaderJobWorker)
+    @Html.HiddenFor(m => m.DocTypeId)
+    @Html.HiddenFor(m => m.CreatedDate)
+    @Html.HiddenFor(m => m.ProcessId)
+    <div class="panel panel-default">
+        <div class="panel-heading">
+
+            @CustomHelpers.RenderResHeaderInfo(ViewBag.transactionType, (int?)ViewBag.PendingToSubmit, (int?)ViewBag.PendingToReview, ViewBag.Name)
+
+            @*@if (ViewBag.transactionType == "submit" || ViewBag.transactionType == "submitContinue")
+            {<h3 style="border-bottom:1px solid #e1dada;padding-bottom:10px;">
+                <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"> <span class="glyphicon glyphicon-file black"></span>Submit @ViewBag.Name</span>
+                <button type="submit" name="Command:Submit" class="btn btn-primary right" id="SubmitContinue" style="margin-left:5px;">Submit & Next<span class='badge'>@(ViewBag.PendingToSubmit != 0 ? ViewBag.PendingToSubmit : "")</span></button>
+                <button type="submit" name="Command:Submit" class="btn btn-primary right">Submit</button>
+                <input type="hidden" id="IsContinue" name="IsContinue" value="" />
+            </h3>
+            }
+            else if (ViewBag.transactionType == "review" || ViewBag.transactionType == "ReviewContinue")
+            {<h3 style="border-bottom:1px solid #e1dada;padding-bottom:10px;">
+                <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"> <span class="glyphicon glyphicon-file black"></span>Review @ViewBag.Name</span>
+                <button type="submit" name="Command:Review" class="btn btn-primary right" style="margin-left:5px" id="ReviewContinue">Review & Next<span class='badge'>@(ViewBag.PendingToReview != 0 ? ViewBag.PendingToReview : "")</span></button>
+                <button type="submit" class="btn btn-primary right" name="Command:Review">Review</button>
+                <input type="hidden" id="IsContinue" name="IsContinue" value="" />
+            </h3>
+            }
+            else if (ViewBag.transactionType == "detail")
+            {
+                <h3>
+                    <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"> <span class="glyphicon glyphicon-file black"></span>@ViewBag.Name</span>
+                </h3>
+            }
+            else
+            {
+                <h3 style="border-bottom:1px solid #e1dada;padding-bottom:10px;">
+                    <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"> <span class="glyphicon glyphicon-file black"></span>@ViewBag.Name</span>
+                    <input type="submit" value="Save" class="btn btn-primary right" id="submit" style="width: 90px; background-color: #2980b9" />
+                </h3>             
+            }*@
+
+           @*@Html.ActionLink("For Receipt", "_ForReceipt", "JobInvoiceLine", new { id = @Model.JobInvoiceHeaderId, JobworkrId = @Model.JobWorkerId }, new { data_modal = "", id = "btnCreateF", @class = "btn btn-primary borderradii", @title = "For Indent", @data_toggle = "tooltip", @data_detailDeleted = "true" })
+            @Html.ActionLink("For Order", "_ForOrder", "JobInvoiceLine", new { id = @Model.JobInvoiceHeaderId, JobworkrId = @Model.JobWorkerId }, new { data_modal = "", id = "btnCreateFP", @class = "btn btn-primary borderradii", @title = "For Order", @data_toggle = "tooltip", @data_detailDeleted = "true" })*@
+
+
+            <hr style="margin-top: 5px; margin-bottom: 5px; border-top: 1px solid #d8d5d5" />
+            @{
+                string EditAction = "";
+                if (Model.Status == (int)StatusConstants.Drafted || Model.Status == (int)StatusConstants.Import)
+                {
+                    EditAction = "Modify";
+                }
+                else if ((Model.Status == (int)StatusConstants.Submitted || Model.Status == (int)StatusConstants.Modified))
+                {
+                    EditAction = "ModifyAfter_Submit";
+                }
+                else
+                {
+                    EditAction = "DetailInformation";
+                }
+            }
+
+
+            <div class="panel-info">
+               @* <h4 style="padding:5px 0 0 0;margin:0px">
+                    @Html.ActionLink(" ", " ", " ", null, new { @class = "glyphicon glyphicon-refresh toolbar", @title = "Refresh Page", @data_toggle = "tooltip", @id = "RefreshPage" })
+                    @Html.ActionLink(" ", "Create", "JobInvoiceHeader", new { @id = ViewBag.id }, new { @class = "glyphicon glyphicon-plus toolbar", @title = "Add New", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "GetHistory", "LogHistory", new { Ids = Model.JobInvoiceHeaderId, DocTypeId = Model.DocTypeId }, new { @class = "glyphicon glyphicon-user toolbar", @title = "History", @data_toggle = "tooltip", @id = "DocHistory", @data_modal = "" })
+                    @Html.ActionLink(" ", "GeneratePrints", "JobInvoiceHeader", new { Ids = Model.JobInvoiceHeaderId, DocTypeId = Model.DocTypeId }, new { @class = "glyphicon glyphicon-print toolbar", @title = "Print", @data_toggle = "tooltip", @id = "PrintRecordC", target = "_blank" })
+                    @Html.ActionLink(" ", "Email", "JobInvoiceHeader", null, new { @class = "glyphicon glyphicon-envelope toolbar", @title = "Email", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "PrevPage", "JobInvoiceHeader", new { DocId = @Model.JobInvoiceHeaderId, DocTypeId = Model.DocTypeId }, new { @class = "glyphicon glyphicon-arrow-left toolbar", @title = "Prev Record", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "NextPage", "JobInvoiceHeader", new { DocId = @Model.JobInvoiceHeaderId, DocTypeId = Model.DocTypeId }, new { @class = "glyphicon glyphicon-arrow-right toolbar", @title = "Next Record", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "Index", "JobInvoiceHeader", new { @id = ViewBag.id, IndexType = ViewBag.IndexStatus }, new { @class = "glyphicon glyphicon-list toolbar right", @title = "List", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "Report", "JobInvoiceHeader", null, new { @class = "glyphicon glyphicon-th toolbar right", @title = "Report", @data_toggle = "tooltip" })
+                </h4>*@
+                <div class="btn-group">
+                    @Html.ActionLink(" ", "Create", "JobInvoiceHeader", new { @id = @ViewBag.id }, new { @class = "cbtn btn-circle glyphicon glyphicon-plus", @title = "Add New", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", EditAction, "JobInvoiceHeader", new { @id = Model.JobInvoiceHeaderId, IndexType = ViewBag.IndexStatus }, new { @class = "cbtn btn-circle glyphicon glyphicon-edit", @title = "Edit", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "GeneratePrints", "JobInvoiceHeader", new { Ids = Model.JobInvoiceHeaderId, DocTypeId = Model.DocTypeId }, new { @class = "cbtn btn-circle glyphicon glyphicon-print", @title = "Print", @data_toggle = "tooltip", @id = "PrintRecordC", target = "_blank" })
+                    @Html.ActionLink(" ", "PrevPage", "JobInvoiceHeader", new { DocId = @Model.JobInvoiceHeaderId, DocTypeId = Model.DocTypeId }, new { @class = "cbtn btn-circle glyphicon glyphicon-arrow-left", @title = "Prev Record", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "NextPage", "JobInvoiceHeader", new { DocId = @Model.JobInvoiceHeaderId, DocTypeId = Model.DocTypeId }, new { @class = "cbtn btn-circle glyphicon glyphicon-arrow-right", @title = "Next Record", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "Index", "JobInvoiceHeader", new { id = ViewBag.id, IndexType = ViewBag.IndexStatus }, new { @class = "cbtn btn-circle glyphicon glyphicon-list", @title = "List", @data_toggle = "tooltip" })
+					@*<button class="btn custom"  id="Print" ><h2 style="margin:0px"><span class="glyphicon glyphicon-print"></span> </h2></button>*@
+                </div>
+                <div class="btn-group">
+                    <a class="cbtn btn-circle glyphicon glyphicon-option-horizontal dropdown-toggle" title="More Option" aria-expanded="false" style="padding-top: 6px;padding-bottom: 6px;" href="#" data-toggle="dropdown" id="dropdownMenu1">
+                    </a>
+                    <ul class="dropdown-menu pull-right" aria-labelledby="dropdownMenu1">
+                                             
+                        <li><a id="DocHistory" data-modal="" href="@Url.Action("GetHistory", "LogHistory", new { Ids = Model.JobInvoiceHeaderId, DocTypeId = Model.DocTypeId })"><span class="glyphicon glyphicon-user"> </span> History</a></li>
+                        <li><a href="@Url.Action("Email", "JobInvoiceHeader")"><span class="glyphicon glyphicon-envelope"> </span> Email</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="@Url.Action("Report", "JobInvoiceHeader", new { @ViewBag.id })"><span class="glyphicon glyphicon-th"> </span> Report</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="panel-info" style="padding-left:15px">
+            <div class="form-horizontal">
+                @Html.ValidationSummary(true, "", new { @class = "alert alert-danger" })
+
+                <div>
+                    <h4 class="col-md-12 black">
+                        <span class="glyphicon glyphicon-align-justify"></span>
+                        1.Document Details
+                    </h4>
+                    <div>
+                        <div>
+                            <div class="col-md-6">
+                                <div class="form-group" style="margin-top:15px">
+                                    @Html.LabelFor(model => model.DocDate, "Invoice Date", new { @class = "control-label col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextBoxFor(m => m.DocDate, "{0:dd/MMMM/yyyy}", new
+                                   {
+                                       @class = "datepickerWithNFD form-control col-xs-6 required updateDocNo",
+                                       data_tabl = "JobInvoiceHeaders",
+                                       data_doctype = Model.DocTypeId,
+                                       data_divId = Model.DivisionId,
+                                       data_sitId = Model.SiteId,
+                                   })
+                                        @Html.ValidationMessageFor(model => model.DocDate, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group" style="margin-top:15px">
+                                    @Html.LabelFor(model => model.DocNo, "Invoice No", new { @class = "control-label col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextBoxFor(m => m.DocNo, null, new { @class = "form-control col-xs-6 required" })
+                                        @Html.ValidationMessageFor(m => m.DocNo, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div  style="display:@(Model.JobInvoiceSettings.isVisibleHeaderJobWorker?"":"none")">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.JobWorkerId, (Model.DocumentTypeSettings.PartyCaption ?? "Party"), new { @class = "control-label col-md-4 col-sm-2" })
+                                    @Html.HiddenFor(m => m.DocumentTypeSettings.PartyCaption)
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextBoxFor(m => m.JobWorkerId, new { @class = "form-control required" })
+                                        @Html.ValidationMessageFor(m => m.JobWorkerId, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.JobWorkerDocNo, (Model.DocumentTypeSettings.PartyCaption ?? "Party") + " Doc No", new { @class = "control-label col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextBoxFor(m => m.JobWorkerDocNo, null, new { @class = "form-control" })
+                                        @Html.ValidationMessageFor(m => m.JobWorkerDocNo, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.JobWorkerDocDate, (Model.DocumentTypeSettings.PartyCaption ?? "Party") + " Doc Date", new { @class = "control-label col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextBoxFor(m => m.JobWorkerDocDate, "{0:dd/MMMM/yyyy}", new { @class = "datepicker form-control " })
+                                        @Html.ValidationMessageFor(m => m.JobWorkerDocDate, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6" style="display:@(Model.JobInvoiceSettings.isVisibleSalesTaxGroupPerson  ? "" : "none")">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.SalesTaxGroupPersonId, "Sales Tax Group Person", new { @class = "control-label col-md-4 col-sm-2" })
+                                    @Html.HiddenFor(m => m.JobInvoiceSettings.isVisibleSalesTaxGroupPerson)
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextBoxFor(m => m.SalesTaxGroupPersonId, null, new { @class = "form-control" })
+                                        @Html.ValidationMessageFor(m => m.SalesTaxGroupPersonId, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+
+
+                        </div>
+                        <div>
+                            @*<div class="col-md-6">
+                                    <div class="form-group">
+                                        @Html.LabelFor(model => model.ProcessId, "Process", new { @class = "control-label col-md-4 col-sm-2" })
+                                        <div class="col-xs-6">
+                                            @Html.TextBoxFor(m => m.ProcessId, new { @class = "form-control col-xs-6 required" })
+                                            @Html.ValidationMessageFor(m => m.ProcessId, "", new { @class = "text-danger" })
+                                        </div>
+                                    </div>
+                                </div>*@
+
+
+                            @if (Model.DocumentTypeHeaderAttributes != null)
+                            {
+                                for (int i = 0; i < Model.DocumentTypeHeaderAttributes.Count; i++)
+                                {
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            @Html.Label(Model.DocumentTypeHeaderAttributes[i].Name, new { @class = "control-label col-md-4 col-sm-2" })
+                                            @Html.HiddenFor(m => Model.DocumentTypeHeaderAttributes[i].Name)
+                                            @Html.HiddenFor(m => Model.DocumentTypeHeaderAttributes[i].DocumentTypeHeaderAttributeId)
+                                            @if (Model.DocumentTypeHeaderAttributes[i].DataType == "List")
+                                            {
+                                                List<SelectListItem> tem = new List<SelectListItem>();
+                                                foreach (string item in (Model.DocumentTypeHeaderAttributes[i].ListItem).Split(',').ToList())
+                                                {
+                                                    tem.Add(new SelectListItem { Text = item, Value = item, Selected = (Model.DocumentTypeHeaderAttributes[i].Value == item ? true : false) });
+                                                }
+
+                                                <div class="col-md-7 col-sm-10">
+                                                    @Html.DropDownListFor(m => Model.DocumentTypeHeaderAttributes[i].Value, new SelectList(tem as System.Collections.IEnumerable, "Value", "Text", Model.DocumentTypeHeaderAttributes[i].Value), " ", new { @class = "form-control col-xs-6 height" })
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <div class="col-md-7 col-sm-10">
+                                                    @Html.TextBoxFor(m => Model.DocumentTypeHeaderAttributes[i].Value, new { @class = "form-control col-xs-6" })
+                                                </div>
+                                            }
+                                        </div>
+                                    </div>
+                                }
+                            }
+
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.Remark, "Remark", new { @class = "control-label col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextAreaFor(m => m.Remark, new { @class = "form-control col-xs-6" })
+                                        @Html.ValidationMessageFor(m => m.Remark, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+
+                <hr />
+                <div class="row">
+                    <h4 class="col-md-12 black" style="margin-top:15px">
+                        <span class="glyphicon glyphicon-shopping-cart"></span>
+                        2.Products
+                    </h4>
+                </div>
+
+                @*<div class="panel-info">
+                    <h5 style="padding:5px 0 3px 0;margin:0px;font-weight:bold">
+                        <span class="glyphicon glyphicon-plus-sign"></span>
+                        @{string Action = "";
+                        if (Model.Status == (int)StatusConstants.Drafted || Model.Status == (int)StatusConstants.Import)
+                        { Action = "CreateLine"; }
+                        else if (Model.Status == (int)StatusConstants.Submitted || Model.Status == (int)StatusConstants.Modified)
+                        { Action = "CreateLineAfter_Submit"; }
+                        }
+                        @Html.ActionLink("Add New Row ", Action, "JobInvoiceLine", new { id = @Model.JobInvoiceHeaderId, JobWorkerId = @Model.JobWorkerId }, new { data_modal = "", id = "btnCreate", @class = "toolbar", @title = "Add New", @data_toggle = "tooltip", @data_detailDisabled = "true" })
+                    </h5>
+                </div>*@
+                <div class="panel-info" style="height:40px">
+                    <div class="btn-group" style="padding:5px 0 3px 0;margin:0px;font-weight:bold">
+                        <span class="glyphicon glyphicon-plus-sign"></span>
+                        @{string Action = "";
+                            if (Model.Status == (int)StatusConstants.Drafted || Model.Status == (int)StatusConstants.Import)
+                            { Action = "CreateLine"; }
+                            else if (Model.Status == (int)StatusConstants.Submitted || Model.Status == (int)StatusConstants.Modified)
+                            { Action = "CreateLineAfter_Submit"; }
+                        }
+                        @Html.ActionLink("Add New Row ", Action, "JobInvoiceLine", new { id = @Model.JobInvoiceHeaderId, JobWorkerId = @Model.JobWorkerId }, new { data_modal = "", id = "btnCreate", @class = "toolbar", @title = "Add New", @data_toggle = "tooltip", @data_detailDisabled = "true" })
+                        @Html.ActionLink("/Summary", "GetSummary", "JobInvoiceHeader", new { id = @Model.JobInvoiceHeaderId }, new { @class = "toolbar", @data_toggle = "tooltip", @data_detailDisabled = "true" })
+                    </div>
+                    <div class="btn-group right" style="padding-right:15px">
+                        <a class="cbtn btn-circle glyphicon glyphicon-link dropdown-toggle" aria-expanded="false" style="padding-top: 6px;padding-bottom: 6px;" href="#" data-toggle="dropdown" id="dropdownMenu1">
+                        </a>
+                        <ul class="dropdown-menu pull-right" aria-labelledby="dropdownMenu1">
+                            <li><a id="btnCreateF" data-modal="" href="@Url.Action("_ForReceipt", "JobInvoiceLine", new { id = @Model.JobInvoiceHeaderId, JobworkrId = @Model.JobWorkerId })"><span class="glyphicon glyphicon-user"> </span> For Receipt</a></li>
+                            <li><a id="btnCreateFP" data-modal="" href="@Url.Action("_ForOrder", "JobInvoiceLine", new { id = @Model.JobInvoiceHeaderId, JobworkrId = @Model.JobWorkerId })"><span class="glyphicon glyphicon-user"> </span> For Order</a></li>
+                        </ul>
+                    </div>                   
+                </div>
+
+                <div style="padding-right:15px">
+
+
+                    <div class="panel panel-default" id="grid">
+
+                        <div class="panel-heading headrow">
+                            <div class="row grid-head">
+                                <div class="text-left block" style="width: 5%; ">
+                                    Srl.
+                                </div>
+                                <div class="block" style="width: 90%;">
+                                    <div class="row">
+                                        @*ProductInfo*@
+                                        <div class="block" style="width: 25%; ">
+                                            Product Name
+                                        </div>
+                                        <div class="block" style="width: 15%;">
+                                            Receipt No
+                                        </div>
+                                        @*Qty*@
+                                        <div class="text-right block" style="width: 10%;">
+                                            Qty
+                                        </div>
+                                        @*Rate*@
+                                        <div class="text-right block" style="width: 10%; ">
+                                            Deal Qty
+                                        </div>
+                                        @*Amount*@
+                                        <div class="text-right block" style="width: 10%;">
+                                            Rate
+                                        </div>
+                                        <div class="text-right block" style="width: 10%; ">
+                                            Amount
+                                        </div>
+                                        @*Remark*@
+                                        <div class="block" style="width: 20%;">
+                                            Remark
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <div class="" style="width:5%">
+
+                                </div>
+                            </div>
+
+                        </div>
+
+
+
+                        <div class="panel-info" id="gbody">
+
+
+                        </div>
+                    </div>
+
+
+
+                    <div class="panel panel-default" id="gridcharges">
+                        <div class="panel-heading headrow">
+                            <div class="row grid-head">
+                                <div class="col-xs-1 text-left">
+                                    Srl.
+                                </div>
+                                <div class="col-xs-10">
+                                    <div class="row">
+
+                                        <div class="col-sm-2">
+                                            Charge
+                                        </div>
+
+                                        <div class="col-sm-3">
+                                            Calculate On
+                                        </div>
+                                        <div class="col-sm-2">
+                                            Add/Deduct
+                                        </div>
+
+                                        <div class="col-sm-2 text-right">
+                                            Rate
+                                        </div>
+
+                                        <div class="col-sm-3 text-right">
+                                            Amount
+                                        </div>
+
+
+                                    </div>
+                                </div>
+                                <div class="col-xs-1">
+
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="panel-info" id="gbodycharges">
+
+
+                        </div>
+                    </div>
+
+
+
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+
+@if ((ViewBag.Mode == "Add") || (ViewBag.Mode == "Edit"))
+{
+
+    <script type="text/javascript">
+
+        $("#DocNo").on("change", function () {
+            $(this).DuplicateCheckForCreate({ name: 'JobOrderHeader', value: $(this).val(), doctype: $("#DocTypeId").val() });
+        });
+
+        ////For Populating Modal PopUp on DoubleClick Of Row
+        //$('#gbody').on("dblclick",'.grid-body',function(){
+        //    var editurl=$(this).find('a[edit]').attr('href');
+        //    $('#myModalContent').load(editurl, function () {
+        //        //alert('2');
+        //        $('#myModal').modal({
+        //            backdrop: 'static',
+        //            keyboard: true
+        //        }, 'show');
+
+        //        bindForm1(this);
+        //    });
+        //});
+
+        ////For Populating Modal PopUp on DoubleClick Of Row
+        //$('#gbodycharges').on("dblclick",'.grid-body',function(){
+        //    var text = $(this).find(".id").val();
+        //    var editurl="/TaxCalculation/GetJIHeaderChargeForEdit/";
+        //    $('#myModalContent').load(editurl,{id:text,HeaderTable:"Web.JobInvoiceHeaderCharges",LineTable:"Web.JobInvoiceLineCharges"}, function () {
+        //        //alert('2');
+        //        $('#myModal').modal({
+        //            backdrop: 'static',
+        //            keyboard: true
+        //        }, 'show');
+
+        //        bindForm1(this);
+        //    });
+        //});
+
+        ////For Handling Modal PopUp on Clicking Delete Icon
+        //$('#gbody').on("click",'a[delete]', function (e) {
+        //    $('#myModalContent').load(this.href, function () {
+        //        //alert('2');
+        //        $('#myModal').modal({
+        //            backdrop: 'static',
+        //            keyboard: true
+        //        }, 'show');
+
+        //        bindForm1(this);
+        //    });
+        //    return false;
+        //});
+
+        ////For Handling Modal PopUp on Clicking Delete Icon
+        //$('#gbody').on("click",'a[Detail]', function (e) {
+        //    $('#myModalContent').load(this.href, function (response, status, xhr) {
+        //        //alert('2');
+        //        if ( status == "error" ) {
+        //            var msg = "Sorry but there was an error: ";
+        //        }
+        //        else
+        //        {
+        //            $('#myModal').modal({
+        //                backdrop: 'static',
+        //                keyboard: true
+        //            }, 'show');
+
+        //            bindForm1(this);}
+        //    });
+        //    return false;
+        //});
+
+
+
+        var id='@Model.JobInvoiceHeaderId';
+        if(id==null||id==0)
+        {
+            $(document).find('a#btnCreate').removeAttr('href').removeAttr('data-modal');
+            $(document).find('a#btnCreateF').removeAttr('href').removeAttr('data-modal');
+            $(document).find('a#btnCreateFP').removeAttr('href').removeAttr('data-modal');
+            $("#btnCreateF").attr('disabled','disabled');
+            $("#btnCreateFP").attr('disabled','disabled');
+        }
+
+
+
+        //Reloading the table contents on modal hide
+        $('#myModal').on('hidden.bs.modal', function () {
+            LoadProducts();
+            var id='@Model.JobInvoiceHeaderId';
+            LoadCharges(id,"Web.JobInvoiceHeaderCharges","Web.JobInvoiceLineCharges","/TaxCalculation/GetJIHeaderChargeForEdit");
+        });
+
+        $(document).ready(function () {
+            enableModalTransitions();
+        })
+
+
+        //function JobInvoiceChargeModel() {
+        //    var self = this;
+        //    self.JobInvoiceHeaderId = $("#JobInvoiceHeaderId").val();
+        //    self.JobInvoiceLineId = $("#JobInvoiceLineId").val();
+        //    self.JobReceiveLineId = $("#JobReceiveLineId").val();
+        //    self.JobWorkerId = $("#JobWorkerId").val();
+        //    self.ProductId = $("#ProductId").val();
+        //    self.Specification = $("#Specification").val();
+        //    self.Dimension1Name = $("#Dimension1Name").val();
+        //    self.Dimension2Name = $("#Dimension2Name").val();
+        //    self.Qty = $("#Qty").val();
+        //    self.DivisionId = $("#DivisionId").val();
+        //    self.SiteId = $("#SiteId").val();
+        //    self.DocTypeId = $("#DocTypeId").val();
+        //    self.UnitId = $("#UnitId").val();
+        //    self.Rate = $("#Rate").val();
+        //    self.DealUnitId = $("#DealUnitId").val();
+        //    self.UnitConversionMultiplier = $("#UnitConversionMultiplier").val();
+        //    self.DealQty = $("#DealQty").val();
+        //    self.CostCenterId = $("#CostCenterId").val();
+        //    self.Amount = $("#Amount").val();
+        //    self.Remark = $("#Remark").val();
+        //    self.__RequestVerificationToken= $('[name=__RequestVerificationToken]').val();
+
+        //    var settings=new SettingsViewModel();
+        //    self.JobInvoiceSettings=settings;
+
+        //    self.linecharges =charges;
+        //    self.footercharges=footercharges;
+        //}
+
+        //var charges;
+        //var footercharges;
+
+        //function SettingsViewModel(){
+        //    var self=this;
+        //    var settings;
+
+        //    self.isPostedInStock=$("#JobInvoiceSettings_isPostedInStock").val();
+        //    self.ProcessId=$("#JobInvoiceSettings_ProcessId").val();
+        //    self.SqlProcConsumption=$("#JobInvoiceSettings_SqlProcConsumption").val();
+        //    self.isPostedInStockProcess=$("#JobInvoiceSettings_isPostedInStockProcess").val();
+        //    self.CalculationId=$("#JobInvoiceSettings_CalculationId").val();
+        //    self.isVisibleDimension1=$("#JobInvoiceSettings_isVisibleDimension1").val();
+        //    self.isVisibleDimension2=$("#JobInvoiceSettings_isVisibleDimension2").val();
+        //    self.isVisibleHeaderJobWorker=$("#JobInvoiceSettings_isVisibleHeaderJobWorker").val();
+        //    self.AmountRoundOff=$("#JobInvoiceSettings_AmountRoundOff").val();
+        //}
+
+
+        ////For posting the data through ajax and render the contents sent back from the server
+        //function bindForm1(dialog) {
+        //    //alert("binding1");
+        //    $('form#modform', dialog).submit(function () {
+        //        //charges= AssignValuesToCharges();
+        //        //footercharges=AssignValuesToFooter();
+
+        //        //alert(charges.length);
+        //        //alert(footercharges.length);
+        //        //var request = new JobInvoiceChargeModel();
+
+        //        $.ajax({
+        //            //contentType:'application/json',
+        //            //headers: headers,
+        //            url: this.action,
+        //            type: this.method,
+        //            //data:JSON.stringify(request),
+        //            data:$(this).serialize(),
+        //            success: function (result) {
+        //                if (result.success) {
+        //                    $('#myModal').modal('hide');
+        //                    //Refresh
+        //                    //location.reload();
+        //                    //alert('Data Saved');
+        //                }else if(!result.success)
+        //                {
+        //                    $('#myModalContent').html(result);
+        //                    bindForm1();
+        //                }
+        //                else {
+        //                    $('#myModalContent').html(result);
+        //                    bindForm1();
+        //                }
+        //            }
+        //        });
+        //        return false;
+        //    });
+
+        //    $('form#modformcharges', dialog).submit(function () {
+        //        //alert('charges');
+
+        //        footercharges=AssignValuesToFooter();
+
+        //        $.ajax({
+        //            contentType:'application/json',
+        //            url: this.action,
+        //            type: this.method,
+        //            data:JSON.stringify(footercharges),
+        //            success: function (result) {
+        //                if (result.success) {
+        //                    $('#myModal').modal('hide');
+        //                    //Refresh
+        //                    //location.reload();
+        //                    //alert('Data Saved');
+        //                }else if(!result.success)
+        //                {
+        //                    $('#myModalContent').html(result);
+        //                    bindForm1();
+        //                }
+        //                else {
+        //                    $('#myModalContent').html(result);
+        //                    bindForm1();
+        //                }
+        //            }
+        //        });
+        //        return false;
+        //    });
+
+        //}
+
+
+
+
+        //$(function () {
+
+        //    $.ajaxSetup({ cache: false });
+
+        //    $("a[data-modalCustom]").on("click", function (e) {
+        //        // hide dropdown if any
+        //        if(this.href=="")
+        //        {
+        //            return false;
+        //        }
+        //        //alert(' Script');
+        //        $('#myModalContent').load(this.href, function () {
+        //            $('#myModal').modal({
+        //                backdrop: 'static',
+        //                keyboard: true
+        //            }, 'show');
+
+        //            bindForm1(this);
+        //        });
+
+        //        return false;
+        //    });
+        //});
+
+    </script>
+
+
+}
+
+<script type="text/javascript">
+    $('#Print').click(function (e) {
+        Print();
+    })
+
+
+
+
+
+    function Print() {
+        var HeaderId=@Model.JobInvoiceHeaderId;
+        var link="/JobInvoiceHeader/JobInvoicePrint/"+HeaderId;
+
+        $.ajax({
+            url: link,
+            type: "GET",
+            success: function (data) {
+
+                if(data.length!=0)
+                {
+
+
+
+                    lineSpacing=1.5;
+
+
+                    var Data1 = new Array();
+                    Data1=data;
+                    var doc = new jsPDF({
+                        unit: 'mm',
+                        lineHeight: lineSpacing
+                    });
+                    doc.page=1;
+
+
+
+
+
+                    pageCenterLeft=105;
+
+                    marginLeft=15;
+                    marginRight=5;
+                    marginTop=10;
+                    pageWidth=210-marginRight;pageHeight=297-marginTop;
+                    heightText=4.5;
+                    heightLine=4.5;
+                    currTop=marginTop;
+                    pointPerMM=2.83465;
+                    headerTextFontSize=9;
+                    lineTextFontSize=9;
+                    reportTitleFontSize=12;
+                    pageMMCount=marginTop;
+                    pageCount=1;
+
+                     i=0;
+                     header1KeyLeft=marginLeft;header1ColLeft=header1KeyLeft+20;header1ValueLeft=header1ColLeft+5;header1Top=0;header1LineCount=0;
+                     header2KeyLeft=header1KeyLeft+95;header2ColLeft=header2KeyLeft+25;header2ValueLeft=header2ColLeft+5;header2Top=0;header2LineCount=0;
+
+
+
+                    colWidthProduct=30;
+                    colWidthSalesTaxProductCode=15;
+                    colWidthContraDocNo=20;
+                    colWidthQty=15;
+                    colWidthUnit=15;
+                    colWidthDealQty=15;
+                    colWidthDealUnit=15;
+                    colWidthRate=15;
+                    colWidthAmount=20;
+                    colWidthRemark=20;
+                    colWidthSalesTaxProductGroup=15;
+
+
+                    printCompanyData();
+                    currTop+=heightLine*5;
+
+                    printReportTitle();
+
+                    printHeaderData();
+
+                    printLineHeaderData();
+
+                    printLineData();
+
+                    printReportFooter();
+
+                    PrintCalculationFooter();
+
+                    printPageFooter();
+
+                    doc.save('table.pdf');
+
+
+                    function printCompanyData()
+                    {
+                        mText=""; mTextLineCount=0;
+
+                        header2Top=currTop;
+                        header1Top=currTop;
+
+
+                        //Printing Header 1 Left # Party Information
+
+
+                        doc.setFontSize(headerTextFontSize);                    
+
+                        var imgData = 'data:image/jpeg;base64,'+data["Data"][0].CompanyDetail[0]["LogoBlob"];
+                        doc.addImage(imgData, 'JPEG',header1ColLeft-header1KeyLeft,header1Top,20,20);
+
+                        doc.setFontType("bold");
+                        mText=doc.splitTextToSize(data["Data"][0].CompanyDetail[0]["CompanyName"]==null?"":data["Data"][0].CompanyDetail[0]["CompanyName"],header2KeyLeft- header1ValueLeft -5);                         
+                        doc.text(header1ValueLeft, header1Top ,mText);  
+                        if(mText.length >mTextLineCount) mTextLineCount=mText.length;
+
+                        header1Top+=mTextLineCount*heightText;
+                        header1LineCount+=mTextLineCount;
+
+
+                        mTextLineCount=0;
+                        doc.setFontType("bold");                       
+                        mText=doc.splitTextToSize(data["Data"][0].CompanyDetail[0]["CompanyName"]==null?"":data["Data"][0].CompanyDetail[0]["CompanyName"],header2KeyLeft-5);                         
+                        doc.text(header1ValueLeft, header1Top ,mText);  
+                        if(mText.length >mTextLineCount) mTextLineCount=mText.length;
+
+                        header1Top+=mTextLineCount*heightText;
+                        header1LineCount+=mTextLineCount;
+
+                    }
+
+
+
+                    function printPageFooter()
+                    {
+
+                        for(j=1;j<=pageCount;j++)
+                        {
+                            doc.setPage(j);
+                            mText=doc.splitTextToSize('Print By : '  +  (data["Data"][j].PrintedBy==null?"":data["Data"][j].PrintedBy),75);
+                            doc.text(15, 293,mText);
+                            mText=doc.splitTextToSize('Print Date : '  +  (data["Data"][j].PrintDate==null?"":data["Data"][j].PrintDate),80);
+                            doc.text(100, 293,mText);
+                            doc.text(180,293, 'Page ' + j + ' of ' +  pageCount );
+                        }
+                    }
+
+                    function printReportTitle()
+                    {
+                        doc.setFont("arial");
+
+                        doc.line(marginLeft, currTop, pageWidth, currTop);
+                        currTop+=heightLine;
+                        doc.setFontSize(reportTitleFontSize);
+                        doc.setFontType("bold");
+                        doc.text(pageCenterLeft,currTop ,data["Data"][0].ReportTitle,null,null,'center');
+                        currTop+=heightText;
+                        doc.line(marginLeft, currTop, pageWidth, currTop);
+                        currTop+=heightLine;
+                        pageMMCount+=reportTitleFontSize*lineSpacing/pointPerMM;
+
+                    }
+
+                    function printHeaderData()
+                    {
+                        mText=""; mTextLineCount=0;
+
+                        header2Top=currTop;
+                        header1Top=currTop;
+
+
+                        //Printing Header 1 Left # Party Information
+
+
+                        doc.setFontSize(headerTextFontSize);
+
+                        doc.setFontType("bold");
+                        mText=doc.splitTextToSize(data["Data"][i].PartyNameCaption==null?"":data["Data"][i].PartyNameCaption,header1ColLeft-header1KeyLeft);
+                        doc.text(header1KeyLeft, header1Top,mText);
+                        if(mText.length >mTextLineCount) mTextLineCount=mText.length;
+
+                        doc.text(header1ColLeft, header1Top,':');
+
+                        doc.setFontType("normal");
+                        mText=doc.splitTextToSize(data["Data"][i].PartyName==null?"":data["Data"][i].PartyName + " Ugapur, Aurai, Sant Ravidas Nagar, Uttar Pradesh, India, Asia - 221423",header2KeyLeft- header1ValueLeft -5);
+                        doc.text(header1ValueLeft, header1Top ,mText);
+                        if(mText.length >mTextLineCount) mTextLineCount=mText.length;
+
+                        header1Top+=mTextLineCount*heightText;
+                        header1LineCount+=mTextLineCount;
+
+
+                        mTextLineCount=0;
+                        doc.setFontType("bold");
+                        mText=doc.splitTextToSize('Address',header1ColLeft-header1KeyLeft);
+                        doc.text(header1KeyLeft, header1Top,mText);
+                        if(mText.length >mTextLineCount) mTextLineCount=mText.length;
+
+                        doc.text(header1ColLeft, header1Top,':');
+
+                        doc.setFontType("normal");
+                        mText=doc.splitTextToSize(data["Data"][i].PartyAddress==null?"":data["Data"][i].PartyAddress,header2KeyLeft-5);
+                        doc.text(header1ValueLeft, header1Top ,mText);
+                        if(mText.length >mTextLineCount) mTextLineCount=mText.length;
+
+                        header1Top+=mTextLineCount*heightText;
+                        header1LineCount+=mTextLineCount;
+
+
+
+
+
+                        mTextLineCount=0;
+                        doc.setFontType("bold");
+                        mText=doc.splitTextToSize('Mobile',header1ColLeft-header1KeyLeft);
+                        doc.text(header1KeyLeft, header1Top,mText);
+                        if(mText.length >mTextLineCount) mTextLineCount=mText.length;
+
+                        doc.text(header1ColLeft, header1Top,':');
+
+                        doc.setFontType("normal");
+                        mText=doc.splitTextToSize(data["Data"][i].PartyMobileNo==null?"":data["Data"][i].PartyMobileNo,header2KeyLeft-5);
+                        doc.text(header1ValueLeft, header1Top ,mText);
+                        if(mText.length >mTextLineCount) mTextLineCount=mText.length;
+
+                        header1Top+=mTextLineCount*heightText;
+                        header1LineCount+=mTextLineCount;
+
+
+
+
+
+
+                        if(data["Data"][0].PartyGSTNo !="" || data["Data"][i].PartyGSTNo !=null)
+                        {
+                            doc.setFontType("bold");
+                            mText=doc.splitTextToSize('GST No.',header1ColLeft-header1KeyLeft);
+                            doc.text(header1KeyLeft, header1Top,mText);
+                            if(mText.length >mTextLineCount) mTextLineCount=mText.length;
+
+                            doc.text(header1ColLeft, header1Top,':');
+
+                            doc.setFontType("normal");
+                            mText=doc.splitTextToSize(data["Data"][i].PartyGSTNo==null?"":data["Data"][i].PartyGSTNo,header2KeyLeft-5);
+                            doc.text(header1ValueLeft, header1Top ,mText);
+                            if(mText.length >mTextLineCount) mTextLineCount=mText.length;
+
+                            header1Top+=mTextLineCount*heightText;
+                            header1LineCount+=mTextLineCount;
+                        }
+                        else
+                        {
+
+                            doc.setFontType("bold");
+                            mText=doc.splitTextToSize('Aadhar No.',header1ColLeft-header1KeyLeft);
+                            doc.text(header1KeyLeft, header1Top,mText);
+                            if(mText.length >mTextLineCount) mTextLineCount=mText.length;
+
+                            doc.text(header1ColLeft, header1Top,':');
+
+                            doc.setFontType("normal");
+                            mText=doc.splitTextToSize(data["Data"][i].PartyAadharNo==null?"":data["Data"][i].PartyAadharNo,header2KeyLeft-5);
+                            doc.text(header1ValueLeft, header1Top ,mText);
+                            if(mText.length >mTextLineCount) mTextLineCount=mText.length;
+
+                            header1Top+=mTextLineCount*heightText;
+                            header1LineCount+=mTextLineCount;
+                        }
+
+                        //End of printing Header 1 Left # Party Information
+
+
+
+
+
+                        //Printing Header 2 Left # Document Information
+
+
+                        doc.setFontType("bold");
+                        mText=doc.splitTextToSize(data["Data"][i].DocIdCaption==null?" ":data["Data"][i].DocIdCaption,header2ColLeft-header2KeyLeft);
+                        doc.text(header2KeyLeft, header2Top,mText);
+                        if(mText.length >mTextLineCount) mTextLineCount=mText.length;
+
+                        doc.text(header2ColLeft, header2Top,':');
+
+                        doc.setFontType("normal");
+                        mText=doc.splitTextToSize(data["Data"][i].DocNo==null?" ":data["Data"][i].DocNo,pageWidth- header2ValueLeft);
+                        doc.text(header2ValueLeft, header2Top ,mText);
+                        if(mText.length >mTextLineCount) mTextLineCount=mText.length;
+
+                        header2Top+=mTextLineCount*heightText;
+                        header2LineCount+=mTextLineCount;
+
+
+
+                        doc.setFontType("bold");
+                        mText=doc.splitTextToSize(data["Data"][i].DocDateCaption==null?" ":data["Data"][i].DocDateCaption,header2ColLeft-header2KeyLeft);
+                        doc.text(header2KeyLeft, header2Top,mText);
+                        if(mText.length >mTextLineCount) mTextLineCount=mText.length;
+
+                        doc.text(header2ColLeft, header2Top,':');
+
+                        doc.setFontType("normal");
+                        mText=doc.splitTextToSize(data["Data"][i].DocDate==null?" ":data["Data"][i].DocDate,pageWidth- header2ValueLeft);
+                        doc.text(header2ValueLeft, header2Top ,mText);
+                        if(mText.length >mTextLineCount) mTextLineCount=mText.length;
+
+                        header2Top+=mTextLineCount*heightText;
+                        header2LineCount+=mTextLineCount;
+
+
+
+
+                        doc.setFontType("bold");
+                        mText=doc.splitTextToSize(data["Data"][i].PartyDocCaption==null?" ":data["Data"][i].PartyDocCaption,header2ColLeft-header2KeyLeft);
+                        doc.text(header2KeyLeft, header2Top,mText);
+                        if(mText.length >mTextLineCount) mTextLineCount=mText.length;
+
+                        doc.text(header2ColLeft, header2Top,':');
+
+                        doc.setFontType("normal");
+                        mText=doc.splitTextToSize(data["Data"][i].PartyDocNo==null?" ":data["Data"][i].PartyDocNo,pageWidth- header2ValueLeft);
+                        doc.text(header2ValueLeft, header2Top ,mText);
+                        if(mText.length >mTextLineCount) mTextLineCount=mText.length;
+
+                        header2Top+=mTextLineCount*heightText;
+                        header2LineCount+=mTextLineCount;
+
+
+
+
+                        doc.setFontType("bold");
+                        mText=doc.splitTextToSize(data["Data"][i].PartyDocDateCaption==null?" ":data["Data"][i].PartyDocDateCaption,header2ColLeft-header2KeyLeft);
+                        doc.text(header2KeyLeft, header2Top,mText);
+                        if(mText.length >mTextLineCount) mTextLineCount=mText.length;
+
+                        doc.text(header2ColLeft, header2Top,':');
+
+                        doc.setFontType("normal");
+                        mText=doc.splitTextToSize(data["Data"][i].PartyDocDate==null?" ":data["Data"][i].PartyDocDate+"skfolskfosikfposko  ksfjskdjfpods   ksdjfdsoif   sikdfjds  oksjfdidsojf  soifjosj",pageWidth- header2ValueLeft);
+                        doc.text(header2ValueLeft, header2Top ,mText);
+                        if(mText.length >mTextLineCount) mTextLineCount=mText.length;
+
+                        header2Top+=mTextLineCount*heightText;
+                        header2LineCount+=mTextLineCount;
+
+
+                        //End of printing Header 2 Left # Document Information
+
+
+                        //Setting of currTop : Header1 Height or Header2 Height ? Which is heigher
+                        currTop=(header2Top>header1Top?header2Top:header1Top);
+                        headerLineCount=header2LineCount>header1LineCount?header2LineCount:header1LineCount;
+                        alert('HeaderLineCount : ' + headerLineCount);
+                        pageMMCount+=headerTextFontSize*headerLineCount*lineSpacing/pointPerMM;
+
+                    }
+
+                    function printLineHeaderData()
+                    {
+                        colLeft=marginLeft;
+                        mTextLineCount=0
+                        doc.line(marginLeft, currTop, pageWidth, currTop);
+                        currTop+=heightLine;
+
+                        doc.setFontSize(lineTextFontSize);
+                        doc.setFontType("bold");
+                        mText=doc.splitTextToSize(data["Data"][i].ProductCaption==null?" ":data["Data"][i].ProductCaption,colWidthProduct);
+                        doc.text(colLeft, currTop ,mText);
+                        colLeft+=colWidthProduct;
+                        if(mText.length >mTextLineCount) mTextLineCount=mText.length;
+
+                        mText=doc.splitTextToSize(data["Data"][i].SalesTaxProductCodeCaption==null?" ":data["Data"][i].SalesTaxProductCodeCaption,colWidthSalesTaxProductCode);
+                        doc.text(colLeft, currTop ,mText);
+                        colLeft+=colWidthSalesTaxProductCode;
+                        if(mText.length >mTextLineCount) mTextLineCount=mText.length;
+
+                        mText=doc.splitTextToSize(data["Data"][i].ContraDocTypeCaption==null?" ":data["Data"][i].ContraDocTypeCaption,colWidthContraDocNo);
+                        doc.text(colLeft, currTop ,mText);
+                        colLeft+=colWidthContraDocNo;
+                        if(mText.length >mTextLineCount) mTextLineCount=mText.length;
+
+                        mText=doc.splitTextToSize('Qty.',colWidthQty);
+                        doc.text(colLeft, currTop ,mText);
+                        colLeft+=colWidthQty;
+                        if(mText.length >mTextLineCount) mTextLineCount=mText.length;
+
+                        mText=doc.splitTextToSize('Unit',colWidthUnit);
+                        doc.text(colLeft, currTop ,mText);
+                        colLeft+=colWidthUnit;
+                        if(mText.length >mTextLineCount) mTextLineCount=mText.length;
+
+                        mText=doc.splitTextToSize(data["Data"][i].DealQtyCaption==null?" ":data["Data"][i].DealQtyCaption,colWidthDealQty);
+                        doc.text(colLeft, currTop ,mText);
+                        colLeft+=colWidthDealQty;
+                        if(mText.length >mTextLineCount) mTextLineCount=mText.length;
+
+                        mText=doc.splitTextToSize('Deal Unit',colWidthDealUnit);
+                        doc.text(colLeft, currTop ,mText);
+                        colLeft+=colWidthDealUnit;
+                        if(mText.length >mTextLineCount) mTextLineCount=mText.length;
+
+                        mText=doc.splitTextToSize('Rate',colWidthRate);
+                        doc.text(colLeft, currTop ,mText);
+                        colLeft+=colWidthRate;
+                        if(mText.length >mTextLineCount) mTextLineCount=mText.length;
+
+                        mText=doc.splitTextToSize('Amount',colWidthAmount);
+                        doc.text(colLeft, currTop ,mText);
+                        colLeft+=colWidthAmount;
+                        if(mText.length >mTextLineCount) mTextLineCount=mText.length;
+
+                        mText=doc.splitTextToSize('Remark',colWidthRemark);
+                        doc.text(colLeft, currTop ,mText);
+                        colLeft+=colWidthRemark;
+                        if(mText.length >mTextLineCount) mTextLineCount=mText.length;
+
+                        mText=doc.splitTextToSize(data["Data"][i].SalesTaxGroupProductCaption==null?" ":data["Data"][i].SalesTaxGroupProductCaption,colWidthSalesTaxProductGroup);
+                        doc.text(colLeft, currTop ,mText);
+                        colLeft+=colWidthSalesTaxProductGroup;
+                        if(mText.length >mTextLineCount) mTextLineCount=mText.length;
+
+
+                        currTop+=2;
+                        doc.line(marginLeft, currTop, pageWidth, currTop);
+                        currTop+=mTextLineCount*heightText;
+                        pageMMCount+=lineTextFontSize*mTextLineCount*lineSpacing/pointPerMM;
+                        doc.setFontType("normal");
+
+                    }
+
+                    function printLineData()
+                    {
+                        doc.setFontType("normal");
+                        Qty=0;DealQty=0;Amount=0;
+                        for(i = 0; i <= Data1["Data"].length-1; i++) {
+                            var mText;
+                            mTextLineCount=0;
+                            colLeft=marginLeft;
+
+
+                            mText=doc.splitTextToSize(data["Data"][i].ProductName==null?" ":data["Data"][i].ProductName,colWidthProduct);
+                            doc.text(colLeft, currTop,mText);
+                            colLeft+=colWidthProduct;
+                            if(mText.length >mTextLineCount) mTextLineCount=mText.length;
+
+                            mText =doc.splitTextToSize(Data1["Data"][i].SalesTaxProductCodes==null?" ":Data1["Data"][i].SalesTaxProductCodes,colWidthSalesTaxProductCode);
+                            doc.text(colLeft, currTop,mText);
+                            colLeft+=colWidthSalesTaxProductCode;
+                            if(mText.length >mTextLineCount) mTextLineCount=mText.length;
+
+                            mText=doc.splitTextToSize(Data1["Data"][i].ContraDocNo==null?" ":Data1["Data"][i].ContraDocNo,colWidthContraDocNo);
+                            doc.text(colLeft, currTop,mText);
+                            colLeft+=colWidthContraDocNo;
+                            if(mText.length >mTextLineCount) mTextLineCount=mText.length;
+
+                            mText=doc.splitTextToSize(""+Data1["Data"][i].Qty.toFixed(Data1["Data"][i].DecimalPlaces)+"",colWidthQty);
+                            doc.text(colLeft, currTop,mText);
+                            colLeft+=colWidthQty;
+                            if(mText.length >mTextLineCount) mTextLineCount=mText.length;
+
+                            mText=doc.splitTextToSize(Data1["Data"][i].UnitName==null?" ":Data1["Data"][i].UnitName,colWidthUnit);
+                            doc.text(colLeft, currTop,mText);
+                            colLeft+=colWidthUnit;
+                            if(mText.length >mTextLineCount) mTextLineCount=mText.length;
+
+
+                            mText=doc.splitTextToSize(""+Data1["Data"][i].DealQty.toFixed(Data1["Data"][i].DealDecimalPlaces)+"",colWidthDealQty);
+                            doc.text(colLeft, currTop,mText);
+                            colLeft+=colWidthDealQty;
+                            if(mText.length >mTextLineCount) mTextLineCount=mText.length;
+
+
+                            mText=doc.splitTextToSize(Data1["Data"][i].DealUnitName==null ? " ":Data1["Data"][i].DealUnitName,colWidthDealUnit);
+                            doc.text(colLeft, currTop,mText);
+                            colLeft+=colWidthDealUnit;
+                            if(mText.length >mTextLineCount) mTextLineCount=mText.length;
+
+
+                            mText=doc.splitTextToSize(""+Data1["Data"][i].Rate.toFixed(2)+"",colWidthRate);
+                            doc.text(colLeft, currTop,mText);
+                            colLeft+=colWidthRate;
+                            if(mText.length >mTextLineCount) mTextLineCount=mText.length;
+
+
+                            mText=doc.splitTextToSize(""+Data1["Data"][i].Amount.toFixed(2)+"",colWidthAmount);
+                            doc.text(colLeft, currTop,mText);
+                            colLeft+=colWidthAmount;
+                            if(mText.length >mTextLineCount) mTextLineCount=mText.length;
+
+                            mText=doc.splitTextToSize(Data1["Data"][i].HeaderRemark==null?" ":Data1["Data"][i].HeaderRemark,colWidthRemark);
+                            doc.text(colLeft, currTop,mText);
+                            colLeft+=colWidthRemark;
+                            if(mText.length >mTextLineCount) mTextLineCount=mText.length;
+
+
+                            //mText=doc.splitTextToSize(Data1["Data"][i].ChargeGroupProductName==null?" ":Data1["Data"][i].ChargeGroupProductName,colWidthSalesTaxProductGroup);
+                            mText=doc.splitTextToSize(""+i+"",colWidthSalesTaxProductGroup);
+                            doc.text(colLeft, currTop,mText);
+                            colLeft+=colWidthSalesTaxProductGroup;
+                            if(mText.length >mTextLineCount) mTextLineCount=mText.length;
+
+
+                            //Qty
+
+                            //DealQty
+
+                            //Rate
+                            //Amount
+
+
+                            Qty=Qty+Data1["Data"][i].Qty;
+                            DealQty=DealQty+Data1["Data"][i].DealQty;
+                            Amount=Amount+Data1["Data"][i].Amount;
+
+                            currTop+=mTextLineCount*heightText;
+                            pageMMCount+=lineTextFontSize*mTextLineCount*lineSpacing/pointPerMM;
+
+
+                            //alert(pageMMCount);
+                            if(pageMMCount >=pageHeight)
+                            {
+                                doc.addPage();
+                                pageCount+=1;
+                                pageMMCount=marginTop;
+                                currTop=marginTop;
+                                printReportTitle();
+                                printHeaderDataFirstLine();
+                                printLineHeaderData();
+                            }
+                        }
+
+
+                    }
+
+                    function printHeaderDataFirstLine()
+                    {
+                        mText=""; mTextLineCount=0;
+
+                        header2Top=currTop;
+                        header1Top=currTop;
+
+
+                        //Printing Header 1 Left # Party Information
+
+
+                        doc.setFontSize(headerTextFontSize);
+
+                        doc.setFontType("bold");
+                        mText=doc.splitTextToSize(data["Data"][i].PartyNameCaption==null?"":data["Data"][i].PartyNameCaption,header1ColLeft-header1KeyLeft);
+                        doc.text(header1KeyLeft, header1Top,mText);
+                        if(mText.length >mTextLineCount) mTextLineCount=mText.length;
+
+                        doc.text(header1ColLeft, header1Top,':');
+
+                        doc.setFontType("normal");
+                        mText=doc.splitTextToSize(data["Data"][i].PartyName==null?"":data["Data"][i].PartyName + " Ugapur, Aurai, Sant Ravidas Nagar, Uttar Pradesh, India, Asia - 221423",header2KeyLeft- header1ValueLeft -5);
+                        doc.text(header1ValueLeft, header1Top ,mText);
+                        if(mText.length >mTextLineCount) mTextLineCount=mText.length;
+
+                        header1Top+=mTextLineCount*heightText;
+                        header1LineCount+=mTextLineCount;
+
+
+                        //End of printing Header 1 Left # Party Information
+
+
+
+
+
+                        //Printing Header 2 Left # Document Information
+
+
+                        doc.setFontType("bold");
+                        mText=doc.splitTextToSize(data["Data"][i].DocIdCaption==null?" ":data["Data"][i].DocIdCaption,header2ColLeft-header2KeyLeft);
+                        doc.text(header2KeyLeft, header2Top,mText);
+                        if(mText.length >mTextLineCount) mTextLineCount=mText.length;
+
+                        doc.text(header2ColLeft, header2Top,':');
+
+                        doc.setFontType("normal");
+                        mText=doc.splitTextToSize(data["Data"][i].DocNo==null?" ":data["Data"][i].DocNo,pageWidth- header2ValueLeft);
+                        doc.text(header2ValueLeft, header2Top ,mText);
+                        if(mText.length >mTextLineCount) mTextLineCount=mText.length;
+
+                        header2Top+=mTextLineCount*heightText;
+                        header2LineCount+=mTextLineCount;
+
+                        //End of printing Header 2 Left # Document Information
+
+
+                        //Setting of currTop : Header1 Height or Header2 Height ? Which is heigher
+                        currTop=(header2Top>header1Top?header2Top:header1Top);
+                        headerLineCount=header2LineCount>header1LineCount?header2LineCount:header1LineCount;
+                        alert('HeaderLineCount : ' + headerLineCount);
+                        pageMMCount+=headerTextFontSize*headerLineCount*lineSpacing/pointPerMM;
+
+                    }
+
+                    function printReportFooter()
+                    {
+                        doc.line(marginLeft, currTop, pageWidth, currTop);
+                        doc.setFontType("bold");
+                        currTop+=heightLine;
+                        colLeft=marginLeft;
+                        doc.text(colLeft, currTop,"Total"); colLeft+=colWidthProduct;
+                        doc.text(colLeft, currTop,"");colLeft+=colWidthSalesTaxProductCode;
+                        doc.text(colLeft, currTop,"");colLeft+=colWidthContraDocNo;
+                        doc.text(colLeft, currTop,""+Qty+"");colLeft+=colWidthQty;
+                        doc.text(colLeft, currTop,"");colLeft+=colWidthUnit;
+                        doc.text(colLeft, currTop,""+DealQty+"");colLeft+=colWidthDealQty;
+                        doc.text(colLeft, currTop,"");colLeft+=colWidthDealUnit;
+                        doc.text(colLeft, currTop,"");colLeft+=colWidthRate;
+                        doc.text(colLeft, currTop,""+Amount+"");colLeft+=colWidthAmount;
+                        doc.text(colLeft, currTop,"");colLeft+=colWidthRemark;
+                        doc.text(colLeft, currTop,"");colLeft+=colWidthSalesTaxProductGroup;
+                        currTop+=2;
+                        doc.line(marginLeft, currTop, pageWidth, currTop);
+                        currTop+=heightLine;
+                        pageMMCount+=lineTextFontSize*1*lineSpacing/pointPerMM;
+
+
+
+                    }
+
+                    function PrintCalculationFooter()
+                    {
+                        mText="";mTextLineCount=0;
+                        chargesTop=currTop;
+                        chargegstTop=currTop;
+                        i=0;
+                        chargeLeftText=45;
+                        chargeLeftValue=35;
+                        chargeColLeft=140;
+
+                        if(data["Data"][0].CalculationHeader !=null || data["Data"][0].CalculationHeader !="")
+                        {
+
+                            for(i = 0; i <= data["Data"][0].CalculationHeader.length-1; i++)
+                            {
+
+                                mTextLineCount=0;
+                                chargeColLeft=140;
+
+                                if(data["Data"][0].CalculationHeader[i].ChargeName !='Net Amount')
+                                {
+                                    doc.setFontType("bold");
+                                    mText=doc.splitTextToSize(data["Data"][0].CalculationHeader[i].ChargeName==null?" ":data["Data"][0].CalculationHeader[i].ChargeName,chargeLeftText);
+                                    doc.text(chargeColLeft, chargesTop,mText);
+                                    chargeColLeft+=chargeLeftText;
+                                    if(mText.length >mTextLineCount) mTextLineCount=mText.length;
+
+                                    doc.setFontType("normal");
+                                    mText=doc.splitTextToSize(""+data["Data"][0].CalculationHeader[i].Amount==null?" ":data["Data"][0].CalculationHeader[i].Amount+"",chargeLeftValue);
+                                    doc.text(chargeColLeft, chargesTop,mText);
+                                    if(mText.length >mTextLineCount) mTextLineCount=mText.length;
+
+                                    chargesTop+=mTextLineCount*heightText;
+                                    pageMMCount+=lineTextFontSize*mTextLineCount*lineSpacing/pointPerMM;
+
+                                }
+
+                            }
+                        }
+
+                        if(data["Data"][0].ReturnAmount !=null && data["Data"][0].ReturnAmount >0)
+                        {
+                            mTextLineCount=0;
+                            chargeColLeft=140;
+
+                            doc.setFontType("bold");
+                            mText=doc.splitTextToSize("- Return Amount",chargeLeftText);
+                            doc.text(chargeColLeft, chargesTop,mText);
+                            chargeColLeft+=chargeLeftText;
+                            if(mText.length >mTextLineCount) mTextLineCount=mText.length;
+
+                            doc.setFontType("normal");
+                            mText=doc.splitTextToSize(""+data["Data"][0].ReturnAmount==null?" ":data["Data"][0].ReturnAmount+"",chargeLeftValue);
+                            doc.text(chargeColLeft, chargesTop,mText);
+                            if(mText.length >mTextLineCount) mTextLineCount=mText.length;
+
+                            chargesTop+=mTextLineCount*heightText;
+                            pageMMCount+=lineTextFontSize*mTextLineCount*lineSpacing/pointPerMM;
+                        }
+                        if(data["Data"][0].DebitAmount !=null && data["Data"][0].DebitAmount >0)
+                        {
+                            mTextLineCount=0;
+                            chargeColLeft=140;
+                            doc.setFontType("bold");
+                            mText=doc.splitTextToSize("- Debit Amount",chargeLeftText);
+                            doc.text(chargeColLeft, chargesTop,mText);
+                            chargeColLeft+=chargeLeftText;
+                            if(mText.length >mTextLineCount) mTextLineCount=mText.length;
+
+                            doc.setFontType("normal");
+                            mText=doc.splitTextToSize(""+data["Data"][0].DebitAmount==null?" ":data["Data"][0].DebitAmount+"",chargeLeftValue);
+                            doc.text(chargeColLeft, chargesTop,mText);
+                            if(mText.length >mTextLineCount) mTextLineCount=mText.length;
+
+                            chargesTop+=mTextLineCount*heightText;
+                            pageMMCount+=lineTextFontSize*mTextLineCount*lineSpacing/pointPerMM;
+                        }
+                        if(data["Data"][0].CreaditAmount !=null && data["Data"][0].CreaditAmount > 0)
+                        {
+                            mTextLineCount=0;
+                            chargeColLeft=140;
+                            doc.setFontType("bold");
+                            mText=doc.splitTextToSize("+ Creadit Amount",chargeLeftText);
+                            doc.text(chargeColLeft, chargesTop,mText);
+                            chargeColLeft+=chargeLeftText;
+                            if(mText.length >mTextLineCount) mTextLineCount=mText.length;
+
+                            doc.setFontType("normal");
+                            mText=doc.splitTextToSize(""+data["Data"][0].CreaditAmount==null?" ":data["Data"][0].CreaditAmount+"",chargeLeftValue);
+                            doc.text(chargeColLeft, chargesTop,mText);
+                            if(mText.length >mTextLineCount) mTextLineCount=mText.length;
+
+                            chargesTop+=mTextLineCount*heightText;
+                            pageMMCount+=lineTextFontSize*mTextLineCount*lineSpacing/pointPerMM;
+                        }
+                        if(data["Data"][0].NetAmount !=null && data["Data"][0].NetAmount > 0)
+                        {
+                            mTextLineCount=0;
+                            chargeColLeft=140;
+                            doc.setFontType("bold");
+                            mText=doc.splitTextToSize("Net Amount",chargeLeftText);
+                            doc.line(chargeColLeft, chargesTop-3, pageWidth, chargesTop-3);
+                            doc.text(chargeColLeft, chargesTop,mText);
+                            chargeColLeft+=chargeLeftText;
+                            if(mText.length >mTextLineCount) mTextLineCount=mText.length;
+
+                            doc.setFontType("normal");
+                            mText=doc.splitTextToSize(""+data["Data"][0].NetAmount==null?" ":data["Data"][0].NetAmount+"",chargeLeftValue);
+                            doc.text(chargeColLeft, chargesTop,mText);
+                            doc.line(chargeColLeft-chargeLeftText, chargesTop+lineSpacing, pageWidth, chargesTop+lineSpacing);
+                            if(mText.length >mTextLineCount) mTextLineCount=mText.length;
+                            chargesTop+=mTextLineCount*heightText;
+                            pageMMCount+=lineTextFontSize*mTextLineCount*lineSpacing/pointPerMM;
+
+                        }
+
+
+                        var gstKeyTitle=Object.keys(data["Data"][0].GstDetail[0]);
+                        gstkeyWidth=marginLeft+3;
+                        Gstleft=gstkeyWidth;
+                        mTextKeyCount=0;mTextLineValueCount=0;
+                        doc.line(marginLeft, chargegstTop, 135, chargegstTop);
+                        chargegstTop+=heightLine;
+                        for(i = 0; i <=gstKeyTitle.length-1; i++)
+                        {
+                            doc.setFontType("bold");
+                            mText=doc.splitTextToSize(gstKeyTitle[i]==null?" ":gstKeyTitle[i],gstkeyWidth);
+                            doc.text(Gstleft, chargegstTop,mText);
+                            Gstleft+=gstkeyWidth;
+                            if(mText.length >mTextKeyCount) mTextKeyCount=mText.length;
+                        }
+                        chargegstTop+=mTextKeyCount*heightText
+                        doc.line(marginLeft, chargegstTop, 135, chargegstTop);
+                        chargegstTop+=mTextKeyCount*heightText;
+
+                        //var gstValues=Object.values(data["Data"][0].GstDetail[0]);
+                        //gstkeyWidth=marginLeft;
+                        //Gstleft=gstkeyWidth;
+                        //mTextKeyCount=0;mTextLineValueCount=0;
+                        //for(i = 0; i <=gstKeyTitle.length-1; i++)
+                        //{
+                        //    var mText;
+                        //    mTextLineKeyCount=0;
+                        //    mText=doc.splitTextToSize(gstKeyTitle[i]==null?" ":gstKeyTitle[i],gstkeyWidth);
+                        //    doc.text(Gstleft, chargegstTop,mText);
+                        //    Gstleft+=gstkeyWidth
+                        //    if(mText.length >mTextKeyCount) mTextKeyCount=mText.length;
+                        //}
+
+                        //gstkeyWidth=marginLeft;
+                        //Gstleft=gstkeyWidth;
+                        //chargegstTop+=mTextKeyCount*heightText;
+                        //for(i = 0; i <=gstValues.length-1; i++)
+                        //{
+                        //    var mText;
+                        //    mTextLineValueCount=0;
+                        //    mText=doc.splitTextToSize(""+gstValues[i]==null?" ":gstValues[i]+"",gstkeyWidth);
+                        //    doc.text(Gstleft, chargegstTop,mText);
+                        //    Gstleft+=gstkeyWidth
+                        //    if(mText.length >mTextLineValueCount) mTextLineValueCount=mText.length;
+                        //}
+
+                    }
+
+                }
+
+
+
+
+            },
+            error: function (result) {
+                alert("Error");
+            }
+        });
+    };
+</script>
+
+
+
+
+
+<script type="text/javascript">
+
+    var form_clean;
+    $(document).ready(function () {
+        //CustomSelectFunction($("#JobWorkerId"), '/ComboHelpList/GetJobWorkersWithProcess', '/ComboHelpList/SetSingleJobWorker', ' ', false, 1,$('#ProcessId').val());
+        CustomSelectFunction($("#JobWorkerId"), '/JobInvoiceHeader/GetCustomPerson', '/ComboHelpList/SetSinglePerson', ' ', false, 0, $('#DocTypeId').val());
+        CustomSelectFunction($("#SalesTaxGroupPersonId"), '/ComboHelpList/GetSalesTaxGroupPerson', '/ComboHelpList/SetSingleSalesTaxGroupPerson', ' ', false, 0);
+
+        //Calling the function to load the table data/ Line information
+        LoadProducts();
+
+        //Adding Hidden Input Fields
+        AddFields();
+
+        $("#JobWorkerId").select2('focus');
+
+
+        $("#JobWorkerId").change(GetJobWorkerDetail);
+
+
+        function GetJobWorkerDetail() {
+            var ProcessProgress = $("#Product detail loading progress");
+            ProcessProgress.show();
+            if ($("#JobWorkerId").val() != 0 && $("#JobWorkerId").val() != null) {
+                $.ajax({
+                    cache: false,
+                    type: "POST",
+                    url: "@(Url.Action("GetJobWorkerDetailJson"))",
+                    data: { JobWorkerId: $("#JobWorkerId").val() },
+                success: function (data) {
+                    (data.SalesTaxGroupPartyId == null) ? (1 == 1) : ($("#SalesTaxGroupPersonId").select2("data", { id: data.SalesTaxGroupPartyId, text: data.SalesTaxGroupPartyName }));
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    alert('Failed to retrieve product details.' + thrownError);
+                }
+            });
+        }
+        else {
+            $("#SalesTaxGroupPersonId").select2("data", { id: '', text: '' })
+        }
+    }
+
+
+        //Adding Charges on Doc Load
+        var id='@Model.JobInvoiceHeaderId';
+        LoadCharges(id,"Web.JobInvoiceHeaderCharges","Web.JobInvoiceLineCharges","/TaxCalculation/GetJIHeaderChargeForEdit/");
+
+    });
+
+
+
+    function LoadProducts() {
+        var DomainName='@System.Configuration.ConfigurationManager.AppSettings["AdminSetupDomain"]';
+        var SelectedRecord='@ViewBag.DocLineId';
+        var groupId='@Model.JobInvoiceHeaderId';
+        var status='@Model.Status';
+        var LineEditUrl;
+        var LineDeleteUrl;
+        if(status==StatusContstantsEnum.Drafted ||status==StatusContstantsEnum.Import)
+        {
+            LineEditUrl="/JobInvoiceLine/_ModifyLine/";
+            LineDeleteUrl="/JobInvoiceLine/_DeleteLine/";
+        }
+        else if(status==StatusContstantsEnum.Submitted || status == StatusContstantsEnum.Modified)
+        {
+            LineEditUrl="/JobInvoiceLine/_ModifyLineAfterSubmit/";
+            LineDeleteUrl="/JobInvoiceLine/_DeleteLine_AfterSubmit/";
+        }
+        else
+        {
+            LineEditUrl="/JobInvoiceLine/_Detail/";
+            LineDeleteUrl="/JobInvoiceLine/_Detail/";
+        }
+
+        var link="/JobInvoiceLine/Index/"+groupId;
+        var QtyCount=0;
+        var DealQtyCount=0;
+        var AmountCount=0;
+        var unit=true;
+        var dunit=true;
+        var prevunit;
+        var prevdunit;
+        var decimal=0;
+        var ddecimal=0;
+        $.ajax({
+            url: link,
+            type: "GET",
+            success: function (data) {
+                var row = ""
+                var srno=1;
+
+                if(data.length!=0)
+                {
+                    $.each(data, function (index, item) {
+
+                        var ReceiptUrl=DomainName+"/Redirect/RedirectToDocument?DocTypeId="+item.ReceiptDocTypeId+"&DocId="+item.ReceiptHeaderId+"&DocLineId="+item.ReceiptLineId;
+                        var OrderUrl=DomainName+"/Redirect/RedirectToDocument?DocTypeId="+item.OrderDocTypeId+"&DocId="+item.OrderHeaderId+"&DocLineId="+item.OrderLineId;
+                        var BarCodeUrl=DomainName+"/Redirect/BarCodeDetail?BarCode="+item.ProductUidName;
+
+                        row += " <div class='row crow grid-body' style='margin-left:0px;margin-right:0px' id='"+item.JobInvoiceLineId+"'>"
+                            +"      <div class='row-index block'  style='width:5%'>"+srno+"<input type='hidden' class='id' value='"+item.JobInvoiceLineId+"' /></div>"
+                            +"          <div class='block'  style='width:90%'>"
+                            +"              <div class='row'>"
+                            +"                  <div class='block' style='width:25%'>"+(item.ProductName==null?" ":"<strong>"+item.ProductName+"</strong>")
+                            +"                      <div>"+(item.Specification==null?" ":item.Specification)+"</div>"
+                            + "                          <div>" + (item.Dimension1Name == null ? " " : item.Dimension1Name + ",") + (item.Dimension2Name == null ? " " : item.Dimension2Name) + (item.Dimension3Name == null ? " " : item.Dimension3Name) + (item.Dimension4Name == null ? " " : item.Dimension4Name) + "</div>"
+                            +"                          <div>"+((item.DueDate==null)?" ":"<span title='DueDate' class='label label-danger' style='font-weight:bold'>"+formatDate('d/m/Y',new Date(parseInt(item.DueDate.substr(6))))+"</span>")
+                            +"                          </div>"
+                            +"                           <div>"+(item.ProductUidName==null?" ":"ProductUID:<a href='"+BarCodeUrl+"' target='_blank'> "+item.ProductUidName+"</a>")+"</div>"
+                            +"                  </div>"
+                            +"                  <div class='block'  style='width:15%'>"+(item.JobReceiveHeaderDocNo==null?" ":" <a href='"+ReceiptUrl+"' style='color:black'> <span class='small' style='font-weight:bold'>Receipt No:"+item.JobReceiveHeaderDocNo)+"</span></a>"
+                            +"                      <div>"+(item.JobOrderHeaderDocNo==null?" ":" <a href='"+OrderUrl+"' style='color:black'> <span class='small' style='font-weight:bold'>Order No:"+item.JobOrderHeaderDocNo+"</span> </a>")
+                            +"                      </div>"
+                            +"                   </div>"
+                            +"                  <div class='text-right block'  style='width:10%'>"+(item.Qty==null?" ":item.Qty)+"<br />"
+                            +"                      <div><small>"+(item.UnitName==null?" ":item.UnitName)+"</small>"
+                            +"                      </div>"
+                            +"                   </div>"
+                            +"                  <div class='text-right block'  style='width:10%'>"+(item.DealQty==null?" ":item.DealQty)+"<br />"
+                            +"                      <div><small>"+(item.DealUnitName==null?" ":item.DealUnitName)+"</small>"
+                            +"                      </div>"
+                            +"                   </div>"
+                            +"                   <div class='text-right block'  style='width:10%'>"+(item.Rate==null?" ":item.Rate.toFixed(2))
+                            +"                   </div>"
+                            +"                   <div class=' text-right block'  style='width:10%'>"+(item.Amount==null?" ":item.Amount.toFixed(2))
+                            +"                   </div>"
+                            +"                   <div class='block'  style='width:10%'>"+(item.LotNo==null?" ":"Lot-No:"+item.LotNo+"<br />")+(item.Remark==null?" ":item.Remark)
+                            +"                   </div>"
+                            +"              </div>"
+                            +"          </div>"
+                            +"      <div class='block'  style='width:5%'>"
+                            + "          <a class='glyphicon glyphicon-trash icon-Cus-Size' data-modal data-detailDisabled='true' delete='' href='" + LineDeleteUrl + item.JobInvoiceLineId + "'></a>"
+                            +"          <a  edit='' href='"+LineEditUrl+item.JobInvoiceLineId+"'></a>"
+                            +"      </div>"
+                            +"  </div>"
+                            +"<hr style='margin-top:0px;margin-bottom:0px'/>";
+                        QtyCount+=item.Qty;
+                        DealQtyCount+=item.DealQty;
+                        AmountCount+=item.Amount;
+                        if(srno!=1)
+                        {
+                            if(item.UnitId==prevunit && unit!=false)
+                            {}
+                            else
+                            {unit=false;}
+                            if(item.DealUnitId==prevdunit && dunit!=false)
+                            {}
+                            else
+                            {dunit=false;}
+                        }
+
+                        if(decimal<item.UnitDecimalPlaces){decimal=item.UnitDecimalPlaces;}
+                        if(ddecimal<item.DealUnitDecimalPlaces){ddecimal=item.DealUnitDecimalPlaces;}
+                        srno++;
+                        prevunit=item.UnitId;
+                        prevdunit=item.DealUnitId;
+                    });
+                    row+="<div class='row tfooter' style='padding-top:10px;'>"
+                        +"  <div class='block' style='width:5%'>"
+                        +"  </div>"
+                        +"  <div class='block' style='width:90%'>"
+                        +"      <div class='row'> "
+                        +"          <div class='block'  style='width:25%'><strong>Total</strong></div>"
+                        +"          <div class='block' style='width:15%'>"
+                        +"          </div>"
+                        +"          <div class='block text-right' style='width:10%'><strong>"
+                        +               ((unit==true)?QtyCount.toFixed(decimal)+"<br /><small>"+prevunit:QtyCount.toFixed(decimal))+"</small></strong>"
+                        +"          </div>"
+                        +"          <div class='block text-right' style='width:10%'><strong>"
+                        +               ((dunit==true)?DealQtyCount.toFixed(ddecimal)+"<br /><small>"+prevdunit:DealQtyCount.toFixed(ddecimal))+"</small></strong>"
+                        +"          </div>"
+                        +"          <div class='block text-right' style='width:10%'>"
+                        +"          </div>"
+                        +"          <div class='block text-right' style='width:10%'><strong>"+AmountCount.toFixed(2)+"</strong>"
+                        +"          </div>"
+                        +"          <div class='block' style='width:20%'>"
+                        +"          </div>"
+                        +"      </div>"
+                        +"  </div>"
+                        +"  <div class='block'  style='width:5%'>"
+                        +"  </div>"
+                        +"</div>"
+                }
+                else
+                {
+                    ;
+                }
+                $("#gbody").html(row);
+                if(SelectedRecord && SelectedRecord!=0)
+                {
+                    var Id="#"+SelectedRecord
+                    NavigateToLineRecord(Id);}
+            },
+            error: function (result) {
+                alert("Error");
+            }
+        });
+    }
+
+
+
+
+</script>
+
+
+@if ((ViewBag.Mode != "Add") && (ViewBag.Mode != "Edit"))
+{
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+            DisablePageNavigation();
+        })
+
+    </script>
+}
+
+@if ((Model.Status == (int)ActivityTypeContants.Modified || Model.Status == (int)ActivityTypeContants.Submitted)
+    && (ViewBag.transactionType == "submit" || ViewBag.transactionType == "submitContinue" || ViewBag.transactionType == "review" || ViewBag.transactionType == "ReviewContinue"))
+{
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+            enableActivityLogReason();
+        })
+
+        //var href = '/ActivityLog/LogEditReason'
+        //var $btnClicked;
+
+        //$(':submit').bind('click', function () {
+        //    $btnClicked=$(this);
+        //    $('#myModalContent').load(href, function () {
+
+        //        $('#myModal').modal({
+        //            backdrop: 'static',
+        //            keyboard: true
+        //        }, 'show');
+
+        //        bindForm1(this);
+        //    });
+
+        //    return false;
+        //})
+
+        //function bindForm1(dialog) {
+
+        //    $('#modformr', dialog).submit(function () {
+
+        //        $.ajax({
+        //            url: this.action,
+        //            type: this.method,
+        //            data: $(this).serialize(),
+        //            success: function (result) {
+        //                if (result.success) {
+        //                    $('#myModal').modal('hide');
+
+        //                    $(':submit').unbind();
+
+        //                    $('input[name="UserRemark"]').val(result.UserRemark);
+
+        //                    $btnClicked.trigger('click');
+
+        //                } else {
+        //                    $('#myModalContent').html(result);
+        //                    bindForm1();
+        //                }
+        //            }
+        //        });
+        //        return false;
+        //    });
+
+        //}
+
+    </script>
+}
+@if (ViewBag.transactionType != null && (ViewBag.transactionType == "submitContinue" || ViewBag.transactionType == "ReviewContinue"))
+{
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+            CreateTrasitionEffect();
+        })
+
+        //CreateTrasitionEffectForSubmit();
+
+        //function CreateTrasitionEffectForSubmit() {
+
+        //    //$('body').find('.container.body-content > div.row ').wrap("<div class='animsition' data-animsition-in='fade-in-right-lg' data-animsition-out='fade-out-left-lg' style='animation-duration: 1.5s; -webkit-animation-duration: 1.5s; opacity: 0;'> </div>");
+
+        //    $('body').find('form').filter(":last").wrapInner("<div class='animsition' data-animsition-in='fade-in-right-lg' data-animsition-out='fade-out-left-lg' style='animation-duration: 1.5s; -webkit-animation-duration: 1.5s; opacity: 0;'> </div>");
+
+        //    var script = document.createElement('script');
+
+        //    script.setAttribute('type', 'text/javascript');
+
+        //    script.text = " $(document).ready(function () {$('.animsition').animsition().one('animsition.start', function () {}).one('animsition.end', function () {$(this).find('.animsition-child').addClass('zoom-in').css({'opacity': 1});})});";
+
+        //    $('body').append(script);
+
+        //}
+
+    </script>
+}

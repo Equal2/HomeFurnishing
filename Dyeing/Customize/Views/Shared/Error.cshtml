@@ -1,0 +1,65 @@
+﻿@model System.Web.Mvc.HandleErrorInfo
+
+@{
+    ViewBag.Title = "Error";
+    // Layout=null;
+}
+
+<div class="panel panel-warning">
+
+    <div class="panel panel-heading" style="padding:15px">
+
+        <h3>
+            <span style="font-family: Calibri,sans-serif,Verdana">We'ar sorry...</span>
+        </h3>
+
+    </div>
+
+
+
+
+    <div style="padding:0px 15px">
+
+        @if (Model.Exception != null)
+        {
+            <h2>An error occurred while processing your request.</h2>
+            <h3><span style="font-family: Calibri,sans-serif,Verdana">@Model.Exception.Message</span></h3>
+        }
+        else if (Model.Exception.InnerException != null)
+        {
+            if (Model.Exception.InnerException.Message.Contains("Mailbox unavailable. The server response was:"))
+            {
+                <h3>"Email Error-Not sent to all recipients"</h3>
+            }
+            else if (Model.Exception.InnerException.InnerException.Message.Contains("Cannot insert duplicate key row in object"))
+            {
+                <h3>"Duplicate record found with the key value"</h3>
+            }
+            else if (Model.Exception.InnerException.InnerException.Message.Contains("The DELETE statement conflicted with the REFERENCE constraint"))
+            {
+                <h3>"Corresponding record exists. Can't delete data."</h3>
+            }
+        }
+        else if (Model.Exception.InnerException != null)
+        {
+            <h2>An error occurred while processing your request.</h2>
+            <h3><span style="font-family: Calibri,sans-serif,Verdana">@Model.Exception.InnerException.Message</span></h3>
+        }
+
+        else
+        {
+            <h4> <span style="font-family: Calibri,sans-serif,Verdana"> An error occurred while processing your request. Please try after sometime.</span></h4>
+
+        }
+
+    </div>
+</div>
+
+
+
+
+
+
+
+
+

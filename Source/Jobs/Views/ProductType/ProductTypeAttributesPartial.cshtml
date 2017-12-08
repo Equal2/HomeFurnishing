@@ -1,0 +1,6 @@
+﻿@using Presentation.Helper
+@model System.Collections.Generic.List<Model.Models.ProductTypeAttribute>
+@foreach (var productTypeAttribute in Model)
+{
+    @Html.Partial("ProductTypeAttributePartial", productTypeAttribute)
+}

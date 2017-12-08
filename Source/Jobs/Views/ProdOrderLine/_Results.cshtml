@@ -1,0 +1,251 @@
+﻿@model Model.ViewModel.ProdOrderMasterDetailModel
+@using Core.Common
+
+<div class="modal-content">
+    <div class="modal-header" style="border-bottom: 1px solid #8E8888">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"> <span class="glyphicon glyphicon-remove"></span></button>
+        <h3>
+            <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-file black"></span> Material Plan & Quantities</span>
+        </h3>
+    </div>
+    <div>
+        @using (Html.BeginForm("_ResultsPost", "ProdOrderLine", FormMethod.Post, new { enctype = "multipart/form-data", id = "modform" }))
+        {
+            @Html.ValidationLog((string)TempData["CSEXCL"])
+            @Html.AntiForgeryToken()            
+            <div class="form-horizontal modal-body">
+
+                <div style="padding-right:15px">
+                    <div class="row">
+                        <div class="form-horizontal">
+                            @Html.ValidationSummary(true, null, new { @class="alert alert-danger"})
+
+                            <div class="panel panel-default" id="grid">
+                                <div class="panel-heading headrow" style="background-image: -webkit-linear-gradient(top, #428bca 0%, #428bca 100%);color:white">
+                                    <div class="row grid-head">
+                                        <div class="col-xs-1 text-left">
+                                            Srl.
+                                        </div>
+                                        <div class="col-xs-11">
+                                            <div class="row">
+                                                @*ProductInfo*@
+                                                <div class="col-sm-4">
+                                                    Product
+
+                                                </div>
+                                                <div class="col-sm-2">
+                                                    Material Plan
+                                                </div>
+                                                @*Qty*@
+                                                <div class="col-sm-2 text-right">
+                                                    Plan Qty
+                                                </div>
+                                                <div class="col-sm-2 text-right" style="padding-right:30px">
+                                                   Production Qty
+                                                </div>                                                
+                                                <div class="col-sm-2 text-right" style="padding-right:30px">
+                                                    Remark
+                                                </div>
+                                            </div>
+                                        </div>
+                                      
+                                    </div>
+
+                                </div>
+                                <div class="panel-info" id="gbody" style="max-height:250px;overflow-y:scroll">
+                                    @{
+            decimal PlanQty = 0;
+            decimal IndentQty = 0;
+                                    }
+                                    @for (int i = 0; i < Model.ProdOrderLineViewModel.Count(); i++)
+                                    {
+                                        @Html.HiddenFor(m => Model.ProdOrderLineViewModel[i].ProductId)
+                                        @Html.HiddenFor(m => Model.ProdOrderLineViewModel[i].ProductName)
+                                        @Html.HiddenFor(m => Model.ProdOrderLineViewModel[i].Specification)
+                                        @Html.HiddenFor(m => Model.ProdOrderLineViewModel[i].Dimension1Name)
+                                        @Html.HiddenFor(m => Model.ProdOrderLineViewModel[i].Dimension1Id)
+                                        @Html.HiddenFor(m => Model.ProdOrderLineViewModel[i].Dimension2Id)
+                                        @Html.HiddenFor(m => Model.ProdOrderLineViewModel[i].Dimension2Name)
+                                        @Html.HiddenFor(m => Model.ProdOrderLineViewModel[i].MaterialPlanLineId)
+                                        @Html.HiddenFor(m => Model.ProdOrderLineViewModel[i].ProdOrderHeaderId)
+                                        @Html.HiddenFor(m => Model.ProdOrderLineViewModel[i].MaterialPlanHeaderDocNo)
+                                        @Html.HiddenFor(m => Model.ProdOrderLineViewModel[i].PlanBalanceQty)
+                                        //@Html.HiddenFor(m => Model.ProdOrderLineViewModel[i].UnitId)
+                                        @Html.HiddenFor(m => Model.ProdOrderLineViewModel[i].Specification)
+                                        
+                                        <div class='row crow grid-body' style='margin-left:0px;margin-right:0px'>
+                                            <div class='col-xs-1 row-index'>
+                                                @(i + 1)
+                                                <input type='hidden' class='id' value="@Model.ProdOrderLineViewModel[i].ProdOrderHeaderId" />
+                                            </div>
+                                            <div class='col-xs-11'>
+                                                <div class='row'>
+                                                    <div class='col-sm-4'>
+                                                        <strong>@Model.ProdOrderLineViewModel[i].ProductName</strong>
+                                                        <br />                                                                                                          
+                                                        @{
+                                        var Dim1 = (string.IsNullOrEmpty(Model.ProdOrderLineViewModel[i].Dimension1Name)) ? "" : Model.ProdOrderLineViewModel[i].Dimension1Name + ",";
+                                        var Dim2 = (string.IsNullOrEmpty(Model.ProdOrderLineViewModel[i].Dimension2Name)) ? "" : Model.ProdOrderLineViewModel[i].Dimension2Name;
+                                        var Spec = (string.IsNullOrEmpty(Model.ProdOrderLineViewModel[i].Specification)) ? "" : Model.ProdOrderLineViewModel[i].Specification;
+                                                        }
+
+                                                        @Dim1 @Dim2 <br />
+                                                        @Spec
+                                                        <div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-2 text-center">
+                                                        @Model.ProdOrderLineViewModel[i].MaterialPlanHeaderDocNo
+                                                    </div>
+                                                    <div class='col-sm-2 text-right'>
+                                                        <span id="PlanQty"> @Model.ProdOrderLineViewModel[i].PlanBalanceQty</span>
+                                                        <br />
+                                                        
+                                                        @{PlanQty += Model.ProdOrderLineViewModel[i].PlanBalanceQty;}
+                                                    </div>
+                                                    <div class="col-md-2 text-right">
+                                                        @Html.TextBoxFor(m => Model.ProdOrderLineViewModel[i].Qty, new { @class = "form-control text-right IndentQty" })
+                                                        @Html.ValidationMessageFor(m => Model.ProdOrderLineViewModel[i].Qty, "", new { @class = "text-danger" })
+                                                        @{IndentQty += Model.ProdOrderLineViewModel[i].Qty;}
+                                                    </div>
+                                                    <div class='col-sm-2 text-right'>
+                                                        @Html.TextBoxFor(m => Model.ProdOrderLineViewModel[i].Remark, new { @class = "form-control text-right" })
+                                                        @Html.ValidationMessageFor(m => Model.ProdOrderLineViewModel[i].Remark, "", new { @class = "text-danger" })
+                                                    </div>                                                                                                       
+                                                </div>
+                                            </div>
+                                           
+                                        </div>                                        
+                                    }
+                                </div>
+                            </div>
+
+                            <div class="row grid-head" style='margin-left:0px;margin-right:0px'>
+                                <div class="col-xs-1 text-left">
+                                </div>
+                                <div class="col-xs-11">
+                                    <div class="row">
+                                        @*ProductInfo*@
+                                        <div class="col-sm-4">
+                                            <strong>Total</strong>
+                                        </div>
+                                        <div class="col-sm-2">
+
+                                        </div>
+                                        @*Qty*@
+                                        <div class="col-sm-2 text-right">
+                                            @PlanQty
+                                        </div>
+                                        <div class="col-sm-2 text-right" style="padding-right:30px">
+                                            <strong><span id="IndentQty">@IndentQty</span></strong>
+                                        </div>
+                                        <div class="col-sm-2 text-right" style="padding-right:30px">
+
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+
+
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer " style="padding: 19px 20px 0 20px; border-top:1px solid #8E8888">
+                    <button class="btn custom" name="Command:Edit" type="submit" id="submit"><h2 style="margin:0px" title="Proceed"><span class="glyphicon glyphicon-floppy-disk black black"></span> </h2></button>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+
+
+<script type="text/javascript">
+
+    var IsSaved = false;
+    var ValidationCount = 0;
+
+    $('#modform').bind('submit', function (event) {
+
+        if (!IsSaved) {
+            if (!ValidateData()) {
+                return false;
+            }
+            IsSaved = true;
+            $('button:submit').attr('disabled', 'disabled');
+            return IsSaved;
+        }
+        else {
+            return false;
+        }
+
+
+    });
+
+
+    function ValidateData() {
+        var ValidationMessage = "";
+
+        //Client Side Validaion.....
+
+        return (ValidationMessage == "");
+
+    }
+
+
+    $('input.IndentQty').change(function () {
+
+        var $div = $(this).closest('div.row');
+        var PlanQty = parseFloat($div.find('#PlanQty').text()) || 0;
+
+        var IndentQty = parseFloat($div.find('input.IndentQty').val()) || 0;
+
+        var bal = (IndentQty) - (PlanQty);
+
+        if (bal > 0) {
+            if (!$('#modform').find('.modal-body #errormsg').length) {
+                $('#modform').find('#submit').attr('disabled', 'disabled');
+                $('#modform').find('.modal-body').prepend("<div class='alert alert-danger'><span id=errormsg >Qty exceeding Plan Qty</span></div>")
+            }
+            else {
+                $('#modform').find('#errormsg').text("Qty exceeding Required Qty");
+            }
+        }
+        else {
+            $('#modform').find('#submit:disabled').removeAttr('disabled');
+            if ($('#modform').find('.modal-body #errormsg').length) {
+                $('#modform').find('#errormsg').parent().remove();
+            }
+        }
+        CalculateTotal();
+
+    })
+
+    function CalculateTotal() {
+        var Receipt = 0;
+
+        $('.row.crow.grid-body', '.modal-body').each(function () {
+
+            if ($(this).find('input.IndentQty').val()) {
+                Receipt += parseFloat($(this).find('input.IndentQty').val());
+            }
+
+        })
+        $('#IndentQty', '.modal-body').text(Receipt);
+    }
+
+    $('.ToReceipt').click(function () {
+
+        var $div = $(this).closest('div.row');
+
+        var IndentQty = parseFloat($div.find('#PlanQty').text()) || 0;
+
+        $div.find('input.IndentQty').val(IndentQty);
+
+
+        CalculateTotal();
+
+    })
+
+</script>

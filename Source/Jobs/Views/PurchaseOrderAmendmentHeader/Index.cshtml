@@ -1,0 +1,73 @@
+﻿@model IQueryable<Model.ViewModel.PurchaseOrderAmendmentHeaderViewModel>
+@using Core.Common
+@using GridMvc.Html;
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    string ControllerName = (string)ViewContext.RouteData.Values["controller"];
+    string IndexStatus = (string)ViewBag.IndexStatus;
+}
+
+<!-- modal placeholder-->
+<div id='myModal' class='modal fade in'>
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div id='myModalContent'></div>
+        </div>
+    </div>
+</div>
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3>
+            <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-list black"></span> @ViewBag.Name List</span>
+        </h3>
+        <hr style="margin-top:0px;margin-bottom:0px" />
+        <input type="hidden" class="DocType_Id" value="@ViewBag.id">
+        <div class="panel-info">
+            <div class="btn-group">
+                @Html.ActionLink(" ", "Create", "PurchaseOrderAmendmentHeader", new { @id = @ViewBag.id }, new { @class = "cbtn btn-circle glyphicon glyphicon-plus toolbar", @title = "Add New", @data_toggle = "tooltip" })
+                @Html.ActionLink(" ", "GetHistory", "LogHistory", null, new { @class = "cbtn btn-circle glyphicon glyphicon-user toolbar", @title = "History", @data_toggle = "tooltip", @id = "DocHistoryI" })
+                @Html.ActionLink(" ", "GeneratePrints", "PurchaseOrderAmendmentHeader", null, new { @class = "cbtn btn-circle glyphicon glyphicon-print toolbar", @title = "Print", @data_toggle = "tooltip", @id = "PrintRecordI", target = "_blank" })
+                @Html.ActionLink(" ", "Remove", "PurchaseOrderAmendmentHeader", null, new { @class = "cbtn btn-circle glyphicon glyphicon-trash toolbar", @title = "Delete", @data_toggle = "tooltip", @id = "DeleteRecord", @data_modalDelete = "" })
+            </div>
+            <div class="btn-group">
+                <a class="cbtn btn-circle glyphicon glyphicon-option-horizontal dropdown-toggle" aria-expanded="false" title="More Option" style="padding-top: 6px;padding-bottom: 6px;" href="#" data-toggle="dropdown" id="dropdownMenu1">
+                </a>
+                <ul class="dropdown-menu pull-right" aria-labelledby="dropdownMenu1">
+                    <li><a href="@Url.Action("Index", "PurchaseInvoiceExcelImport", new { @id = @ViewBag.id })"><span class="glyphicon glyphicon-import"> </span>&nbsp;&nbsp;Import</a></li>
+                    <li><a href="@Url.Action("CreatePurchaseOrderAmendment", "PurchaseOrderSetting", new { @id = @ViewBag.id })"><span class="glyphicon glyphicon-cog"> </span>&nbsp;&nbsp;Settings</a></li>
+                    <li role="separator" class="divider"></li>
+                    <li><a target="_blank" href="@Url.Action("Report", "PurchaseOrderAmendmentHeader", new { @ViewBag.id })"><span class="glyphicon glyphicon-stats"> </span>&nbsp;&nbsp;Report</a></li>
+                </ul>
+            </div>
+            @*<h4 style="padding:5px 0 0 0;margin:0px">
+                @Html.ActionLink(" ", " ", " ", null, new { @class = "glyphicon glyphicon-refresh toolbar", @title = "Refresh Page", @data_toggle = "tooltip", @id = "RefreshPage" })
+                @Html.ActionLink(" ", "Report", "PurchaseOrderAmendmentHeader", new { @id = @ViewBag.id }, new { @class = "glyphicon glyphicon-stats toolbar right", @title = "Report", @data_toggle = "tooltip", target = "_blank" })
+                @Html.ActionLink(" ", "", "", null, new { @class = "glyphicon glyphicon-export toolbar right", @title = "Export", @data_toggle = "tooltip" })
+                @Html.ActionLink(" ", "CreatePurchaseOrderAmendment", "PurchaseOrderSetting", new { @id = @ViewBag.id }, new { @class = "glyphicon glyphicon-cog toolbar right", @title = "Default Settings", @data_toggle = "tooltip" })
+                @Html.ActionLink(" ", "Index", "PurchaseOrderAmendmentHeader", new { @id = @ViewBag.id }, new { @class = "glyphicon glyphicon-import toolbar right", @title = "Import", @data_toggle = "tooltip" })
+            </h4>*@
+        </div>
+        <hr style="margin-top: 5px; margin-bottom: 5px; border-top: 1px solid #706f6f; " />
+
+        @CustomHelpers.RenderStatusFilters(ViewBag.PendingToSubmit, ViewBag.PendingToReview, ControllerName, ViewBag.id, ViewBag.IndexStatus)
+    </div>
+    <div class="panel-info" style="padding-left:5px;padding-top:2px">
+        @Html.Grid(Model).Columns(columns =>
+           {
+               columns.Add(foo => foo.PurchaseOrderAmendmentHeaderId, true).Css("Header_Id");
+               columns.Add(m => m.Status, true);
+               columns.Add().Encoded(false).Sanitized(false).SetWidth("5%").RenderValueAs(m => CustomHelpers.RenderCheckBox());
+               columns.Add(foo => foo.DocDate).Sortable(true).Titled("Amendment Date").Format("{0:dd/MMM/yyyy}").Filterable(true);
+               columns.Add(foo => foo.DocNo).Titled("Amendment No").Sortable(true).Filterable(true);
+               columns.Add(m => m.SupplierName).Titled("Supplier").Sortable(true).Filterable(true);
+               columns.Add(m => m.Remark).Titled("Remark").Sortable(true).Filterable(true);
+               columns.Add().Sanitized(false).Encoded(false).RenderValueAs(m => CustomHelpers.RenderStatus(m.Status)).Titled("Status");
+               columns.Add().Titled("").Encoded(false).Sanitized(false).RenderValueAs(m => CustomHelpers.RenderUserImage(m.ModifiedBy)).Titled("User").SetWidth("5%").Css("UserImageIndex");
+               columns.Add().Encoded(false).Sanitized(false).RenderValueAs(m => CustomHelpers.RenderActionColumn(ControllerName, m.PurchaseOrderAmendmentHeaderId, m.Status, m.Reviewed, m.ReviewCount, (string)ViewBag.IndexStatus)).SetWidth(20).Css("icon-Cus-Size");
+               columns.Add(true).RenderValueAs(m => CustomHelpers.RenderHEDActionLink(ControllerName, m.PurchaseOrderAmendmentHeaderId, m.Status, IndexStatus));
+           }).WithPaging(25).EmptyText("No records found.")
+
+    </div>
+</div>

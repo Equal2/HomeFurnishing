@@ -1,0 +1,88 @@
+﻿@using Surya.India.Core.Common;
+@using Surya.India.Model.ViewModels;
+@model IQueryable<Surya.India.Model.ViewModels.PurchaseIndentHeaderViewModel>
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+@helper RenderActionColumn(PurchaseIndentHeaderViewModel s)
+{
+    if (s.Status == (int)StatusConstants.Submitted || s.Status == (int)StatusConstants.ModificationSubmitted)
+    {
+        @Html.ActionLink(" ", "Approve", "PurchaseIndentHeader", new { id = s.PurchaseIndentHeaderId, Redirect = ViewContext.RouteData.Values["action"] }, new { @class = "rowApproveBlue", @title = " Approve", @data_toggle = "tooltip" });
+    }
+    if (s.Status == (int)StatusConstants.Drafted || s.Status == (int)StatusConstants.Modified)
+    {
+        @Html.ActionLink(" ", "Submit", "PurchaseIndentHeader", new { id = s.PurchaseIndentHeaderId, Redirect = ViewContext.RouteData.Values["action"] }, new { @class = "rowSubmitBlue", @title = " Submit", @data_toggle = "tooltip" });
+
+    }
+}
+@helper RenderStatus(Surya.India.Model.ViewModels.PurchaseIndentHeaderViewModel s)
+{
+    if (s.Status == (int)StatusConstants.Submitted)
+    {
+        @Html.Raw("Submitted");
+    }
+    else if (s.Status == (int)StatusConstants.Approved)
+    {
+        @Html.Raw("Approved")
+    }
+    else if (s.Status == (int)StatusConstants.Drafted)
+    {
+        @Html.Raw("Drafted")}
+    else if (s.Status == (int)StatusConstants.Modified)
+    {
+        @Html.Raw("Modified")
+    }
+    else if (s.Status == (int)StatusConstants.ModificationSubmitted)
+    {
+        @Html.Raw("Modification Submitted")
+    }
+}
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h4>
+            <span style="font-family: Calibri,sans-serif,Verdana">Purchase Indent List(To Approve).</span>
+        </h4>
+        <hr style="margin-top:0px;margin-bottom:0px" />
+        <div class="panel-info">
+            <span style="font-family: Calibri,sans-serif,Verdana;font-size:large;">
+                <u> @Html.ActionLink("Create", "Create", "PurchaseIndentHeader", null, new { @class = "modal-link" })</u>
+            </span>
+
+            <br />
+            <span style="font-family: Calibri,sans-serif,Verdana;font-size:small">
+                <u> @Html.ActionLink("All", "Index", "PurchaseIndentHeader", new { @class = "modal-link" })</u>|
+                <u>@Html.ActionLink("To Submit", "PendingToSubmit", "PurchaseIndentHeader", new { @class = "modal-link" })</u>|
+                <u>@Html.ActionLink("To Approve", "PendingToApprove", "PurchaseIndentHeader", new { @class = "modal-link" })</u>
+            </span>
+        </div>
+
+    </div>
+    <div class="panel-info" style="padding-left:5px;padding-top:2px">
+
+        @Html.Grid(Model).Columns(columns =>
+           {
+               columns.Add(m => m.PurchaseIndentHeaderId, true);
+               columns.Add(foo => foo.DocDate).Sortable(true).Titled("Indent Date").Format("{0:dd/MMM/yyyy}").Filterable(true);
+               columns.Add(m => m.DocNo).Sortable(true).Titled("Indent No.").Filterable(true).Sortable(true);
+               columns.Add(m => m.DepartmentName).Sortable(true).Titled("Department").Filterable(true).Sortable(true);
+               columns.Add(foo => foo.DueDate).Sortable(true).Titled("Due Date").Format("{0:dd/MMM/yyyy}").Filterable(true);
+               columns.Add(m => m.Remark).Sortable(true).Filterable(true).Titled("Remark");
+               columns.Add().Sanitized(false).Encoded(false).RenderValueAs(m => RenderStatus(m)).Titled("Status");
+               columns.Add().Encoded(false).Sanitized(false).RenderValueAs(d => @Html.ActionLink(" ", "Index", "PurchaseIndentLine", new { id = d.PurchaseIndentHeaderId }, new { @class = "rowLineDetailBlue", @title = "Line Detail", @data_toggle = "tooltip" })).SetWidth(20);
+               columns.Add().Encoded(false).Sanitized(false).RenderValueAs(m => RenderActionColumn(m)).SetWidth(20);
+               columns.Add().Encoded(false).Sanitized(false).RenderValueAs(d => @Html.ActionLink(" ", "Detail", "PurchaseIndentHeader", new { id = d.PurchaseIndentHeaderId }, new { @class = "rowDetailBlue", @title = "Detail", @data_toggle = "tooltip" })).SetWidth(20);
+               columns.Add().Encoded(false).Sanitized(false).RenderValueAs(m => @Html.ActionLink(" ", " ", " ", new { id = m.PurchaseIndentHeaderId }, new { @class = "rowPrintBlue", @data_toggle = "tooltip", @title = "Print" })).SetWidth(20);
+               columns.Add().Encoded(false).Sanitized(false).RenderValueAs(m => @Html.ActionLink(" ", "Edit", "PurchaseIndentHeader", new { id = m.PurchaseIndentHeaderId, PrevAction = ViewContext.RouteData.Values["action"] }, new { @class = "rowEditBlue", @title = "Edit", @data_toggle = "tooltip" })).SetWidth(20);
+               columns.Add().Encoded(false).Sanitized(false).RenderValueAs(d => @Html.ActionLink(" ", "Delete", "PurchaseIndentHeader", new { id = d.PurchaseIndentHeaderId, PrevAction = ViewContext.RouteData.Values["action"] }, new { @class = "rowDeleteBlue", @title = "Delete", @data_toggle = "tooltip" })).SetWidth(20);
+           }).WithPaging(25).EmptyText("No records found.")
+
+
+
+    </div>
+</div>

@@ -1,0 +1,281 @@
+﻿@{
+    ViewBag.Title = "Selecting Demo";
+}
+@section CssImport 
+{
+    <style type="text/css">
+        #SelectedRowList
+        {
+            margin-top: 5px;
+            border: 1px solid #999;
+            background-color: #EEE;
+            padding: 5px;
+        }
+    </style>
+}
+
+<!-- Container for jTable -->
+<div id="StudentTableContainer"></div>
+
+<!-- An area to show selected rows (for demonstration) -->
+<br />
+<button id="DeleteAllButton">Delete all selected records</button>
+<br /> <br />
+Selected rows (refreshed on <b>selectionChanged</b> event):
+<div id="SelectedRowList">
+    No row selected! Select rows to see here...
+</div>
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+
+        //Prepare jtable plugin
+        $('#StudentTableContainer').jtable({
+            title: 'Student List',
+            paging: true,
+            sorting: true,
+            defaultSorting: 'Name ASC',
+            selecting: true, //Enable selecting
+            multiselect: true, //Allow multiple selecting
+            selectingCheckboxes: true, //Show checkboxes on first column
+            //selectOnRowClick: false, //Enable this to only select using checkboxes
+            actions: {
+                listAction: '@Url.Action("StudentList")',
+                deleteAction: '@Url.Action("DeleteStudent")',
+                updateAction: '@Url.Action("UpdateStudent")',
+                createAction: '@Url.Action("CreateStudent")'
+            },
+            fields: {
+                StudentId: {
+                    key: true,
+                    create: false,
+                    edit: false,
+                    list: false
+                },
+                Name: {
+                    title: 'Name',
+                    width: '23%',
+                    inputClass: 'validate[required]'
+                },
+                EmailAddress: {
+                    title: 'Email address',
+                    list: false,
+                    inputClass: 'validate[required,custom[email]]'
+                },
+                Password: {
+                    title: 'User Password',
+                    type: 'password',
+                    list: false,
+                    inputClass: 'validate[required]'
+                },
+                Gender: {
+                    title: 'Gender',
+                    width: '13%',
+                    options: { 'M': 'Male', 'F': 'Female' }
+                },
+                CityId: {
+                    title: 'City',
+                    width: '12%',
+                    options: '@Url.Action("GetCityOptions")'
+                },
+                BirthDate: {
+                    title: 'Birth date',
+                    width: '15%',
+                    type: 'date',
+                    displayFormat: 'yy-mm-dd',
+                    inputClass: 'validate[required,custom[date]]'
+                },
+                Education: {
+                    title: 'Education',
+                    list: false,
+                    type: 'radiobutton',
+                    options: { '1': 'Primary school', '2': 'High school', '3': 'University' },
+                    inputClass: 'validate[required]'
+                },
+                About: {
+                    title: 'About this person',
+                    type: 'textarea',
+                    list: false
+                },
+                IsActive: {
+                    title: 'Status',
+                    width: '12%',
+                    type: 'checkbox',
+                    values: { 'false': 'Passive', 'true': 'Active' },
+                    defaultValue: 'true'
+                },
+                RecordDate: {
+                    title: 'Record date',
+                    width: '15%',
+                    type: 'date',
+                    displayFormat: 'yy-mm-dd',
+                    create: false,
+                    edit: false,
+                    sorting: false
+                }
+            },
+            //Register to selectionChanged event to hanlde events
+            selectionChanged: function () {
+                //Get all selected rows
+                var $selectedRows = $('#StudentTableContainer').jtable('selectedRows');
+
+                $('#SelectedRowList').empty();
+                if ($selectedRows.length > 0) {
+                    //Show selected rows
+                    $selectedRows.each(function () {
+                        var record = $(this).data('record');
+                        $('#SelectedRowList').append(
+                            '<b>PersonId</b>: ' + record.PersonId +
+                            '<br /><b>Name</b>:' + record.Name + '<br /><br />'
+                            );
+                    });
+                } else {
+                    //No rows selected
+                    $('#SelectedRowList').append('No row selected! Select rows to see here...');
+                }
+            }
+        });
+
+        //Load student list from server
+        $('#StudentTableContainer').jtable('load');
+
+        //Delete selected students
+        $('#DeleteAllButton').button().click(function () {
+            var $selectedRows = $('#StudentTableContainer').jtable('selectedRows');
+            $('#StudentTableContainer').jtable('deleteRows', $selectedRows);
+        });
+    });
+   
+</script>
+<br />
+<hr />
+<h3>
+    HTML code</h3>
+<pre class="brush:html">&lt;div id=&quot;StudentTableContainer&quot;&gt;&lt;/div&gt;</pre>
+<h3>
+    Javascript code</h3>
+<pre class="brush:js; highlight: [10,11,12,13,92,98,116,117]">&lt;script type=&quot;text/javascript&quot;&gt;
+
+    $(document).ready(function () {
+
+        $(&#39;#StudentTableContainer&#39;).jtable({
+            title: &#39;Student List&#39;,
+            paging: true,
+            sorting: true,
+            defaultSorting: &#39;Name ASC&#39;,
+            selecting: true, //Enable selecting
+            multiselect: true, //Allow multiple selecting
+            selectingCheckboxes: true, //Show checkboxes on first column
+            //selectOnRowClick: false, //Enable this to only select using checkboxes
+            actions: {
+                listAction: &#39;/Demo/StudentList&#39;,
+                deleteAction: &#39;/Demo/DeleteStudent&#39;,
+                updateAction: &#39;/Demo/UpdateStudent&#39;,
+                createAction: &#39;/Demo/CreateStudent&#39;
+            },
+            fields: {
+                StudentId: {
+                    key: true,
+                    create: false,
+                    edit: false,
+                    list: false
+                },
+                Name: {
+                    title: &#39;Name&#39;,
+                    width: &#39;23%&#39;,
+                    inputClass: &#39;validate[required]&#39;
+                },
+                EmailAddress: {
+                    title: &#39;Email address&#39;,
+                    list: false,
+                    inputClass: &#39;validate[required,custom[email]]&#39;
+                },
+                Password: {
+                    title: &#39;User Password&#39;,
+                    type: &#39;password&#39;,
+                    list: false,
+                    inputClass: &#39;validate[required]&#39;
+                },
+                Gender: {
+                    title: &#39;Gender&#39;,
+                    width: &#39;13%&#39;,
+                    options: { &#39;M&#39;: &#39;Male&#39;, &#39;F&#39;: &#39;Female&#39; }
+                },
+                CityId: {
+                    title: &#39;City&#39;,
+                    width: &#39;12%&#39;,
+                    options: &#39;/Demo/GetCityOptions&#39;
+                },
+                BirthDate: {
+                    title: &#39;Birth date&#39;,
+                    width: &#39;15%&#39;,
+                    type: &#39;date&#39;,
+                    displayFormat: &#39;yy-mm-dd&#39;,
+                    inputClass: &#39;validate[required,custom[date]]&#39;
+                },
+                Education: {
+                    title: &#39;Education&#39;,
+                    list: false,
+                    type: &#39;radiobutton&#39;,
+                    options: { &#39;1&#39;: &#39;Primary school&#39;, &#39;2&#39;: &#39;High school&#39;, &#39;3&#39;: &#39;University&#39; },
+                    inputClass: &#39;validate[required]&#39;
+                },
+                About: {
+                    title: &#39;About this person&#39;,
+                    type: &#39;textarea&#39;,
+                    list: false
+                },
+                IsActive: {
+                    title: &#39;Status&#39;,
+                    width: &#39;12%&#39;,
+                    type: &#39;checkbox&#39;,
+                    values: { &#39;false&#39;: &#39;Passive&#39;, &#39;true&#39;: &#39;Active&#39; },
+                    defaultValue: &#39;true&#39;
+                },
+                RecordDate: {
+                    title: &#39;Record date&#39;,
+                    width: &#39;15%&#39;,
+                    type: &#39;date&#39;,
+                    displayFormat: &#39;yy-mm-dd&#39;,
+                    create: false,
+                    edit: false,
+                    sorting: false
+                }
+            },
+            //Register to selectionChanged event to hanlde events
+            selectionChanged: function () {
+                //Get all selected rows
+                var $selectedRows = $(&#39;#StudentTableContainer&#39;).jtable(&#39;selectedRows&#39;);
+
+                $(&#39;#SelectedRowList&#39;).empty();
+                if ($selectedRows.length &gt; 0) {
+                    //Show selected rows
+                    $selectedRows.each(function () {
+                        var record = $(this).data(&#39;record&#39;);
+                        $(&#39;#SelectedRowList&#39;).append(
+                            &#39;&lt;b&gt;PersonId&lt;/b&gt;: &#39; + record.PersonId +
+                            &#39;&lt;br /&gt;&lt;b&gt;Name&lt;/b&gt;:&#39; + record.Name + &#39;&lt;br /&gt;&lt;br /&gt;&#39;
+                            );
+                    });
+                } else {
+                    //No rows selected
+                    $(&#39;#SelectedRowList&#39;).append(&#39;No row selected! Select rows to see here...&#39;);
+                }
+            }
+        });
+
+        //Load student list from server
+        $(&#39;#StudentTableContainer&#39;).jtable(&#39;load&#39;);
+
+        //Delete selected students
+        $(&#39;#DeleteAllButton&#39;).button().click(function () {
+            var $selectedRows = $(&#39;#StudentTableContainer&#39;).jtable(&#39;selectedRows&#39;);
+            $(&#39;#StudentTableContainer&#39;).jtable(&#39;deleteRows&#39;, $selectedRows);
+        });
+    });
+   
+&lt;/script&gt;</pre>
+<h3>
+    Server side code</h3>
+@Html.Partial("_PagedAndSortedServerSideCodes")

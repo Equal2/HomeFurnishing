@@ -1,0 +1,46 @@
+﻿@model IEnumerable<Model.Models.DocumentType>
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3>
+            <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-list black"></span> @Model.FirstOrDefault().DocumentCategory.DocumentCategoryName List</span>
+        </h3>
+
+    </div>
+    <div class="panel-info" style="width:100%">
+        <div class="Wrapper">
+
+
+            @foreach (var item in Model)
+            {
+
+                string Dd = (System.Configuration.ConfigurationManager.AppSettings["DocTypePic"]);
+                string Ad = (System.Configuration.ConfigurationManager.AppSettings["AlphabetPic"]);
+                string ImgSrc = Dd + item.ImageFileName;
+                int val;
+                bool IsNumeric = Int32.TryParse(item.DocumentTypeName.Substring(0, 1), out val);
+                string ImgAlt = Ad + (IsNumeric ? "N" : item.DocumentTypeName.Substring(0, 1)) + ".png";
+
+                <div class="Box">
+                    <a href="/JobReceiveHeader/Index/@item.DocumentTypeId">
+                        <div class="InnerContent">
+                            <div style="width:100%;height:100%;margin-left:auto;margin-right:auto">
+                                <img src="@ImgSrc" style="max-height:100%;max-width:100%;padding:5px;height:135px;width:155px; border-radius:10%" alt="@ImgAlt" onerror="this.src = '@ImgAlt'" />
+                            </div>
+                            <div class="titleBox">@(string.IsNullOrEmpty(item.IconDisplayName) ? item.DocumentTypeName : item.IconDisplayName)</div>
+                        </div>
+                    </a>
+                </div>
+
+
+            }
+
+        </div>
+
+    </div>
+</div> 

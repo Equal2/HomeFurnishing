@@ -1,0 +1,145 @@
+﻿@using Core.Common;
+@using Model.ViewModel;
+@using GridMvc.Html;
+@model IQueryable<Model.ViewModels.SaleQuotationHeaderViewModel>
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    string ControllerName = (string)ViewContext.RouteData.Values["controller"];
+    string IndexStatus = (string)ViewBag.IndexStatus;
+
+    string Partycaption = "";
+    if ((string)ViewBag.PartyCaption =="" || (string)ViewBag.PartyCaption ==null)
+    {
+        Partycaption = "Party";
+    }
+    else
+    {
+        Partycaption= (string)ViewBag.PartyCaption;
+    }
+
+}
+
+@*<style type="text/css">
+    .panel-info .dropdown-toggle:hover {
+        color: #1AAFD0;
+    $("table.grid-table .grid-header > .grid-header-title").eq(1).css("text-align", "right");
+    }
+</style>*@
+@*<style type="text/css">
+    table.grid-table .grid-header > .grid-header-title.{
+        text-align: right;
+    }
+   
+</style>*@
+
+
+
+
+<!-- modal placeholder-->
+<div id='myModal' class='modal fade in'>
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div id='myModalContent'></div>
+        </div>
+    </div>
+</div>
+
+
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3>
+            <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-list black"></span> @ViewBag.Name List </span>
+        </h3>
+        <hr style="margin-top:0px;margin-bottom:0px" />
+        <input type="hidden" class="DocType_Id" value="@ViewBag.id">
+        <div class="panel-info">            
+            <div class="btn-group">               
+                @Html.ActionLink(" ", "Create", "SaleQuotationHeader", new { @id = @ViewBag.id }, new { @class = "cbtn btn-circle glyphicon glyphicon-plus toolbar", @title = "Add New", @data_toggle = "tooltip" })
+                @if (ViewBag.SqlProcDocumentPrint != null)
+                {
+                @Html.ActionLink(" ", "GeneratePrints", "SaleQuotationHeader", null, new { @class = "cbtn btn-circle glyphicon glyphicon-print", @title = "Print", @data_toggle = "tooltip", @id = "PrintRecordI", target = "_blank" })
+                }
+                @if (ViewBag.SqlProcGatePass != null)
+                {
+                @Html.ActionLink(" ", "GenerateGatePass", "SaleQuotationHeader", null, new { @class = "cbtn btn-circle glyphicon glyphicon glyphicon-log-out ", @title = "GatePass", @data_toggle = "tooltip", @id = "GenGatePassI" })
+                }
+                @Html.ActionLink(" ", "Remove", "SaleQuotationHeader", null, new { @class = "cbtn btn-circle glyphicon glyphicon-trash hidden-xs", @title = "Delete", @data_toggle = "tooltip", @id = "DeleteRecord", @data_modalDelete = "", onclick = "" })
+            </div>
+            <div class="btn-group">
+                <a class="cbtn btn-circle glyphicon glyphicon-option-horizontal dropdown-toggle" aria-expanded="false" title="More Option" style="padding-top: 6px;padding-bottom: 6px;" href="#" title="More Option" data-toggle="dropdown" id="dropdownMenu1">
+                </a>
+                <ul class="dropdown-menu pull-right" aria-labelledby="dropdownMenu1">
+                @if (ViewBag.WizardId != null)
+                {
+                <li><a href="@Url.Action("Wizard", "SaleQuotationHeader", new { @id = @ViewBag.id })"><span class="glyphicon glyphicon-random" onclick="$('#')"> </span>&nbsp;&nbsp;Wizard</a></li>
+                }
+                @if (ViewBag.ExportMenuId != null)
+                {
+                <li><a href="@Url.Action("Export", "SaleQuotationHeader", new { @id = @ViewBag.id })"><span class="glyphicon glyphicon-export"> </span>&nbsp;&nbsp;Export</a></li>
+                }
+                @if (ViewBag.ImportMenuId != null)
+                {
+                <li><a href="@Url.Action("Import", "SaleQuotationHeader", new { @id = @ViewBag.id })"><span class="glyphicon glyphicon-import"> </span>&nbsp;&nbsp;Import</a></li>
+                }
+                @if (ViewBag.AdminSetting== "True")
+                {
+                <li><a href="@Url.Action("Create", "SaleQuotationSettings", new { @id = @ViewBag.id })"><span class="glyphicon glyphicon-cog"> </span>&nbsp;&nbsp;Settings</a></li>
+                }
+                <li role="separator" class="divider"></li>
+                <li><a id="DocHistoryI" href="@Url.Action("GetHistory", "LogHistory", new {  })"><span class="glyphicon glyphicon-user"> </span> History</a></li>
+                <li><a target="_blank" href="@Url.Action("Report", "SaleQuotationHeader", new { @ViewBag.id })"><span class="glyphicon glyphicon-stats"> </span> Report</a></li>
+                </ul>
+            </div>
+
+            <div class="btn-group right">
+                @CustomHelpers.RenderIconStatusFilters(ViewBag.PendingToSubmit, ViewBag.PendingToReview, ControllerName, ViewBag.id, ViewBag.IndexStatus)
+            </div>
+        </div>
+        @*<hr style="margin-top: 5px; margin-bottom: 5px; border-top: 1px solid #706f6f; " />
+        @CustomHelpers.RenderStatusFilters(ViewBag.PendingToSubmit, ViewBag.PendingToReview, ControllerName, ViewBag.id, ViewBag.IndexStatus)*@
+
+    </div>
+    <div class="panel-info" style="padding-left:5px;padding-top:2px;font-size:12px">
+
+        @if (ViewBag.IsPostedInStock == true)
+        {
+            @Html.Grid(Model).Columns(columns =>
+           {
+               columns.Add(m => m.SaleQuotationHeaderId, true).Css("Header_Id");
+               columns.Add(m => m.Status, true);
+               columns.Add(foo => foo.DocDate).Sortable(true).Titled("Quotation Date").Format("{0:dd/MMM/yyyy}").Filterable(true);
+               columns.Add(m => m.DocNo).Sortable(true).Titled("Quotation No.").Filterable(true).Sortable(true);
+               columns.Add(foo => foo.DueDate).Sortable(true).Titled("Due Date").Format("{0:dd/MMM/yyyy}").Filterable(true);
+               columns.Add(foo => foo.ExpiryDate).Sortable(true).Titled("Expiry Date").Format("{0:dd/MMM/yyyy}").Filterable(true);
+               columns.Add(m => m.CostCenterName, (bool)(!(ViewBag.isVisibleCostCenter ?? true))).Sortable(true).Titled("CostCenter").Filterable(true).Sortable(true);
+               columns.Add(m => m.SaleToBuyerName).Sortable(true).Filterable(true).Titled(Partycaption);
+               columns.Add().Sanitized(false).Encoded(false).RenderValueAs(m => CustomHelpers.RenderStatus(m.Status)).Titled("Status");
+               columns.Add().Titled("").Encoded(false).Sanitized(false).RenderValueAs(m => CustomHelpers.RenderUserImage(m.ModifiedBy)).Titled("User").SetWidth("5%").Css("UserImageIndex");
+               columns.Add().Encoded(false).Sanitized(false).RenderValueAs(m => CustomHelpers.RenderActionColumn(ControllerName, m.SaleQuotationHeaderId, m.Status, m.Reviewed, m.ReviewCount, (string)ViewBag.IndexStatus)).SetWidth(20).Css("icon-Cus-Size");
+               columns.Add(true).RenderValueAs(m => CustomHelpers.RenderHEDActionLink(ControllerName, m.SaleQuotationHeaderId, m.Status, IndexStatus));
+           }).WithPaging(25).EmptyText("No records found.")
+        }
+        else
+        {
+            @Html.Grid(Model).Columns(columns =>
+       {
+           columns.Add(m => m.SaleQuotationHeaderId, true).Css("Header_Id");
+           columns.Add(m => m.Status, true);
+           columns.Add(foo => foo.DocDate).Sortable(true).Titled("Quotation Date").Format("{0:dd/MMM/yyyy}").Filterable(true);
+           columns.Add(m => m.DocNo).Sortable(true).Titled("Quotation No.").Filterable(true).Sortable(true);
+           columns.Add(foo => foo.DueDate).Sortable(true).Titled("Due Date").Format("{0:dd/MMM/yyyy}").Filterable(true);
+           columns.Add(foo => foo.ExpiryDate).Sortable(true).Titled("Expiry Date").Format("{0:dd/MMM/yyyy}").Filterable(true);
+           columns.Add(m => m.CostCenterName, (bool)(!(ViewBag.isVisibleCostCenter ?? true))).Sortable(true).Titled("CostCenter").Filterable(true).Sortable(true);
+           columns.Add(m => m.SaleToBuyerName).Sortable(true).Filterable(true).Titled(Partycaption);
+           columns.Add(m => m.Remark).Sortable(true).Filterable(true).Titled("Remark");
+           columns.Add().Sanitized(false).Encoded(false).RenderValueAs(m => CustomHelpers.RenderStatus(m.Status)).Titled("Status");
+           columns.Add().Titled("").Encoded(false).Sanitized(false).RenderValueAs(m => CustomHelpers.RenderUserImage(m.ModifiedBy)).Titled("User").SetWidth("5%").Css("UserImageIndex");
+           columns.Add().Encoded(false).Sanitized(false).RenderValueAs(m => CustomHelpers.RenderActionColumn(ControllerName, m.SaleQuotationHeaderId, m.Status, m.Reviewed, m.ReviewCount, (string)ViewBag.IndexStatus)).SetWidth(20).Css("icon-Cus-Size");
+           columns.Add(true).RenderValueAs(m => CustomHelpers.RenderHEDActionLink(ControllerName, m.SaleQuotationHeaderId, m.Status, IndexStatus));
+       }).WithPaging(25).EmptyText("No records found.")
+        }
+    </div>
+</div>

@@ -1,0 +1,135 @@
+﻿@model Model.ViewModel.SmsViewModel
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+
+
+@using (Html.BeginForm("SendSms", "Sms", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            @CustomHelpers.RenderResHeaderInfo(ViewBag.transactionType, (int?)ViewBag.PendingToSubmit, (int?)ViewBag.PendingToReview, "Send SMS")
+
+            <hr style="margin-top: 5px; margin-bottom: 5px; border-top: 1px solid #d8d5d5" />
+
+            <div class="panel-info">
+                <div class="btn-group">
+                </div>
+                @*<div class="btn-group">
+                    <a class="cbtn btn-circle glyphicon glyphicon-option-horizontal dropdown-toggle" title="More Option" aria-expanded="false" style="padding-top: 6px;padding-bottom: 6px;" href="#" data-toggle="dropdown" id="dropdownMenu1">
+                    </a>
+                    <ul class="dropdown-menu pull-right" aria-labelledby="dropdownMenu1">
+                        <li><a href="@Url.Action("Email", "JobOrderHeader")"><span class="glyphicon glyphicon-envelope"> </span> Email</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a target="_blank" href="@Url.Action("Report", "JobOrderHeader", new { @ViewBag.id })"><span class="glyphicon glyphicon-th"> </span> Report</a></li>
+                    </ul>
+                </div>*@
+            </div>
+        </div>
+
+            <div class="panel-info" style="padding-left:15px">
+                <div class="form-horizontal">
+                    @Html.ValidationSummary(true)
+                    <div>
+                        <div class="col-md-12">
+                            <div class="form-group" style="margin-top:15px">
+                                @Html.LabelFor(model => model.MobileNoList, "Send To", new { @class = "control-label col-md-4 col-sm-2" })
+                                <div class="col-md-7 col-sm-10">
+                                    @Html.TextBoxFor(m => m.MobileNoList, null, new { @class = "form-control required" })
+                                    @Html.ValidationMessageFor(m => m.MobileNoList, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.Message, "Message", new { @class = "control-label col-md-4 col-sm-2" })
+                                <div class="col-md-7 col-sm-10">
+                                    @Html.TextAreaFor(m => m.Message, new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(m => m.Message, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+}
+
+<script type="text/javascript">
+    //CustomSelectFunction($("#MobileNoList"), '/Sms/GetPerson', '/Sms/SetPerson', ' ', true, 0);
+    CustomTagFunction($("#MobileNoList"), '/Sms/GetPerson', '/Sms/SetPerson', ' ', 0);
+
+    function CustomTagFunction(ElementId, GetAction, SetAction, placehold, MinLength, filterid, maxItemsToSelect) {
+        var geturl = GetAction;
+        //The url we will send our get request to
+        var attendeeUrl = GetAction;
+        var pageSize = 20;
+
+        ElementId.select2(
+        {
+            tags: true,
+            placeholder: placehold,
+            //Does the user have to enter any data before sending the ajax request
+            minimumInputLength: MinLength,
+            allowClear: true,
+            createSearchChoice: function (term) {
+                return {
+                    id: $.trim(term.toUpperCase()),
+                    text: $.trim(term.toUpperCase())
+                };
+            },
+            maximumSelectionSize: maxItemsToSelect,
+
+            // override message for max tags
+            formatSelectionTooBig: function (limit) {
+                return "Max tags is only " + limit;
+            },
+            ajax: {
+                //How long the user has to pause their typing before sending the next request
+                quietMillis: 1000,
+                //The url of the json service
+                url: attendeeUrl,
+                dataType: 'jsonp',
+                //Our search term and what page we are on
+                data: function (term, page) {
+                    return {
+                        pageSize: pageSize,
+                        pageNum: page,
+                        searchTerm: term,
+                        filter: filterid
+                    };
+                },
+                results: function (data, page) {
+                    //Used to determine whether or not there are more results available,
+                    //and if requests for more data should be sent in the infinite scrolling
+                    var more = (page * pageSize) < data.Total;
+                    return { results: data.Results, more: more };
+                }
+            },
+            initSelection: function (element, callback) {
+
+                var xval = element.val();
+                if (xval != 0) {
+                    $.ajax({
+                        cache: false,
+                        type: "POST",
+                        url: SetAction,
+                        data: { Ids: element.val() },
+                        success: function (data) {
+                            callback(data);
+                        },
+                        error: function (xhr, ajaxOptions, thrownError) {
+                            alert('Failed to Retrive Qty' + thrownError);
+                        }
+                    })
+                }
+                //callback([{ id: "1", text: "arpit" }, { id: "2", text: "akash" }]);
+            }
+        });
+    }
+ </script>

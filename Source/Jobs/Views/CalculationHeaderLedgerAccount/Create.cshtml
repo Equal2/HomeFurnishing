@@ -1,0 +1,415 @@
+﻿@model Model.ViewModel.CalculationHeaderLedgerAccountViewModel
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<!-- modal placeholder-->
+<div id='myModal' class='modal fade in'>
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div id='myModalContent'></div>
+        </div>
+    </div>
+</div>
+
+@using (Html.BeginForm("CreatePost", "CalculationHeaderLedgerAccount", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+
+    <div class="panel panel-default">
+
+        <div class="panel-heading">
+
+            <h3>
+                <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-file black"></span> Calculation Ledger Accounts</span>
+                <input type="submit" value="Save" class="btn btn-primary right" id="submit" style="width: 90px; background-color: #2980b9" />
+            </h3>
+            <hr style="margin-top:0px;margin-bottom:0px" />
+
+            <div class="panel-info">
+                <h4 style="padding:5px 0 0 0;margin:0px">
+                    @Html.ActionLink(" ", " ", " ", null, new { @class = "glyphicon glyphicon-refresh toolbar", @title = "Refresh Page", @data_toggle = "tooltip", @id = "RefreshPage" })
+                    @Html.ActionLink(" ", "Create", "CalculationHeaderLedgerAccount", null, new { @class = "glyphicon glyphicon-plus toolbar", @title = "Add New", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "History", "CalculationHeaderLedgerAccount", null, new { @class = "glyphicon glyphicon-user toolbar", @title = "History", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "Email", "CalculationHeaderLedgerAccount", null, new { @class = "glyphicon glyphicon-envelope toolbar", @title = "Email", @data_toggle = "tooltip" })
+                    @*@Html.ActionLink(" ", "PrevPage", "CalculationHeaderLedgerAccount", new { id = @Model.CalculationId }, new { @class = "glyphicon glyphicon-arrow-left toolbar", @title = "Prev Record", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "NextPage", "CalculationHeaderLedgerAccount", new { id = @Model.CalculationId }, new { @class = "glyphicon glyphicon-arrow-right toolbar", @title = "Next Record", @data_toggle = "tooltip" })*@
+                    @Html.ActionLink(" ", "HeaderIndex", "CalculationHeaderLedgerAccount", null, new { @class = "glyphicon glyphicon-list toolbar right", @title = "List", @data_toggle = "tooltip" })
+                </h4>
+            </div>
+        </div>
+        <div class="panel-info" style="padding-left:15px">
+
+            <div class="form-horizontal">
+
+                @Html.ValidationSummary(true)
+
+                @if (Model.CalculationId > 0 && Model.DocTypeId > 0)
+                {
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group" style="margin-top:15px">
+                                @Html.LabelFor(model => model.CalculationId, "Calculation Name", new { @class = "control-label col-xs-4" })
+                                <div class="col-xs-6">
+                                    @Html.TextBoxFor(m => m.CalculationId, null, new { @class = "form-control col-xs-6 required", @readonly = true })
+                                    @Html.ValidationMessageFor(m => m.CalculationId, null, new { @class = "text-danger" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group" style="margin-top:15px">
+                                @Html.LabelFor(model => model.DocTypeId, "Document Type", new { @class = "control-label col-xs-4" })
+                                <div class="col-xs-6">
+                                    @Html.TextBoxFor(m => m.DocTypeId, new { @class = "form-control col-xs-6 required", @readonly = true })
+                                    @Html.ValidationMessageFor(m => m.DocTypeId, null, new { @class = "text-danger" })
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                }
+                else
+                {
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group" style="margin-top:15px">
+                                @Html.LabelFor(model => model.CalculationId, "Calculation Name", new { @class = "control-label col-xs-4" })
+                                <div class="col-xs-6">
+                                    @Html.TextBoxFor(m => m.CalculationId, null, new { @class = "form-control col-xs-6 required" })
+                                    @Html.ValidationMessageFor(m => m.CalculationId, null, new { @class = "text-danger" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group" style="margin-top:15px">
+                                @Html.LabelFor(model => model.DocTypeId, "Document Type", new { @class = "control-label col-xs-4" })
+                                <div class="col-xs-6">
+                                    @Html.TextBoxFor(m => m.DocTypeId, new { @class = "form-control col-xs-6 required" })
+                                    @Html.ValidationMessageFor(m => m.DocTypeId, null, new { @class = "text-danger" })
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+
+                <hr />
+                <div role="tabpanel">
+                    <!-- Nav tabs -->
+                    <ul class="nav nav-tabs" role="tablist">                        
+                        <li role="presentation" class="active"><a href="#Header" aria-controls="Header" role="tab" data-toggle="tab">Header Ledger</a></li>
+                        <li role="presentation"><a href="#Line" aria-controls="Line" role="tab" data-toggle="tab">Line Ledger</a></li>
+                    </ul>
+                    <!-- Tab panes -->
+                    <div class="tab-content">
+
+                        <div role="tabpanel" class="tab-pane fade in active" id="Header">
+
+                            <div class="row">
+                                <h4 class="col-md-12 black" style="margin-top:15px">
+                                    <span class="glyphicon glyphicon-shopping-cart"></span>
+                                    1.Header Ledger Accounts
+                                </h4>
+                            </div>
+
+                            <div class="panel-info">
+                                <h5 style="padding:5px 0 3px 0;margin:0px;font-weight:bold">
+                                    <span class="glyphicon glyphicon-plus-sign"></span>
+                                   @* @Html.ActionLink("Add New Row ", "_Create", "CalculationHeaderLedgerAccount", new { CalculationId = @Model.CalculationId,DocTypeId=@Model.DocTypeId }, new { data_modal = "", @id = "btnCreateP", @class = "toolbar", @title = "Add New", @data_toggle = "tooltip" })*@
+                                </h5>
+                            </div>
+                            <div style="padding-right:15px">
+
+
+                                <div class="panel panel-default" id="grid">
+                                    <div class="panel-heading headrow" style="background-image: -webkit-linear-gradient(top, #428bca 0%, #428bca 100%);color:white">
+                                        <div class="row grid-head">
+                                            <div class="col-xs-1 text-left">
+                                                Srl.
+                                            </div>
+                                            <div class="col-xs-10">
+                                                <div class="row">
+                                                    @*ProductInfo*@
+                                                    <div class="col-sm-3">
+                                                        Calculation Footer
+                                                    </div>
+                                                    @*Qty*@
+                                                    <div class="col-sm-3">
+                                                        Ledger Acc Cr
+                                                    </div>
+                                                    @*Rate*@
+                                                    <div class="col-sm-3">
+                                                        Ledger Acc Dr
+                                                    </div>
+                                                    @*Amount*@
+                                                    <div class="col-sm-3">
+                                                        Cost Centre
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-xs-1">
+
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                    <div class="panel-info" id="gbodyp">
+
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div role="tabpanel" class="tab-pane fade" id="Line">
+
+                            <div class="row">
+                                <h4 class="col-md-12 black" style="margin-top:15px">
+                                    <span class="glyphicon glyphicon-shopping-cart"></span>
+                                    2.Line Ledger Accounts
+                                </h4>
+                            </div>
+
+                            <div class="panel-info">
+                                <h5 style="padding:5px 0 3px 0;margin:0px;font-weight:bold">
+                                    <span class="glyphicon glyphicon-plus-sign"></span>
+                                   @* @Html.ActionLink("Add New Row ", "_Create", "CalculationLineLedgerAccount", new { CalculationId = @Model.CalculationId, DocTypeId = Model.DocTypeId }, new { data_modal = "", @class = "toolbar", @id = "btnCreateF", @title = "Add New", @data_toggle = "tooltip" })*@
+                                </h5>
+                            </div>
+                            <div style="padding-right:15px">
+
+                                <div class="panel panel-default" id="grid">
+                                    <div class="panel-heading headrow" style="background-image: -webkit-linear-gradient(top, #428bca 0%, #428bca 100%);color:white">
+                                        <div class="row grid-head">
+                                            <div class="col-xs-1 text-left">
+                                                Srl.
+                                            </div>
+                                            <div class="col-xs-10">
+                                                <div class="row">
+                                                    @*ProductInfo*@
+                                                    <div class="col-sm-3">
+                                                        Calculation Product
+
+                                                    </div>
+                                                    @*Qty*@
+                                                    <div class="col-sm-3">
+                                                        Ledger Acc Cr
+                                                    </div>
+                                                    @*Rate*@
+                                                    <div class="col-sm-3">
+                                                        Ledger Acc Dr
+                                                    </div>
+                                                    @*Amount*@
+                                                    <div class="col-sm-3">
+                                                        Cost Centre
+                                                    </div>                                                    
+                                                </div>
+                                            </div>
+                                            <div class="col-xs-1">
+
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                    <div class="panel-info" id="gbodyf">
+
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+}
+<script type="text/javascript">
+
+    $(document).ready(function () {
+
+        CustomSelectFunction($("#CalculationId"), '/ComboHelpList/GetCalculation', '/ComboHelpList/SetSingleCalculation', ' ', false, 1);
+        CustomSelectFunction($("#DocTypeId"), '/ComboHelpList/GetDocumentType', '/ComboHelpList/SetSingleDocumentType', ' ', false, 1);
+
+        //Calling the function to load the table data/ Line information
+        LoadProducts();
+    });
+
+    var IsSaved=false;
+    var ValidationCount=0;
+
+    $('form').submit(function(event){
+
+        if(!IsSaved)
+        {
+            if(!ValidateData())
+            {
+                return false;
+            }
+            IsSaved=true;
+            return IsSaved;
+        }
+
+    });
+
+
+    function ValidateData() {
+        var DocId=@Model.CalculationId;
+        var TempValue;
+        var ValidationMessage="";
+        
+        return  (ValidationMessage=="");
+
+    }
+
+    //For Populating Modal PopUp on DoubleClick Of Row
+    $('#gbodyf,#gbodyp').on("dblclick",'.grid-body',function(){
+        var text = $(this).find(".id").val();
+        var editurl=$(this).find('a[delete]').attr('href');
+        $('#myModalContent').load(editurl, function () {
+            //alert('2');
+            $('#myModal').modal({
+                backdrop: 'static',
+                keyboard: true
+            }, 'show');
+
+            bindForm1(this);
+        });
+    });
+
+
+    //For Handling Modal PopUp on Clicking Delete Icon
+    $('#gbodyf,#gbodyp').on("click",'a[delete]', function (e) {
+        $('#myModalContent').load(this.href, function () {
+            //alert('2');
+            $('#myModal').modal({
+                backdrop: 'static',
+                keyboard: true
+            }, 'show');
+
+            bindForm1(this);
+        });
+        return false;
+    });
+
+
+    var id='@Model.CalculationId';
+    var did='@Model.DocTypeId';
+    if((id==null||id==0)||(did==null||did==0))
+    {
+        $(document).find('a#btnCreateP,a#btnCreateF').removeAttr('href').removeAttr('data-modal');
+        $("a#btnCreateP,a#btnCreateF").attr('disabled','disabled');
+
+    }
+
+
+
+    //Reloading the table contents on modal hide
+    $('#myModal').on('hidden.bs.modal', function () {
+        LoadProducts();
+    });
+
+    function LoadProducts() {
+        var groupId='@Model.CalculationId';
+        var dId='@Model.DocTypeId';
+        var link="/CalculationHeaderLedgerAccount/Index/";
+        $.ajax({
+            url: link,
+            type: "GET",
+            data:{id:groupId,DocTypeId:dId},
+            success: function (data) {
+                var row = ""
+                var srno=1;
+
+                if(data.length!=0)
+                {
+                    $.each(data, function (index, item) {
+                        row += " <div class='row crow grid-body' style='margin-left:0px;margin-right:0px'><div class='col-xs-1 row-index'>"+srno+"<input type='hidden' class='id' value='"+item.CalculationHeaderLedgerAccountId+"' /></div><div class='col-xs-10'><div class='row'><div class='col-sm-3'>"+(item.CalculationFooterName==null?" ":"<strong>"+item.CalculationFooterName+"</strong>")+"<br />"+"<p></p><div>"+"</div></div><div class='col-sm-3'>"+(item.LedgerAccountCrName==null?" ":item.LedgerAccountCrName)+"  </div><div class='col-sm-3'>"+(item.LedgerAccountDrName==null?" ":item.LedgerAccountDrName)+"</div><div class='col-sm-3'>"+(item.CostCentreName==null?" ":item.CostCentreName)+"</div></div></div><div class='col-xs-1'><a class='glyphicon glyphicon-trash icon-Cus-Size' delete='' href='/CalculationHeaderLedgerAccount/_Edit?CHeaderLedgerId="+item.CalculationHeaderLedgerAccountId+"&DocTypeId="+item.DocTypeId+"&CalculationFooterId="+item.CalculationFooterId+"&CalculationId="+item.CalculationId+"'></a></div></div><hr style='margin-top:0px;margin-bottom:0px'/></div>";
+                        srno++;
+                    });
+                    // row+="<div class='row tfooter' style='padding-top:10px;'><div class='col-xs-1'></div><div class='col-xs-10'><div class='row'>  <div class='col-sm-4'><strong>Total</strong></div><div class='col-sm-2 text-right'><strong>"+ ((unit==true)?QtyCount.toFixed(decimal)+"<br /><small>"+prevunit:QtyCount.toFixed(decimal))+"</small></strong></div><div class='col-sm-2 text-right'></div><div class='col-sm-2 text-right'><strong></strong></div><div class='col-sm-2'></div></div></div><div class='col-xs-1'></div></div>"
+
+                    //$('#DocNo').attr('readonly','true');
+
+                }
+                else
+                {
+                    ;
+                }
+                $("#gbodyp").html(row);
+
+            },
+            error: function (result) {
+                alert("Error");
+            }
+        });
+
+        var group2Id=@Model.CalculationId;
+        var link2="/CalculationLineLedgerAccount/Index/"+groupId;
+
+        $.ajax({
+            url: link2,
+            type: "GET",
+            data:{id:groupId,DocTypeId:dId},
+            success: function (data) {
+                var row = ""
+                var srno=1;
+
+                if(data.length!=0)
+                {
+                    $.each(data, function (index, item) {
+                        row += " <div class='row crow grid-body' style='margin-left:0px;margin-right:0px'><div class='col-xs-1 row-index'>"+srno+"<input type='hidden' class='id' value='"+item.CalculationLineLedgerAccountId+"' /></div><div class='col-xs-10'><div class='row'><div class='col-sm-3'>"+(item.CalculationProductName==null?" ":"<strong>"+item.CalculationProductName+"</strong>")+"</div><div class='col-sm-3'>"+(item.LedgerAccountCrName==null?" ":item.LedgerAccountCrName)+"</div><div class='col-sm-3'>"+(item.LedgerAccountDrName==null?" ":item.LedgerAccountDrName)+"</div><div class='col-sm-3'>"+(item.CostCentreName==null?" ":item.CostCentreName)+"</div></div></div><div class='col-xs-1'><a class='glyphicon glyphicon-trash icon-Cus-Size' delete='' href='/CalculationLineLedgerAccount/_Edit/?CLineLedgerId="+item.CalculationLineLedgerAccountId+"&DocTypeId="+item.DocTypeId+"&CalculationProductId="+item.CalculationProductId+"&CalculationId="+item.CalculationId+"'></a></div></div><hr style='margin-top:0px;margin-bottom:0px'/></div>";
+                        srno++;
+                    });
+                }
+                else
+                {
+                    ;
+                }
+                $("#gbodyf").html(row);
+
+            },
+            error: function (result) {
+                alert("Error");
+            }
+        });
+
+
+    }
+
+    //For posting the data through ajax and render the contents sent back from the server
+    function bindForm1(dialog) {
+        //alert("binding");
+        $('form#modform', dialog).submit(function () {
+            //alert(this.action);
+            $.ajax({
+                url: this.action,
+                type: this.method,
+                data: $(this).serialize(),
+                success: function (result) {
+                    if (result.success) {
+                        $('#myModal').modal('hide');
+                        //Refresh
+                        //location.reload();
+                        //alert('Data Saved');
+                    }else if(!result.success)
+                    {
+                        $('#myModalContent').html(result);
+                        bindForm1();
+                    }
+                    else {
+                        $('#myModalContent').html(result);
+                        bindForm1();
+                    }
+                }
+            });
+            return false;
+        });
+
+    }
+
+
+</script>

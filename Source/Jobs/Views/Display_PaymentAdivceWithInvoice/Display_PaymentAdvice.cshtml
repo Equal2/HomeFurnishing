@@ -1,0 +1,360 @@
+﻿@model Service.Display_PaymentAdviceViewModel
+@using System.Text.RegularExpressions
+
+@{
+    ViewBag.Title = "Payment Advice";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style type="text/css">
+    .grid {
+        width: 1140px;
+        height: 80vh;
+    }
+
+
+
+
+    .ui-grid-cell {
+        border-style: solid;
+        border-width: thin;
+        
+    }
+
+    .text-right {
+        text-align: right;
+        /*float: right;*/
+    }
+
+    .cell-text {
+        font-size:13px;
+        font-weight:normal;
+    }
+
+    .header-text {
+        font-size: 13px;
+    }
+
+
+    .ui-grid-viewport .ui-grid-cell-contents {
+        word-wrap: break-word;white-space: normal !important;
+    }
+
+    .ui-grid-row, .ui-grid-cell {
+        height: auto !important;
+    }
+
+        .ui-grid-row div[role=row] {
+            display: flex;
+            align-content: stretch;
+        }
+
+
+
+</style>
+
+
+<!doctype html>
+<html ng-app="DisplayPaymentAdvice">
+<head>
+    <title>
+        UI-Grid
+    </title>
+    <script src="~/Scripts/angular.js"></script>
+    <script src="~/Scripts/angular-touch.js"></script>
+    <script src="~/Scripts/angular-animate.js"></script>
+    <script data-require="angular.js@1.4.x" src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.4.6/angular.min.js" data-semver="1.4.6"></script>
+    <script src="http://ui-grid.info/docs/grunt-scripts/csv.js"></script>
+    <script src="http://ui-grid.info/docs/grunt-scripts/pdfmake.js"></script>
+    <script src="http://ui-grid.info/docs/grunt-scripts/vfs_fonts.js"></script>
+    <script src="http://ui-grid.info/release/ui-grid-unstable.js"></script>
+    <link rel="stylesheet" href="http://ui-grid.info/release/ui-grid-unstable.css" type="text/css">
+
+
+    @*<script src="~/Scripts/pdfmake/pdfmake.min.js"></script>
+        <script src="~/Scripts/pdfmake/vfs_fonts.js"></script>*@
+    @*<script src="~/Scripts/app.js"></script>*@
+
+
+    @*<script src="~/Scripts/FinancialDisplay/FinancialDisplay.js"></script>
+    <script src="~/Scripts/ui-grid.js"></script>
+    <link href="~/Content/ui-grid.css" rel="stylesheet" />*@
+</head>
+<body id="MyBody">
+
+    <div ng-controller="MainCtrl">
+        <div class="panel panel-default" style="margin-bottom:0px">
+
+            <div class="panel-heading">
+                <h4>
+                    <span>Finishing Payment Advice </span>
+                    <input type="submit" value="Fill" ng-click="BindData()" class="btn btn-primary btn-sm CurveBorder height" data-toggle="collapse" data-target="#ReportFilters" style="float : right ; width:5em; background-color: #2980b9" />
+                    <span role="button" data-toggle="collapse" href="#ReportFilters" aria-expanded="false" aria-controls="ReportFilters" id="ShowFilters">
+                        <span class="btn btn-primary btn-sm CurveBorder height" style="float : right ; width:5em; background-color: #2980b9; margin-right:2px" />
+                        Filters
+                    </span>
+                </h4>
+            </div>
+            <form action="/" id="registerSubmit">
+                <div class="panel-info" style="padding-left:15px">
+                    @Html.AntiForgeryToken()
+                  @Html.HiddenFor(m => m.TextHidden)
+                     @*@Html.HiddenFor(m => m.LedgerAccount)*@
+                    
+                    <div class="form-horizontal" role="form" id="ReportFilters">
+                        @Html.ValidationSummary(true)
+                        <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+                            <div class="panel-body">
+                                <div class="row">
+
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            @Html.LabelFor(model => model.Format, "Format", new { @class = "control-label col-md-4 col-sm-2" })
+                                            <div class="col-xs-6">
+                                                @Html.TextBoxFor(m => m.Format, null, new { @class = "form-control col-xs-6" })
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            @Html.LabelFor(model => model.FromDate, "From Date", new { @class = "control-label col-md-4 col-sm-2" })
+                                            <div class="col-xs-6">
+                                                @Html.TextBoxFor(m => m.FromDate, "{0:dd/MMMM/yyyy}", new { @class = "datepicker form-control col-xs-6 " })
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            @Html.LabelFor(model => model.ToDate, "To Date", new { @class = "control-label col-md-4 col-sm-2" })
+                                            <div class="col-xs-6">
+                                                @Html.TextBoxFor(m => m.ToDate, "{0:dd/MMMM/yyyy}", new { @class = "datepicker form-control col-xs-6 " })
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            @Html.LabelFor(model => model.JobWorker, "Job Worker", new { @class = "control-label col-md-4 col-sm-2" })
+                                            <div class="col-xs-6">
+                                                @Html.TextBoxFor(m => m.JobWorker, null, new { @class = "form-control col-xs-6" })
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            @Html.LabelFor(model => model.SiteIds, "Sites", new { @class = "control-label col-md-4 col-sm-2" })
+                                            <div class="col-xs-6">
+                                                @Html.TextBoxFor(m => m.SiteIds, null, new { @class = "form-control col-xs-6" })
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            @Html.LabelFor(model => model.DivisionIds, "Divisions", new { @class = "control-label col-md-4 col-sm-2" })
+                                            <div class="col-xs-6">
+                                                @Html.TextBoxFor(m => m.DivisionIds, null, new { @class = "form-control col-xs-6" })
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            @Html.LabelFor(model => model.Process, "Process", new { @class = "control-label col-md-4 col-sm-2" })
+                                            <div class="col-xs-6">
+                                                @Html.TextBoxFor(m => m.Process, null, new { @class = "form-control col-xs-6" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="col-md-offset-2 col-md-10">
+
+                                <span style="font-family: Calibri,sans-serif,Verdana;font-size:large">
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div id="tableDiv"></div>
+            </form>
+        </div>
+
+
+        @*<div ui-grid="gridOptions" ui-grid-exporter ui-grid-resize-columns ui-grid-move-columns ui-grid-cellnav ui-grid-pinning ui-grid-save-state  ui-grid-tree-view class="grid" style="margin-top:0px"></div>*@
+
+        <div ui-grid="gridOptions" ui-grid-exporter ui-grid-cellnav ui-grid-resize-columns ui-grid-move-columns ui-grid-pinning class="grid" style="margin-top:0px"></div>
+
+
+
+        
+    </div>
+    <script src="~/Scripts/DisplayPaymentAdvice/DisplayPaymentAdvice.js"></script>
+    <script src="~/Scripts/ui-grid.js"></script>
+    <link href="~/Content/ui-grid.css" rel="stylesheet" />
+
+
+</body>
+
+
+</html>
+<script type="text/ng-template" id="ui-grid/uiGridCell">
+    <div class="ui-grid-cell-contents my-cell" ng-dblclick="grid.appScope.ShowDetail() ">{{COL_FIELD CUSTOM_FILTERS}}</div>
+
+
+    
+</script>
+
+
+
+
+    <script type="text/javascript">
+        CustomSelectFunction($("#DivisionIds"), '/ComboHelpList/GetDivision', '/ComboHelpList/SetSingleDivision', ' ', false, 0);
+        CustomSelectFunction($("#SiteIds"), '/ComboHelpList/GetSite', '/ComboHelpList/SetSingleSite', ' ', false, 0);
+        //CustomSelectFunction($("#ProductNature"), '/ComboHelpList/GetProductNature', '/ComboHelpList/SetProductNature', ' ', false, 0);
+        //CustomSelectFunction($("#ProductType"), '/ComboHelpList/GetProductType', '/ComboHelpList/SetProductType', ' ', false, 0);
+        CustomSelectFunction($("#JobWorker"), '/ComboHelpList/GetPerson', '/ComboHelpList/SetSinglePerson', ' ', false, 0);
+        CustomSelectFunction($("#Format"), '/Display_PaymentAdivceWithInvoice/GetFilterFormat', '/Display_JobOrderBalance/SetFilterFormat', ' ', false, 0);
+        CustomSelectFunction($("#Process"), '/ComboHelpList/GetProcess', '/ComboHelpList/SetSingleProcess', ' ',false, 0);
+        $(function () {
+
+            $('[data-toggle="tooltip"]').tooltip({
+            });
+
+            $.each(students, function () {
+
+                if (this.DataType == "Multi Select"||this.DataType=="Single Select" && !(this.ListItem))
+                {
+                    var getFunction= '/ComboHelpList/' + this.ServiceFuncGet;
+                    var setFunction= '/ComboHelpList/' + this.ServiceFuncSet;
+                    var NoofChar=this.NoOfCharToEnter;
+                    var elementId= '#' + this.FieldName;
+                    var bool=this.DataType=="Single Select"?false:true
+                    if(!this.SqlProcGetSet)
+                        CustomSelectFunction($(elementId), getFunction, setFunction, ' ', bool, NoofChar);
+                    else
+                        CustomSelectFunction2($(elementId), getFunction, setFunction, ' ', bool, NoofChar,this.SqlProcGetSet,(closeOnSelect=='True' ? false:true ));
+                    //alert(elementId+" "+getFunction+" "+setFunction)
+                }
+                else if(this.DataType=="Date" )
+                {
+                    var getFunction='/ComboHelpList/SetDate' +"?Proc="+this.SqlProcGetSet;
+                    if(this.SqlProcGetSet)
+                        SetDate(getFunction,'#'+this.FieldName);
+                }
+
+            });
+
+            function SetDate(url,elem)
+            {
+                $.get(url, function (data)
+                {
+                    $(elem).datepicker('update',data);
+                })
+
+            }
+
+
+            $(':btn1').click(function(){
+
+                var form=this;
+                if($('input.has-error').length)
+                {
+                    alertify.error(message = "Please select all the mandatory fields", wait = '0')
+                    return false;
+                }
+                $.each(students, function () {
+
+                    if (this.DataType == "Multi Select")
+                    {
+                        var poarr=[];
+                        var elementId='#'+this.FieldName;
+                        var hiddenId= '#' + this.FieldName+'s';
+                        var hiddendic= this.FieldName+'dic';
+                        var products = (JSON.stringify($(elementId).select2('data')));
+                        var obj = jQuery.parseJSON(products);
+                        $.each(obj, function (key, value) {
+                            poarr.push(value.text);
+                        });
+                        $(hiddenId).val(poarr);
+
+                        for(var i=0;i<obj.length; i++)
+                        {
+                            var key="input[name='"+hiddendic+"["+i+"].Key']";
+                            var val="input[name='"+hiddendic+"["+i+"].Value']";
+                            if(!$(key).length)
+                                $("<input type='hidden' name="+hiddendic+"["+i+"].Key />").val(obj[i].id).appendTo(form);
+                            else
+                                $(key).val(obj[i].id);
+
+                            if(!$(val).length)
+                                $("<input type='hidden' name="+hiddendic+"["+i+"].Value />").val(obj[i].text).appendTo(form);
+                            else
+                                $(val).val(obj[i].text);
+                        }
+
+                    }
+                    if (this.DataType=="Single Select")
+                    {
+                        var poarr=[];
+                        var elementId='#'+this.FieldName;
+                        var hiddenId= '#' + this.FieldName+'s';
+                        var hiddendic= '#' + this.FieldName+'dic';
+                        $(hiddenId).val($(elementId).select2('data').text);
+                    }
+
+                });
+
+            })
+
+        });
+
+
+        $('.collapse').on('hidden.bs.collapse', toggleSign);
+        $('.collapse').on('shown.bs.collapse', toggleSign);
+
+        function toggleSign(e)
+        {
+            $(e.target).prev('.panel-heading').find('span.collapse_Ico').toggleClass("glyphicon-plus-sign glyphicon-minus-sign")
+        }
+
+        $(document).on("mouseover",".select2-container",function(){
+            $(".select2-container").tooltip({
+                title: function(){
+                    return $(this).next('input').attr("title");
+                },
+            });
+        })
+
+        $('input:checkbox').click(function(e){
+
+            if($(e.target).is(":checked"))
+            {
+                $.ajax({
+                    async:true,
+                    type:"POST",
+                    url:"/ReportLayout/SetSelectOption",
+                    data:{Checked:$('#closeOnSelect').is(":checked")},
+                    success:function(data)
+                    {
+                        if(data.success)
+                            window.location.reload();
+                    }
+                })
+            }
+            else
+            {
+                $('select2-input').select2({
+                    "closeOnSelect": true,
+                });
+            }
+
+        })
+
+    </script>

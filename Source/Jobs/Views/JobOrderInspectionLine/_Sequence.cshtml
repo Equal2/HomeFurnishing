@@ -1,0 +1,319 @@
+﻿@model Model.ViewModel.BarCodeSequenceListViewModelForReceive
+@using Core.Common
+
+<style type="text/css">
+    #tbody {
+        height: 250px;
+        overflow-y: scroll;
+        width: 100%;
+    }
+
+    tbody td {
+        padding: 2px 2px 2px 2px;
+    }
+
+    .textRight {
+        text-align: right;
+    }
+    /*th div{
+        position:absolute;
+    }*/
+</style>
+
+<div class="modal-content">
+    <div class="modal-header" style="border-bottom: 1px solid #8E8888">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"> <span class="glyphicon glyphicon-remove"></span></button>
+        <h3>
+            <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-file black"></span> Receive & Quantities</span>
+        </h3>
+    </div>
+    <div>
+        @using (Html.BeginForm("_SequencePost", "JobReceiveLine", FormMethod.Post, new { enctype = "multipart/form-data", id = "modform" }))
+        {
+            @Html.AntiForgeryToken()
+
+            <div class="form-horizontal modal-body">
+
+                <div style="padding-right:15px">
+                    <div class="row">
+                        <div class="form-horizontal">
+                            @Html.ValidationSummary(true)
+
+                            <div class="panel panel-default" id="grid">
+                                <div class="panel-heading headrow" style="background-image: -webkit-linear-gradient(top, #428bca 0%, #428bca 100%);color:white">
+                                    <div class="row grid-head">
+                                        <div class="block text-left" style="width:5%">
+                                            Srl.
+                                        </div>
+                                        <div class="block" style="width:92%">
+                                            <div class="row">
+                                                @*ProductInfo*@
+                                                <div class="block" style="width:40%">
+                                                    Product
+
+                                                </div>
+                                                <div class="block text-right" style="width:30%">
+                                                    <a href="#" id="ToOrder" style="color:white">Qty</a>
+                                                </div>
+                                                @*Qty*@
+                                                <div class="block" style="width:30%">
+                                                    First BarCode
+                                                </div>
+
+
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+                                </div>
+                                <div class="panel-info" id="gbody" style="max-height:250px;overflow-y:scroll">
+                                    @{
+            decimal OrderQty = 0;
+                                    }
+                                    @for (int i = 0; i < Model.BarCodeSequenceViewModel.Count(); i++)
+                                    {
+
+                                        <div class='row crow grid-body' style='margin-left:0px;margin-right:0px'>
+
+
+                                            @Html.HiddenFor(m => m.BarCodeSequenceViewModel[i].JobReceiveHeaderId)
+                                            @Html.HiddenFor(m => m.BarCodeSequenceViewModel[i].JobOrderLineId, new { @class = "LineId" })
+                                            @Html.HiddenFor(m => m.BarCodeSequenceViewModel[i].ProductName)
+                                            @Html.HiddenFor(m => m.BarCodeSequenceViewModel[i].JobReceiveType)
+                                            @Html.HiddenFor(m => m.BarCodeSequenceViewModel[i].BalanceQty, new { @class = "BalQty" })
+                                            @Html.HiddenFor(m => m.BarCodeSequenceViewModel[i].ProductUidIdName, new { @class = "UIDName" })
+
+
+                                            <div class='block row-index' style='width:5%'>
+                                                @(i + 1)
+                                            </div>
+                                            <div class='block pull-middle' style='width:94%'>
+                                                <div class='row'>
+                                                    <div class='block' style='width:40%'>
+                                                        <strong>@Model.BarCodeSequenceViewModel[i].ProductName</strong>
+                                                        <br />
+                                                        <small>Qty:@Model.BarCodeSequenceViewModel[i].Qty</small>
+                                                    </div>
+                                                    <div class='block text-center' style='width:30%'>
+                                                        @Html.TextBoxFor(m => Model.BarCodeSequenceViewModel[i].Qty, new { @class = "form-control Qty text-right" })
+                                                    </div>
+                                                    @{OrderQty += Model.BarCodeSequenceViewModel[i].Qty;}
+                                                    <div class='block' style='width:30%'>
+                                                        @Html.TextBoxFor(m => Model.BarCodeSequenceViewModel[i].FirstBarCode, new { @class = "form-control BarCodes" })
+                                                    </div>
+
+
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                        <hr style='margin-top:0px;margin-bottom:0px' />
+                                    }
+                                </div>
+                            </div>
+
+
+                            <div class="row grid-head">
+                                <div class="block text-left" style="width:5%">
+
+                                </div>
+                                <div class="block" style="width:92%">
+                                    <div class="row">
+                                        @*ProductInfo*@
+                                        <div class="block" style="width:40%">
+                                            <strong>Total</strong>
+
+                                        </div>
+                                        <div class="block text-right" style="width:30%">
+                                            <strong><span id="OrderQty">@string.Format("{" + "0:0.".PadRight(0 + 4, '0') + "}", OrderQty)</span></strong>
+                                        </div>
+                                        @*Qty*@
+                                        <div class="block" style="width:30%">
+                                        </div>
+
+
+                                    </div>
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer " style="padding: 19px 20px 0 20px; border-top:1px solid #8E8888">
+                    <button class="btn custom" name="Command:Edit" type="submit" id="submit"><h2 style="margin:0px" title="Proceed"><span class="glyphicon glyphicon-floppy-disk black black"></span> </h2></button>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+
+
+<script type="text/javascript">
+
+    $('.BarCodes').select2({
+        minimumInputLength: 0,
+        multiple: false,
+        placeholder: "Select a BarCode",
+        ajax: {
+            url: function () { return '/JobReceiveLine/GetBarCodes/' + $(this).closest('div.row.crow').find('.LineId').val(); },
+            dataType: 'json',
+            type: "GET",
+            quietMillis: 500,
+            data: function (term) {
+                return {
+                    term: term,
+                };
+            },
+            results: function (data) {
+                return {
+                    results: $.map(data, function (item) {
+                        return {
+                            text: item.PropFirst,
+                            id: item.Id
+                        }
+                    })
+
+                };
+            }
+        },
+        initSelection: function (element, callback) {
+
+            var xval = element.val();
+            if (xval != 0) {
+                $.ajax({
+                    cache: false,
+                    type: "POST",
+                    url: '/ComboHelpList/SetSingleProductUids',
+                    data: { Ids: element.val() },
+                    success: function (data) {
+                        callback(data);
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        alert('Failed to Retrive Qty' + thrownError);
+                    }
+                })
+            }
+            //callback([{ id: "1", text: "arpit" }, { id: "2", text: "akash" }]);
+        }
+
+    });
+
+    $('.Qty').change(function () {
+
+        var $Block = $(this).closest('div.row.crow');
+        var BalQty = parseFloat($Block.find('.BalQty').val()) || 0;
+
+        if ($(this).val() > BalQty) {
+            if (!$('#modform').find('.modal-body #errormsg').length) {
+                $('#modform').find('#submit').attr('disabled', 'disabled');
+                $('#modform').find('.modal-body').prepend("<div class='alert alert-danger'><span id=errormsg >Qty exceeding Balance Qty</span></div>")
+            }
+        }
+        else {
+            $('#modform').find('#submit:disabled').removeAttr('disabled');
+            if ($('#modform').find('.modal-body #errormsg').length) {
+                $('#modform').find('#errormsg').parent().remove();
+            }
+        }
+
+        CalculateTotal();
+
+    })
+
+    var reset = false;
+
+    $('#ToOrder').click(function () {
+        if (reset) {
+            var Qty = 0;
+            $('div.row.crow', "#gbody.panel-info").each(function (index) {
+
+
+                var $Hidiv = $(this);
+
+                var OrderQty = parseFloat($Hidiv.find('.BalQty').val()) || 0;
+                Qty += OrderQty;
+
+                $Hidiv.find('input.Qty').val(OrderQty.toFixed(0));
+
+
+            })
+            $('#OrderQty', '.modal-body').text(Qty.toFixed(0));
+            //CalculateTotal();
+            reset = false;
+        }
+        else if (!reset) {
+            $('div.row.crow', "#gbody.panel-info").each(function (index) {
+
+                var $Hidiv = $(this);
+
+                $Hidiv.find('input.Qty').val(0);
+
+            })
+            $('#OrderQty', '.modal-body').text(0);
+            //CalculateTotal();
+            reset = true;
+        }
+    })
+
+    function CalculateTotal() {
+        var Order = 0;
+        var maxDeclaces = 0;
+        $('.row.crow.grid-body', '.modal-body').each(function () {
+
+            if ($(this).find('input.Qty').val()) {
+                Order += parseFloat($(this).find('input.Qty').val());
+            }
+
+        })
+        $('#OrderQty', '.modal-body').text(Order.toFixed(0));
+    }
+
+    $(':submit').click(function () {
+
+        $('.row.crow.grid-body', '.modal-body').each(function () {
+
+            var elem = $(this).find('.BarCodes:first');
+            var UidName = $(this).find('.UIDName:first');
+            $(UidName).val($(elem).select2('data').text);
+        })
+        return;
+
+    })
+
+    $(document).ready(function () {
+        var IsSaved = false;
+        var ValidationCount = 0;
+
+        $('#modform').bind('submit', function (event) {
+
+            if (!IsSaved) {
+                if (!ValidateData()) {
+                    return false;
+                }
+                IsSaved = true;
+                $('button:submit').attr('disabled', 'disabled');
+                return IsSaved;
+            }
+            else {
+                return false;
+            }
+
+
+        });
+
+        function ValidateData() {
+            var ValidationMessage = "";
+
+            //Client Side Validaion.....
+
+            return (ValidationMessage == "");
+
+        }
+    })
+
+
+
+</script>

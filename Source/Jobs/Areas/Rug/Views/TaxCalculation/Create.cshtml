@@ -1,0 +1,565 @@
+﻿@model Surya.India.Model.ViewModel.PurchaseOrderHeaderViewModel
+
+@{
+    ViewBag.Title = "Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style type="text/css">
+  
+    .ui-autocomplete .m-name {
+        display:block;
+        margin-right: 1em;
+        font-size: small;
+    }
+
+    .ui-autocomplete .m-year {
+        display:block;
+        font-size: small;
+    }
+    .ui-autocomplete .rt-bar span {
+        display: block;
+        height: 1em;
+    }
+
+    /*.ui-autocomplete span {
+        background-color: #C91B22;
+    }*/
+    .ui-widget{
+        font-family:Tahoma;
+    }
+    /*.ui-autocomplete li {
+        background-color: #94B13C;
+    }*/
+</style>
+<!-- modal placeholder-->
+<div id='myModal' class='modal fade in'>
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div id='myModalContent'></div>
+        </div>
+    </div>
+</div>
+
+@using (Html.BeginForm("Post", "PurchaseOrderHeader", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(m=>m.SiteId)
+    @Html.HiddenFor(m=>m.DivisionId)
+        @Html.HiddenFor(m=>m.PurchaseOrderHeaderId)
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3>
+                <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"> <span class="glyphicon glyphicon-file black"></span>Purchase Order</span>
+                <input type="submit" value="Save" class="btn btn-primary right" id="submit" style="width: 90px; background-color: #2980b9" />                
+            </h3>
+            @Html.ActionLink("For Indent", "_ForIndent", "PurchaseOrderLine", new { id = @Model.PurchaseOrderHeaderId, sid = @Model.SupplierId}, new { data_modal = "", id = "btnCreateF", @class = "btn btn-primary borderradii", @title = "For Indent", @data_toggle = "tooltip" })
+        
+            <hr style="margin-top:0px;margin-bottom:0px" />
+
+            <div class="panel-info">
+                <h4 style="padding:5px 0 0 0;margin:0px">
+                    @Html.ActionLink(" ", " ", " ", null, new { @class = "glyphicon glyphicon-refresh toolbar", @title = "Refresh Page", @data_toggle = "tooltip", @id = "RefreshPage" })
+                    @Html.ActionLink(" ", "Create", "PurchaseOrderHeader", null, new { @class = "glyphicon glyphicon-plus toolbar", @title = "Add New", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "History", "PurchaseOrderHeader", null, new { @class = "glyphicon glyphicon-user toolbar", @title = "History", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "Print", "PurchaseOrderHeader", new { id=@Model.PurchaseOrderHeaderId}, new { @class = "glyphicon glyphicon-print toolbar", @title = "Print", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "Email", "PurchaseOrderHeader", null, new { @class = "glyphicon glyphicon-envelope toolbar", @title = "Email", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "PrevPage", "PurchaseOrderHeader", new { id = @Model.PurchaseOrderHeaderId}, new { @class = "glyphicon glyphicon-arrow-left toolbar", @title = "Prev Record", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "NextPage", "PurchaseOrderHeader", new { id = @Model.PurchaseOrderHeaderId}, new { @class = "glyphicon glyphicon-arrow-right toolbar", @title = "Next Record", @data_toggle = "tooltip" })                    
+                    @Html.ActionLink(" ", "Index", "PurchaseOrderHeader", null, new { @class = "glyphicon glyphicon-list toolbar right", @title = "List", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "Report", "PurchaseOrderHeader", null, new { @class = "glyphicon glyphicon-th toolbar right", @title = "Report", @data_toggle = "tooltip" })
+                </h4>
+            </div>
+        </div>
+        <div class="panel-info" style="padding-left:15px">
+            <div class="form-horizontal">                
+                @Html.ValidationSummary(true)
+
+                <div class="row">
+                    <h4 class="col-md-12 black">
+                        <span class="glyphicon glyphicon-align-justify"></span>
+                        1.Document Details
+                    </h4> 
+                    <div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group" style="margin-top:15px">
+                                    @Html.LabelFor(model => model.DocTypeId, "Entry Type", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.DropDownListFor(model => model.DocTypeId, new SelectList(ViewBag.DocTypeList as System.Collections.IEnumerable, "DocumentTypeId", "DocumentTypeName"), new { @class = "form-control col-xs-6 height required" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group" style="margin-top:15px">
+                                    @Html.LabelFor(model => model.DocDate, "Order Date", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.DocDate, "{0:dd/MMMM/yyyy}", new { @class = "datepicker form-control col-xs-6 required" })
+                                        @Html.ValidationMessageFor(model => model.DocDate, "", new { @class="text-danger"})
+                                    </div>
+                                </div>
+                            </div>                            
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.DocNo, "Order No", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.DocNo, null, new { @class = "form-control col-xs-6 required" })
+                                        @Html.ValidationMessageFor(m => m.DocNo,"", new { @class="text-danger"})
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.SupplierId, "Supplier", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.SupplierId, null, new { @class = "form-control col-xs-6 required" })
+                                        @Html.ValidationMessageFor(m => m.SupplierId, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>                                                 
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.DueDate, "Due Date", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.DueDate, "{0:dd/MMMM/yyyy}", new { @class = "datepicker form-control col-xs-6 required" })
+                                        @Html.ValidationMessageFor(model => model.DueDate, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.CurrencyId, "Currency", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.DropDownListFor(m => m.CurrencyId, new SelectList(ViewBag.CurrencyList as System.Collections.IEnumerable,"ID","Name"), new { @class = "height form-control col-xs-6 " })
+                                        @Html.ValidationMessageFor(m => m.CurrencyId, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>     
+                            
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.SalesTaxGroupId, "Sales Tax Group", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.DropDownListFor(m => m.SalesTaxGroupId, new SelectList(ViewBag.SalesTaxGroupList as System.Collections.IEnumerable, "SalesTaxGroupId", "SalesTaxGroupName"), new { @class = "height form-control col-xs-6 " })
+                                        @Html.ValidationMessageFor(m => m.SalesTaxGroupId, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>   
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.DeliveryTermsId, "Delivery Terms", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.DropDownListFor(m => m.DeliveryTermsId, new SelectList(ViewBag.DeliveryTermsList as System.Collections.IEnumerable, "DeliveryTermsId", "DeliveryTermsName"), new { @class = "height form-control col-xs-6" })
+                                        @Html.ValidationMessageFor(m => m.DeliveryTermsId, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                           
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.ShipMethodId, "Ship Method", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.DropDownListFor(m => m.ShipMethodId, new SelectList(ViewBag.ShipMethodList as System.Collections.IEnumerable, "ShipMethodId", "ShipMethodName"), new { @class = "height form-control col-xs-6" })
+                                        @Html.ValidationMessageFor(m => m.SalesTaxGroupId, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model =>model.ShipAddress, "Ship Address", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.ShipAddress, new { @class = "form-control col-xs-6" })
+                                        @Html.ValidationMessageFor(m => m.ShipAddress, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>                                                     
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.TermsAndConditions, "Terms & Conditions", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextAreaFor(m => m.TermsAndConditions, new { @class = "form-control col-xs-6" })
+                                        @Html.ValidationMessageFor(m => m.TermsAndConditions, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.Remark, "Remark", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextAreaFor(m => m.Remark, new { @class = "form-control col-xs-6" })
+                                        @Html.ValidationMessageFor(m => m.Remark, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>               
+
+
+                <hr />
+                <div class="row">
+                    <h4 class="col-md-12 black" style="margin-top:15px">
+                        <span class="glyphicon glyphicon-shopping-cart"></span>
+                        2.Products
+                    </h4>
+                </div>
+
+                <div class="panel-info">
+                    <h5 style="padding:5px 0 3px 0;margin:0px;font-weight:bold">
+                        <span class="glyphicon glyphicon-plus-sign"></span>
+                        @Html.ActionLink("Add New Row ", "_Create", "PurchaseOrderLine", new { id = @Model.PurchaseOrderHeaderId,sid=@Model.SupplierId }, new { data_modal = "", id = "btnCreate", @class = "toolbar", @title = "Add New", @data_toggle = "tooltip" })
+                    </h5>
+                </div>
+                <div style="padding-right:15px">
+
+
+                    <div class="panel panel-default" id="grid">
+                        <div class="panel-heading headrow" style="background-image: -webkit-linear-gradient(top, #428bca 0%, #428bca 100%);color:white">
+                            <div class="row grid-head">
+                                <div class="col-xs-1 text-left">
+                                    Srl.                                   
+                                </div>
+                                <div class="col-xs-10">
+                                    <div class="row">
+                                        @*ProductInfo*@
+                                        <div class="col-sm-4">
+                                           Product Name
+                                           
+                                        </div>
+                                        @*Qty*@
+                                        <div class="col-sm-2 text-right">
+                                            Qty                                           
+                                        </div>
+                                        @*Rate*@
+                                        <div class="col-sm-2 text-right">
+                                            Rate
+                                        </div>
+                                        @*Amount*@
+                                        <div class="col-sm-2 text-right">
+                                            Amount
+                                        </div>
+                                        @*Remark*@
+                                        <div class="col-sm-2">
+                                            Remark
+                                           
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-xs-1">
+
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="panel-info" id="gbody">
+                           
+                            
+                        </div>
+                    </div> 
+                </div>
+
+
+
+                @*<hr />*@
+
+                @*<div class="form-group">
+                    <div class="col-md-offset-2 col-md-8">
+                        <input type="submit" value="Next" class="btn btn-primary btn-sm CurveBorder height" id="submit" style=" border-color: #606264" />
+                       
+                            @Html.ActionLink("Back", "Index", "PurchaseOrderHeader", new { @class = "btn btn-primary btn-sm col-md-offset-1 CurveBorder ActionLinkPadding CustomCss height" })
+           
+                    </div>
+                </div>*@
+            </div>
+        </div>
+    </div>
+    
+    @*<input id="autocomplete" />*@
+    @*<input type="hidden" id="indentid" />*@
+}
+
+<script type="text/javascript">
+    //var arr=[ "c++", "java", "php", "coldfusion", "javascript", "asp", "ruby" ];
+    //var availableTags = [
+	//{key: "1",value: "Name 1",add:"additional1"},{key: "2",value: "Name 2",add:"additional2"},{key: "3",value: "Name 3",add:"additional3"},{key: "4",value: "Name 4",add:"additional4"},{key: "5",value: "Name 5",add:"additional5"}
+    //];
+
+  
+
+
+
+    //$(function() {
+    //    $("#autocomplete").autocomplete({
+    //        source: availableTags,
+    //        focus: function(event, ui) {
+    //            // prevent autocomplete from updating the textbox
+    //            event.preventDefault();
+    //        },
+    //        select: function(event, ui) {
+    //            // prevent autocomplete from updating the textbox
+    //            //event.preventDefault();
+    //            // navigate to the selected item's url
+    //            alert(ui.item.key);
+    //        }
+    //    }).data("ui-autocomplete")._renderItem = function(ul, item) {
+    //        var $a = $("<a></a>");
+    //        $("<strong></strong>").text(item.value).appendTo($a);
+    //        $("<br />").appendTo($a);
+    //        $("<span class='small'></span>").text(item.add).appendTo($a);
+            
+    //        return $("<li></li>").append($a).appendTo(ul);
+    //    };
+    //});
+
+
+    //$("#autocomplete").bind('focus',function(){
+    //    $(this).keydown();
+    //});
+
+
+
+    CustomSelectFunction($("#SupplierId"), '/ComboHelpList/GetSuppliers', '/ComboHelpList/SetSingleSupplier', ' ', false, 1);    
+
+    $("#DocNo").on("change", function () {
+        $(this).DuplicateCheckForCreate({ name: 'PurchaseOrderHeader', value: $(this).val(), doctype: $("#DocTypeId").val() });
+    });
+
+</script>
+
+<script type="text/javascript">
+    var form_clean;
+    $(document).ready(function () {
+
+        //Calling the function to load the table data/ Line information
+        LoadProducts();      
+    });
+
+    //For Populating Modal PopUp on DoubleClick Of Row
+    $('#gbody').on("dblclick",'.grid-body',function(){
+        var text = $(this).find(".id").val();
+        var editurl=$(this).find('a[delete]').attr('href');
+        $('#myModalContent').load(editurl, function () {
+            //alert('2');
+            $('#myModal').modal({
+                backdrop: 'static',
+                keyboard: true
+            }, 'show');
+
+            bindForm1(this);
+        });
+    });
+
+    $('#gbody').on("click",'.grid-body',function(){
+
+    });
+
+    //For Handling Modal PopUp on Clicking Delete Icon
+    $('#gbody').on("click",'a[delete]', function (e) {
+        $('#myModalContent').load(this.href, function () {
+            //alert('2');
+            $('#myModal').modal({
+                backdrop: 'static',
+                keyboard: true
+            }, 'show');
+
+            bindForm1(this);
+        });
+        return false;
+    });
+
+
+    var id=@Model.PurchaseOrderHeaderId;
+    if(id==null||id==0)
+    {
+        $(document).find('a#btnCreate').removeAttr('href').removeAttr('data-modal');
+        $("#btnCreateF").attr('disabled','disabled');
+
+    }
+
+
+
+    //Reloading the table contents on modal hide
+    $('#myModal').on('hidden.bs.modal', function () {
+        LoadProducts();
+    });
+
+
+    //To focus on the first element on modal load
+    $('#myModal').on('shown.bs.modal', function () {
+        $("#ProductId").select2("focus");
+    });
+
+
+   
+
+
+
+    function LoadProducts() {
+        var groupId=@Model.PurchaseOrderHeaderId;
+        var link="/PurchaseOrderLine/Index/"+groupId;
+        var QtyCount=0;
+        var AmountCount=0;
+        var unit=true;
+        var prevunit;
+        var decimal=0;
+        $.ajax({
+            url: link,
+            type: "GET",
+            success: function (data) {
+                var row = ""
+                var srno=1;
+                
+                if(data.length!=0)
+                {
+                    $.each(data, function (index, item) {
+                        row += " <div class='row crow grid-body' style='margin-left:0px;margin-right:0px'><div class='col-xs-1 row-index'>"+srno+"<input type='hidden' class='id' value='"+item.PurchaseOrderLineId+"' /></div><div class='col-xs-10'><div class='row'><div class='col-sm-4'>"+(item.ProductName==null?" ":"<strong>"+item.ProductName+"</strong>")+"<br />"+(item.Specification==null?" ":item.Specification)+"<p>"+(item.Dimension1Name==null?" ":item.Dimension1Name+",")+(item.Dimension2Name==null?" ":item.Dimension2Name)+"</p><div>"+((item.DueDate==null)?" ":"<span title='DueDate' class='label label-danger' style='font-weight:bold'>"+formatDate('d/m/Y',new Date(parseInt(item.DueDate.substr(6))))+"</span>")+"</div></div><div class='col-sm-2 text-right'>"+(item.Qty==null?" ":item.Qty)+"<br /> <div><small>"+(item.UnitId==null?" ":item.UnitId)+"</small></div> <div style='width:80%;float:right'> <div class='progress'> <div class='progress-bar' role='progressbar' aria-valuenow='"+item.ProgressPerc+"' aria-valuemin='0' aria-valuemax='100' style='width: "+item.ProgressPerc+"%;'>60%</div> </div> </div>  </div><div class='col-sm-2 text-right'>"+(item.Rate==null?" ":item.Rate.toFixed(2))+"</div><div class='col-sm-2 text-right'>"+(item.Amount==null?" ":item.Amount.toFixed(2))+"</div><div class='col-sm-2'>"+(item.Remark==null?" ":item.Remark+"<br />")+(item.LotNo==null?" ":"Lot-No:"+item.LotNo)+"</div></div></div><div class='col-xs-1'><a class='glyphicon glyphicon-trash icon-Cus-Size' delete='' href='/PurchaseOrderLine/_Edit/"+item.PurchaseOrderLineId+"'></a></div></div><hr style='margin-top:0px;margin-bottom:0px'/></div>";
+                        QtyCount+=item.Qty;
+                        AmountCount+=item.Amount;                        
+                        if(srno!=1)
+                            {
+                        if(item.UnitId==prevunit)
+                        {}
+                        else
+                        {unit=false;}
+                        }
+                        if(decimal<item.unitDecimalPlaces){decimal=item.unitDecimalPlaces;}
+                        srno++;
+                        prevunit=item.UnitId;                        
+                    });
+                    row+="<div class='row tfooter' style='padding-top:10px;'><div class='col-xs-1'></div><div class='col-xs-10'><div class='row'>  <div class='col-sm-4'><strong>Total</strong></div><div class='col-sm-2 text-right'><strong>"+ ((unit==true)?QtyCount.toFixed(decimal)+"<br /><small>"+prevunit:QtyCount.toFixed(decimal))+"</small></strong></div><div class='col-sm-2 text-right'></div><div class='col-sm-2 text-right'><strong>"+AmountCount.toFixed(2)+"</strong></div><div class='col-sm-2'></div></div></div><div class='col-xs-1'></div></div>"                  
+
+                    $('#DocNo').attr('readonly','true');
+                }
+                else
+                {
+                    ;
+                }
+                $("#gbody").html(row);
+                
+            },
+            error: function (result) {
+                alert("Error");
+            }
+        });
+    }
+
+
+    //Loading the Table data or Line Information
+    @*function LoadProducts() {
+        var groupId=@Model.PurchaseOrderHeaderId;
+        var link="/PurchaseOrderLine/Index/"+groupId;
+        var QtyCount=0;
+        var AmountCount=0;
+        $.ajax({
+            url: link,
+            type: "GET",
+            success: function (data) {
+                var row = ""
+                var srno=1;
+                var head="<tr style='background-color:#428bca'>  <th style='width:10px'><input type='hidden'  /></th> <th class='col-sm-1'>Sr.No</th><th class='center' class='col-sm-7'>Product</th>  <th style='width:10px'></th>       <th style='width:10px'></th> </tr>"
+                if(data.length!=0)
+                {
+                    $.each(data, function (index, item) {
+                        row += "<tr> <td><input type='hidden' class='id' value='" + item.PurchaseOrderLineId + "'/></td>  <td>"+srno+"</td><td><div>" + item.ProductName + "</div><div>" + item.Specification + "</div></td>  <td><a class='hidden' Modify href='/PurchaseOrderLine/_Edit/"+item.PurchaseOrderLineId+"' ></a></td>       <td style='padding-top:0px;padding-bottom:0px'><a class='glyphicon glyphicon-trash icon-Cus-Size' data-modal='' delete='' href='/PurchaseOrderLine/_Edit/"+item.PurchaseOrderLineId+"' ></a></td></tr>";
+                        QtyCount+=item.Qty;
+                        AmountCount+=item.Amount;
+                        srno++;
+                    });
+                   
+                    function formatDate(format, date) {
+                        format = format.replace(/Y/g, date.getFullYear());
+                        format = format.replace(/m/g, (date.getMonth()+1));
+                        format = format.replace(/d/g, date.getDate());    
+                        return format;
+                    }
+
+                    $('#DocNo').attr('readonly','true');
+                }
+                else
+                {
+                    row+="<tr><td>No Items Found.</td></tr>";
+                }
+                $("#header").html(head);
+                $("#Result").html(row);
+            },
+            error: function (result) {
+                alert("Error");
+            }
+        });
+    }*@
+
+
+    ////For Populating Modal PopUp on DoubleClick Of Row
+    //$('#Result').on("dblclick",'tr',function(){
+    //    var text = $(this).find(".id").val();
+    //    var editurl=$(this).find('a[Modify]').attr('href');
+    //    $('#myModalContent').load(editurl, function () {
+    //        //alert('2');
+    //        $('#myModal').modal({
+    //            backdrop: 'static',
+    //            keyboard: true
+    //        }, 'show');
+
+    //        bindForm1(this);
+    //    });
+    //});
+
+
+    ////For Handling Modal PopUp on Clicking Delete Icon
+    //$('#Result').on("click",'a[delete]', function (e) {
+    //    $('#myModalContent').load(this.href, function () {
+    //        //alert('2');
+    //        $('#myModal').modal({
+    //            backdrop: 'static',
+    //            keyboard: true
+    //        }, 'show');
+
+    //        bindForm1(this);
+    //    });
+    //    return false;
+    //});
+
+
+    //For posting the data through ajax and render the contents sent back from the server
+    function bindForm1(dialog) {
+        //alert("binding");
+        $('form#modform', dialog).submit(function () {
+            //alert(this.action);
+            $.ajax({
+                url: this.action,
+                type: this.method,
+                data: $(this).serialize(),
+                success: function (result) {
+                    if (result.success) {
+                        $('#myModal').modal('hide');
+                        //Refresh
+                        //location.reload();
+                        //alert('Data Saved');
+                    }else if(!result.success)
+                    {
+                        $('#myModalContent').html(result);
+                        bindForm1();
+                    }
+                    else {
+                        $('#myModalContent').html(result);
+                        bindForm1();
+                    }
+                }
+            });
+            return false;
+        });
+
+    }
+
+</script>

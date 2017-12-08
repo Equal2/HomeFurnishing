@@ -1,0 +1,70 @@
+﻿@using Core.Common
+@model Web.BankReconciliationFilterArgs
+
+<div class="modal-content">
+    <div class="modal-header" style="border-bottom: 1px solid #8E8888">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"> <span class="glyphicon glyphicon-remove"></span></button>
+        <h3>
+            <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-file black"></span> Bank Reconciliation Filters</span>
+        </h3>
+    </div>
+    <div>
+        @using (Html.BeginForm("_FilterPost", "BankReconciliation", FormMethod.Post, new { enctype = "multipart/form-data", id = "modform" }))
+        {
+            <div class="form-horizontal modal-body">
+                <div class="row">
+                    <div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(m => m.FromDate, "From Date", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-7">
+                                        @Html.TextBoxFor(m => m.FromDate, "{0:dd/MMMM/yyyy}", new { @class = "datepicker form-control col-xs-6 " })
+                                        @Html.ValidationMessageFor(m => m.FromDate, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(m => m.ToDate, "To Date", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-7">
+                                        @Html.TextBoxFor(m => m.ToDate, "{0:dd/MMMM/yyyy}", new { @class = "datepicker form-control col-xs-6 " })
+                                        @Html.ValidationMessageFor(m => m.ToDate, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(m => m.TransactionType, "Records", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-7">
+                                        @Html.DropDownListFor(m => m.TransactionType, new SelectList(ViewBag.TransactionType as System.Collections.IEnumerable, "Value", "Text"), new { @class = "height form-control col-xs-7 required" })
+                                        @Html.ValidationMessageFor(m => m.TransactionType, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <hr style="margin-bottom:0px" />
+
+                <div class="modal-footer " style="padding: 19px 20px 0 20px; border-top:1px solid #8E8888">
+                    <button class="btn custom" name="Command:Edit" type="submit"><h2 style="margin:0px" id="submit" title="Proceed"><span class="glyphicon glyphicon-arrow-right black"></span> </h2></button>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+
+<script type="text/javascript">
+    $('.datepicker').datepicker({
+        format: 'dd/MM/yyyy',
+        "setDate": new Date(),
+        "autoclose": true
+
+    })
+</script>

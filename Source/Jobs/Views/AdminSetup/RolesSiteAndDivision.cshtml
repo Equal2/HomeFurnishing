@@ -1,0 +1,122 @@
+﻿@model Model.ViewModel.RoleSitePermissionViewModel
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />    
+    <link href="~/Content/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Content/css/select2.css" rel="stylesheet" />
+    <script src="~/Scripts/jquery-2.1.4.min.js"></script>
+    <script src="~/Scripts/bootstrap.min.js"></script>
+    <script src="~/Scripts/FunctionForMultiSelect.js"></script>
+    <script src="~/Scripts/select2.min.js"></script>
+</head>
+<body>
+    <style>
+        legend {
+            margin-top: 5px;
+            margin-bottom: 30px;
+            padding-bottom: 25px;
+        }
+
+        .body {
+            padding-bottom: 30px;
+            border-bottom: 1px solid #eeeeee;
+        }
+
+        .footer {
+            margin-top: 20px;
+            padding-bottom:20px;
+        }
+
+        .btn {
+            -webkit-box-shadow: none;
+            -moz-box-shadow: none;
+            box-shadow: none;
+            margin-left: 15px;
+            padding: 7px 25px;
+        }
+        .select2-container {
+            max-width: inherit !important;
+        }
+        .row{
+            padding:10px;
+        }
+        div.container4 {
+            height: 45em;
+            position: relative;
+        }
+
+            div.container4 .cus {
+                -moz-border-radius: 15px;
+                -ms-border-radius: 15px;
+                -o-border-radius: 15px;
+                border-radius: 15px;
+                -webkit-box-shadow: 0 0 8px rgba(0, 0, 0, 0.4);
+                -moz-box-shadow: 0 0 8px rgba(0, 0, 0, 0.4);
+                box-shadow: 0 0 8px rgba(0, 0, 0, 0.4);
+                margin: 0;
+                background: white;
+                text-align: center;
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                margin-right: -50%;
+                transform: translate(-50%, -50%);
+            }
+    </style>
+
+
+
+    <div class=container4>
+        <div class="cus" style="width:400px">
+            <legend>Assign Site & Division</legend>
+            @using (Html.BeginForm("Roles", "AdminSetup", FormMethod.Post, new { enctype = "multipart/form-data" }))
+            {
+                @Html.HiddenFor(m => m.RoleId)
+                @Html.AntiForgeryToken()
+                <div class="body">
+                  
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.SiteId, "Site", new { @class = "control-label col-xs-3", @style = "padding-top:8px;" })
+                                <div class="col-xs-9">
+                                    @Html.TextBoxFor(m => m.SiteId, new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(m => m.SiteId)
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.DivisionId, "Division", new { @class = "control-label col-xs-3", @style = "padding-top:8px;" })
+                                <div class="col-xs-9">
+                                    @Html.TextBoxFor(m => m.DivisionId, new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(m => m.SiteId)
+                                </div>
+                            </div>
+                        </div>
+                    </div>                 
+                </div>
+                <div class="footer">
+                    <button type="submit" class="btn btn-warning">Proceed</button>
+                </div>
+            }
+        </div>
+    </div>
+
+    <script type="text/javascript">
+
+        CustomSelectFunction($("#SiteId"), '/ComboHelpList/GetSite', '/ComboHelpList/SetSite', 'Sites', true, 0);
+        CustomSelectFunction($("#DivisionId"), '/ComboHelpList/GetDivision', '/ComboHelpList/SetDivision', 'Division', true, 0);
+
+    </script>
+</body>
+</html>

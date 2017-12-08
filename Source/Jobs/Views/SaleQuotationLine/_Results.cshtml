@@ -1,0 +1,348 @@
+﻿@model Model.ViewModels.SaleQuotationMasterDetailModel
+@using Core.Common
+
+<div class="modal-content  Custom-modal">
+    <div class="modal-header" style="border-bottom: 1px solid #8E8888">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"> <span class="glyphicon glyphicon-remove"></span></button>
+        <h3>
+            <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-file black"></span> Orders & Quantities</span>
+        </h3>
+    </div>
+    <div>
+        @using (Html.BeginForm("_ResultsPost", "SaleQuotationLine", FormMethod.Post, new { enctype = "multipart/form-data", id = "modform" }))
+        {
+            @Html.ValidationLog((string)TempData["CSEXCL"])
+
+            @Html.AntiForgeryToken()
+
+            <div class="form-horizontal modal-body">
+                @Html.HiddenFor(m => m.SaleQuotationSettings.ProcessId)
+                <div style="padding-right:15px">
+                    <div class="row">
+
+                            <div class="form-horizontal">
+                                @Html.ValidationSummary(true, null, new { @class = "alert alert-danger" })
+
+                                <div class="panel panel-default" id="grid">
+                                    <div class="panel-heading headrow" style="background-image: -webkit-linear-gradient(top, #428bca 0%, #428bca 100%);color:white">
+                                        <div class="row grid-head">
+                                            <div class="col-xs-1 text-left">
+                                                Srl.
+                                            </div>
+                                            <div class="col-xs-11">
+                                                <div class="row">
+                                                    @*ProductInfo*@
+                                                    <div class="col-sm-2">
+                                                        Product
+
+                                                    </div>
+                                                    <div class="col-sm-2 text-right">
+                                                        @if (Model.DocumentTypeSettings.ContraDocTypeCaption != null)
+                                                        {
+                                                            @Model.DocumentTypeSettings.ContraDocTypeCaption
+                                                        }
+                                                        else
+                                                        {
+                                                            @Html.Raw("Enquiry")
+                                                        }
+                                                        No.
+                                                    </div>
+                                                    @*Qty*@
+
+                                                    <div class="col-sm-2 text-right" style="padding-right:30px">
+                                                        <a href="#" id="ToOrder" style="color:white">Qty</a>
+                                                    </div>
+                                                    <div class="col-sm-2 text-right" style="padding-right:30px;">
+                                                        Rate
+                                                    </div>
+                                                    <div class="col-sm-2 text-right">
+                                                        Multiplier
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+                                    <div class="panel-info" id="gbody" style="max-height:250px;overflow-y:scroll">
+                                        @{
+                            decimal OrderQty = 0;
+                            decimal ProdQty = 0;
+                            int MaxUnitDecplaces = 0;
+                            int MaxDealUnitDecplaces = 0;
+                                        }
+                                        @for (int i = 0; i < Model.SaleQuotationLineViewModel.Count(); i++)
+                                        {
+                                            <div class='row crow grid-body' style='margin-left:0px;margin-right:0px'>
+
+                                                @Html.HiddenFor(m => Model.SaleQuotationLineViewModel[i].ProductId)
+                                                @Html.HiddenFor(m => Model.SaleQuotationLineViewModel[i].DealUnitId)
+                                                @Html.HiddenFor(m => Model.SaleQuotationLineViewModel[i].ProductName)
+                                                @Html.HiddenFor(m => Model.SaleQuotationLineViewModel[i].Specification)
+                                                @Html.HiddenFor(m => Model.SaleQuotationLineViewModel[i].Dimension1Name)
+                                                @Html.HiddenFor(m => Model.SaleQuotationLineViewModel[i].Dimension1Id)
+                                                @Html.HiddenFor(m => Model.SaleQuotationLineViewModel[i].Dimension2Name)
+                                                @Html.HiddenFor(m => Model.SaleQuotationLineViewModel[i].Dimension2Id)
+                                                @Html.HiddenFor(m => Model.SaleQuotationLineViewModel[i].Dimension3Name)
+                                                @Html.HiddenFor(m => Model.SaleQuotationLineViewModel[i].Dimension3Id)
+                                                @Html.HiddenFor(m => Model.SaleQuotationLineViewModel[i].Dimension4Name)
+                                                @Html.HiddenFor(m => Model.SaleQuotationLineViewModel[i].Dimension4Id)
+                                                @Html.HiddenFor(m => Model.SaleQuotationLineViewModel[i].SaleEnquiryLineId)
+                                                @Html.HiddenFor(m => Model.SaleQuotationLineViewModel[i].SaleQuotationHeaderId)
+                                                @Html.HiddenFor(m => Model.SaleQuotationLineViewModel[i].SaleEnquiryDocNo)
+                                                @Html.HiddenFor(m => Model.SaleQuotationLineViewModel[i].SaleEnquiryBalanceQty)
+                                                @Html.HiddenFor(m => Model.SaleQuotationLineViewModel[i].UnitId)
+                                                @*@Html.HiddenFor(m => Model.SaleQuotationLineViewModel[i].UnitConversionMultiplier)*@
+                                                @Html.HiddenFor(m => Model.SaleQuotationLineViewModel[i].UnitDecimalPlaces, new { @class = "UDec" })
+                                                @Html.HiddenFor(m => Model.SaleQuotationLineViewModel[i].DealUnitDecimalPlaces, new { @class = "DelUDec" })
+
+                                                @if (MaxDealUnitDecplaces < Model.SaleQuotationLineViewModel[i].DealUnitDecimalPlaces)
+                                                {
+                                                    MaxDealUnitDecplaces = Model.SaleQuotationLineViewModel[i].DealUnitDecimalPlaces;
+                                                }
+                                                @if (MaxUnitDecplaces < Model.SaleQuotationLineViewModel[i].UnitDecimalPlaces)
+                                                {
+                                                    MaxUnitDecplaces = Model.SaleQuotationLineViewModel[i].UnitDecimalPlaces;
+                                                }
+
+
+                                                <div class='col-xs-1 row-index'>
+                                                    @(i + 1)
+                                                    <input type='hidden' class='id' value="@Model.SaleQuotationLineViewModel[i].SaleQuotationHeaderId" />
+                                                </div>
+                                                <div class='col-xs-11'>
+                                                    <div class='row'>
+                                                        <div class='col-sm-2'>
+                                                            <strong>@Model.SaleQuotationLineViewModel[i].ProductName</strong>
+                                                            <br />
+                                                            @Model.SaleQuotationLineViewModel[i].Specification
+                                                            @{
+                                                var Dim1 = (string.IsNullOrEmpty(Model.SaleQuotationLineViewModel[i].Dimension1Name)) ? "" : Model.SaleQuotationLineViewModel[i].Dimension1Name + ",";
+                                                var Dim2 = (string.IsNullOrEmpty(Model.SaleQuotationLineViewModel[i].Dimension2Name)) ? "" : Model.SaleQuotationLineViewModel[i].Dimension2Name + ",";
+                                                var Dim3 = (string.IsNullOrEmpty(Model.SaleQuotationLineViewModel[i].Dimension3Name)) ? "" : Model.SaleQuotationLineViewModel[i].Dimension3Name + ",";
+                                                var Dim4 = (string.IsNullOrEmpty(Model.SaleQuotationLineViewModel[i].Dimension4Name)) ? "" : Model.SaleQuotationLineViewModel[i].Dimension4Name;
+                                                            }
+
+                                                            @Dim1 @Dim2 @Dim3 @Dim4
+                                                            <div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-sm-2  text-right">
+                                                            @Model.SaleQuotationLineViewModel[i].SaleEnquiryDocNo
+                                                            <br />
+                                                            <a href="#" class="ToOrder" style="color:black">
+                                                                <span id="ProdQty"> @string.Format("{" + "0:0.".PadRight(@Model.SaleQuotationLineViewModel[i].UnitDecimalPlaces + 4, '0') + "}", Model.SaleQuotationLineViewModel[i].SaleEnquiryBalanceQty)</span>
+                                                                <small>@Model.SaleQuotationLineViewModel[i].UnitId</small>
+                                                            </a>
+                                                            @{ProdQty += Model.SaleQuotationLineViewModel[i].SaleEnquiryBalanceQty ?? 0;}
+                                                        </div>
+
+                                                        <div class="col-md-2 text-right">
+                                                            @Html.TextBoxFor(m => Model.SaleQuotationLineViewModel[i].Qty, new { @class = "form-control multiple-modal text-right OrderQty" })
+                                                            @Html.ValidationMessageFor(m => Model.SaleQuotationLineViewModel[i].Qty, "", new { @class = "text-danger" })
+                                                            @{OrderQty += Model.SaleQuotationLineViewModel[i].Qty;}
+                                                        </div>
+                                                        <div class='col-sm-2 text-right'>
+                                                            @Html.TextBoxFor(m => Model.SaleQuotationLineViewModel[i].Rate, new { @class = "form-control multiple-modal text-right" })
+                                                            @Html.ValidationMessageFor(m => Model.SaleQuotationLineViewModel[i].Rate, null, new { @class = "text-danger" })
+                                                        </div>
+
+
+                                                        <div class='col-sm-2 text-right'>
+                                                            @Html.TextBoxFor(m => Model.SaleQuotationLineViewModel[i].UnitConversionMultiplier, "{0:0.0000}", new { @class = "form-control multiple-modal text-right" })
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                            <hr style='margin-top:0px;margin-bottom:0px' />
+                                        }
+                                    </div>
+                                </div>
+
+
+                                <div class="row grid-head" style='margin-left:0px;margin-right:0px'>
+                                    <div class="col-xs-1 text-left">
+                                    </div>
+                                    <div class="col-xs-11">
+                                        <div class="row">
+                                            @*ProductInfo*@
+                                            <div class="col-sm-2">
+                                                <strong>Total</strong>
+                                            </div>
+
+                                            @*Qty*@
+                                            <div class="col-sm-2 text-right">
+                                                @string.Format("{" + "0:0.".PadRight(MaxUnitDecplaces + 4, '0') + "}", ProdQty)
+                                            </div>
+                                            <div class="col-sm-2 text-right" style="padding-right:30px">
+                                                <strong><span id="OrderQty">@string.Format("{" + "0:0.".PadRight(MaxDealUnitDecplaces + 4, '0') + "}", OrderQty)</span></strong>
+                                            </div>
+                                            <div class="col-sm-2 text-right" style="padding-right:30px">
+
+                                            </div>
+                                            <div class="col-sm-2 text-right">
+
+                                            </div>
+                                            <div class="col-sm-2">
+
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+
+
+                    </div>
+                </div>
+                <div class="modal-footer " style="padding: 19px 20px 0 20px; border-top:1px solid #8E8888">
+                    <button class="btn custom" name="Command:Edit" type="submit" id="submit"><h2 style="margin:0px" title="Proceed"><span class="glyphicon glyphicon-floppy-disk black black"></span> </h2></button>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+
+
+
+<script type="text/javascript">
+
+    var IsSaved = false;
+    var reset = false;
+    var ValidationCount = 0;
+
+    $('#modform').bind('submit', function (event) {
+
+        if (!IsSaved) {
+            if (!ValidateData()) {
+                return false;
+            }
+            IsSaved = true;
+            $('button:submit').attr('disabled', 'disabled');
+            return IsSaved;
+        }
+        else {
+            return false;
+        }
+
+
+    });
+
+
+    function ValidateData() {
+        var ValidationMessage = "";
+
+        //Client Side Validaion.....
+
+        return (ValidationMessage == "");
+
+    }
+
+
+    $('input.OrderQty').change(function () {
+
+        var $div = $(this).closest('div.row');
+        var ProdQty = parseFloat($div.find('#ProdQty').text()) || 0;
+
+        var OrderQty = parseFloat($div.find('input.OrderQty').val()) || 0;
+
+        var bal = (OrderQty) - (ProdQty);
+
+        if (bal > 0) {
+            if (!$('#modform').find('.modal-body #errormsg').length) {
+                $('#modform').find('#submit').attr('disabled', 'disabled');
+                $('#modform').find('.modal-body').prepend("<div class='alert alert-danger'><span id=errormsg >Qty exceeding Enquiry Qty</span></div>")
+            }
+            else {
+                $('#modform').find('#errormsg').text("Qty exceeding Required Qty");
+            }
+        }
+        else {
+            $('#modform').find('#submit:disabled').removeAttr('disabled');
+            if ($('#modform').find('.modal-body #errormsg').length) {
+                $('#modform').find('#errormsg').parent().remove();
+            }
+        }
+        CalculateTotal();
+
+    })
+
+    function CalculateTotal() {
+        var Order = 0;
+        var maxDeclaces = 0;
+        $('.row.crow.grid-body', '.modal-body').each(function () {
+
+            if ($(this).find('input.OrderQty').val()) {
+                Order += parseFloat($(this).find('input.OrderQty').val());
+                var $Hidiv = $(this).closest('div.row.crow');
+                var unitDecPlaces = parseFloat($Hidiv.find('.DelUDec').val()) || 0;
+                if (unitDecPlaces > maxDeclaces)
+                    maxDeclaces = unitDecPlaces;
+            }
+
+        })
+        $('#OrderQty', '.modal-body').text(Order.toFixed(maxDeclaces));
+    }
+
+
+    $('.ToOrder').click(function () {
+
+        var $Hidiv = $(this).closest('div.row.crow');
+
+        var unitDecPlaces = parseFloat($Hidiv.find('.UDec').val()) || 0;
+
+        var $div = $(this).closest('div.row');
+
+        var OrderQty = parseFloat($div.find('#ProdQty').text()) || 0;
+
+        if ($div.find('input.OrderQty').val() && $div.find('input.OrderQty').val() > 0) {
+            $div.find('input.OrderQty').val(0);
+        }
+
+        else {
+            $div.find('input.OrderQty').val(OrderQty.toFixed(unitDecPlaces));
+        }
+
+
+
+
+        CalculateTotal();
+
+    })
+
+    $('#ToOrder').click(function () {
+        if (reset) {
+            $('div.row.crow', "#gbody.panel-info").each(function (index) {
+
+
+                var $Hidiv = $(this);
+
+                var unitDecPlaces = parseFloat($Hidiv.find('.UDec').val()) || 0;
+
+                var OrderQty = parseFloat($Hidiv.find('#ProdQty').text()) || 0;
+
+                $Hidiv.find('input.OrderQty').val(OrderQty.toFixed(unitDecPlaces));
+
+
+            })
+            CalculateTotal();
+            reset = false;
+        }
+        else if (!reset) {
+            $('div.row.crow', "#gbody.panel-info").each(function (index) {
+
+                var $Hidiv = $(this);
+                
+                $Hidiv.find('input.OrderQty').val(0);
+
+            })
+            CalculateTotal();
+            reset = true;
+        }
+    })
+
+</script>

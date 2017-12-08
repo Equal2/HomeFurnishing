@@ -1,0 +1,377 @@
+﻿@model Model.ViewModel.RequisitionCancelLineViewModel
+@using Core.Common
+
+<style type="text/css">
+    .ui-autocomplete {
+        max-height: 250px;
+        overflow-y: auto;
+        /* prevent horizontal scrollbar */
+        overflow-x: hidden;
+    }
+</style>
+
+<div class="modal-content">
+    <div class="modal-header" style="border-bottom: 1px solid #8E8888">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"> <span class="glyphicon glyphicon-remove"></span></button>
+        <h3>
+            <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-file black"></span> Job Order Cancel</span>
+        </h3>
+    </div>
+    <div>
+        @using (Html.BeginForm("_CreatePost", "MaterialRequestCancelLine", FormMethod.Post, new { enctype = "multipart/form-data", id = "modform" }))
+        {
+            @Html.ValidationLog((string)TempData["CSEXCL"])
+           
+            @Html.AntiForgeryToken()
+
+            <div class="form-horizontal modal-body">
+
+                @Html.HiddenFor(model => model.RequisitionCancelHeaderId)
+                @Html.HiddenFor(m => m.RequisitionCancelLineId)
+                @Html.HiddenFor(m => m.RequisitionLineId)
+                @Html.HiddenFor(m => m.PersonId)
+                @Html.HiddenFor(m => m.ProductId)
+                @Html.HiddenFor(m => m.BalanceQty)
+
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.ProductId, "Product", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBox(" ", "", new { @class = "form-control", @id = "acProducts" })
+                                @Html.ValidationMessageFor(model => model.ProductId, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.RequisitionLineId, "Request No", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(m => m.RequisitionDocNo, new { @class = "form-control" })
+                                @Html.ValidationMessageFor(model => model.RequisitionLineId, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Specification, "Specification", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.Specification, new { @class = "form-control col-xs-7 required", @readonly = true })
+                                @Html.ValidationMessageFor(model => model.Specification, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6" style="display:@(Model.RequisitionSettings.isVisibleDimension1?"":"none")">
+                        @Html.HiddenFor(m => m.RequisitionSettings.isVisibleDimension1)
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Dimension1Name, "Dimension1", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.Dimension1Name, new { @class = "form-control col-xs-7 required", @readonly = true })
+                                @Html.ValidationMessageFor(model => model.Dimension1Name, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6" style="display:@(Model.RequisitionSettings.isVisibleDimension2?"":"none")">
+                        @Html.HiddenFor(m => m.RequisitionSettings.isVisibleDimension2)
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Dimension2Name, "Dimension2", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.Dimension2Name, new { @class = "form-control col-xs-7 required", @readonly = true })
+                                @Html.ValidationMessageFor(model => model.Dimension2Name, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Qty, "Cancel Qty", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10" style="padding:0px;">
+                                <div class="col-xs-7" style="padding-right:0px">
+                                    @Html.TextBoxFor(model => model.Qty, new { @class = "form-control col-xs-7 required" })
+                                    @Html.ValidationMessageFor(model => model.Qty, "", new { @class = "text-danger" })
+                                </div>
+                                <div class="col-xs-5" style="padding-left:0px">
+                                    @Html.TextBoxFor(m => m.UnitName, new { @class = "form-control col-xs-2", @readonly = "true" })
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Remark, "Remark", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextAreaFor(model => model.Remark, new { @class = "form-control required" })
+                                @Html.ValidationMessageFor(model => model.Remark, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer " style="padding: 19px 20px 0 20px; border-top:1px solid #8E8888">
+                    @if (ViewBag.LineMode == "Edit" || ViewBag.LineMode == "Create")
+                    {
+                        <button class="btn custom left" name="Command:Edit" type="submit" id="submit"><h2 style="margin:0px"><span class="glyphicon glyphicon-floppy-disk black"></span> </h2></button>
+                    } @if (ViewBag.LineMode == "Delete")
+                    {
+                        <button class="btn custom" name="Command:Delete" id="delete" type="submit"><h2 style="margin:0px"><span class="glyphicon glyphicon-trash black"></span> </h2></button>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+
+<script type="text/javascript">
+    $(function () {
+
+
+        var IsSaved = false;
+        var ValidationCount = 0;
+
+        $('#modform').bind('submit', function (event) {
+
+            if (!IsSaved) {
+                if (!ValidateData()) {
+                    return false;
+                }
+                IsSaved = true;
+                $('button:submit').attr('disabled', 'disabled');
+                return IsSaved;
+            }
+            else {
+                return false;
+            }
+
+
+        });
+
+        function ValidateData() {
+            var ValidationMessage = "";
+
+            //Client Side Validaion.....
+
+            return (ValidationMessage == "");
+
+        }
+
+
+
+        $("#ProductId").focus();
+    });
+
+
+    function LockFields() {
+        $("#Dimension1Name").attr('readonly', 'true');
+        $("#Dimension2Name").attr('readonly', 'true');
+        $("#RequisitionDocNo").attr('readonly', 'true');
+        $('#Specification').attr('readonly', 'true');
+    }
+    function UnLockFields() {
+        $("#Dimension1Name").removeAttr('readonly');
+        $("#Dimension2Name").removeAttr('readonly');
+        $("#RequisitionDocNo").removeAttr('readonly');
+        $("#Specification").removeAttr('readonly');
+    }
+
+    var id = '@Model.RequisitionCancelLineId';
+    if (id > 0) {
+        var tex = '@Model.RequisitionDocNo';
+        var prod = '@Model.ProductName';
+        $("#RequisitionDocNo").val(tex);
+        $("#acProducts").val(prod).attr('readonly', 'true');
+        LockFields();
+
+    }
+
+
+
+
+
+
+    //$(':submit').click(function (event) {
+    //    if (($('#BalanceQty').val() - $('#Qty').val()) < 0) {
+    //        alert('Qty Exceeding BalQty');
+    //        event.preventDefault();
+    //    }
+    //    else
+    //        return true;
+
+    //})
+    $('#delete', '.modal-content').click(function (e) {
+        if (id > 0) {
+            var url = '/MaterialRequestCancelLine/DeletePost';
+            $('form').attr('action', url);
+            return;
+        }
+        else {
+            return false;
+        }
+    })
+
+
+    $('#Qty').keyup(function () {
+        if (($('#BalanceQty').val() - $('#Qty').val()) < 0) {
+            $('#submit', '.modal-body').attr('disabled', 'disabled');
+            if ($(this).closest('div.col-xs-4').find('span#cerror').length == 0) {
+                $(this).parents('.col-xs-4').append("<span class='text-danger' id='cerror'>Qty exceeding BalQty</span>")
+            }
+        }
+        else {
+            $('#submit', '.modal-body').removeAttr('disabled');
+            if ($(this).closest('div.col-xs-4').find('span#cerror').length > 0) {
+                $(this).closest('.col-xs-4').find('span#cerror').remove();
+            }
+        }
+    })
+
+</script>
+
+
+
+@if (Model.RequisitionCancelLineId <= 0)
+{
+    <script type="text/javascript">
+
+        $("#acProducts").focusout(function () {
+
+            if (!$(this).val()) {
+                $("#acProducts").val("");
+                $('#ProductId').val("");
+                $('#RequisitionLineId').val("");
+            }
+
+
+            if ($("#acProducts").val() == "") {
+                $('#ProductId').val("");
+                $('#RequisitionLineId').val("");
+            }
+
+            if ($('#RequisitionLineId').val() != "" && $('#RequisitionLineId').val() != 0) {
+                $.ajax({
+                    cache: false,
+                    type: "POST",
+                    url: "@(Url.Action("GetLineDetail"))",
+                    data: { LineId: $("#RequisitionLineId").val() },
+                    success: function (data) {
+                        $('#RequisitionDocNo').val(data.RequisitionDocNo);
+                        $('#Qty').val(data.Qty);
+                        $('#BalanceQty').val(data.Qty);
+                        $('#UnitName').val(data.UnitName);
+                        $('#UnitId').val(data.UnitId);
+                        $('#Specification').val(data.Specification);
+
+                        (data.Dimension1Name == null) ? (1 == 1) : ($("#Dimension1Name").val(data.Dimension1Name));
+                        (data.Dimension2Name == null) ? (1 == 1) : ($("#Dimension2Name").val(data.Dimension2Name));
+
+                        LockFields();
+
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        alert('Failed to retrieve product details.' + thrownError);
+                    }
+                });
+            }
+            else if ($('#RequisitionLineId').val() == "") {
+                $('#RequisitionDocNo').val("");
+                $('#Qty').val(0);
+                $('#BalanceQty').val(0);
+                $('#UnitId').val("");
+                $('#UnitName').val("");
+                $('#Specification').val("");
+                $("#Dimension1Name").val("")
+                $("#Dimension2Name").val("");
+                UnLockFields();
+            }
+        }
+        );
+
+
+
+
+
+        $(function () {
+            $("#acProducts").autocomplete({
+                delay: 500,
+                minLength: 3,
+                source: function (request, response) {
+
+                    var DocID = $('#RequisitionCancelHeaderId', '.modal-body').val();
+                    $.ajax({
+                        cache: false,
+                        type: "POST",
+                        url: "@(Url.Action("GetCustomProductsForOrder"))",
+                        data: { id: DocID, term: request.term, Limit: 30 },
+                        success: function (data) {
+                            if (data.length > 0) {
+                                var cachearray = data.error ? [] : $.map(data, function (m) {
+
+                                    return {
+                                        value: m.ProductName,
+                                        key: m.ProductId,
+                                        spec: m.Specification,
+                                        dim1: m.Dimension1Name,
+                                        dim2: m.Dimension2Name,
+                                        SO: m.RequisitionDocNo,
+                                        balqty: m.Qty,
+                                        linekey: m.RequisitionLineId,
+                                    };
+                                });
+                                response(cachearray);
+                            }
+                            else {
+                                var dimensions = { width: 10 };
+                                var cachearray = $.map(dimensions, function (value, key) {
+                                    return {
+                                        value: "No Record Found!",
+                                        key: null
+                                    }
+                                })
+                                response(cachearray);
+                            }
+                        },
+                        error: function (xhr, ajaxOptions, thrownError) {
+                            $('.ui-autocomplete-loading').removeClass("ui-autocomplete-loading");
+                            alert('Failed to retrieve Pending Orders.' + thrownError);
+                        }
+
+                    });
+
+                },
+                appendTo: $("#myModalContent"),
+                select: function (event, ui) {
+                    // prevent autocomplete from updating the textbox
+                    // navigate to the selected item's url
+                    if ($("#acProducts").val() == "") {
+                        $('#ProductId').val("");
+                        $('#RequisitionLineId').val("");
+                    }
+                    else {
+                        $("#ProductId").val(ui.item.key);
+                        $("#RequisitionLineId").val(ui.item.linekey);
+                    }
+                },
+
+            }).data("ui-autocomplete")._renderItem = function (ul, item) {
+                var $a = $("<a></a>");
+                $("<strong></strong>").text(item.value).appendTo($a);
+                (item.balqty == null) ? ("") : ($("<small></small>").text(" (Qty:" + item.balqty + ")").appendTo($a));
+                (item.spec == null) ? ("") : ($("<br /><span class='small' style='font-weight:bold'></span>").text(item.spec).appendTo($a));
+                (item.dim1 == null) ? ("") : ($("<br /><span class='small'></span>").text(item.dim1 + ",").appendTo($a));
+                (item.dim2 == null) ? ("") : ($("<span class='small'></span>").text(item.dim2).appendTo($a));
+                (item.SO == null) ? ("") : ($("<br /><span class='small'></span>").text("Order:" + item.SO + ",").appendTo($a));
+
+
+                return $("<li></li>").append($a).appendTo(ul);
+            }
+        });
+
+
+    </script>
+}

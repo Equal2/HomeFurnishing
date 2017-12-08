@@ -1,0 +1,478 @@
+﻿@model Model.ViewModel.PurchaseOrderCancelLineViewModel
+@using Core.Common
+
+<div class="modal-content">
+    <div class="modal-header" style="border-bottom: 1px solid #8E8888">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"> <span class="glyphicon glyphicon-remove"></span></button>
+        <h3>
+            <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-file black"></span> Products </span>
+        </h3>
+    </div>
+    <div>
+        @using (Html.BeginForm("_CreatePost", "PurchaseOrderCancelLine", FormMethod.Post, new { enctype = "multipart/form-data", id = "modform" }))
+        {
+           @Html.ValidationLog((string)TempData["CSEXCL"])
+            <div class="form-horizontal modal-body">
+
+                @Html.AntiForgeryToken()
+
+                @Html.HiddenFor(model => model.PurchaseOrderCancelHeaderId)
+                @Html.HiddenFor(m => m.PurchaseOrderCancelLineId)
+                @Html.HiddenFor(m => m.PurchaseOrderLineId)
+                @Html.HiddenFor(m => m.SupplierId)
+                @Html.HiddenFor(m => m.BalanceQty)
+                @Html.HiddenFor(m => m.PurchOrderSettings.isPostedInStockVirtual)
+                @Html.HiddenFor(m => m.PurchOrderSettings.CalculationId)
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.ProductId, "Product", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.ProductId, new { @class = "form-control col-xs-7 required" })
+                                @Html.ValidationMessageFor(model => model.ProductId, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.PurchaseOrderLineId, "Purchase Order", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBox(" ", " ", new { @class = "form-control", @id = "acorders" })
+                                @Html.ValidationMessageFor(model => model.PurchaseOrderLineId, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Specification, "Specification", new { @class = "control-label col-md-4 col-sm-2 " })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.Specification, new { @class = "form-control col-xs-7 required", @readonly = true })
+                                @Html.ValidationMessageFor(model => model.Specification, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6" style="display:@(Model.PurchOrderSettings.isVisibleLotNo ? "" : "none")">
+                        @Html.HiddenFor(m => m.PurchOrderSettings.isVisibleLotNo)
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.LotNo, "LotNo", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.LotNo, new { @class = "form-control required", @readonly = true })
+                                @Html.ValidationMessageFor(model => model.LotNo, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="col-md-6" style="display:@(Model.PurchOrderSettings.isVisibleDimension1 ? "" : "none")">
+                        @Html.HiddenFor(m => m.PurchOrderSettings.isVisibleDimension1)
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Dimension1Name, "Dimension1", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.Dimension1Name, new { @class = "form-control col-xs-7 required", @readonly = true })
+                                @Html.ValidationMessageFor(model => model.Dimension1Name, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6" style="display:@(Model.PurchOrderSettings.isVisibleDimension2 ? "" : "none")">
+                        @Html.HiddenFor(m => m.PurchOrderSettings.isVisibleDimension2)
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Dimension2Name, "Dimension2", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.Dimension2Name, new { @class = "form-control col-xs-7 required", @readonly = true })
+                                @Html.ValidationMessageFor(model => model.Dimension2Name, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Qty, "Cancel Qty", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10" style="padding:0px;">
+                                <div class="col-xs-7">
+                                    @Html.TextBoxFor(model => model.Qty, new { @class = "form-control  required" })
+                                    @Html.ValidationMessageFor(model => model.Qty, "", new { @class = "text-danger" })
+                                </div>
+                                <div class="col-xs-5" style="padding-left:0px">
+                                    @Html.TextBoxFor(m => m.UnitId, new { @class = "form-control col-xs-2", @readonly = "true" })
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Remark, "Remark", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextAreaFor(model => model.Remark, new { @class = "form-control required" })
+                                @Html.ValidationMessageFor(model => model.Remark, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="modal-footer " style="padding: 19px 20px 0 20px; border-top:1px solid #8E8888">
+                    @if (ViewBag.LineMode == "Edit" || ViewBag.LineMode == "Create")
+                    {
+                        <button class="btn custom left" name="Command:Edit" type="submit" id="submit"><h2 style="margin:0px"><span class="glyphicon glyphicon-floppy-disk black"></span> </h2></button>}
+                    @if (ViewBag.LineMode == "Delete")
+                    {
+                        <button class="btn custom" name="Command:Delete" id="delete" type="submit"><h2 style="margin:0px"><span class="glyphicon glyphicon-trash black"></span> </h2></button>}
+
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@if (Model.PurchaseOrderCancelLineId <= 0)
+{
+    <script type="text/javascript">
+        $("#acorders").autocomplete({
+            change: function (event, ui) {
+
+                if (ui.item == null || ui.item.value == undefined) {
+                    $("#acorders").val("");
+                    $('#PurchaseOrderLineId').val("");
+                }
+
+                if ($("#acorders").val() == "") {
+                    $('#PurchaseOrderLineId').val("");
+                }
+
+                if ($('#PurchaseOrderLineId').val() != "") {
+                    $.ajax({
+                        cache: false,
+                        type: "POST",
+                        url: "@(Url.Action("GetLineDetail"))",
+                        data: { LineId: $("#PurchaseOrderLineId").val() },
+                        success: function (data) {
+                            $('#BalanceQty').val(data.Qty);
+                            $('#Qty').val(data.Qty);
+                            $('#Specification').val(data.Specification);
+                            $("#Dimension1Name").val(data.Dimension1Name);
+                            $("#Dimension2Name").val(data.Dimension2Name);
+                            $('#LotNo').val(data.LotNo);
+                            $('#UnitId').val(data.UnitId);
+                        },
+                        error: function (xhr, ajaxOptions, thrownError) {
+                            alert('Failed to retrieve product details.' + thrownError);
+                        }
+                    });
+                }
+                else if ($('#PurchaseOrderLineId').val() == "") {
+                    $('#BalanceQty').val("");
+                    $('#Qty').val("");
+                    $('#Specification').val("");
+                    $('#Dimension1Name').val("");
+                    $('#Dimension2Name').val("");
+                    $('#LotNo').val("");
+                    $('#UnitId').val("");
+                }
+            }
+        });
+
+
+
+        $("#acorders").autocomplete({
+            source: function (request, response) {
+                $.ajax({
+                    cache: false,
+                    type: "POST",
+                    url: "@(Url.Action("GetPendingOrders"))",
+                    data: { ProductId: $("#ProductId").val(), PurchaseOrderCancelHeaderId: $("#PurchaseOrderCancelHeaderId", ".modal-body").val() },
+                    success: function (data) {
+
+                        var cachearray = data.error ? [] : $.map(data, function (m) {
+                            return {
+                                value: m.DocNo,
+                                key: m.PurchaseOrderLineId,
+                                dim1: m.Dimension1Name == null ? "" : m.Dimension1Name + ",",
+                                dim2: m.Dimension2Name == null ? "" : m.Dimension2Name,
+                            };
+                        });
+                        response(cachearray);
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        alert('Failed to retrieve Pending Orders.' + thrownError);
+                    }
+                });
+            },
+            appendTo: $("#myModalContent"),
+            select: function (event, ui) {
+                // prevent autocomplete from updating the textbox
+                // navigate to the selected item's url
+                if ($("#acorders").val() == "") {
+                    $('#PurchaseOrderLineId').val("");
+                }
+                else
+                    $("#PurchaseOrderLineId").val(ui.item.key);
+
+            },
+
+        }).data("ui-autocomplete")._renderItem = function (ul, item) {
+            var $a = $("<a></a>");
+            $("<strong></strong>").text(item.value).appendTo($a);
+            $("<br />").appendTo($a);
+            $("<span class='small'></span>").text(item.dim1).appendTo($a);
+            $("<span class='small'></span>").text(item.dim2).appendTo($a);
+            return $("<li></li>").append($a).appendTo(ul);
+        }
+
+
+        $("#acorders").bind("focus", function () {
+            $(this).keydown();
+        })
+    </script>
+}
+
+
+
+
+
+
+<script type="text/javascript">
+    $(function () {
+        // CustomSelectFunction($("#ProductId"), '/ComboHelpList/GetProducts', '/ComboHelpList/SetSingleProducts', 'Enter Product Name', false, 3);
+
+        var DocID = $('#PurchaseOrderCancelHeaderId', '.modal-body').val();
+        var URL = '/PurchaseOrderCancelLine/GetCustomProducts/' + DocID;
+        $("#ProductId").select2({
+            minimumInputLength: 1,
+            multiple: false,
+            ajax: {
+                url: URL,
+                dataType: 'json',
+                type: "GET",
+                quietMillis: 1000,
+                data: function (term) {
+                    return {
+                        term: term,
+                    };
+                },
+                results: function (data) {
+                    return {
+                        results: $.map(data, function (item) {
+                            return {
+                                text: item.PropFirst,
+                                id: item.Id
+                            }
+                        })
+
+                    };
+                }
+            },
+            initSelection: function (element, callback) {
+
+                var xval = element.val();
+                if (xval != 0) {
+                    $.ajax({
+                        cache: false,
+                        type: "POST",
+                        url: "/ComboHelpList/SetSingleProducts",
+                        data: { Ids: element.val() },
+                        success: function (data) {
+                            callback(data);
+                        },
+                        error: function (xhr, ajaxOptions, thrownError) {
+                            alert('Failed to Retrive Qty' + thrownError);
+                        }
+                    })
+                }
+                //callback([{ id: "1", text: "arpit" }, { id: "2", text: "akash" }]);
+            }
+
+
+        });
+
+        $("#ProductId").select2("focus");
+    });
+
+    var id = '@Model.PurchaseOrderCancelLineId';
+    if (id > 0) {
+        var order = '@Model.PurchaseOrderDocNo';
+        $('#acorders').val(order).attr('disabled', 'disabled');
+        $('#ProductId').attr('readonly', 'true');
+
+    }
+
+
+
+
+
+
+    //$(':submit').click(function (event) {
+    //    if (($('#BalanceQty').val() - $('#Qty').val()) < 0) {
+    //        alert('Qty Exceeding BalQty');
+    //        event.preventDefault();
+    //    }
+    //    else
+    //        return true;
+
+    //})
+    $('#delete', '.modal-content').click(function (e) {
+        if (id > 0) {
+            var url = '/PurchaseOrderCancelLine/DeletePost';
+            $('form#modform').attr('action', url);
+            return;
+        }
+        else {
+            return false;
+        }
+    })
+    $('#Qty').keyup(function () {
+        if (($('#BalanceQty').val() - $('#Qty').val()) < 0) {
+            $('#submit', '.modal-body').attr('disabled', 'disabled');
+            if ($(this).closest('div.col-xs-4').find('span#cerror').length == 0) {
+                $(this).parents('.col-xs-4').append("<span class='text-danger' id='cerror'>Qty exceeding BalQty</span>")
+            }
+        }
+        else {
+            $('#submit', '.modal-body').removeAttr('disabled');
+            if ($(this).closest('div.col-xs-4').find('span#cerror').length > 0) {
+                $(this).closest('.col-xs-4').find('span#cerror').remove();
+            }
+        }
+    })
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@*<script type="text/javascript">
+
+
+        $(document).ready(function () {
+            var id=@Model.PurchaseOrderCancelLineId;
+            if(id<=0)
+            {
+                CustomSelectFunction($("#ProductId"), '/ComboHelpList/GetProducts', '/ComboHelpList/SetSingleProducts', 'Enter Product Name', false, 3);
+            }
+            $("#ProductId").select2("focus");
+
+            var POID='@Model.PurchaseOrderLineId';
+            if(POID!='0'&&POID!=null&&POID!='')
+            {
+                var ddl = $("#PurchaseOrderLineId");
+                $.ajax({
+                    cache: false,
+                    type: "POST",
+                    url: "@(Url.Action("GetPurchaseOrder"))",
+                    data: { LineId: POID },
+                    success: function (data) {
+                        ddl.html('');
+                        ddl.append($('<option></option>').val(data.PurchaseOrderLineId).html(data.PurchaseOrderDocNo));
+
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        alert('Failed to retrieve purchase orders.' + thrownError);
+                        PurchaseOrdersProgress.hide();
+                    }
+                });
+
+            }
+
+
+
+            $('#delete','.modal-content').click(function (e) {
+                if(id>0)
+                {
+                    var url = '/PurchaseOrderCancelLine/DeletePost';
+                    $('form').attr('action',url);
+                    return;
+                }
+                else
+                {
+                    return false;
+                }
+            })
+        });
+
+        $("#ProductId").change(GetPurchaseOrderLine);
+
+
+        function GetPurchaseOrderLine() {
+            var selectedItem = $(this).val();
+            var ddlPurchaseOrders = $("#PurchaseOrderLineId");
+            var BuyId=@Model.SupplierId;
+            $.ajax({
+                cache: false,
+                type: "POST",
+                url: "@(Url.Action("GetPurchaseOrderList"))",
+                data: { ProductId: selectedItem, BuyerId: BuyId },
+                success: function (data) {
+                    ddlPurchaseOrders.html('');
+
+                    $.each(data, function (id, option) {
+                        ddlPurchaseOrders.append($('<option></option>').val(option.PurchaseOrderLineId).html(option.PurchaseOrderDocNo));
+                    });
+                    $(function () {
+
+                        if($("#PurchaseOrderLineId").val()!=null||$("#PurchaseOrderLineId").val()!=0)
+                        {
+                            $.ajax({
+                                cache: false,
+                                type: "POST",
+                                url: "@(Url.Action("GetPurchaseOrderLineJson"))",
+                                data: { PurchaseOrderLineId: $("#PurchaseOrderLineId").val() },
+                                success: function (data) {
+                                    $("#Qty").val(data.BalanceQty);
+                                },
+                                error: function (xhr, ajaxOptions, thrownError) {
+                                    alert('Failed to retrieve purchase orders status.' + thrownError);
+                                    NProgress.done();
+                                }
+                            });
+                        }
+                    });
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    alert('Failed to retrieve purchase orders.' + thrownError);
+
+                    PurchaseOrdersProgress.hide();
+                }
+            });
+        }
+
+        $(function () {
+            $("#PurchaseOrderLineId").change(GetPurchaseOrderLineStatus);
+
+            function GetPurchaseOrderLineStatus() {
+                $.ajax({
+                    cache: false,
+                    type: "POST",
+                    url: "@(Url.Action("GetPurchaseOrderLineJson"))",
+                    data: { PurchaseOrderLineId: $("#PurchaseOrderLineId").val() },
+                    success: function (data) {
+                        $("#Qty").val(data.BalanceQty);
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        alert('Failed to retrieve purchase orders status.' + thrownError);
+                        ProcessProgress.hide();
+                    }
+                });
+
+            }
+        });
+
+    </script>*@

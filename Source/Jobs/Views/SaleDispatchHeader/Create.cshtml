@@ -1,0 +1,920 @@
+﻿@model Model.ViewModels.SaleDispatchHeaderViewModel
+@using Core.Common
+@{
+    ViewBag.Title = "Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<!-- modal placeholder-->
+<div id='myModal' class='modal fade in'>
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div id='myModalContent'></div>
+        </div>
+    </div>
+</div>
+
+@using (Html.BeginForm("CreatePost", "SaleDispatchHeader", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(m => m.SiteId)
+    @Html.HiddenFor(m => m.DivisionId)
+    @Html.HiddenFor(m => m.SaleDispatchHeaderId)
+    @Html.HiddenFor(m => m.DocTypeId)
+    @Html.HiddenFor(m => m.CreatedDate)
+    @Html.HiddenFor(m => m.GodownId)
+    @Html.HiddenFor(m => m.ProcessId)
+
+    <div class="panel panel-default">
+        <div class="panel-heading">
+
+            @CustomHelpers.RenderHeaderInfo(ViewBag.transactionType, (int?)ViewBag.PendingToSubmit, (int?)ViewBag.PendingToReview, ViewBag.Name)
+            @{
+                string EditAction = "";
+                if (Model.Status == (int)StatusConstants.Drafted || Model.Status == (int)StatusConstants.Import)
+                {
+                    EditAction = "Modify";
+                }
+                else if ((Model.Status == (int)StatusConstants.Submitted || Model.Status == (int)StatusConstants.Modified))
+                {
+                    EditAction = "ModifyAfter_Submit";
+                }
+                else
+                {
+                    EditAction = "DetailInformation";
+                }
+            }
+
+           
+
+            @*<hr style="margin-top:0px;margin-bottom:0px" />*@
+
+            <div class="panel-info">
+              
+                <div class="btn-group">
+                    @Html.ActionLink(" ", "Create", "SaleDispatchHeader", new { @id = @ViewBag.id }, new { @class = "cbtn btn-circle glyphicon glyphicon-plus toolbar", @title = "Add New", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", EditAction, "SaleDispatchHeader", new { @id = Model.SaleDispatchHeaderId, IndexType = ViewBag.IndexStatus }, new { @class = "cbtn btn-circle glyphicon glyphicon-edit", @title = "Edit", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "GeneratePrints", "SaleDispatchHeader", new { Ids = Model.SaleDispatchHeaderId, DocTypeId = Model.DocTypeId }, new { @class = "cbtn btn-circle glyphicon glyphicon-print toolbar", @title = "Print", @data_toggle = "tooltip", @id = "PrintRecordC", target = "_blank" })
+                    @Html.ActionLink(" ", "PrevPage", "SaleDispatchHeader", new { DocId = @Model.SaleDispatchHeaderId, DocTypeId = Model.DocTypeId }, new { @class = "cbtn btn-circle glyphicon glyphicon-arrow-left toolbar", @title = "Prev Record", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "NextPage", "SaleDispatchHeader", new { DocId = @Model.SaleDispatchHeaderId, DocTypeId = Model.DocTypeId }, new { @class = "cbtn btn-circle glyphicon glyphicon-arrow-right toolbar", @title = "Next Record", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "Index", "SaleDispatchHeader", new { @id = ViewBag.id, IndexType = ViewBag.IndexStatus }, new { @class = "cbtn btn-circle glyphicon glyphicon-list toolbar", @title = "List", @data_toggle = "tooltip" })
+                </div>
+                <div class="btn-group">
+                    <a class="cbtn btn-circle glyphicon glyphicon-option-horizontal dropdown-toggle"   title="More Option"  aria-expanded="false" style="padding-top: 6px;padding-bottom: 6px;" href="#" data-toggle="dropdown" id="dropdownMenu1">
+                    </a>
+                    <ul class="dropdown-menu pull-right" aria-labelledby="dropdownMenu1">
+                        @if (Model.Status == (int)StatusConstants.Submitted && !Model.GatePassHeaderId.HasValue)
+                        {
+                            <li><a id="GenGatePassC" href="@Url.Action("GenerateGatePass", "SaleDispatchHeader", new { Ids = @Model.SaleDispatchHeaderId, DocTypeId = Model.DocTypeId })"><span class="glyphicon glyphicon-log-out"> </span> Generate Gatepass</a></li>
+                        }
+                        <li><a id="DocHistory" data-modal="" href="@Url.Action("GetHistory", "LogHistory", new { Ids = Model.SaleDispatchHeaderId, DocTypeId = Model.DocTypeId })"><span class="glyphicon glyphicon-user"> </span> History</a></li>
+                        <li><a href="@Url.Action("Email", "SaleDispatchHeader")"><span class="glyphicon glyphicon-envelope"> </span> Email</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="@Url.Action("Report", "SaleDispatchHeader")"><span class="glyphicon glyphicon-stats"> </span> Report</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="panel-info" style="padding-left:15px">
+            <div class="form-horizontal">
+                @Html.ValidationSummary(true)
+                <h4 class="col-md-12 black">
+                    <span class="glyphicon glyphicon-align-justify"></span>
+                    1.Document Details
+                    @if (Model.GatePassHeaderId.HasValue)
+                    {
+                        <span class="label label-danger right">
+                            <span class="glyphicon glyphicon-log-out"></span>
+                            GPNo:@Model.GatePassDocNo,GPDate:@Model.GatePassDocDate.Value.ToString("dd/MMM/yyyy")
+                            @Html.ActionLink(" ", "DeleteGatePass", "SaleDispatchHeader", new { Id = @Model.SaleDispatchHeaderId }, new { @class = "glyphicon glyphicon-remove", @title = "GatePass", @data_toggle = "tooltip", @id = "GenGatePassD", @style = "color:white;opacity:0.4" })
+                        </span>
+                    }
+                </h4>
+
+
+                <div class="row">
+                    @*<h4 class="col-md-12 black">
+                        <span class="glyphicon glyphicon-align-justify"></span>
+                        1.Document Details
+                    </h4>*@
+                    <div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group" style="margin-top:15px">
+                                    @Html.LabelFor(model => model.DocDate, "Dispatch Date", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @*@Html.TextBoxFor(m => m.DocDate, "{0:dd/MMMM/yyyy}", new { @class = "datepickerWithNFD form-control col-xs-6 required" })*@
+                                        @Html.TextBoxFor(m => m.DocDate, "{0:dd/MMMM/yyyy}", new
+                                   {
+                                       @class = "datepickerWithNFD form-control col-xs-6 required updateDocNo",
+                                       data_tabl = "SaleDispatchHeaders",
+                                       data_doctype = Model.DocTypeId,
+                                       data_divId = Model.DivisionId,
+                                       data_sitId = Model.SiteId,
+                                   })
+                                        @Html.ValidationMessageFor(model => model.DocDate, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6" style="margin-top:15px">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.DocNo, "Dispatch No", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.DocNo, null, new { @class = "form-control col-xs-6 required" })
+                                        @Html.ValidationMessageFor(m => m.DocNo, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+
+                        <div class="row">
+
+
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.SaleToBuyerId, "Sale To", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        <div class="input-group">
+                                            @Html.TextBoxFor(m => m.SaleToBuyerId, new { @class = "form-control col-xs-6" })
+                                            @Html.ValidationMessageFor(m => m.SaleToBuyerId, "", new { @class = "text-danger" })
+                                            <span class="input-group-btn">
+                                                @Html.ActionLink("...", "_Create", "PersonCreation", new { id = "id" }, new { data_modalCustom2 = "", id = "CustomerDetail", @class = "btn btn-default ", @title = "For Order", @data_toggle = "tooltip" })
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        
+
+                        <div class="row">
+                            <div class="col-md-6" style="display:@(Model.SaleDispatchSettings.isVisibleDeliveryTerms ? "" : "none")">
+                                @Html.HiddenFor(m => m.SaleDispatchSettings.isVisibleDeliveryTerms)
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.DeliveryTermsId, "Delivery Terms", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.DropDownListFor(m => m.DeliveryTermsId, new SelectList(ViewBag.DeliveryTermsList as System.Collections.IEnumerable, "DeliveryTermsId", "DeliveryTermsName"), string.Empty, new { @class = "height form-control col-xs-6" })
+                                        @Html.ValidationMessageFor(m => m.DeliveryTermsId, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6" style="display:@(Model.SaleDispatchSettings.isVisibleShipMethod ? "" : "none")">
+                                @Html.HiddenFor(m => m.SaleDispatchSettings.isVisibleShipMethod)
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.ShipMethodId, "Ship Method", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.DropDownListFor(model => model.ShipMethodId, new SelectList(ViewBag.ShipMethodList as System.Collections.IEnumerable, "ShipMethodId", "ShipMethodName"), new { @class = "form-control col-xs-6 height required " })
+                                        @Html.ValidationMessageFor(m => m.ShipMethodId, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="row">
+                            
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.Remark, "Remark", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextAreaFor(m => m.Remark, new { @class = "form-control col-xs-6" })
+                                        @Html.ValidationMessageFor(m => m.Remark, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            
+                        </div>
+                    </div>
+                </div>
+
+
+
+
+                <hr />
+                <div class="row">
+                    <h4 class="col-md-12 black" style="margin-top:15px">
+                        <span class="glyphicon glyphicon-shopping-cart"></span>
+                        2.Products Details
+                    </h4>
+                </div>
+
+                <div class="panel-info" style="height:40px;">
+                    
+                        <div class="btn-group" style="padding:5px 0 3px 0;margin:0px;font-weight:bold">
+                            <span class="glyphicon glyphicon-plus-sign"></span>
+                            @{string Action = "";
+                                if (Model.Status == (int)StatusConstants.Drafted)
+                                { Action = "CreateLine"; }
+                                else if (Model.Status == (int)StatusConstants.Submitted || Model.Status == (int)StatusConstants.Modified || Model.Status == (int)StatusConstants.ModificationSubmitted)
+                                { Action = "CreateLineAfter_Submit"; }
+                                else if (Model.Status == (int)StatusConstants.Approved)
+                                { Action = "CreateLineAfter_Approve"; }
+                            }
+                            @Html.ActionLink("Add New Row ", Action, "SaleDispatchLine", new { id = @Model.SaleDispatchHeaderId, IsSaleBased = false }, new { data_modal = "", id = "btnCreate", @class = "toolbar", @title = "Add New", @data_toggle = "tooltip", @data_detailDisabled = "true" })
+                            @if (Model.SaleDispatchSettings.isVisibleForSaleOrder)
+                            {
+                                @:/
+                                @Html.ActionLink("For Sale Order", Action, "SaleDispatchLine", new { id = @Model.SaleDispatchHeaderId, IsSaleBased = true }, new { data_modal = "", id = "btnCreate", @class = "toolbar", @title = "Add New", @data_toggle = "tooltip", @data_detailDisabled = "true" })
+                            }
+                            </div>
+                    <div class="btn-group right" style="padding-right:15px">
+                        @if (Model.SaleDispatchSettings.isVisibleForSaleOrder)
+                        {
+                            @Html.ActionLink(" ", "_ForOrder", "SaleDispatchLine", new { id = @Model.SaleDispatchHeaderId }, new { data_modal = "", id = "btnCreateFP", @class = "cbtn btn-circle glyphicon glyphicon-link toolbar right", @title = "For Order", @data_toggle = "tooltip", @data_detailDeleted = "true" })
+                        }
+                    </div>
+
+                </div>
+                <div style="padding-right:15px;">
+
+                    <div class="panel panel-default" id="grid">
+
+                        <div style="min-width: 700px;">
+
+                            <div class="panel-info" id="gbody">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                
+
+            </div>
+        </div>
+    </div>
+}
+
+
+
+
+@if ((ViewBag.Mode == "Add") || (ViewBag.Mode == "Edit"))
+{
+    <script type="text/javascript">
+        var IsSaved=false;
+        var ValidationCount=0;
+
+        $('form').submit(function(event){
+
+            if(!IsSaved)
+            {
+                if(!ValidateData())
+                {
+                    return false;
+                }
+                IsSaved=true;
+                return IsSaved;
+            }
+            else
+            {
+                return false;
+            }
+        });
+
+
+        function ValidateData() {
+            var DocId=@Model.SaleDispatchHeaderId;
+            var TempValue;
+            var ValidationMessage="";
+
+
+
+            //Checking for dulicate key value
+            if(DocId<=0)
+            {
+                TempValue= $('#DocNo').DuplicateCheckForCreate({ name: 'SaleDispatchHeader', value: $('#DocNo').val(), doctype: 0 });
+                if (TempValue){ ValidationMessage=$('#DocNo').val() + " already exist <br />";}
+            }
+            else
+            {
+                test = $('#DocNo').DuplicateCheckForEdit({ name: 'SaleDispatchHeader', value: $('#DocNo').val(), doctype: 0,headerId:DocId });
+                if (TempValue) {ValidationMessage+=$('#DocNo').val() + " already exist <br />";}
+            }
+            if(TempValue)
+            {
+                if($('#validationerrormsg').length==0){
+                    $('.panel-info').filter(':eq(1)').before('<div class="alert alert-danger" role="alert" id="validationerrormsg">'+ValidationMessage+'</div>');}
+                else
+                {
+                    $('#validationerrormsg').html(ValidationMessage);
+                }
+            }
+            return  (ValidationMessage=="");
+
+        }
+
+
+        $('#BillToBuyerId').change(function () {
+            var cid = $("#BillToBuyerId").val();
+            var cdata = $('#BillToBuyerId').select2('data').text;
+
+
+            if (cdata != 'Cash A/c' && cdata != 'Bank A/c')
+            {
+                $("#SaleToBuyerId").select2('data', { id: cid, text: cdata });
+            }
+
+            
+
+
+            if ($("#SaleToBuyerId").val() != 0 && $("#SaleToBuyerId").val() != null)
+            {
+                GetPersonLedgerBalance();
+                GetPersonDetail();
+            }
+        });
+
+        function GetPersonLedgerBalance()
+        {
+            if ($("#SaleToBuyerId").val() != 0 && $("#SaleToBuyerId").val() != null) 
+            {
+                $.ajax({
+                    cache: false,
+                    async: false,
+                    type: "POST",
+                    url: "@(Url.Action("GetPersonLedgerBalance"))",
+                    data: { PersonId: $("#SaleToBuyerId").val() },
+                success: function (data) {
+                    if (data != null)
+                    {
+                        $("#CurrentBalance").val(data);
+                        
+                    }
+                    else {
+                        $("#CurrentBalance").val(0);
+                    }
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    alert('Failed to retrieve Current Balance.' + thrownError);
+                    ProcessProgress.hide();
+                }
+            });
+            }
+            else {
+                $("#CurrentBalance").val(0);
+            }
+
+            if ($("#CurrentBalance").val() > 0)
+            {
+                $("#PersonLedgerBalance").text($("#CurrentBalance").val().toString() + ' ' + 'Dr');
+            }
+            else if ($("#CurrentBalance").val() < 0) {
+                $("#PersonLedgerBalance").text(Math.abs($("#CurrentBalance").val()).toString() + ' ' + 'Cr');
+            }
+            else{
+                $("#PersonLedgerBalance").text($("#CurrentBalance").val());
+            }
+        }
+
+
+        function GetPersonDetail()
+        {
+            if ($("#SaleToBuyerId").val() != 0 && $("#SaleToBuyerId").val() != null) 
+            {
+                $.ajax({
+                    cache: false,
+                    async: false,
+                    type: "POST",
+                    url: "@(Url.Action("GetPersonDetail"))",
+                    data: { PersonId: $("#SaleToBuyerId").val() },
+                success: function (data) {
+                    if (data != null)
+                    {
+                        $("#CreditDays").val(data.CreditDays);
+                        $("#CreditLimit").val(data.CreditLimit);
+                    }
+                    else {
+                        $("#CreditDays").val(0);
+                        $("#CreditLimit").val(0);
+                    }
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    alert('Failed to retrieve Person Detail.' + thrownError);
+                    ProcessProgress.hide();
+                }
+            });
+        }
+        else {
+                $("#CreditDays").val(0);
+                $("#CreditLimit").val(0);
+            }
+        }
+
+        var id=@Model.SaleDispatchHeaderId;
+        if(id==null||id==0)
+        {
+            $(document).find('a#btnCreate').removeAttr('href').removeAttr('data-modal');
+            $("#btnCreateF").attr('disabled','disabled');
+        }
+
+        var status = @Model.Status;
+        if(id != null && id != 0 &&  status != 0)
+        {
+            $("#SaleToBuyerId").attr('disabled','disabled');
+            $("#BillToBuyerId").attr('disabled','disabled');
+            $("#GodownId").attr('disabled','disabled');
+        }
+
+
+
+        //Reloading the table contents on modal hide
+        $('#myModal').on('hidden.bs.modal', function () {
+            LoadProducts();
+            var id=@Model.SaleDispatchHeaderId;
+        });
+
+        $(document).ready(function(){
+            enableModalTransitions();
+        })
+
+        ////For Populating Modal PopUp on DoubleClick Of Row
+        //$('#gbody').on("dblclick",'.grid-body',function(){
+        //    var text = $(this).find(".id").val();
+        //    var editurl=$(this).find('a[edit]').attr('href');
+        //    $('#myModalContent').load(editurl, function ( response, status, xhr) {
+        //        //alert('2');
+
+        //        if ( status == "error" ) {
+        //        }
+        //        else
+        //        {
+        //            $('#myModal').modal({
+        //                backdrop: 'static',
+        //                keyboard: true
+        //            }, 'show');
+
+        //            bindForm1(this);
+        //        }
+        //    });
+        //});
+
+        
+        ////For Handling Modal PopUp on Clicking Delete Icon
+        //$('#gbody').on("click",'a[Detail]', function (e) {
+        //    $('#myModalContent').load(this.href, function (response, status, xhr) {
+        //        //alert('2');
+        //        if ( status == "error" ) {
+        //            var msg = "Sorry but there was an error: ";
+        //        }
+        //        else
+        //        {
+        //            $('#myModal').modal({
+        //                backdrop: 'static',
+        //                keyboard: true
+        //            }, 'show');
+
+        //            bindForm1(this);}
+        //    });
+        //    return false;
+        //});
+
+
+        ////For Handling Modal PopUp on Clicking Delete Icon
+        //$('#gbody').on("click",'a[delete]', function (e) {
+        //    $('#myModalContent').load(this.href, function (response, status, xhr) {
+        //        //alert('2');
+        //        if ( status == "error" ) {
+        //            var msg = "Sorry but there was an error: ";
+        //        }
+        //        else
+        //        {
+        //            $('#myModal').modal({
+        //                backdrop: 'static',
+        //                keyboard: true
+        //            }, 'show');
+
+        //            bindForm1(this);}
+        //    });
+        //    return false;
+        //});
+
+
+
+
+        ////To focus on the first element on modal load
+        //$('#myModal').on('shown.bs.modal', function () {
+        //    $("#ProductId").select2("focus");
+        //});
+
+
+
+
+
+
+        ////For posting the data through ajax and render the contents sent back from the server
+        //function bindForm1(dialog) {
+        //    //alert("binding1");
+        //    $('form#modform', dialog).submit(function () {
+        //        //alert(this.action);
+        //        $.ajax({
+        //            //headers: headers,
+        //            url: this.action,
+        //            type: this.method,
+        //            data:$(this).serialize(),
+        //            success: function (result) {
+        //                if (result.success) {
+        //                    $('#myModal').modal('hide');
+        //                    //Refresh
+        //                    //location.reload();
+        //                    //alert('Data Saved');
+        //                }else if(!result.success)
+        //                {
+        //                    $('#myModalContent').html(result);
+        //                    bindForm1();
+        //                }
+        //                else {
+        //                    $('#myModalContent').html(result);
+        //                    bindForm1();
+        //                }
+        //            },
+        //        });
+        //        return false;
+        //    });}
+
+        //$(function () {
+
+        //    $.ajaxSetup({ cache: false });
+
+        //    $("a[data-modalCustom]").on("click", function (e) {
+        //        // hide dropdown if any
+        //        if(this.href=="")
+        //        {
+        //            return false;
+        //        }
+        //        //alert(' Script');
+        //        $('#myModalContent').load(this.href, function () {
+        //            $('#myModal').modal({
+        //                backdrop: 'static',
+        //                keyboard: true
+        //            }, 'show');
+
+        //            bindForm1(this);
+        //        });
+
+        //        return false;
+        //    });
+        //});
+    </script>
+}
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+
+        //CustomSelectFunction($("#BillToBuyerId"), '/ComboHelpList/GetPersonWithProcess', '/ComboHelpList/SetSinglePerson', ' ', false, 0,$('#ProcessId').val());
+        //CustomSelectFunction($("#SaleToBuyerId"), '/ComboHelpList/GetPersonWithProcess', '/ComboHelpList/SetSinglePerson', ' ', false, 0,$('#ProcessId').val());
+        CustomSelectFunction($("#BillToBuyerId"), '/SaleDispatchHeader/GetCustomPerson', '/ComboHelpList/SetSinglePerson', ' ', false, 1,$('#DocTypeId').val());
+        CustomSelectFunction($("#SaleToBuyerId"), '/SaleDispatchHeader/GetCustomPerson', '/ComboHelpList/SetSinglePerson', ' ', false, 1,$('#DocTypeId').val());
+
+        CustomSelectFunction($("#AgentId"), '/ComboHelpList/GetPerson', '/ComboHelpList/GetPerson', ' ', false, 0);
+
+        //Adding Hidden Input Fields
+        AddFields();
+
+
+
+
+
+
+        //Calling the function to load the table data/ Line information
+        LoadProducts();
+        var id=@Model.SaleDispatchHeaderId;
+
+        if ($("#CurrentBalance").val() > 0)
+        {
+            $("#PersonLedgerBalance").text($("#CurrentBalance").val().toString() + ' ' + 'Dr');
+        }
+        else if ($("#CurrentBalance").val() < 0) {
+            $("#PersonLedgerBalance").text(Math.abs($("#CurrentBalance").val()).toString() + ' ' + 'Cr');
+        }
+        else{
+            $("#PersonLedgerBalance").text($("#CurrentBalance").val());
+        }
+    });
+
+
+
+
+    var id=@Model.SaleDispatchHeaderId;
+    if(id==null||id==0)
+    {
+        $(document).find('a#btnCreate').removeAttr('href').removeAttr('data-modal');
+    }
+
+
+
+
+
+
+    ////To focus on the first element on modal load
+    //$('#myModal').on('shown.bs.modal', function () {
+    //    $("#ProductId").select2("focus");
+    //});
+
+   function LoadProducts() {
+        var groupId=@Model.SaleDispatchHeaderId;
+        var status='@Model.Status';
+        var link="/SaleDispatchLine/_Index/";
+
+        $.ajax({
+            url: link,
+            type: "GET",
+            data:{id:groupId,status:status},
+            success: function (data) {
+                $("#gbody").html(data);
+            },
+            error: function (result) {
+                alert("Error");
+            }
+        });
+    };
+
+   @*function LoadProducts() {
+        var groupId=@Model.SaleDispatchHeaderId;
+        var status='@Model.Status';
+        var LineEditUrl;
+        var LineDeleteUrl;
+        if(status==StatusContstantsEnum.Drafted)
+        {
+            LineEditUrl="/SaleDispatchLine/_ModifyLine/";
+            LineDeleteUrl="/SaleDispatchLine/_DeleteLine/";
+        }
+        else if(status==StatusContstantsEnum.Submitted || status == StatusContstantsEnum.Modified || status == StatusContstantsEnum.ModificationSubmitted)
+        {
+            LineEditUrl="/SaleDispatchLine/_ModifyLineAfterSubmit/";
+            LineDeleteUrl="/SaleDispatchLine/_DeleteLine_AfterSubmit/";
+        }
+        else if(status==StatusContstantsEnum.Approved)
+        {
+            LineEditUrl="/SaleDispatchLine/_ModifyLineAfterApprove/";
+            LineDeleteUrl="/SaleDispatchLine/_DeleteLine_AfterApprove/";
+        }
+        var link="/SaleDispatchLine/Index/"+groupId;
+        var QtyCount=0;
+        var DealQtyCount=0;
+        var AmountCount=0;
+        var unit=true;
+        var prevunit;
+        var dealunit=true;
+        var prevdealunit;
+        var decimal=0;
+        var dealdecimal=0;
+        $.ajax({
+            url: link,
+            type: "GET",
+            success: function (data) {
+                var row = ""
+                var srno=1;
+                if(data.length!=0)
+                {
+                    $.each(data, function (index, item) {
+                        row += " <div class='row crow grid-body' style='margin-left:0px;margin-right:0px'><div class='row-index block'  style='width:5%'>"+srno+"<input type='hidden' class='id' value='"+item.SaleDispatchLineId+"' /></div><div class='block' style='width: 90%; '><div class='row'><div class='block' style='width: 60%; '>"+(item.ProductName==null?" ":"<strong>"+item.ProductName+"</strong>")+"<br />"+(item.Specification==null?" ":item.Specification)+" <div>"+(item.Dimension1Name==null?" ":item.Dimension1Name+",")+(item.Dimension2Name==null?" ":item.Dimension2Name)+"</div><div>"+((item.SaleOrderHeaderDocNo==null)?" ":"<h4><span title='SaleOrder' class='label label-danger' style='font-weight:bold'>"+item.SaleOrderHeaderDocNo+"</span></h4>")+"<br />"+(item.ProductUidName==null?" ":"<strong>"+item.ProductUidName+"</strong>")+"</div></div> <div class='block text-right' style='width: 10%; '>"+(item.Qty==null?" ":item.Qty.toFixed(item.unitDecimalPlaces))+"<br /> <div><small>"+(item.UnitId==null?" ":item.UnitId)+"</small></div>  </div>  </div></div><div class='block' style='width: 5%; '><a class='glyphicon glyphicon-trash icon-Cus-Size' data-modal='' data-detailDisabled='true' delete='' href='"+LineDeleteUrl+item.SaleDispatchLineId+"'></a><a  edit='' href='"+LineEditUrl+item.SaleDispatchLineId+"'></a></div></div><hr style='margin-top:0px;margin-bottom:0px'/></div>";
+                        QtyCount+=item.Qty;
+                        DealQtyCount+=item.DealQty;
+                        AmountCount+=item.Amount;
+                        if(srno!=1)
+                        {
+                            if(item.UnitId==prevunit)
+                            {}
+                            else
+                            {unit=false;}
+
+                            if(item.DealUnitId==prevdealunit)
+                            {}
+                            else
+                            {dealunit=false;}
+
+                        }
+                        if(decimal<item.unitDecimalPlaces){decimal=item.unitDecimalPlaces;}
+                        if(dealdecimal < item.DealUnitDecimalPlaces){dealdecimal=item.DealUnitDecimalPlaces;}
+                        srno++;
+                        prevunit=item.UnitId;
+                        prevdealunit=item.DealUnitId;
+                    });
+                    row+="<div class='row tfooter' style='padding-top:10px;margin-left:0px;margin-right:0px'><div class='block'  style='width:5%'></div><div class='block'  style='width:90%'><div class='row'>  <div class='block'  style='width:60%'><strong>Total</strong></div><div class='block'  style='width:10%'></div><div class='block'  style='width:25%'></div><div class='block text-right'  style='width:10%'><strong>"+ ((unit==true)?QtyCount.toFixed(decimal)+"<br /><small>"+prevunit+"</small>":QtyCount.toFixed(decimal))+"</strong></div></div></div><div class='block'  style='width:5%'></div></div>"
+
+                    $('#DocNo').attr('readonly','true');
+                }
+                else
+                {
+
+                }
+                //$("#header").html(head);
+                $("#gbody").html(row);
+
+            },
+            error: function (result) {
+                alert("Error");
+            }
+        });
+    }*@
+
+
+    $(function () {
+
+        $("a[data-modalCustom2]").on("click", function (e) {
+            if (this.href == "") {
+                return false;
+            }
+
+            var SaleToBuyerId =  $("#SaleToBuyerId").val()
+            var NewUrl = this.href.replace("id",SaleToBuyerId);
+
+            $.ajax({
+                url: NewUrl,
+                type: "POST",
+                success: function (result) {
+                    $('#myModalContent').html(result);
+                    $('#myModal').modal({
+                        backdrop: 'static',
+                        keyboard: true
+                    }, 'show');
+
+                    bindForm2('#myModalContent');
+                },
+            });
+            return false;
+        });
+
+
+        function bindForm2(dialog) {
+            $('#modformr2', dialog).submit(function () {
+                $.ajax({
+                    url: this.action,
+                    type: this.method,
+                    data: $(this).serialize(),
+                    success: function (result) {
+                        if (result.success) {
+                            $('#myModal').modal('hide');
+                            CustomSelectFunction($("#SaleToBuyerId"), '/ComboHelpList/GetPerson', '/ComboHelpList/SetSinglePerson', ' ', false, 0);
+                            //$('#SaleToBuyerId').keydown();
+                            $("#SaleToBuyerId").select2('data', { id: result.PersonId, text: result.Name });
+                        } else {
+                            $('#myModalContent').html(result);
+                            bindForm();
+                        }
+                    }
+                });
+                return false;
+            });
+        }
+
+    });
+
+
+</script>
+
+
+
+@if ((ViewBag.Mode != "Add") && (ViewBag.Mode != "Edit"))
+{
+    <script type="text/javascript">
+
+        $(document).ready(function(){
+            DisablePageNavigation();
+        })
+        
+        //RemoveFields();
+
+        //function RemoveFields(){
+        //    //Disabling input fields
+        //    $(':input:not(:submit)').attr('disabled','disabled');
+
+        //    //Removing all the events from the newly created lines
+        //    $('#gbody').unbind();
+
+        //    //Removing Add New Row ActionLink
+        //    $('a#btnCreate').parents('h5')[0].remove();
+
+
+        //    //Preventing the click event on newly created elements
+        //    $(document).on('click','#gbody a:not(:has([Detail]))',function(event){
+        //        event.preventDefault();
+        //    })
+        //    //Removing the action link from the form so that the request will be redirected to the Submit function in the controller instead of the hardcoded path
+        //    $('form:last').prop('action','');
+        //}
+
+
+    </script>
+}
+
+@if ((Model.Status == (int)ActivityTypeContants.Modified || Model.Status == (int)ActivityTypeContants.Submitted)
+    && (ViewBag.transactionType == "submit" || ViewBag.transactionType == "submitContinue" || ViewBag.transactionType == "review" || ViewBag.transactionType == "ReviewContinue"))
+{
+    <script type="text/javascript">
+
+        var GatePassGen='@Model.SaleDispatchSettings.SqlProcGatePass'
+        var GatePassId='@Model.GatePassHeaderId'
+        var TrancType='@ViewBag.transactionType'
+
+        $(document).ready(function(){
+            enableActivityLogReason(GatePassGen,GatePassId,TrancType);
+        })
+
+        //var href = '/ActivityLog/LogEditReason'
+
+        //$(':submit').bind('click', function () {
+        //    var Button=$(this);
+        //    $('#myModalContent').load(href, function () {
+
+        //        $('#myModal').modal({
+        //            backdrop: 'static',
+        //            keyboard: true
+        //        }, 'show');
+
+        //        bindForm1(this,Button);
+        //    });
+
+
+        //    return false;
+        //})
+
+        //function bindForm1(dialog,Button) {
+
+        //    $('#modformr', dialog).submit(function () {
+
+        //        $.ajax({
+        //            url: this.action,
+        //            type: this.method,
+        //            data: $(this).serialize(),
+        //            success: function (result) {
+        //                if (result.success) {
+        //                    $('#myModal').modal('hide');
+
+        //                    $(':submit').unbind();
+
+        //                    $('input[name="UserRemark"]').val(result.UserRemark);
+
+        //                    if(GatePassGen && !GatePassId && (TrancType=="submit"||TrancType=="submitContinue"))
+        //                    {
+        //                        alertify.confirm('Generate GatePass ?').set({
+        //                            'closable': false, 'onok': function (onok) {
+
+        //                                $('input[name="GenGatePass"]').val('true');
+        //                                Button.trigger('click');
+
+        //                            }, 'oncancel': function (oncancel) {
+
+        //                                $('input[name="GenGatePass"]').val('false');
+        //                                Button.trigger('click');
+
+        //                            }
+        //                        }).setting('labels',{'ok':'Yes', 'cancel': 'No'});
+        //                    }
+        //                    else
+        //                    {
+        //                        Button.trigger('click');
+        //                    }
+        //                } else {
+        //                    $('#myModalContent').html(result);
+        //                    bindForm1();
+        //                }
+        //            }
+        //        });
+        //        return false;
+        //    });
+
+        //}
+    </script>
+}
+else if (Model.GatePassHeaderId == null && (ViewBag.transactionType == "submit" || ViewBag.transactionType == "submitContinue") && !string.IsNullOrEmpty(Model.SaleDispatchSettings.SqlProcGatePass))
+{
+    <script type="text/javascript">
+
+        $(document).ready(function(){
+            prompGatePassGeneration();
+        })
+
+        //$(':submit','form .panel.panel-default').one('click', function () {
+        //    $btnClicked=$(this);
+        //    var uChoice=false;
+        //    alertify.confirm('Generate GatePass ?').set({
+        //        'closable': false, 'onok': function (onok) {
+
+        //            $('input[name="GenGatePass"]').val('true');
+        //            $btnClicked.trigger('click');
+        //            uChoice=true;
+
+        //        }, 'oncancel': function (oncancel) {
+
+        //            $('input[name="GenGatePass"]').val('false');
+        //            $btnClicked.trigger('click');
+        //            uChoice=true;
+        //        }
+        //    }).setting('labels',{'ok':'Yes', 'cancel': 'No'});
+        //    return uChoice;
+        //})
+
+
+    </script>
+}

@@ -1,0 +1,250 @@
+﻿@model Surya.India.Model.ViewModels.PurchaseGoodsReceiptLineViewModel
+@using Surya.India.Core.Common
+@{
+    ViewBag.Title = "Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<style type="text/css">
+    .select2-container {
+        width: 300px;
+    }
+</style>
+
+@using (Html.BeginForm("Create", "PurchaseGoodsReceiptLine", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(model => model.PurchaseGoodsReceiptHeaderId)
+        @Html.HiddenFor(m=>m.UnitId)
+    @Html.HiddenFor(m=>m.UnitConversionMultiplier)
+    <script>
+        $(document).ready(function () {
+
+            CustomSelectFunction($("#ProductId"), '/ComboHelpList/GetProducts', '/ComboHelpList/SetSingleProducts', 'Enter Product Name', false, 3);
+
+        });
+
+    </script>
+
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h4>
+                <span style="font-family: Calibri,sans-serif,Verdana"> Create Purchase Goods Receipt Line(Order No:@ViewBag.DocNo)</span>
+            </h4>
+        </div>
+        <div class="panel-info" style="padding-left:15px">
+            <div class="form-horizontal">
+                @Html.ValidationSummary(true)
+
+                <div class="form-group" style="margin-top:15px">
+                    @Html.LabelFor(model => model.ProductId, "Product*", new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.TextBoxFor(a => a.ProductId)
+                        @Html.ValidationMessageFor(model => model.ProductId)
+                        <span id="status"></span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.PurchaseOrderLineId, "Order No", new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.DropDownListFor(m => m.PurchaseOrderLineId, Enumerable.Empty<SelectListItem>())
+                        @Html.ValidationMessageFor(model => model.PurchaseOrderLineId)
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.Specification, "Specification", new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(m => m.Specification)
+                        @Html.ValidationMessageFor(model => model.Specification)
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.Qty, "Qty*", new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.Qty)
+                        @Html.ValidationMessageFor(model => model.Qty)
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.DeliveryUnitId, "Delivery Unit", new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.DropDownList("DeliveryUnitId")
+                        @Html.ValidationMessageFor(model => model.DeliveryUnitId)
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-top:15px">
+                    @Html.LabelFor(model => model.DeliveryQty, "Delivery Qty*", new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.TextBoxFor(a => a.DeliveryQty)
+                        @Html.ValidationMessageFor(model => model.DeliveryQty)                       
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-top:15px">
+                    @Html.LabelFor(model => model.BaleNo, "Bale No", new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.TextBoxFor(a => a.BaleNo)
+                        @Html.ValidationMessageFor(model => model.BaleNo)
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.Remark, new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.Remark)
+                        @Html.ValidationMessageFor(model => model.Remark)
+                    </div>
+                </div>
+
+                <hr />
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-10">
+                        <input type="submit" id="btnSave" name="Command" value="Save" class="btn btn-primary btn-sm CurveBorder" />
+                        <span style="font-family: Calibri,sans-serif,Verdana;font-size:large">
+                            @Html.ActionLink("Back", "Index", new { id = @Model.PurchaseGoodsReceiptHeaderId }, new { @class = "btn btn-primary btn-sm col-md-offset-1 CurveBorder ActionLinkPadding" })
+                        </span>
+                        @if (ViewBag.Status == (int)StatusConstants.Drafted)
+                        {
+                            <input type="submit" id="btnSave" name="Command" value="Submit" class="btn btn-primary btn-sm CurveBorder col-md-offset-1" />
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#ProductId").select2("focus");
+    })
+</script>
+
+<script type="text/javascript">
+    $(function () {
+
+        $("#DeliveryQty,#Qty").keyup(Calculation);
+        $("#DeliveryUnitId").change(GetUnitConversionMultiplier);
+        $("#ProductId").change(GetProductDetail);
+        $("#ProductId").change(GetPendingPurchaseOrders);
+        $("#PurchaseOrderLineId").change(GetProductBalance);
+
+        function GetProductBalance() {
+
+
+            if ($("#PurchaseOrderLineId option:selected").text() != '-Select-') {
+
+                var ProcessProgress = $("#Purchase Order Line Status loading progress");
+                ProcessProgress.show();
+                $.ajax({
+                    cache: false,
+                    type: "POST",
+                    url: "@(Url.Action("GetPurchaseOrderLineJson"))",
+                    data: { PurchaseOrderLineId: $("#PurchaseOrderLineId").val() },
+                success: function (data) {
+                    $("#Qty").val(data);
+                    GetUnitConversionMultiplier.call();
+                    Calculation.call();
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    alert('Failed to retrieve purchase orders status.' + thrownError);
+                    ProcessProgress.hide();
+                }
+            });
+        }
+    else {
+                $("#Qty").val(0);
+        $("#DeliveryQty").val(0);
+    }
+
+    }
+
+        function GetPendingPurchaseOrders() {
+            var ddlPurchaseOrders = $("#PurchaseOrderLineId");
+            if ($("#ProductId").val() != 0 || $("#ProductId").val() != NULL) {
+                $.ajax({
+                    cache: false,
+                    type: "POST",
+                    url: "@(Url.Action("GetPendingPurchaseOrder"))",
+                    data: { ProductId: $("#ProductId").val() },
+                    success: function (data) {
+                        ddlPurchaseOrders.html('');
+                        ddlPurchaseOrders.append($('<option></option>').html('-Select-').val(0));
+                    $.each(data, function (id, option) {
+                        ddlPurchaseOrders.append($('<option></option>').val(option.PurchaseOrderLineId).html(option.DocNo));
+                    });
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    alert('Failed to retrieve product details.' + thrownError);
+                    ProcessProgress.hide();
+                }
+            });
+        }
+
+    }    
+
+        function GetProductDetail() {
+            var ProcessProgress = $("#Product detail loading progress");
+            ProcessProgress.show();
+            if ($("#ProductId").val() != 0 || $("#ProductId").val() != NULL) {
+                $.ajax({
+                    cache: false,
+                    type: "POST",
+                    url: "@(Url.Action("GetProductDetailJson"))",
+                    data: { ProductId: $("#ProductId").val() },
+                    success: function (data) {                        
+                        $("#UnitId").val(data[0].UnitId);
+                        $("#DeliveryUnitId").val(data[0].UnitId);
+                        GetUnitConversionMultiplier.call();
+                        Calculation.call();
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        alert('Failed to retrieve product details.' + thrownError);
+                        ProcessProgress.hide();
+                    }
+                });
+            }
+
+        }      
+
+        function GetUnitConversionMultiplier() {
+
+            if ($("#UnitId").val() == $("#DeliveryUnitId").val()) {
+                $("#UnitConversionMultiplier").val(1);
+                Calculation.call();
+            }
+
+            else {
+                var ProcessProgress = $("#Unit conversion detail loading progress");
+                ProcessProgress.show();
+                $.ajax({
+                    cache: false,
+                    type: "POST",
+                    url: "@(Url.Action("GetUnitConversionDetailJson"))",
+                    data: { ProductId: $("#ProductId").val(), UnitId: $("#UnitId").val(), DeliveryUnitId: $("#DeliveryUnitId").val() },
+
+                success: function (data) {
+                    $("#UnitConversionMultiplier").val(data[0].Value);
+                    Calculation.call();
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    alert('Failed to retrieve Unit conversion details.' + thrownError);
+                    ProcessProgress.hide();
+                }
+            });
+        }
+    }
+
+
+        function Calculation() {
+            if ($('#UnitConversionMultiplier').val() != 0) {
+                $('#DeliveryQty').val($('#Qty').val() * $('#UnitConversionMultiplier').val())
+            }
+            
+        }
+    });
+</script>

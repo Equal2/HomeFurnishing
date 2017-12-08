@@ -1,0 +1,21 @@
+Links-
+
+http://unitymvc3.codeplex.com/
+http://tpeczek.blogspot.co.uk/2011/03/jqgrid-and-aspnet-mvc-strongly-typed.html
+http://tpeczek.codeplex.com/releases/view/62741
+ 
+------------------Calculation--------------------
+DONE----->1. Calculate on should list only respective record charges. in header only of header. in footer only of footer.
+2. While selecting charge type round off, it should ask for calculate on
+3.-TO-DO-Fix error and Remove 2 unitOfWork.Save();-JobOrderLine View
+ 4-FGetExcessStock in MaterialPlanLine Taking tOo Much time -need to Find a solution.
+
+
+
+ Notifications and Themes:
+ 1-PNotify
+ 2-Admin LTE
+
+
+ 31/07/2015:
+ Implement Duplicate Check comman functionality and change it in entire project

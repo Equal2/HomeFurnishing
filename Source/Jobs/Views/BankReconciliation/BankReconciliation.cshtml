@@ -1,0 +1,636 @@
+﻿@{
+    ViewBag.Title = "Bank Reconciliation";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<link href="~/Content/DataTables/css/jquery.dataTables.min.css" rel="stylesheet" />
+
+<script src="~/Scripts/DataTables/jquery.dataTables.min.js"></script>
+@*<script src="~/Scripts/DataTables/dataTables.scroller.js"></script>*@
+<script src="~/Scripts/DataTables/dataTables.scroller.min.js"></script>
+
+<style type="text/css">
+    .DTHidden {
+        display: none;
+    }
+
+    .TextRight {
+        text-align: right;
+    }
+
+    .dataTables_scroll {
+        font-size: 13px !important;
+        line-height: 1;
+    }
+
+    table.dataTable tbody td {
+        padding: 2px 10px;
+    }
+</style>
+
+<!-- modal placeholder-->
+<div id='myModal' class='modal fade in'>
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div id='myModalContent'></div>
+        </div>
+    </div>
+</div>
+
+
+@*<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" style="font-size:13px">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="exampleModalLabel">Summary</h4>
+            </div>
+            <div class="modal-body" id="SelectedSummary">
+                <div class="row" style="margin-left:0px;margin-right:0px;margin-bottom:7px">
+                    <div class='row-index block' style='width:5%'>  <strong>Sr</strong>  </div>
+                    <div class='block' style='width:93%'>
+
+                        <div class='block' style='width:30%'>
+                            <strong>LedgerId</strong>
+                        </div>
+                        <div class='block' style='width:30%'>
+                            <strong>DocNo</strong>
+                        </div>
+                        <div class='block' style='width:20%'>
+                            <strong>DocDate</strong>
+                        </div>
+                        <div class='block' style='width:20%'>
+                            <strong>AccountName</strong>
+                        </div>
+                        <div class='block text-right' style='width:10%'>
+                            <strong>Narration</strong>
+                        </div>
+                        <div class='block text-right' style='width:10%'>
+                            <strong>ChqNo</strong>
+                        </div>
+                        </div>
+                        <div class='block text-right' style='width:10%'>
+                            <strong>AmtDr</strong>
+                        </div>
+                        <div class='block text-right' style='width:10%'>
+                            <strong>AmtCr</strong>
+                        </div>
+                    </div>
+                </div>
+                <div id="SummaryContent" style="max-height:350px;overflow-y:scroll">
+
+                </div>
+            </div>
+            <div class="modal-footer" id="Total">
+                <div class="row" style="margin-left:0px;margin-right:0px">
+                    <div class='row-index block' style='width:5%'></div>
+                    <div class='block' style='width:92%'>
+                        <div class='block' style='width:30%'>
+                            <strong>Total</strong>
+                        </div>
+
+                        <div class='block' style='width:20%'>
+                        </div>
+                        <div class='block' style='width:20%'>
+                        </div>
+                        <div class='block' style='width:20%'>
+                        </div>
+                        <div class='block' style='width:20%'>
+                        </div>
+                        <div class='block' style='width:20%'>
+                        </div>
+                        <div class='block' style='width:10%'>
+                            <strong id="QtyTotal"></strong>
+                        </div>
+                        <div class='block' style='width:20%'>
+                            Amt:<strong id="AmtTotal"></strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>*@
+</div>
+
+
+@*<input type="button" id="button" />*@
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3>
+            <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-list black"></span> @ViewBag.Title </span>
+            @Html.ActionLink(" ", "Filters", "BankReconciliation", null, new { data_modalCustom = "", id = "btnCreateF", @class = "glyphicon glyphicon-filter toolbar right", @title = "Filters", @data_toggle = "tooltip" })
+        </h3>
+        <hr style="margin-top:0px;margin-bottom:0px" />
+    </div>
+
+    <div class="Filters fSelected" id="sFilter">
+        @*<strong>JobOrder:</strong>
+            <span class="label label-danger">
+                Star
+            </span>*@
+    </div>
+
+
+    <div class="panel-info tab" style="padding-left:5px;padding-top:20px">
+        <table id="example" class="display" cellspacing="0" width="100%">
+            <thead style="background: #428bca;color:white">
+                <tr>
+                    <th>LedgerId</th>
+                    <th>Doc No</th>
+                    <th>Doc Date</th>
+                    <th>Account Name</th>
+                    <th>Narration</th>
+                    <th>Chq No</th>
+                    <th>Chq Date</th>
+                    <th>Amt Dr</th>
+                    <th>Amt Cr</th>
+                    <th>Bank Date</th>
+                </tr>
+            </thead>
+            <tfoot>
+                <tr>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+</div>
+
+<!-- The Modal -->
+<div id="myImgModal" class="Imgmodal">
+
+    <!-- Modal Content (The Image) -->
+    <div class="Imgcontainer" style="
+    width: 600px;
+    height: 600px;
+    margin-left: auto;
+    margin-right: auto;
+">
+        <!-- The Close Button -->
+        @*<span class="close" onclick="document.getElementById('myModal').style.display='none'">&times;</span>*@
+        <img class="Imgmodal-content" id="img01" style="max-width: 100%; max-height: 100%; width: auto; height: auto">
+    </div>
+</div>
+
+
+<script type="text/javascript">
+
+
+    $(document).ready(function () {
+
+        var Filters = new AssignFilters();
+        Filters.TransactionType = "@ViewBag.TransactionType";
+        $('#sFilter').html(GenerateFiltersForHtml());
+        var LedgerAccountId = @ViewBag.LedgerAccountId
+
+        var PageLoadFirst = true;
+        var Url = "/BankReconciliation/LedgerAccountLedgerList/";
+        var tab = $('#example').DataTable({
+            scrollY: "300px",
+            scrollCollapse: false,
+            scroller: true,
+            sort : false,
+            lengthChange : false,
+            bInfo: false,
+            //ajax: Url,
+            ajax: {
+                "url": Url,
+                "type": "POST",
+                "data": function (d) {
+                    d.TransactionType = Filters.TransactionType ? Filters.TransactionType : null;
+                    d.FromDate = Filters.FromDate ? Filters.FromDate : null;
+                    d.ToDate = Filters.ToDate ? Filters.ToDate : null;
+                    d.LedgerAccountId = LedgerAccountId;
+                },
+            },
+
+            columns: [
+                { "data": "LedgerId", "width": "0%" },
+                { "data": "DocNo", "width": "8%" },
+                { "data": "DocDate", "width": "4%" },
+                { "data": "AccountName", "width": "15%" },
+                { "data": "Narration", "width": "25%" },
+                { "data": "ChqNo", "width": "7%" },
+                { "data": "ChqDate", "width": "7%" },
+                { "data": "AmtDr", "width": "7%", className: "TextRight", },
+                { "data": "AmtCr", "width": "7%", className: "TextRight", },
+                { "data": "BankDate", "width": "10%" },
+            ],
+            columnDefs: [
+    { "targets": 0, "searchable": false, className: "DTHidden LedgerId", },
+    { "targets": 9, "render": function (data, type, row) { return '<input style="width:100%;text-align:left" class="datepickerForExpiry BankDate"  type="text" name="BankDate' + row.LedgerId + '" id="BankDate' + row.LedgerId + '" value="' + data + '"/>'; }, },
+            ],
+            dom: 'T<"clear">lfrti',
+            TableTools: {
+                "sRowSelect": "os",
+                "aButtons": [
+                "select_all", "select_none"
+                ]
+            },
+            tableTools: {
+                "sSwfPath": "../../Content/DataTables/swf/copy_csv_xls_pdf.swf"
+            }
+
+
+        });
+
+
+        GetBalanceAsPerBooks();
+
+
+        $(document).on('change', ' td > input', function () {
+
+            GetBalanceAsPerBooks();
+            if ($(this).val() && $(this).hasClass('BankDate'))
+                eXBankDate = $(this).val();
+
+            var td = $(this).closest('td').get(0);
+            var JData = $(this).closest('tr');
+            var BankDate = JData.find('.BankDate').val();
+
+            if ($(this).val()) {
+                var data = tab.rows(JData).data();
+                $.ajax({
+                    url: '/BankReconciliation/UpdateBankDate',
+                    type: "POST",
+                    data: { LedgerId: data[0].LedgerId, BankDate: BankDate },
+                    success: function (result) {
+                        if (result.Success == true) {
+
+                        }
+                        else if (!result.Success) {
+                            alert('Something went wrong');
+                        }
+                    },
+                    error: function () {
+
+                    },
+                });
+            }
+            return true;
+        });
+
+        $(document).on('focus', '.datepickerForExpiry', function () {
+            $(this).datepicker({
+                format: 'dd/MM/yyyy',
+                "setDate": new Date(),
+                "autoclose": true,
+            })
+        })
+
+
+        $(function () {
+
+            $("a[data-modalCustom]").on("click", function (e) {
+                // hide dropdown if any
+                if (this.href == "") {
+                    return false;
+                }
+                //alert("Go");
+                var url = this.href;
+                var data = new GenerateFiltersForParameter();
+                $.ajax({
+                    url: url,
+                    type: "POST",
+                    data: data,
+                    success: function (result) {
+                        $('#myModalContent').html(result);
+                        $('#myModal').modal({
+                            backdrop: 'static',
+                            keyboard: true
+                        }, 'show');
+
+                        bindForm1('#myModalContent');
+                    },
+                });
+                return false;
+            });
+        });
+
+
+        function bindForm1(dialog) {
+            $('form#modform', dialog).submit(function () {
+                Filters = new AssignFilters();
+                $('#myModal').modal('hide');
+                $('#sFilter').html(GenerateFiltersForHtml());
+                var tab = $('#example').DataTable();
+                tab.ajax.reload();
+                GetBalanceAsPerBooks();
+                return false;
+
+            });
+
+        }
+
+
+
+        function AssignFilters() {
+            var self = this;
+
+            self.TransactionType = $('#TransactionType', '.modal-body').val();
+            self.FromDate = $('#FromDate', '.modal-body').val();
+            self.ToDate = $('#ToDate', '.modal-body').val();
+        }
+
+        function GenerateFiltersForParameter() {
+            var self = this;
+
+            self.TransactionType = Filters.TransactionType ? Filters.TransactionType : null;
+            self.FromDate = Filters.FromDate ? Filters.FromDate : null;
+            self.ToDate = Filters.ToDate ? Filters.ToDate : null;
+
+        }
+
+        function GenerateFiltersForHtml() {
+
+            var html = "";
+            html += Filters.TransactionType ? "<strong>Type:</strong> <span class='label label-danger'> " + Filters.TransactionType + " </span>" : "";
+            html += Filters.FromDate ? "<strong>From Date:</strong> <span class='label label-danger'> " + Filters.FromDate + " </span>" : "";
+            html += Filters.ToDate ? "<strong>To Date:</strong> <span class='label label-danger'> " + Filters.ToDate + " </span>" : "";
+
+            return html;
+        }
+
+
+        var LedgerAccountId = @ViewBag.LedgerAccountId;
+        
+        function GetBalanceAsPerBooks() {
+            var ToDate = Filters.ToDate ? Filters.ToDate : null;
+            var table = $('#example').DataTable();
+            var BalanceAsPerBooks = 0;
+            var BalanceAsPerBank = 0;
+            var DiffInBankAndBooks = 0;
+            var ProcessProgress = $("#Product detail loading progress");
+            ProcessProgress.show();
+            if (LedgerAccountId != 0 && LedgerAccountId != null) {
+                $.ajax({
+                    cache: false,
+                    async : false,
+                    type: "POST",
+                    url: "@(Url.Action("GetBalanceAsPerBooksJson"))",
+                    data: { LedgerAccountId: LedgerAccountId, ToDate : ToDate },
+                success: function (data) {
+                    BalanceAsPerBooks = data;
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    alert('Failed to retrieve product details.' + thrownError);
+                }
+            });
+
+
+                $.ajax({
+                    cache: false,
+                    async : false,
+                    type: "POST",
+                    url: "@(Url.Action("GetBalanceAsPerBankJson"))",
+                    data: { LedgerAccountId: LedgerAccountId, ToDate : ToDate },
+                success: function (data) {
+                    BalanceAsPerBank = data;
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    alert('Failed to retrieve product details.' + thrownError);
+                }
+            });
+
+                DiffInBankAndBooks = BalanceAsPerBooks - BalanceAsPerBank;
+                
+                $(table.column(4).footer()).html(
+                        'Balance As Per Books : ' + Math.abs(BalanceAsPerBooks).toFixed(2).toString() + (BalanceAsPerBooks > 0 ? " Dr" : " Cr") + "<br>" +
+                        'Balance As Per Bank : ' + Math.abs(BalanceAsPerBank).toFixed(2).toString() + (BalanceAsPerBank > 0 ? " Cr" : " Dr") + "<br>" +
+                        'Difference : ' + Math.abs(DiffInBankAndBooks).toFixed(2).toString() + (DiffInBankAndBooks > 0 ? " Dr" : " Cr") + "<br>" 
+                        );
+        }}
+
+
+        //function CalculateSelectedTotal() {
+        //    var table = $('#example').DataTable();
+
+        //    function CheckTotal() {
+        //        var Qty = 0;
+        //        $.each(table.rows('.selected').data(), function (index, value) {
+        //            Qty += parseFloat(value.Qty);
+        //        })
+        //        return Qty.toFixed(0);
+        //    }
+        //    function CheckTotalArea() {
+        //        var Qty = 0;
+        //        $.each(table.rows('.selected').data(), function (index, value) {
+        //            Qty += parseFloat(value.Area);
+        //        })
+        //        return Qty.toFixed(3);
+        //    }
+
+        //    $(table.column(1).footer()).html(
+        //            'Selected:' + CheckTotal() + ' Pcs, ' + CheckTotalArea() + ' Sq.yards'
+        //       );
+        //}
+
+
+
+        //$('#example tbody').on('click', 'tr', function (e) {
+        //    if (e.target.nodeName == "INPUT") {
+
+        //    }
+        //    else {
+        //        $(this).toggleClass('selected');
+
+        //        if (PageLoadFirst) {
+        //            CaclTotal();
+        //            PageLoadFirst = false;
+        //        }
+
+        //        if ($(this).hasClass('selected') && !$('#TestCheck').is(':checked')) {
+        //            $('#TestCheck').prop("checked", true);
+        //        }
+
+        //        CalculateSelectedTotal();
+        //    }
+        //});
+
+        //$('a#Proceed').click(function () {
+
+        //    var arr = [];
+
+        //    var table = $("#example").DataTable();
+        //    var test = table.rows('.selected').data();
+        //    var List = "";
+        //    var test34 = table.$('input, select').serialize();
+        //    $.each(test, function (index, value) {
+        //        arr.push({ ProdOrderLineId: value.ProdOrderLineId, Qty: value.Qty, BalanceQty: value.BalanceQty, RefDocTypeId: value.RefDocTypeId, RefDocLineId: value.RefDocLineId, DesignName: value.DesignName, Size: value.Size, Colour: value.Colour, Rate: value.Rate, Incentive: value.Incentive });
+        //    })
+
+        //    //alert($(this).attr('href'));
+
+        //    $.ajax({
+        //        url: $(this).attr('href'),
+        //        type: "POST",
+        //        data: { Selected: arr, id: id },
+        //        success: function (result) {
+        //            if (result.Success == true) {
+        //                UpdateDataTable(result);
+        //            } else if (result.Success == "URL") {
+        //                window.location.href = result.Data;
+        //            }
+        //            else if (!result.Success) {
+        //                alert('Something went wrong');
+        //            }
+        //            else { }
+        //        },
+        //    });
+
+        //    return false;
+
+        //});
+
+
+
+
+        //function UpdateDataTable(data) {
+        //    var table = $('#example').DataTable();
+
+        //    table.clear().draw();
+
+        //    table.rows.add(data.Data).draw();
+
+        //    $('#example').dataTable().fnFilterClear();
+
+        //    $('tfoot > tr > th:first').html('');
+
+        //    UpdateActionLink();
+
+        //}
+
+        //function UpdateActionLink() {
+        //    $('a#Proceed').attr('href', '/DyeingOrderWizard/ConfirmProdOrderList');
+        //}
+
+        //$(document).on('change', 'td > input', function () {
+        //    var table = $('#example').dataTable();
+        //    var td = $(this).closest('td').get(0);
+        //    var pos = table.fnGetPosition(td); // Im not familiar with the plugin so the extra $() might be overkill
+
+        //    if ($(this).is('.Qty') && table.fnGetData(pos[0]).BalanceQty < $(this).val()) {
+        //        $(this).val(table.fnGetData(pos[0]).BalanceQty).select();
+        //    }
+        //    else {
+        //        table.fnUpdate(parseFloat($(this).val()), pos[0], pos[1], false);
+        //        $('#example').DataTable().draw(false);
+        //        CalculateSelectedTotal();
+        //    }
+        //})
+
+
+
+
+    });
+
+
+    //$('#TestCheck').change(function () {
+
+    //    var table = $('#example').dataTable();
+    //    var $LRow;
+
+
+    //    if ($(this).is(':checked')) {
+    //        var Rows = table.$('tr', { "filter": "applied" })
+    //        $.each(Rows, function (index, value) {
+
+    //            $(this).addClass('selected');
+    //            $LRow = this;
+    //        })
+    //        CalculateSelectedTotal();
+    //    }
+    //    else {
+    //        var Rows = table.$('tr.selected')
+    //        $.each(Rows, function (index, value) {
+
+    //            $(this).removeClass('selected');
+    //            $LRow = this;
+
+    //        })
+    //        CalculateSelectedTotal();
+    //    }
+
+    //})
+
+
+
+
+
+
+    //function ResetTotal() {
+    //    var table = $('#example').DataTable();
+    //    $(table.column(1).footer()).html(
+    //                'Selected:' + 0 + ' Pcs '
+    //           );
+    //}
+
+    //$('#CartSum').click(function () {
+    //    GenerateSummaryString();
+    //    $('#exampleModal').modal('toggle');
+    //})
+
+
+    //function GenerateSummaryString() {
+    //    var Summary = "";
+    //    Summary += "<div class='row' style='margin:0px'>"
+
+    //    var table = $("#example").DataTable();
+    //    var test = table.rows('.selected').data();
+    //    var List = "";
+    //    var srno = 1;
+    //    var test34 = table.$('input, select').serialize();
+    //    var QtyTotal = 0;
+    //    var AmtTotal = 0;
+    //    $.each(test, function (index, value) {
+
+    //        Summary += " <div class='row crow grid-body' style='margin:0px;padding:0px'>"
+    //            + "      <div class='row-index block'  style='width:5%'>" + srno + "</div>"
+    //            + "          <div class='block'  style='width:95%'>"
+    //            + "                  <div class='block' style='width:30%'>" + (value.DesignName == null ? " " : "<strong>" + value.DesignName + "</strong>")
+    //            + "                  <div>" + value.Size + "</div>"
+    //            + "                  <div>" + value.Colour + "</div>"
+    //            + "                  </div>"
+    //            + "                  <div class='block' style='width:20%'>" + (value.Quality == null ? " " : "<strong>" + value.Quality + "</strong>")
+    //            + "                  </div>"
+    //            + "                  <div class='block'  style='width:20%'>" + (value.DocNo == null ? " " : "<span title='Dim1' class='' style='font-weight:bold'>" + value.DocNo) + "</span>"
+    //            + "                    <div> " + value.Date + " </div>"
+    //            + "                   </div>"
+    //            + "                  <div class='block text-right'  style='width:10%'>" + (value.Qty == null ? " " : value.Qty) + ""
+    //            + "                   </div>"
+    //            + "                  <div class='block text-right'  style='width:10%'>" + (value.Rate == null ? " " : value.Rate) + ""
+    //            + "                   </div>"
+    //            + "                  <div class='block text-right'  style='width:10%'>" + (value.Incentive == null ? " " : value.Incentive) + ""
+    //            + "                   </div>"
+    //            + "          </div>"
+    //            + "  </div>"
+    //            + "<hr style='margin-top:0px;margin-bottom:0px'/>";
+    //        srno++;
+    //        QtyTotal += parseFloat(value.Qty);
+    //        AmtTotal += parseFloat(value.Qty) * parseFloat(value.AreaPerPc) * (parseFloat(value.Rate) + parseFloat(value.Incentive));
+    //        //arr.push({ ProdOrderLineId: value.ProdOrderLineId, Qty: value.Qty, BalanceQty: value.Qty, RefDocTypeId: value.RefDocTypeId, RefDocLineId: value.RefDocLineId, DesignName: value.DesignName, Size: value.Size, Rate: value.Rate, Incentive: value.Incentive });
+    //    });
+    //    Summary += "</div>"
+
+    //    $('#SummaryContent').html(Summary);
+    //    $('#QtyTotal').html(QtyTotal);
+    //    $('#AmtTotal').html(AmtTotal.toFixed(2));
+    //}
+
+
+    //$('#CartSum').on('hidden.bs.modal', function (e) {
+    //    $('#SummaryContent').html("");
+    //    $('#QtyTotal').html(0);
+    //    $('#AmtTotal').html(0);
+    //})
+
+
+
+
+
+
+</script>

@@ -1,0 +1,37 @@
+﻿@model IQueryable<Surya.India.Model.ViewModels.PurchaseIndentLineViewModel>
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h4>
+            <span style="font-family: Calibri,sans-serif,Verdana">Purchase Indent Line(Indent No:@ViewBag.DocNo)</span>
+        </h4>
+        <hr style="margin-top:0px;margin-bottom:0px" />
+        <div class="panel-info">
+            <span style="font-family: Calibri,sans-serif,Verdana;font-size:large;">
+                <u> @Html.ActionLink("Create", "Create", new { Id = @ViewBag.PurchaseIndentHeaderId }, new { @class = "modal-link" })</u>&nbsp;|
+            </span>
+            <span style="font-family: Calibri,sans-serif,Verdana;font-size:large;">
+                <u> @Html.ActionLink("Back to List", "Index", "PurchaseIndentHeader", null, new { @class = "modal-link" })</u>
+            </span>
+
+        </div>
+    </div>
+    <div class="panel-info" style="padding-left:5px;padding-top:2px">
+
+        @Html.Grid(Model).Columns(columns =>
+           {
+               columns.Add(foo => foo.PurchaseIndentLineId, true);
+               columns.Add(foo => foo.ProductName).Titled("Product").Sortable(true).Filterable(true);
+               columns.Add(foo => foo.Qty).Sortable(true).Titled("Qty").Filterable(true);              
+               columns.Add(m => m.DueDate).Sortable(true).Filterable(true).Titled("Due Date").Format("{0:dd/MMM/yyyy}");
+               columns.Add(m => m.Remark).Sortable(true).Filterable(true).Titled("Remark");
+               columns.Add().Encoded(false).Sanitized(false).RenderValueAs(d => @Html.ActionLink(" ", "Edit", "PurchaseIndentLine", new { id = d.PurchaseIndentLineId }, new { @class = "rowEditBlue", @title = "Edit", @data_toggle = "tooltip" })).SetWidth(20);
+               columns.Add().Encoded(false).Sanitized(false).RenderValueAs(d => @Html.ActionLink(" ", "Delete", "PurchaseIndentLine", new { id = d.PurchaseIndentLineId }, new { @class = "rowDeleteBlue", @title = "Delete", @data_toggle = "tooltip" })).SetWidth(20);
+           }).WithPaging(25).EmptyText("No records found.")
+    </div>
+</div>

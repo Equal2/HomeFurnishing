@@ -1,0 +1,390 @@
+﻿
+@{
+    ViewBag.Title = "Sale Invoice Header Charges";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<style type="text/css">
+    .DTHidden {
+        display: none;
+    }
+
+    .TextRight {
+        text-align: right;
+    }
+
+    .dataTable {
+        font-size: 13px !important;
+        line-height: 1;
+    }
+
+    table.dataTable tbody td {
+        padding: 2px 10px;
+    }
+</style>
+@*<link href="~/Content/DataTables/css/jquery.dataTables.min.css" rel="stylesheet" />
+
+<script src="~/Scripts/DataTables/jquery.dataTables.min.js"></script>*@
+<link href="~/Scripts/DatatableTest/jquery.dataTables.min.css" rel="stylesheet" />
+    <link href="~/Scripts/DatatableTest/buttons.dataTables.min.css" rel="stylesheet" />
+
+ @*<script src="~/Scripts/DatatableTest/jquery-1.12.4.js"></script>*@
+  <script src="~/Scripts/DatatableTest/jquery.dataTables.min.js"></script>
+    <script src="~/Scripts/DatatableTest/dataTables.buttons.min.js"></script>
+    <script src="~/Scripts/DatatableTest/buttons.flash.min.js"></script>
+    <script src="~/Scripts/DatatableTest/jszip.min.js"></script>
+    <script src="~/Scripts/DatatableTest/vfs_fonts.js"></script>
+    <script src="~/Scripts/DatatableTest/buttons.html5.min.js"></script>
+    <script src="~/Scripts/DatatableTest/buttons.print.min.js"></script>
+
+<div id='myModal' class='modal fade in'>
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div id='myModalContent'></div>
+        </div>
+    </div>
+</div>
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3>
+            <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"> <span class="glyphicon glyphicon-file black"></span>@ViewBag.Name</span>
+           @Html.ActionLink(" ", "Filters", "SaleInvoiceHeaderCharge",new { name = @ViewBag.MenuName }, new { data_modalCustom = "", id = "btnCreateF", @class = "glyphicon glyphicon-filter toolbar right", @title = "Filters", @data_toggle = "tooltip" })
+            @*@Html.ActionLink(" ", "Filters", "SaleInvoiceHeaderCharge", new { @name = @ViewBag.MenuName }, new { @class = "glyphicon glyphicon-filter toolbar right", @title = "Filters", @data_toggle = "tooltip" })*@
+        </h3>
+    </div>
+    @*<div class="panel-heading">
+        <h3 style="border-bottom:0px solid #e1dada;padding-bottom:0px;">
+            <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"> <span class="glyphicon glyphicon-file black"></span> 1. Filter</span>
+        </h3>
+        <hr style="margin-top:0px;margin-bottom:0px" />
+    </div>*@
+
+
+    <div class="panel-info" style="padding-left:15px">
+        <div class="form-horizontal">
+            @Html.ValidationSummary(true)
+            <div class="row">
+                <h4 class="col-md-12 black">
+                    <span class="glyphicon glyphicon-align-justify"></span>
+                    1.Filter Details
+
+
+                </h4>
+                <div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group" style="margin-top:15px">
+                                @Html.Label("From Date", new { @class = "control-label col-xs-4" })
+                                <div class="col-xs-6">
+                                    @Html.TextBox("FromDate", "", "{0:dd/MMMM/yyyy}", new { @class = "datepickerWithNFD form-control col-xs-6 required" })
+                                    @Html.ValidationMessage("", new { @class = "text-danger" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group" style="margin-top:15px">
+                                @Html.Label("To Date", new { @class = "control-label col-xs-4" })
+                                <div class="col-xs-6">
+                                    @Html.TextBox("ToDate", DateTime.Now, "{0:dd/MMMM/yyyy}", new { @class = "datepickerWithNFD form-control col-xs-6 required" })
+                                    @Html.ValidationMessage("", new { @class = "text-danger" })
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                  
+                  
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<input type="submit" value="Fill" disabled="disabled" class="btn btn-primary" id="submit" style="width: 90px; background-color: #2980b9" />
+@*<input type="button" id="button" />*@
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3>
+            <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-list black"></span>@ViewBag.MenuName</span>
+            @*@Html.ActionLink(" ", "ConfirmProdOrderList", "CostCenterClose", null, new { @class = "glyphicon glyphicon-floppy-disk right", @title = "Update", @data_toggle = "tooltip", @id = "Proceed" })*@
+        </h3>
+        <hr style="margin-top:0px;margin-bottom:0px" />
+    </div>
+
+
+
+    <div class="panel-info tab" style="padding-left:5px;padding-top:20px">
+        <table id="example" class="display" cellspacing="0" width="100%">
+            <thead style="background: #428bca;color:white">
+                <tr>
+                    <th>Invoice Date</th>
+                    <th>Invoice No</th>
+                    <th>Name</th>
+                    <th>Total Qty</th>
+                    <th>Total Measure</th>
+                    <th>Net Amount</th>
+                    <th>Remark</th>
+                </tr>
+            </thead>
+            <tfoot>
+                <tr>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th style="text-align:right"></th>
+                    <th style="text-align:right"></th>
+                    <th style="text-align:right"></th>
+                    <th></th>
+                </tr>
+            </tfoot>
+        </table>
+
+        <div id="tableDiv"></div>
+    </div>
+</div>
+
+
+<script type="text/javascript" class="init">
+
+    //CustomSelectFunction($("#JobWorker"), '/ComboHelpList/GetJobWorkers', '/ComboHelpList/SetSinglePerson', ' ', false, 1);
+
+
+    $('input').change(function () {
+        if ($('#FromDate').val() && $('#ToDate').val()) {
+            $('#submit').removeAttr('disabled');
+        }
+        else {
+            var table = $('#example').DataTable();
+
+            table.clear().draw();
+
+            $('#submit').attr('disabled', 'disabled');
+        }
+    })
+
+
+
+    $('#submit').click(function () {
+        GenerateDataTable();
+        return false;
+
+    })
+
+
+//    $('#example').dataTable({
+//        "scrollY": "300px",
+//        "scrollCollapse": true,
+//      "paging": false,
+//        scroller: true,
+//        "columns": [
+//            { "data": "DocDate"},
+//            { "data": "DocNo"},
+//            { "data": "BillToBuyerName"},
+//            { "data": "Qty", className: "TextRight", },
+//            { "data": "DeliveryQty", className: "TextRight", },
+//            { "data": "NetAmount", className: "TextRight", },
+//            { "data": "Remark", "width": "20%" },
+//        ]   ,
+////        "columnDefs": [
+////{ "targets":7, "searchable": false, className: "DTHidden" },
+////        ],
+//        dom: 'Bfrtip',
+//        buttons: [
+//               'excel'
+//        ],
+//        //TableTools: {
+//        //    "sRowSelect": "os",
+//        //    "aButtons": [
+//        //    "select_all", "select_none"
+//        //    ]
+//        //},
+//    });
+
+    var Lock = false;
+    function GenerateDataTable() {
+        if (!Lock) {
+            Lock = true;
+            var table = $("#example").DataTable();
+            var FromD = $('#FromDate').val();
+            var ToD = $('#ToDate').val();
+            var MName = '@ViewBag.MenuName'
+            //alert($(this).attr('href'));
+            $.ajax({
+                url: '/SaleInvoiceHeaderCharge/SaleInvoiceHeaderChargeList/',
+                type: "POST",
+                data: { FromDate: FromD, ToDate: ToD, MenuName: MName },
+                success: function (result) {
+                    //debugger;
+                    Lock = false;
+                    if (result.Success == true) {
+                        var results = result;
+                        var tableHeaders="";
+                        if (results.Data.length > 0)
+                        {
+                            var columnsIn = results.Data[0];
+                            var j = 0;
+                            $.each(columnsIn, function (key, value) {
+                                tableHeaders += "<th>" + columnsIn[j]["Key"] + "</th>";
+                                j++;
+                            });
+                                //for (var key in columnsIn) {
+                                //    tableHeaders += "<th>" + key + "</th>";
+                                //}
+                        }
+                        $("#tableDiv").empty();
+                        $("#tableDiv").append('<table id="displayTable" class="display" cellspacing="0" width="100%"><thead><tr>' + tableHeaders + '</tr></thead></table>');
+
+                        var rowDataSet = [];
+                        var i = 0;
+                        $.each(results.Data, function (key, value) {
+                            var rowData = [];
+                            var j = 0;
+                            var columnsIn = results.Data[i];
+                            $.each(columnsIn, function (key, value) {
+                                //debugger;
+                                rowData[j] = columnsIn[j]["Value"];
+                                j++;
+                            });
+                            //debugger;
+                            rowDataSet[i] = rowData;
+
+                            i++;
+                        });
+                        $('#displayTable').dataTable({
+                            "bDestroy": true,
+                            "bScrollCollapse": true,
+                            "bJQueryUI": true,
+                            "bPaginate": false,
+                             "scroller": true,
+                             "scrollY": "310px",
+                             "scrollX": true,
+                            "bInfo": true,
+                            "bFilter": true,
+                            "bSort": true,
+                            dom: 'Bfrtip',
+                            buttons: [
+                                'excel'
+                            ],
+                            "aaData": rowDataSet
+                           // "aoColumns": dynamicColumns  //These are dynamically created columns present in JSON object.
+                        });
+
+
+                        //$('#displayTable').DataTable().rows.add(results.Data).draw();
+                       // UpdateDataTable(result);
+                       // CaclTotal();
+                    }
+                    else if (!result.Success) {
+                        alert('Something went wrong');
+                    }
+                },
+                error: function () {
+                    Lock: false;
+                    alert('Something went wrong');
+                }
+            });
+
+
+
+        }
+        else {
+            return false;
+        }
+    }
+
+
+
+
+
+    //$('#example tbody').on('click', 'tr', function () {
+    //    $(this).toggleClass('selected');
+    //    // Start For Old RetentionTrf
+    //    $('#example tbody tr').each(function (i, v) {
+    //        $(v).addClass('selected');
+
+    //    })
+    //    // End For Old RetentionTrf
+    //});
+
+
+    //function CaclTotal() {
+    //    var table = $('#example').DataTable();
+
+
+        //var intVal = function (i) {
+        //    return typeof i === 'string' ?
+        //        i.replace(/[\$,]/g, '') * 1 :
+        //        typeof i === 'number' ?
+        //        i : 0;
+        //};
+
+
+
+
+    //    //totalQty = table.column(3).data().reduce(function (a, b) { return intVal(a) + intVal(b);}, 0);
+
+    //    //totalArea = table
+    //    //   .column(4)
+    //    //   .data()
+    //    //   .reduce(function (a, b) {
+    //    //       return intVal(a) + intVal(b);
+    //    //   }, 0);
+
+    //    //NetAmount = table
+    //    //  .column(5)
+    //    //  .data()
+    //    //  .reduce(function (a, b) {
+    //    //      return intVal(a) + intVal(b);
+    //    //  }, 0);
+
+    //    //$(table.column(3).footer()).html('Total: ' + totalQty.toFixed(3) + ' Qty, ' + totalArea.toFixed(3) + ' Measure');
+
+    //    for (var i = 2 ; i <= 5 ; i++) {
+    //        if (i == 2)
+    //        {
+    //            $(table.column(i).footer()).html('Total: ');
+    //        }
+    //        else if(i==5)
+    //        {
+    //            $(table.column(i).footer()).html(table.column(i).data().reduce(function (a, b) { return intVal(a) + intVal(b); }, 0).toFixed(0));
+    //        }
+    //        else
+    //        {
+    //            $(table.column(i).footer()).html(table.column(i).data().reduce(function (a, b) { return intVal(a) + intVal(b); }, 0).toFixed(2));
+    //        }
+    //    }
+
+
+    //}
+
+    //function UpdateDataTable(data) {
+    //    var table = $('#example').DataTable();
+
+    //    table.clear().draw();
+
+    //    table.rows.add(data.Data).draw();
+    //    $('#example').DataTable().search('').draw();
+
+    //}
+
+
+</script>

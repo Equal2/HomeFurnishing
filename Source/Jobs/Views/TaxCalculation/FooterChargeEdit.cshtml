@@ -1,0 +1,158 @@
+﻿@model IEnumerable<Model.ViewModel.HeaderChargeViewModel>
+@using Core.Common
+
+<style type="text/css">
+    .cusleftnormal {
+        border-bottom-left-radius: 0px !important;
+        border-top-left-radius: 0px !important;
+    }
+
+    .cusrightnormal {
+        border-bottom-right-radius: 0px !important;
+        border-top-right-radius: 0px !important;
+    }
+</style>
+
+<div class="modal-content">
+    <div class="modal-header" style="border-bottom: 1px solid #8E8888">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"> <span class="glyphicon glyphicon-remove"></span></button>
+        <h3>
+            <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-file black"></span> Products</span>
+        </h3>
+    </div>
+    <div>
+        @using (Html.BeginForm("", "", FormMethod.Post, new { enctype = "multipart/form-data", id = "modform" }))
+        {
+            @Html.AntiForgeryToken()
+
+            <div class="form-horizontal modal-body">
+
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+
+
+                <div class="row">
+                    @{var temp = Model.ToList();}
+                    @for (int i = 0; i < Model.Count(); i++)
+                    {
+                        @Html.HiddenFor(m=>temp[i].HeaderTableId)
+                        @Html.HiddenFor(m=>temp[i].Id)
+                        @*<input type="hidden" value="@temp[i].HeaderTableId" />
+                <input type="hidden" value="@temp[i].Id" />*@
+                        if (temp[i].RateType == (byte)RateTypeEnum.Na)
+                        {
+                            <div class='col-md-6'>
+                                <div class='form-group'>
+                                    @*<input type="text" value=i />*@
+                                    @*<label class='control-label col-xs-4'>@item.ChargeName</label> <div class='col-xs-7'><input class='form-control Calculation' id='CALH_@item.ChargeCode' name='CALH_ @item.ChargeCode' type='text' value='@item.Amount' @(item.ProductChargeId!=null?("readonly='true'"):(""))></div>*@
+                                    <label class='control-label col-xs-4'>@temp[i].ChargeName</label> <div class='col-xs-7'><input class='form-control Calculation' id='CALH_@temp[i].ChargeCode' name='temp[@i].Amount' type='text' value='@temp[i].Amount' @(temp[i].ProductChargeId != null ? ("readonly='true'") : (""))></div>
+                                </div>
+                            </div>
+
+                        }
+                        else
+                        {
+                            <div class='col-md-6'>
+                                <div class='form-group'>
+                                    <label class='control-label col-xs-4'> @temp[i].ChargeName</label>
+                                    <div class='col-xs-2' style='padding-right:0px;'>
+                                        @*<input class='form-control cusrightnormal Calculation' id='CALH_@(temp[i].ChargeCode + "RATE")' name='CALH_@(temp[i].ChargeCode + "RATE")' type='text' value='@temp[i].Rate' />*@
+                                        <input class='form-control cusrightnormal Calculation' id='CALH_@(temp[i].ChargeCode + "RATE")' name='temp[@i].Rate' type='text' value='@temp[i].Rate' />
+                                    </div>
+                                    <div class='col-xs-5' style='padding-left:0px'>
+                                        @*<input class='form-control cusleftnormal Calculation' id='CALH_@temp[i].ChargeCode' name='CALH_@temp[i].ChargeCode' type='text' value='@temp[i].Amount' />*@
+                                        <input class='form-control cusleftnormal Calculation' id='CALH_@temp[i].ChargeCode' name='temp[@i].Amount' type='text' value='@temp[i].Amount' />
+                                    </div>
+                                </div>
+                            </div>
+
+                        }
+
+
+
+
+
+
+                    }
+
+
+
+
+                </div>
+                <div class="modal-footer " style="padding: 19px 20px 0 20px; border-top:1px solid #8E8888">
+                    <button class="btn custom left" name="Command:Edit" type="submit"><h2 style="margin:0px" id="submit"><span class="glyphicon glyphicon-floppy-disk black"></span> </h2></button>
+                </div>
+
+            </div>
+        }
+    </div>
+</div>
+
+
+
+@if (ViewBag.ChargeType == TransactionDocCategoryConstants.JobOrder)
+{
+
+
+    <script type="text/javascript">
+
+        var headerid=@Model.FirstOrDefault().HeaderTableId;
+
+        LoadCalculationFooter(headerid,"Web.JobOrderHeaderCharges","Web.JobOrderLineCharges");
+
+
+        $(function(){
+            var url = '/TaxCalculation/PostJOCalculationFields';
+            $('form#modform').attr('action',url);
+        })
+
+    </script>
+
+
+
+}
+
+@if (ViewBag.ChargeType == TransactionDocCategoryConstants.JobInvoice)
+{
+
+
+    <script type="text/javascript">
+
+        var headerid=@Model.FirstOrDefault().HeaderTableId;
+
+        LoadCalculationFooter(headerid,"Web.JobInvoiceHeaderCharges","Web.JobInvoiceLineCharges");
+
+
+        $(function(){
+            var url = '/TaxCalculation/PostJICalculationFields';
+            $('form#modform').attr('action',url);
+        })
+
+    </script>
+
+
+
+}
+
+@if (ViewBag.ChargeType == TransactionDocCategoryConstants.JobInvoiceReturn)
+{
+
+
+    <script type="text/javascript">
+
+        var headerid=@Model.FirstOrDefault().HeaderTableId;
+
+        LoadCalculationFooter(headerid,"Web.JobInvoiceReturnHeaderCharges","Web.JobInvoiceReturnLineCharges");
+
+
+        $(function(){
+            var url = '/TaxCalculation/PostJIRCalculationFields';
+            $('form#modform').attr('action',url);
+        })
+
+    </script>
+
+
+
+}
+

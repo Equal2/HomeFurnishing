@@ -1,0 +1,257 @@
+﻿@model Model.ViewModel.StockExchangeMasterDetailModel
+@using Core.Common
+
+<div class="modal-content Custom-modal">
+    <div class="modal-header" style="border-bottom: 1px solid #8E8888">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"> <span class="glyphicon glyphicon-remove"></span></button>
+        <h3>
+            <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-file black"></span> Orders & Quantities</span>
+        </h3>
+    </div>
+    <div>
+        @Html.ValidationLog((string)TempData["CSEXCL"])
+        @using (Html.BeginForm("_ResultsPost", "StockProcessTransfer", FormMethod.Post, new { enctype = "multipart/form-data", id = "modform" }))
+        {
+        @Html.AntiForgeryToken()
+       
+        @Html.HiddenFor(m => m.StockHeaderSettings.isVisibleLotNo)
+        @Html.HiddenFor(m => m.StockHeaderSettings.isVisibleDimension1)
+        @Html.HiddenFor(m => m.StockHeaderSettings.isVisibleDimension2)
+        <div class="form-horizontal modal-body">
+
+            <div style="padding-right:15px">
+                <div class="row">
+                    <div class="form-horizontal">
+                        @Html.ValidationSummary(true)
+
+                        <div class="panel panel-default" id="grid">
+                            <div class="panel-heading headrow" style="background-image: -webkit-linear-gradient(top, #428bca 0%, #428bca 100%);color:white">
+                                <div class="row grid-head">
+                                    <div class="block text-left" style="width:5%">
+                                        Srl.
+                                    </div>
+                                    <div class="block" style="width:92%">
+                                        <div class="row">
+                                            @*ProductInfo*@
+                                            <div class="block" style="width:30%">
+                                                Product
+                                            </div>
+                                            
+                                            <div class="block text-right" style="width:25%">
+                                                CostCenter
+                                            </div>
+                                            <div class="block text-right" style="width:20%">
+                                                Balance Qty
+                                            </div>
+                                            <div class="block text-right" style="width:25%">
+                                                Qty
+                                            </div>
+
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                            </div>
+                            <div class="panel-info" id="gbody" style="max-height:250px;overflow-y:scroll">
+
+                                @{
+            decimal OrderQty = 0;
+            decimal BalQty = 0;
+            int MaxUnitDecplaces = 0;                               
+                                }
+
+
+                                @for (int i = 0; i < Model.StockLineViewModel.Count(); i++)
+                                {
+
+                                    if (MaxUnitDecplaces < Model.StockLineViewModel[i].UnitDecimalPlaces)
+                                    {
+                                        MaxUnitDecplaces = Model.StockLineViewModel[i].UnitDecimalPlaces.Value;
+                                }
+
+                                <div class='row crow grid-body' style='margin-left:0px;margin-right:0px'>
+                                    @Html.HiddenFor(m => Model.StockLineViewModel[i].ProductId)                                    
+                                    @Html.HiddenFor(m => Model.StockLineViewModel[i].ProductName)
+                                    @Html.HiddenFor(m => Model.StockLineViewModel[i].Specification)
+                                    @Html.HiddenFor(m => Model.StockLineViewModel[i].Dimension1Name)
+                                    @Html.HiddenFor(m => Model.StockLineViewModel[i].Dimension2Name)
+                                    @Html.HiddenFor(m => Model.StockLineViewModel[i].Dimension1Id)
+                                    @Html.HiddenFor(m => Model.StockLineViewModel[i].Dimension2Id)
+                                    @Html.HiddenFor(m => Model.StockLineViewModel[i].ProcessId)
+                                    @Html.HiddenFor(m => Model.StockLineViewModel[i].StockHeaderId)                                    
+                                    @Html.HiddenFor(m => Model.StockLineViewModel[i].UnitId)
+                                    @Html.HiddenFor(m => Model.StockLineViewModel[i].CostCenterId)
+                                    @Html.HiddenFor(m => Model.StockLineViewModel[i].CostCenterName)
+                                    @Html.HiddenFor(m => Model.StockLineViewModel[i].ToCostCenterId)
+                                    @Html.HiddenFor(m => Model.StockLineViewModel[i].UnitDecimalPlaces, new { @class = "UDec" })
+                                    @Html.HiddenFor(m => Model.StockLineViewModel[i].BalanceQty, new { @class = "OrdBalQty" })                                    
+                                    <div class='block row-index' style='width:5%'>
+                                        @(i + 1)
+                                    </div>
+                                    <div class='block pull-middle' style='width:94%'>
+                                        <div class='row'>
+                                            <div class='block' style='width:30%'>
+                                                @{
+                                    var Dim1 = (string.IsNullOrEmpty(Model.StockLineViewModel[i].Dimension1Name) && !Model.StockHeaderSettings.isVisibleDimension1) ? "" : Model.StockLineViewModel[i].Dimension1Name+",";
+                                    var Dim2 = (string.IsNullOrEmpty(Model.StockLineViewModel[i].Dimension2Name) && !Model.StockHeaderSettings.isVisibleDimension2) ? "" : Model.StockLineViewModel[i].Dimension2Name;
+                                                }
+                                                <strong>@Model.StockLineViewModel[i].ProductName</strong>
+                                                <p style="margin-bottom:0px">@Dim1@Dim2</p>
+                                               @if (!string.IsNullOrEmpty(Model.StockLineViewModel[i].Specification)) { 
+                                                <p style="margin-bottom:0px;"> @Model.StockLineViewModel[i].Specification</p>
+                                               }
+                                            </div>
+                                           
+                                            
+                                            
+                                            <div class='block text-right' style='width:25%'>
+                                                @Model.StockLineViewModel[i].CostCenterName
+                                            </div>
+                                            <div class='block text-right' style='width:20%'>
+                                                <span class="BalQty">@string.Format("{" + "0:0.".PadRight(@Model.StockLineViewModel[i].UnitDecimalPlaces.Value + 4, '0') + "}", Model.StockLineViewModel[i].BalanceQty)</span>                                                
+                                            </div>
+                                            @{BalQty += Model.StockLineViewModel[i].BalanceQty;}
+                                            <div class='block text-right' style='width:25%'>
+                                                @Html.TextBoxFor(m => Model.StockLineViewModel[i].Qty, new { @class = "form-control multiple-modal Qty text-right" })
+                                                @Html.ValidationMessageFor(m => Model.StockLineViewModel[i].Qty, "", new { @class = "text-danger" })
+                                            </div>
+                                            @{OrderQty += Model.StockLineViewModel[i].Qty;}
+
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <hr style='margin-top:0px;margin-bottom:0px' />
+                                }
+                            </div>
+                        </div>
+
+
+                        <div class="row grid-head" style="margin-left:0px;margin-right:0px">
+                            <div class="block text-left" style="width:5%">
+
+                            </div>
+                            <div class="block" style="width:92%">
+                                <div class="row">
+                                    @*ProductInfo*@
+                                    <div class='block' style='width:30%'>
+                                        <strong>Total</strong>
+
+                                    </div>
+                                    <div class='block text-center' style='width:25%'>
+
+                                    </div>
+                                   
+                                    @*Qty*@
+                                    <div class='block text-right' style='width:20%'>
+                                        <strong><span id="TotalBalQty">@string.Format("{" + "0:0.".PadRight(MaxUnitDecplaces + 4, '0') + "}", BalQty)</span></strong>
+                                    </div>
+                                    <div class='block text-right' style='width:25%'>
+                                        <strong><span id="TotalQty">@string.Format("{" + "0:0.".PadRight(MaxUnitDecplaces + 4, '0') + "}", OrderQty)</span></strong>
+                                    </div>
+                                    
+                                    
+
+                                </div>
+                            </div>
+
+                        </div>
+
+
+
+
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer " style="padding: 19px 20px 0 20px; border-top:1px solid #8E8888">
+                <button class="btn custom" name="Command:Edit" type="submit" id="submit"><h2 style="margin:0px" title="Proceed"><span class="glyphicon glyphicon-floppy-disk black black"></span> </h2></button>
+            </div>
+        </div>
+        }
+    </div>
+</div>
+
+
+
+
+<script type="text/javascript">
+
+
+    var reset = false;
+    var IsSaved = false;
+    var ValidationCount = 0;
+
+    $('#modform').bind('submit', function (event) {
+
+        if (!IsSaved) {
+            if (!ValidateData()) {
+                return false;
+            }
+            IsSaved = true;
+            $('button:submit').attr('disabled', 'disabled');
+            return IsSaved;
+        }
+        else {
+            return false;
+        }
+
+
+    });
+
+
+    function ValidateData() {
+        var ValidationMessage = "";
+
+        //Client Side Validaion.....
+
+        return (ValidationMessage == "");
+
+    }
+
+
+
+    $('input.Qty').change(function () {
+
+     
+        var $Block = $(this).closest('div.row.crow');
+        var BalQty = parseFloat($Block.find('input.OrdBalQty').val()) || 0;
+        var DecPlaces = parseFloat($Block.find('input.UDec').val()) || 0;
+        var Qty = parseFloat($(this).val()) || 0;
+        if( BalQty > 0 && BalQty-Qty < 0)
+        {
+            $('#submit', '.modal-body').attr('disabled', 'disabled');
+            if (!$('#modform').find('.modal-body #errormsg').length) {
+                $('#modform').find('.modal-body').prepend("<div class='alert alert-danger'><span id=errormsg >Qty exceeding Balance Qty</span></div>")
+            }            
+        }
+        else {
+            $('#submit', '.modal-body').removeAttr('disabled');
+            $('#modform').find('#errormsg').parent().remove();
+        }
+
+        CalculateTotal();
+    })
+
+    function CalculateTotal() {
+
+        var Order = 0;
+        var maxDeclaces = 0;
+        $('.row.crow.grid-body', '.modal-body').each(function () {
+
+            if ($(this).find('input.Qty').val()) {
+                Order += parseFloat($(this).find('input.Qty').val());                
+                var unitDecPlaces = parseFloat($(this).find('.UDec').val()) || 0;
+                if (unitDecPlaces > maxDeclaces)
+                    maxDeclaces = unitDecPlaces;
+            }
+
+        })
+        $('#TotalQty', '.modal-body').text(Order.toFixed(maxDeclaces));
+
+    }
+
+
+    
+
+</script>

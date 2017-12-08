@@ -1,0 +1,202 @@
+﻿@model Model.ViewModel.ProductBuyerViewModel
+@using Core.Common
+
+<div class="modal-content">
+    <div class="modal-header" style="border-bottom: 1px solid #8E8888">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"> <span class="glyphicon glyphicon-remove"></span></button>
+        <h3>
+            <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-file black"></span> Product Buyer Details</span>
+        </h3>
+    </div>
+    <div>
+        @using (Html.BeginForm("_CreatePost", "FinishedProduct", FormMethod.Post, new { enctype = "multipart/form-data", id = "modform" }))
+        {
+            @Html.AntiForgeryToken()
+
+            @Html.HiddenFor(model => model.ProductBuyerId)
+            @Html.HiddenFor(m=>m.ProductId)
+            
+            <div class="form-horizontal modal-body">
+
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group" style="margin-top:15px">
+                            @Html.LabelFor(model => model.BuyerId, "Buyer", new { @class = "control-label col-xs-4" })
+                            <div class="col-xs-7">
+                                @Html.TextBoxFor(m => m.BuyerId, new { @class = "form-control col-xs-7" })
+                                @Html.ValidationMessageFor(m => m.BuyerId, null, new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group" style="margin-top:15px">
+                            @Html.LabelFor(model => model.BuyerSku, "Buyer Sku", new { @class = "control-label col-xs-4" })
+                            <div class="col-xs-7">
+                                @Html.TextBoxFor(m => m.BuyerSku, new { @class = "form-control col-xs-7" })
+                                @Html.ValidationMessageFor(m => m.BuyerSku, null, new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.BuyerUpcCode, "Buyer Upc Code", new { @class = "control-label col-xs-4" })
+                            <div class="col-xs-7">
+                                @Html.TextBoxFor(m => m.BuyerUpcCode, new { @class = "form-control col-xs-7" })
+                                @Html.ValidationMessageFor(m => m.BuyerUpcCode, null, new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.BuyerSpecification, "Specification", new { @class = "control-label col-xs-4" })
+                            <div class="col-xs-7">
+                                @Html.TextBoxFor(m => m.BuyerSpecification, new { @class = "form-control col-xs-7" })
+                                @Html.ValidationMessageFor(m => m.BuyerSpecification, null, new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.BuyerSpecification1, "Specification1", new { @class = "control-label col-xs-4" })
+                            <div class="col-xs-7">
+                                @Html.TextBoxFor(m => m.BuyerSpecification1, new { @class = "form-control col-xs-7" })
+                                @Html.ValidationMessageFor(m => m.BuyerSpecification1, null, new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.BuyerSpecification2, "Specification2", new { @class = "control-label col-xs-4" })
+                            <div class="col-xs-7">
+                                @Html.TextBoxFor(m => m.BuyerSpecification2, new { @class = "form-control col-xs-7" })
+                                @Html.ValidationMessageFor(m => m.BuyerSpecification2, null, new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.BuyerSpecification3, "Specification3", new { @class = "control-label col-xs-4" })
+                            <div class="col-xs-7">
+                                @Html.TextBoxFor(m => m.BuyerSpecification3, new { @class = "form-control col-xs-7" })
+                                @Html.ValidationMessageFor(m => m.BuyerSpecification3, null, new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.BuyerSpecification4, "Specification4", new { @class = "control-label col-xs-4" })
+                            <div class="col-xs-7">
+                                @Html.TextBoxFor(m => m.BuyerSpecification4, new { @class = "form-control col-xs-7" })
+                                @Html.ValidationMessageFor(m => m.BuyerSpecification4, null, new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.BuyerSpecification5, "Specification5", new { @class = "control-label col-xs-4" })
+                            <div class="col-xs-7">
+                                @Html.TextBoxFor(m => m.BuyerSpecification5, new { @class = "form-control col-xs-7" })
+                                @Html.ValidationMessageFor(m => m.BuyerSpecification5, null, new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.BuyerSpecification6, "Specification6", new { @class = "control-label col-xs-4" })
+                            <div class="col-xs-7">
+                                @Html.TextBoxFor(m => m.BuyerSpecification6, new { @class = "form-control col-xs-7 " })
+                                @Html.ValidationMessageFor(m => m.BuyerSpecification6, null, new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                    </div>
+
+
+
+                    <div class="modal-footer " style="padding: 19px 20px 0 20px; border-top:1px solid #8E8888">
+                        <button class="btn custom left" name="Command:Edit" type="submit" id="submit"><h2 style="margin:0px"><span class="glyphicon glyphicon-floppy-disk black"></span> </h2></button>
+                        <button class="btn custom" name="Command:Delete" id="delete" type="submit"><h2 style="margin:0px"><span class="glyphicon glyphicon-trash black"></span> </h2></button>
+                    </div>
+                </div>
+        }
+    </div>
+</div>
+
+
+<script type="text/javascript">
+    CustomSelectFunction($("#BuyerId"), '/ComboHelpList/GetBuyers', '/ComboHelpList/SetSingleBuyer', ' ', false, 1);
+</script>
+
+
+<script type="text/javascript">
+    $(document).ready(function () {
+
+        $("#BuyerId").select2("focus");
+
+
+        var id=@Model.ProductBuyerId;
+
+        $('#delete','.modal-content').click(function (e) {
+
+            if(id>0)
+            {
+
+                var url = '/FinishedProduct/DeleteProductBuyerConfirmed';
+
+                $('form#modform').attr('action',url);
+                return;
+            }
+            else
+            {
+
+                return false;
+            }
+        })
+
+        var IsSaved=false;
+        var ValidationCount=0;
+
+        $('form').submit(function(event){
+    
+            if(!IsSaved)
+            {
+                if(!ValidateData())
+                {
+                    return false;
+                }
+                IsSaved=true;
+                return IsSaved;
+            }
+            else
+            {
+                return false;
+            }
+        });
+
+
+        function ValidateData() {
+            var ValidationMessage="";
+
+            return  (ValidationMessage=="");
+        }
+    });
+</script>
+

@@ -1,0 +1,195 @@
+﻿@using ProjLib.Constants
+
+@helper HelperName(string name)
+{
+    // your helper can contain code and/or markup, e.g.
+    // var msg = "Hello " + name;
+    // <p>@msg</p>
+    // For more information, visit http://go.microsoft.com/fwlink/?LinkID=204658
+}
+
+
+@* For displaying Status in the Index View*@
+@helper RenderStatus(int id)
+{
+    if (id == (int)StatusConstants.Submitted)
+    {
+        @("Submitted");
+    }
+    else if (id == (int)StatusConstants.Approved)
+    {
+        @("Approved")
+    }
+    else if (id == (int)StatusConstants.Drafted)
+    {
+        @("Drafted")
+    }
+    else if (id == (int)StatusConstants.Import)
+    {
+        @("Imported")
+    }
+    else if (id == (int)StatusConstants.Modified)
+    {
+        @("Modified")
+    }
+    else if (id == (int)StatusConstants.Complete)
+    {
+        @("Completed")
+    }
+    else if (id == (int)StatusConstants.Closed)
+    {
+        @("Closed")
+    }
+
+}
+
+
+
+@*For Rendering CheckBoxes*@
+@helper RenderCheckBox(string GatePass, int? GatePassHeaderId, int GatePassStatus)
+{
+    <input type="checkbox" />
+    if (GatePassHeaderId.HasValue)
+    {
+        <span class='glyphicon glyphicon-log-out @(GatePassStatus == (int)StatusConstants.Submitted ? "text-danger" : "")' title=@GatePass></span>
+    }
+}
+
+@helper RenderCheckBox()
+{
+    <input type="checkbox" />
+}
+
+
+@*For Rendering UserImages*@
+@helper RenderUserImage(string Name)
+{
+    string Defaultdomain = (System.Configuration.ConfigurationManager.AppSettings["ProfilePic"]);
+    string ImgSrc = Defaultdomain + Name + ".jpg";
+    <div>
+        <img src="@ImgSrc" class="img-circle UserIndexImage" title="@Name" onerror="$(this).attr('src', '/Images/DefaultUser.png')" />
+    </div>
+}
+
+@*To Display Totals in Index Page*@
+@helper RenderTotal(decimal? Total, int? DecimalPlace)
+{
+    <span>@decimal.Round(Total ?? 0, DecimalPlace ?? 0)</span>
+}
+
+
+@*To Display Submit and Review action links in Index page*@
+@helper RenderActionColumn(string ControllerName, int HeaderId, int Status, bool? Reviewed, int? ReviewCount, string IndexStatus)
+{
+
+    if (Status == (int)StatusConstants.Submitted)
+    {
+        <p class="Badge_Cont">
+            <a class="glyphicon glyphicon-thumbs-up" data-toggle="tooltip" href="/@ControllerName/Review?Id=@HeaderId&IndexType=@(IndexStatus)" title="Review"> </a>
+            <span class="IndexBadges label @(Reviewed==true ? "label-success" : "label-danger")">@ReviewCount</span>
+        </p>
+    }
+    if (Status == (int)StatusConstants.Drafted || Status == (int)StatusConstants.Modified || Status == (int)StatusConstants.Import)
+    {
+        <a class="glyphicon glyphicon-floppy-open" title="Submit" data-toggle="tooltip" href="/@ControllerName/Submit?Id=@HeaderId&IndexType=@(IndexStatus)"></a>
+    }
+}
+
+
+
+@*To Display Status Filters*@
+@helper RenderStatusFilters(decimal PendingToSubmit, decimal PendingToReview, string ControllerName, int DocTypeId, string IndexStatus)
+{
+    <h4 id="StatusFilter" style="height:20px">
+        <a class="btn btn-primary right @(IndexStatus == "All" ? "focus" : "")" href="/@ControllerName/Index/@DocTypeId" id="All" style="border-color: #fff"> All </a>
+        <a class="btn btn-primary right @(IndexStatus == "PTS" ? "focus" : "")" href="/@ControllerName/Index_PendingToSubmit/@DocTypeId" id="PTS" style="border-color: #fff">Pending to Submit <span class='badge'>@(PendingToSubmit != 0 ? PendingToSubmit.ToString() : "")</span> </a>
+        <a class="btn btn-primary right @(IndexStatus == "PTR" ? "focus" : "")" href="/@ControllerName/Index_PendingToReview/@DocTypeId" id="PTR" style="border-color: #fff">Pending to Review <span class="badge">@(PendingToReview != 0 ? PendingToReview.ToString() : "")</span></a>
+    </h4>
+}
+
+@helper RenderIconStatusFilters(decimal PendingToSubmit, decimal PendingToReview, string ControllerName, int DocTypeId, string IndexStatus)
+{
+
+    @*<a class="btn btn-primary right @(IndexStatus == "All" ? "focus" : "")" href="/@ControllerName/Index/@DocTypeId" id="All" style="border-color: #fff"> All </a>*@
+    <a class="cbtn btn-circle glyphicon glyphicon-thumbs-up @(IndexStatus == "PTR" ? "cbtn-selected" : "")" href="/@ControllerName/@(IndexStatus == "PTR" ? "Index" : "Index_PendingToReview")/@DocTypeId" id="PTR"></a>
+    <a class="cbtn btn-circle glyphicon glyphicon-floppy-open @(IndexStatus == "PTS" ? "cbtn-selected" : "")" href="/@ControllerName/@(IndexStatus == "PTS" ? "Index" : "Index_PendingToSubmit")/@DocTypeId" id="PTS"><span class='badge' style="position:absolute;top:-10px">@(PendingToSubmit != 0 ? (PendingToSubmit > 9 ? "9" : PendingToSubmit.ToString()) : "")</span> </a>
+
+}
+
+@*To Add Hidden Edit ActionLink in Index*@
+@helper RenderHEDActionLink(string ControllerName, int DocId, int Status, string IndexStatus)
+{
+    if (Status == (int)StatusConstants.Drafted || Status == (int)StatusConstants.Import)
+    {
+        <a href="/@(ControllerName)/Modify/@(DocId)?IndexType=@IndexStatus" hidden class="RecEditurl"></a>
+        <a href="/@(ControllerName)/Delete/@(DocId)" hidden class="RecDelurl"></a>
+    }
+    else if (Status == (int)StatusConstants.Submitted || Status == (int)StatusConstants.Modified)
+    {
+        <a href="/@(ControllerName)/ModifyAfter_Submit/@(DocId)?IndexType=@IndexStatus" hidden class="RecEditurl"></a>
+        <a href="/@(ControllerName)/DeleteAfter_Submit/@(DocId)" hidden class="RecDelurl"></a>
+    }
+    else
+    {
+        <a href="/@(ControllerName)/DetailInformation/@(DocId)?IndexType=@IndexStatus" hidden class="RecEditurl"></a>
+    }
+
+}  
+
+@helper RenderResHeaderInfo(string TransactionType, int? PendingToSubmit, int? PendingToReview, string Title)
+        {
+if (TransactionType == "submit" || TransactionType == "submitContinue")
+{
+
+        <div class="row">
+            <div class="col-sm-7 col-xs-10">
+                <h3 style="border-bottom:0px solid #e1dada;padding-bottom:0px;">
+                    <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"> <span class="glyphicon glyphicon-file black"></span>Submit @Title</span>
+                </h3>
+            </div>
+            <div class="col-sm-5 col-xs-2">
+                <button type="submit" name="Command:Submit" class="hidden-xs btn btn-primary right" style="margin-left:5px" id="SubmitContinue">Submit & Next<span class='badge'>@((PendingToSubmit != 0 && PendingToSubmit.HasValue) ? PendingToSubmit.ToString() : "")</span></button>
+                <button type="submit" class="hidden-xs btn btn-primary right" name="Command:Submit">Submit</button>
+                <button type="submit" name="Command:Submit" class="hidden-lg hidden-md hidden-sm right" id="SubmitContinue"><span class="glyphicon glyphicon-floppy-open black"></span> </button>
+                <input type="hidden" id="IsContinue" name="IsContinue" value="" />
+            </div>
+        </div>
+}
+else if (TransactionType == "review" || TransactionType == "ReviewContinue")
+{
+
+        <div class="row">
+            <div class="col-sm-7 col-xs-10">
+                <h3 style="border-bottom:0px solid #e1dada;padding-bottom:0px;">
+                    <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"> <span class="glyphicon glyphicon-file black"></span>Review @Title</span>
+                </h3>
+            </div>
+            <div class="col-sm-5 col-xs-2">
+                <button type="submit" name="Command:Review" class="hidden-xs btn btn-primary right" style="margin-left:5px" id="ReviewContinue">Review & Next<span class='badge'>@((PendingToReview != 0 && PendingToSubmit.HasValue) ? PendingToReview.ToString() : "")</span></button>
+                <button type="submit" class="hidden-xs btn btn-primary right" name="Command:Review">Review</button>
+                <button type="submit" name="Command:Review" class="hidden-lg hidden-md hidden-sm right" id="ReviewContinue"><span class="glyphicon glyphicon-thumbs-up black"></span> </button>
+                <input type="hidden" id="IsContinue" name="IsContinue" value="" />
+            </div>
+        </div>
+}
+else if (TransactionType == "detail")
+{
+        <h3>
+            <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"> <span class="glyphicon glyphicon-file black"></span>@Title</span>
+        </h3>
+}
+else
+{
+        <div class="row">
+            <div class="col-xs-10">
+                <h3 style="border-bottom:0px solid #e1dada;padding-bottom:0px;">
+                    <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"> <span class="glyphicon glyphicon-file black"></span>@Title</span>
+                </h3>
+            </div>
+            <div class="col-xs-2">
+                <input type="submit" value="Save" class="hidden-xs btn btn-primary right" id="submit" style="width: 90px; background-color: #2980b9" />
+                <button class="hidden-lg hidden-md hidden-sm right" name="" type="submit" id="submit"><span class="glyphicon glyphicon-floppy-disk black"></span> </button>
+            </div>
+        </div>
+}
+}

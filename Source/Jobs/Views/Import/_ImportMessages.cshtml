@@ -1,0 +1,131 @@
+﻿@model Model.ViewModels.ImportMessageViewModel
+@using Core.Common
+
+<style type="text/css">
+    .cusleftnormal {
+        border-bottom-left-radius: 0pc !important;
+        border-top-left-radius: 0px !important;
+    }
+
+    .cusrightnormal {
+        border-bottom-right-radius: 0px !important;
+        border-top-right-radius: 0px !important;
+    }
+
+    .ui-autocomplete {
+        max-height: 250px;
+        overflow-y: auto;
+        /* prevent horizontal scrollbar */
+        overflow-x: hidden;
+    }
+</style>
+
+<div class="modal-content">
+    <div class="modal-header" style="border-bottom: 1px solid #8E8888">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"> <span class="glyphicon glyphicon-remove"></span></button>
+        <h3>
+            <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-file black"></span> @ViewBag.Name</span>
+        </h3>
+    </div>
+    <div>
+        @using (Html.BeginForm("_LedgerAdj_Single", "LedgerLine", FormMethod.Post, new { enctype = "multipart/form-data", id = "modform" }))
+        { @Html.ValidationLog((string)TempData["CSEXCL"])
+            <div class="form-horizontal modal-body">
+
+                @Html.AntiForgeryToken()
+                @Html.HiddenFor(m => m.ImportHeaderId)
+                
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+
+                @*<div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.LedgerId_Adjusted, "Adjusted Bill", new { @class = "control-label col-md-4 col-sm-2 " })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.LedgerId_Adjusted, new { @class = "form-control col-xs-7 required" })
+                                @Html.ValidationMessageFor(model => model.LedgerId_Adjusted, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                </div>*@
+
+                
+
+
+
+                <div class="row" style="max-height: 400px; overflow: scroll; margin-top: 0px">
+                    <div class="row col-md-12 " style="background: #428bca; color: white">
+                        <div class="col-md-1">
+                            <strong>Srl.</strong>
+                        </div>
+                        <div class="col-md-4">
+                            <strong>Record No.</strong>
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Message</strong>
+                        </div>
+                        <div class="col-md-1" style="text-align:right">
+                        </div>
+                    </div>
+
+                    <div class="panel-info" id="gbody-modal" style="height:200px">
+                        @for (int i = 0; i < Model.ImportMessage.Count(); i++)
+                        {
+                            string delurl = "/Import/__ImportMessages_DeletePost/" + Model.ImportMessage[i].ImportMessageId;
+                            <div class="row athblock" style='margin-left: 0px; margin-right: 0px; margin-top: 0px; margin-bottom: 0px; '>
+                                <div class="row col-md-12 block row-index" style="@(((i%2)==0)?"background:#E0E0E0":"")">
+                                    @Html.HiddenFor(m => Model.ImportMessage[i].ImportMessageId)
+
+                                    <div class="col-md-1">
+                                        @(i + 1)
+                                    </div>
+                                    <div class="col-md-4">
+                                        @Model.ImportMessage[i].RecordId
+                                    </div>
+                                    <div class="col-md-6">
+                                        @Model.ImportMessage[i].Value <br />
+                                    </div>
+                                    <div class="col-md-1" style="text-align:right">
+                                        <a href="@delurl" class="delatch"><span class="glyphicon glyphicon-trash"></span> </a>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+                </div>
+        }
+    </div>
+</div>
+
+
+<script type="text/javascript">
+    $('a.delatch').click(function () {
+
+        $('a', '#modformDocAttchmt').attr('disabled', 'disabled');
+        var thisele = $(this);
+        $.ajax({
+            url: this.href,
+            success: function (data) {
+                if (data.success) {
+                    var row = thisele.closest('div.row.athblock')
+                    $(row).animate({ height: 0 }, 500, "swing", function () {
+                        $(row).remove();
+                    })
+                    $('a', '#modformDocAttchmt').removeAttr('disabled');
+                }
+                else {
+                    if ($('#errormsg', '#modformDocAttchmt'))
+                        $('#modformDocAttchmt').prepend("<div id='errormsg'>" + data.message + "</div> ");
+                    else
+                        $('#errormsg').text(data.message);
+
+                    $('a', '#modformDocAttchmt').removeAttr('disabled');
+                }
+            }
+
+        })
+        return false;
+    })
+</script>

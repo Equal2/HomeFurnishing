@@ -1,0 +1,171 @@
+﻿@{
+    ViewBag.Title = "Review Excess Job Orders";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<link href="~/Content/DataTables/css/jquery.dataTables.min.css" rel="stylesheet" />
+<link href="~/Content/DataTables/css/scroller.dataTables.min.css" rel="stylesheet" />
+
+<script src="~/Scripts/DataTables/jquery.dataTables.min.js"></script>
+<script src="~/Scripts/DataTables/dataTables.scroller.js"></script>
+<style type="text/css">
+    .DTHidden {
+        display: none;
+    }
+
+    .TextRight {
+        text-align: right;
+    }
+
+    .dataTable {
+        font-size: 13px !important;
+        line-height: 1;
+    }
+
+    table.dataTable tbody td {
+        padding: 2px 10px;
+    }
+</style>
+
+<div style="margin:30px;">
+    <table id="example" class="display" cellspacing="0" width="100%">
+        <thead>
+            <tr>
+                <th>DocNo</th>
+                <th>Date</th>
+                <th>Party Name</th>
+                <th>Product</th>
+                <th>Dim1</th>
+                <th>Dim2</th>
+                <th>PlanQty</th>
+                <th>Rec</th>
+                <th>Excess</th>
+                <th>Review</th>
+                <th>ProdOrderLineId</th>
+            </tr>
+        </thead>
+        <tfoot>
+            <tr>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+            </tr>
+        </tfoot>
+    </table>
+</div>
+
+<script type="text/javascript">
+    var selected = [];
+    var Dim1Visible = '@ViewBag.Dim1Visible';
+    var Dim2Visible = '@ViewBag.Dim2Visible';
+    $(document).ready(function () {
+       var tab= $('#example').dataTable({
+            select: true,
+            processing: true,
+            serverSide: true,
+            info: true,            
+            lengthMenu: [[10, 20, 50, -1], [10, 20, 50]],
+            ajax: {
+                "url": "/ExcessJobOrderReview/AjaxGetJsonData/?id=" + '@ViewBag.id',
+                "type": "POST"
+            },
+            columns: [
+                { "data": "DocNo", "width": "12%" },
+                { "data": "DocDate", "width": "10%" },
+                { "data": "PartyName", "width": "13%" },
+                { "data": "ProductName", "width": "11%" },
+                { "data": "Dimension1Name", "width": "11%", "searchable": Dim1Visible == "True" ? true : false, className: Dim1Visible == "True" ? "" : "DTHidden" },
+                { "data": "Dimension2Name", "width": "11%", "searchable": Dim2Visible == "True" ? true : false, className: Dim2Visible == "True" ? "" : "DTHidden" },
+                { "data": "PlanQty", "width": "8%", className: "TextRight", },
+                { "data": "JobOrderQty", "width": "8%", className: "TextRight", },
+                { "data": "ExcessQty", "width": "8%", className: "TextRight", },
+                { "data": "Approved", "width": "8%", "render": function (data, type, row) { return '<input style="width:100%;text-align:right"  type="checkbox" name="Qty' + row.ProdOrderLineId + '" id="Qty' + row.ProdOrderLineId + '" />'; }, },
+                { "data": "ProdOrderLineId" },
+            ],
+            columnDefs: [
+   { "targets": 10, "searchable": false, className: "DTHidden", },
+            ],
+            order: [[0, "asc"]],
+            //rowCallback: function (row, data) {
+            //    if ( data.DT_RowId && $.inArray((data.DT_RowId).toString(), selected) !== -1) {
+            //        $(row).addClass('selected');
+            //    }
+            //}
+       });
+
+        //tab.fnSetFilteringDelay(1000)
+
+        //$('#example tbody').on('click', 'tr', function () {
+        //    var id = this.id;
+        //    var index = $.inArray(id, selected);
+
+        //    if (index === -1) {
+        //        selected.push(id);
+        //    } else {
+        //        selected.splice(index, 1);
+        //    }
+
+        //    $(this).toggleClass('selected');
+        //});
+
+        $(document).on('change', 'td > input:checkbox', function () {
+
+            var CheckBox = this;
+
+            $(this).prop('disabled', true);
+
+            var table = $('#example').dataTable();
+            var td = $(this).closest('td').get(0);
+            var pos = table.fnGetData(table.fnGetPosition(td)[0]); // Im not familiar with the plugin so the extra $() might be overkill
+            if ($(this).is(":checked")) {
+                $.ajax({
+                    url: '/ExcessJobOrderReview/Approve',
+                    type: "POST",
+                    data: { LineId: pos.ProdOrderLineId },
+                    success: function (result) {
+                        if (result.Success == true) {
+                            $(CheckBox).removeAttr('disabled');
+                        }
+                        else if (!result.Success) {
+                            $(CheckBox).removeAttr('disabled');
+                            alert('Something went wrong');
+                        }
+                    },
+                    error: function () {
+                        $(CheckBox).removeAttr('disabled');
+                    },
+                });
+            }
+            else {
+
+                $.ajax({
+                    url: '/ExcessJobOrderReview/DisApprove',
+                    type: "POST",
+                    data: { LineId: pos.ProdOrderLineId },
+                    success: function (result) {
+                        if (result.Success == true) {
+                            $(CheckBox).removeAttr('disabled');
+                        }
+                        else if (!result.Success) {
+                            $(CheckBox).removeAttr('disabled');
+                            alert('Something went wrong');
+                        }
+                    },
+                    error: function () {
+                        $(CheckBox).removeAttr('disabled');
+                    },
+                });
+            }
+            return true;
+
+        })
+
+    });
+</script>

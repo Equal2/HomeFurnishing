@@ -1,0 +1,45 @@
+﻿@model Surya.India.Model.Models.Currency
+
+@{
+    ViewBag.Title = "BaseCurrencyIndex";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@using (Html.BeginForm("BaseCurrencyIndex","Currency",FormMethod.Post))
+ {
+    <div class="panel panel-default">
+
+        <div class="panel-heading">
+
+            <h4>
+                <span style="font-family: Calibri,sans-serif,Verdana"> Edit Base Currency Rate.</span>
+            </h4>
+
+        </div>
+        <div class="panel-info" style="padding-left:15px">
+
+            <div class="form-horizontal">
+                @Html.ValidationSummary(true)
+                @Html.HiddenFor(m=>m.ID)
+                <div class="form-group" style="padding-top:15px">
+                    @Html.LabelFor(m => m.BaseCurrencyRate, "Base Currency Rate", new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(m => m.BaseCurrencyRate)
+                        @Html.ValidationMessageFor(m => m.BaseCurrencyRate)
+                    </div>
+                </div>
+
+
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-10">
+                        <input type="submit" value="Create" class="btn-primary xxlarge" />
+                        <span style="font-family: Calibri,sans-serif,Verdana;font-size:large">
+                            |@Html.ActionLink("Back to List", "Index")
+
+                        </span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    }

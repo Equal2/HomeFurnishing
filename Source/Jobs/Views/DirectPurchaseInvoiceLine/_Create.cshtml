@@ -1,0 +1,493 @@
+﻿@model Model.ViewModel.PurchaseInvoiceLineViewModel
+@using Core.Common
+
+<style type="text/css">
+    .cusleftnormal {
+        border-bottom-left-radius: 0pc !important;
+        border-top-left-radius: 0px !important;
+    }
+
+    .cusrightnormal {
+        border-bottom-right-radius: 0px !important;
+        border-top-right-radius: 0px !important;
+    }
+</style>
+
+<div class="modal-content">
+    <div class="modal-header" style="border-bottom: 1px solid #8E8888">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"> <span class="glyphicon glyphicon-remove"></span></button>
+        <h3>
+            <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-file black"></span> Products</span>
+        </h3>
+    </div>
+    <div>
+        @using (Html.BeginForm("_CreatePost", "DirectPurchaseInvoiceLine", FormMethod.Post, new { enctype = "multipart/form-data", id = "modform" }))
+        {
+           @Html.ValidationLog((string)TempData["CSEXCL"])
+
+            <div class="form-horizontal modal-body">
+
+                @Html.AntiForgeryToken()
+
+                @Html.HiddenFor(model => model.PurchaseInvoiceHeaderId)
+                @Html.HiddenFor(m => m.PurchaseInvoiceLineId)
+                @Html.HiddenFor(m => m.PurchaseGoodsReceiptLineId)
+                @Html.HiddenFor(m => m.PurchaseIndentLineId)
+                @Html.HiddenFor(m => m.IndentBalQty)
+                @Html.HiddenFor(m => m.DocTypeId)
+                @Html.HiddenFor(m => m.SiteId)
+                @Html.HiddenFor(m => m.DivisionId)
+                @Html.HiddenFor(m => m.SupplierId)
+                @Html.HiddenFor(m => m.CalculateDiscountOnRate)
+                @Html.HiddenFor(m => m.UnitId)
+                @Html.HiddenFor(m => m.PurchInvoiceSettings.CalculationId)
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                <div class="row">
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.ProductId, "Product", new { @class = "control-label  col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.ProductId, new { @class = "form-control col-xs-7 required" })
+                                @Html.ValidationMessageFor(model => model.ProductId, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Specification, "Specification", new { @class = "control-label  col-md-4 col-sm-2 " })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.Specification, new { @class = "form-control col-xs-7 required" })
+                                @Html.ValidationMessageFor(model => model.Specification, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6" style="display:@(Model.PurchInvoiceSettings.isVisibleDimension1 ? "" : "none")">
+                        @Html.HiddenFor(m => m.PurchInvoiceSettings.isVisibleDimension1)
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Dimension1Id, "Dimension1", new { @class = "control-label  col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.Dimension1Id, new { @class = "form-control col-xs-7 required" })
+                                @Html.ValidationMessageFor(model => model.Dimension1Id, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6" style="display:@(Model.PurchInvoiceSettings.isVisibleDimension2 ? "" : "none")">
+                        @Html.HiddenFor(m => m.PurchInvoiceSettings.isVisibleDimension2)
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Dimension2Id, "Dimension2", new { @class = "control-label  col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.Dimension2Id, new { @class = "form-control col-xs-7 required" })
+                                @Html.ValidationMessageFor(model => model.Dimension2Id, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6" style="display:@(Model.PurchInvoiceSettings.isVisibleLotNo ? "" : "none")">
+                        @Html.HiddenFor(m => m.PurchInvoiceSettings.isVisibleLotNo)
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.LotNo, "Lot No", new { @class = "control-label  col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.LotNo, new { @class = "form-control col-xs-7 required" })
+                                @Html.ValidationMessageFor(model => model.LotNo, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Qty, "Qty", new { @class = "control-label  col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10" style="padding:0px;">
+                            <div class="col-xs-7" style="padding-right:0px;">
+                                @Html.TextBoxFor(model => model.Qty, new { @class = "form-control required cusrightnormal text-right" })
+                                @Html.ValidationMessageFor(model => model.Qty, "", new { @class = "text-danger" })
+                            </div>
+                            <div class="col-xs-5" style="padding-left:0px">
+                                @Html.TextBoxFor(m => m.UnitName, new { @class = "form-control col-xs-2 cusleftnormal", @readonly = "true" })
+                            </div>
+                                </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Rate, "Rate", new { @class = "control-label  col-md-4 col-sm-2" })
+                            @Html.HiddenFor(m => m.PurchInvoiceSettings.isMandatoryRate)
+                            @Html.HiddenFor(m => m.PurchInvoiceSettings.isEditableRate)
+                            <div class="col-md-7 col-sm-10">
+                                @if (Model.PurchInvoiceSettings.isEditableRate && Model.PurchaseInvoiceLineId > 0)
+                                {
+                                    @Html.TextBoxFor(model => model.Rate, new { @class = "form-control col-xs-7 required text-right", @readonly = true })
+                                    @Html.ValidationMessageFor(model => model.Rate, "", new { @class = "text-danger" })
+                                }
+                                else
+                                {
+                                    @Html.TextBoxFor(model => model.Rate, new { @class = "form-control col-xs-7 required text-right" })
+                                    @Html.ValidationMessageFor(model => model.Rate, "", new { @class = "text-danger" })
+                                }
+
+                            </div>
+                        </div>
+                    </div>
+
+
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.DealUnitId, "Deal Unit& Multiplier", new { @class = "control-label  col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10" style="padding:0px;">
+                                <div class="col-xs-7" style="padding-right:0px">
+                                    @Html.DropDownListFor(model => model.DealUnitId, new SelectList(ViewBag.DeliveryUnitList as System.Collections.IEnumerable, "UnitId", "UnitName"), new { @class = "form-control height cusrightnormal required" })
+                                    @Html.ValidationMessageFor(model => model.DealUnitId, "", new { @class = "text-danger" })
+                                </div>
+                                <div class="col-xs-5" style="padding-left:0px">
+                                    @Html.TextBoxFor(model => model.UnitConversionMultiplier, new { @class = "form-control cusleftnormal required text-right" })
+                                    @Html.ValidationMessageFor(model => model.UnitConversionMultiplier, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.DealQty, "Deal Qty", new { @class = "control-label  col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.DealQty, new { @class = "form-control col-xs-7 required text-right" })
+                                @Html.ValidationMessageFor(model => model.DealQty, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.DiscountPer, "Discount %", new { @class = "control-label  col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.DiscountPer, new { @class = "form-control col-xs-7 text-right" })
+                                @Html.ValidationMessageFor(model => model.DiscountPer, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Amount, "Amount", new { @class = "control-label  col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.Amount, new { @class = "form-control col-xs-7 required text-right" })
+                                @Html.ValidationMessageFor(model => model.Amount, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Remark, "Remark", new { @class = "control-label  col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextAreaFor(model => model.Remark, new { @class = "form-control col-xs-7 required" })
+                                @Html.ValidationMessageFor(model => model.Remark, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer " style="padding: 19px 20px 0 20px; border-top:1px solid #8E8888">
+                    @if (ViewBag.LineMode == "Edit" || ViewBag.LineMode == "Create")
+                    {
+                        <button class="btn custom left" name="Command:Edit" type="submit" id="submit"><h2 style="margin:0px"><span class="glyphicon glyphicon-floppy-disk black"></span> </h2></button>}
+                    @if (ViewBag.LineMode == "Delete")
+                    {
+                        <button class="btn custom" name="Command:Delete" id="delete" type="submit"><h2 style="margin:0px"><span class="glyphicon glyphicon-trash black"></span> </h2></button>}
+
+                </div>
+
+            </div>
+        }
+    </div>
+</div>
+
+
+@if (Model.PurchaseInvoiceLineId <= 0)
+{
+    <script type="text/javascript">
+        $(function(){
+
+            $.ajax({
+                cache: false,
+                url: "/TaxCalculation/GetMaxLineId/",
+                data: { HeaderId: parseInt($('#PurchaseInvoiceHeaderId').val()), LineTable:"Web.PurchaseInvoiceLines" , LineKeyField: "PurchaseInvoiceLineId" ,HeaderKeyField:"PurchaseInvoiceHeaderId"},
+                success: function (data) {
+                    AddCalculation(data);
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    alert('Failed to retrive calculation footer' + thrownError);
+                },
+            });
+
+
+            function AddCalculation(MaxLineId)
+            {
+                AddCalculationFields(parseInt($('#PurchaseInvoiceHeaderId').val()),false,'@Model.PurchInvoiceSettings.CalculationId',"Web.PurchaseInvoiceHeaderCharges","Web.PurchaseInvoiceLineCharges",MaxLineId, $('#DocTypeId','.modal-body').val(),$('#SiteId','.modal-body').val(),$('#DivisionId','.modal-body').val());
+            }
+
+        })
+    </script>
+}
+else
+{
+    <script type="text/javascript">
+        $(function(){
+            AddCalculationFieldsEdit(parseInt($('#PurchaseInvoiceHeaderId').val()),$('#PurchaseInvoiceLineId').val(),false,"Web.PurchaseInvoiceHeaderCharges","Web.PurchaseInvoiceLineCharges");
+        })
+    </script>
+}
+
+
+<script type="text/javascript">
+
+    //var cachearray={};
+
+    $(document).ready(function () {
+        CustomSelectFunction($("#Dimension1Id"), '/ComboHelpList/GetDimension1', '/ComboHelpList/SetSingleDimension1', 'Dimension1', false, 1);
+        CustomSelectFunction($("#Dimension2Id"), '/ComboHelpList/GetDimension2', '/ComboHelpList/SetSingleDimension2', 'Dimension2', false, 1);
+        //CustomSelectFunction($("#ProductId"), '/ComboHelpList/GetProducts', '/ComboHelpList/SetSingleProducts', 'Enter Product', false, 3);
+
+        var DocID = $('#PurchaseInvoiceHeaderId', '.modal-body').val();
+        var URL = '/DirectPurchaseInvoiceLine/GetCustomProducts/'+ DocID;
+        $("#ProductId").select2({
+            minimumInputLength: 1,
+            multiple: false,
+            ajax: {
+                url: URL,
+                dataType: 'json',
+                type: "GET",
+                quietMillis: 1000,
+                data: function (term) {
+                    return {
+                        term: term,
+                    };
+                },
+                results: function (data) {
+                    return {
+                        results: $.map(data, function (item) {
+                            return {
+                                text: item.PropFirst,
+                                id: item.Id
+                            }
+                        })
+
+                    };
+                }
+            },
+            initSelection: function (element, callback) {
+
+                var xval = element.val();
+                if (xval != 0) {
+                    $.ajax({
+                        cache: false,
+                        type: "POST",
+                        url: "/ComboHelpList/SetSingleProducts",
+                        data: { Ids: element.val() },
+                        success: function (data) {
+                            callback(data);
+                        },
+                        error: function (xhr, ajaxOptions, thrownError) {
+                            alert('Failed to Retrive Qty' + thrownError);
+                        }
+                    })
+                }
+                //callback([{ id: "1", text: "arpit" }, { id: "2", text: "akash" }]);
+            }
+
+
+        });
+
+
+        var IsSaved=false;
+        var ValidationCount=0;
+
+        $('#modform').bind('submit',function(event){
+
+            if(!IsSaved)
+            {
+                if(!ValidateData())
+                {
+                    return false;
+                }
+                IsSaved=true;
+                $('button:submit').attr('disabled','disabled');
+                return IsSaved;
+            }
+            else
+            {
+                return false;
+            }
+
+
+        });
+
+        function ValidateData() {
+            var ValidationMessage = "";
+
+            //Client Side Validaion.....
+
+            return  (ValidationMessage=="");
+
+        }
+
+
+
+        $("#ProductId").select2("focus");
+
+        $('.datepicker').datepicker({
+            format: 'dd/MM/yyyy',
+            "setDate": new Date(),
+            "autoclose": true
+        })
+
+        var id=@Model.PurchaseInvoiceLineId;
+        if(id>0)
+        {
+            var tex='@Model.PurchaseIndentHeaderDocNo';
+            $("#acPurchaseIndents").val(tex);
+            LockFields();
+            $('#ProductId').attr('readonly','true');
+            $('#acPurchaseIndents').attr('disabled','disabled');
+        }
+
+        $('#delete','.modal-content').click(function (e) {
+            if(id>0)
+            {
+                var url = '/DirectPurchaseInvoiceLine/DeletePost';
+                $('form#modform').attr('action',url);
+                DeletingProductCharges();
+                return;
+            }
+            else
+            {
+                return false;
+            }
+        })
+    });
+
+    function LockFields(){
+        $("#Dimension1Id").attr('readonly','true');
+        $("#Dimension2Id").attr('readonly','true');
+        $('#LotNo').attr('readonly','true');
+        $('#Specification').attr('readonly','true');
+    }
+    function UnLockFields(){
+        $("#Dimension1Id").removeAttr('readonly');
+        $("#Dimension2Id").removeAttr('readonly');
+        $("#LotNo").removeAttr('readonly');
+        $("#Specification").removeAttr('readonly');
+    }
+
+
+
+
+    $(function(){
+
+        $("#DealQty,#Rate,#Amount,#Qty,#UnitConversionMultiplier").keyup(Calculation);
+        $("#DealUnitId").change(GetUnitConversionMultiplier);
+
+
+        function GetUnitConversionMultiplier() {
+
+            if ($("#UnitId").val() == $("#DealUnitId").val()) {
+                $("#UnitConversionMultiplier").val(1);
+                Calculation.call();
+            }
+            else {
+                $.ajax({
+                    cache: false,
+                    type: "POST",
+                    url: "@(Url.Action("GetUnitConversionDetailJson"))",
+                    data: { ProductId: $("#ProductId").val(), UnitId: $("#UnitId").val(), DealUnitId: $("#DealUnitId").val(),PurchaseInvoiceHeaderId: $("#PurchaseInvoiceHeaderId",".modal-body").val()},
+
+                    success: function (data) {
+                        $("#UnitConversionMultiplier").val(data[0].Value);
+                        Calculation.call();
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        alert('Failed to retrieve Unit conversion details.' + thrownError);
+                    }
+                });
+            }
+        }
+
+        $('#ProductId').change(function(){
+
+            if ($("#ProductId").val()) {
+                $.ajax({
+                    cache: false,
+                    type: "POST",
+                    url: "@(Url.Action("GetProductDetailJson"))",
+                    data: { ProductId: $("#ProductId").val()},
+                    success: function (data) {
+                        $("#Rate").val(data.StandardCost);
+                        $("#UnitId").val(data.UnitId);
+                        $("#DealUnitId").val(data.UnitId);
+                        $('#UnitConversionMultiplier').val(1);
+                        $("#UnitName").val(data.UnitName);
+                        $("#Specification").val(data.ProductSpecification);
+
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        alert('Failed to retrieve product details.' + thrownError);
+                    }
+                });
+            }
+
+        })
+
+        function Calculation() {
+            ValidateMinQty();
+            var TempAmount = 0;
+            var DiscountAmount = 0;
+            var TempRate = 0;
+
+            if ($('#UnitConversionMultiplier').val() != 0) {
+                $('#DealQty').val(($('#Qty').val() * $('#UnitConversionMultiplier').val()).toFixed(2))
+            }
+
+            //$('#Amount').val(($('#DealQty').val() * $('#Rate').val()).toFixed(2));
+
+            TempAmount = ($('#DealQty').val() * $('#Rate').val())
+
+            if ($('#CalculateDiscountOnRate').val() != 0 &&  $('#CalculateDiscountOnRate').val() != null) {
+                TempRate = $('#Rate').val() - ($('#Rate').val() * $('#DiscountPer').val() / 100)
+                $('#Amount').val(($('#DealQty').val() * TempRate).toFixed(2));
+            }
+            else{
+                DiscountAmount = TempAmount * $('#DiscountPer').val() / 100;
+                $('#Amount').val((TempAmount - DiscountAmount).toFixed(2));
+            }
+
+
+
+            ChargeCalculation();
+        }
+
+
+        function ValidateMinQty(){
+            if($('#PurchaseIndentLineId').val())
+            {
+                if(($('#IndentBalQty').val()-$('#Qty').val())<0)
+                {
+                    $('#modform').find('#submit').attr('disabled', 'disabled');
+                    if (!$('#modform').find('.modal-body #errormsg').length) {
+                        $('#modform').find('.modal-body').prepend("<div class='alert alert-danger'><span id=errormsg >Qty should not exceed Indent qty</span></div>")
+                    }
+                }
+                else
+                {
+                    $('#modform').find('#submit:disabled').removeAttr('disabled');
+                    if ($('#modform').find('.modal-body #errormsg').length) {
+                        $('#modform').find('#errormsg').parent().remove();
+                    }
+                }
+            }
+        };
+
+    })
+
+
+</script>

@@ -1,0 +1,987 @@
+﻿@model Model.ViewModels.PersonViewModel
+@using Core.Common
+@{
+    ViewBag.Title = "Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!-- modal placeholder-->
+<div id='myModal' class='modal fade in'>
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div id='myModalContent'></div>
+        </div>
+    </div>
+</div>
+
+<script src="~/Scripts/Jasny/jasny-bootstrap.min.js"></script>
+<link href="~/Content/jasny/jasny-bootstrap.min.css" rel="stylesheet" />
+
+@using (Html.BeginForm("Create", "Person", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(m => m.PersonID)
+    @Html.HiddenFor(m => m.DocTypeId)
+    @Html.HiddenFor(m => m.PersonAddressID)
+    @Html.HiddenFor(m => m.AccountId)
+    @Html.HiddenFor(m => m.PersonRegistrationPanNoID)
+    @Html.HiddenFor(m => m.PersonRegistrationCstNoID)
+    @Html.HiddenFor(m => m.PersonRegistrationGstNoID)
+    @Html.HiddenFor(m => m.PersonRegistrationTinNoID)
+    @Html.HiddenFor(m => m.PersonRegistrationAadharNoID)
+    @Html.HiddenFor(m => m.CreatedBy)
+    @Html.HiddenFor(m => m.CreatedDate)
+    @Html.HiddenFor(m => m.ImageFileName)
+    @Html.HiddenFor(m => m.ImageFolderName)
+
+
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3>
+                <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"> <span class="glyphicon glyphicon-file black"></span>@ViewBag.Name</span>
+                <input type="submit" value="Save" class="btn btn-primary right" id="submit" style="width: 90px; background-color: #2980b9" />
+            </h3>
+            @*<hr style="margin-top:0px;margin-bottom:0px" />*@
+
+            <hr style="margin-top: 5px; margin-bottom: 5px; border-top: 1px solid #d8d5d5" />
+            @{
+//string EditAction = "";
+//if (Model.Status == (int)StatusConstants.Drafted || Model.Status == (int)StatusConstants.Import)
+//{
+//    EditAction = "Modify";
+//}
+//else if ((Model.Status == (int)StatusConstants.Submitted || Model.Status == (int)StatusConstants.Modified))
+//{
+//    EditAction = "ModifyAfter_Submit";
+//}
+//else
+//{
+//    EditAction = "DetailInformation";
+//}
+            }
+            <div class="panel-info">
+                @*<h4 style="padding:5px 0 0 0;margin:0px">
+    @Html.ActionLink(" ", " ", " ", null, new { @class = "glyphicon glyphicon-refresh toolbar", @title = "Refresh Page", @data_toggle = "tooltip", @id = "RefreshPage" })
+    @Html.ActionLink(" ", "Create", "Person", null, new { @class = "glyphicon glyphicon-plus toolbar", @title = "Add New", @data_toggle = "tooltip" })
+    @Html.ActionLink(" ", "History", "Person", null, new { @class = "glyphicon glyphicon-user toolbar", @title = "History", @data_toggle = "tooltip" })
+    @Html.ActionLink(" ", "Print", "Person", null, new { @class = "glyphicon glyphicon-print toolbar", @title = "Print", @data_toggle = "tooltip" })
+    @Html.ActionLink(" ", "Email", "Person", null, new { @class = "glyphicon glyphicon-envelope toolbar", @title = "Email", @data_toggle = "tooltip" })
+    @Html.ActionLink(" ", "PrevPage", "Person", new { id = @Model.PersonId }, new { @class = "glyphicon glyphicon-arrow-left toolbar", @title = "Prev Record", @data_toggle = "tooltip" })
+    @Html.ActionLink(" ", "NextPage", "Person", new { id = @Model.PersonId }, new { @class = "glyphicon glyphicon-arrow-right toolbar", @title = "Next Record", @data_toggle = "tooltip" })*@
+                    @*@Html.ActionLink(" ", " ", " ", null, new { @class = "glyphicon glyphicon-trash toolbar", @title = "Delete", @data_toggle = "tooltip" })*@
+                    @*@Html.ActionLink(" ", "Index", "Person", null, new { @class = "glyphicon glyphicon-list toolbar right", @title = "List", @data_toggle = "tooltip" })
+        @Html.ActionLink(" ", "Report", "Person", null, new { @class = "glyphicon glyphicon-th toolbar right", @title = "Report", @data_toggle = "tooltip" })
+    </h4>*@
+                <div class="btn-group">
+                    @Html.ActionLink(" ", "Create", "Person", new { @id = @ViewBag.id }, new { @class = "cbtn btn-circle glyphicon glyphicon-plus toolbar", @title = "Add New", @data_toggle = "tooltip" })
+                    @*@Html.ActionLink(" ", EditAction, "JobOrderHeader", new { @id = Model.PersonId, IndexType = ViewBag.IndexStatus }, new { @class = "cbtn btn-circle glyphicon glyphicon-edit", @title = "Edit", @data_toggle = "tooltip" })*@
+                    @Html.ActionLink(" ", "Print", "Person", null, new { @class = "cbtn btn-circle glyphicon glyphicon-print toolbar", @title = "Print", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "PrevPage", "Person", new { DocId = @Model.PersonID, DocTypeId = Model.DocTypeId }, new { @class = "cbtn btn-circle glyphicon glyphicon-arrow-left toolbar", @title = "Prev Record", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "NextPage", "Person", new { DocId = @Model.PersonID, DocTypeId = Model.DocTypeId }, new { @class = "cbtn btn-circle glyphicon glyphicon-arrow-right toolbar", @title = "Next Record", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "Index", "Person", new { @id = @ViewBag.id }, new { @class = "cbtn btn-circle glyphicon glyphicon-list", @title = "List", @data_toggle = "tooltip" })
+                </div>
+                <div class="btn-group">
+                    <a class="cbtn btn-circle glyphicon glyphicon-option-horizontal dropdown-toggle" aria-expanded="false" style="padding-top: 6px;padding-bottom: 6px;" href="#" data-toggle="dropdown" id="dropdownMenu1">
+                    </a>
+                    <ul class="dropdown-menu pull-right" aria-labelledby="dropdownMenu1">
+                       
+                        <li><a href="@Url.Action("History", "Person")"><span class="glyphicon glyphicon-user"> </span> History</a></li>
+                        @*<li><a href="@Url.Action("Email", "Person")"><span class="glyphicon glyphicon-envelope"> </span> Email</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="@Url.Action("Report", "Person")"><span class="glyphicon glyphicon-th"> </span> Report</a></li>*@
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="panel-info" style="padding-left:15px">
+            <div class="form-horizontal">
+                @Html.ValidationSummary(true)
+
+                <div class="row">
+                    <h4 class="col-md-12 black">
+                        <span class="glyphicon glyphicon-align-justify"></span>
+                        Personal Details
+                    </h4>
+                    <div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="form-group" style="margin-top:15px">
+                                            @Html.LabelFor(model => model.Name, "Name", new { @class = "control-label col-xs-4" })
+                                            <div class="col-xs-6">
+                                                @Html.TextBoxFor(model => model.Name, null, new { @class = "form-control col-xs-6 required" })
+                                                @Html.ValidationMessageFor(m => m.Name)
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            @Html.LabelFor(model => model.Suffix, "Suffix", new { @class = "control-label col-xs-4" })
+                                            <div class="col-xs-6">
+                                                @Html.TextBoxFor(m => m.Suffix, null, new { @class = "form-control col-xs-6 required" })
+                                                @Html.ValidationMessageFor(m => m.Suffix)
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            @Html.LabelFor(model => model.Code, "Code", new { @class = "control-label col-xs-4" })
+                                            <div class="col-xs-6">
+                                                @Html.TextBoxFor(m => m.Code, null, new { @class = "form-control col-xs-6 required" })
+                                                @Html.ValidationMessageFor(model => model.Code)
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            @Html.LabelFor(model => model.IsActive, new { @class = "control-label col-xs-4" })
+                                            <div class="col-xs-6" style=" padding-top:4px">
+                                                @Html.CheckBoxFor(m => m.IsActive, new { @class = "checkbox col-xs-1" })
+                                                @Html.ValidationMessageFor(model => model.IsActive)
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="row">
+                                    <div class="col-md-offset-4 col-md-8">
+                                        <div class="fileinput fileinput-new" data-provides="fileinput">
+                                            <div class="fileinput-new thumbnail" style="width: 200px; height: 150px;">
+                                                <img src="~/Uploads/@(Model.ImageFolderName)/Medium/@(Model.ImageFileName)" alt="...">
+                                            </div>
+                                            <div class="fileinput-preview fileinput-exists thumbnail" style="max-width: 200px; max-height: 150px;"></div>
+                                            <div>
+                                                <span class="btn btn-default btn-file" style="background-color: transparent; color: black; font-family:Arial; border-radius:5px">
+                                                    <span id="Select" class="fileinput-new">Select</span>
+                                                    <span id="Change" class="fileinput-exists">Change</span>
+                                                    <input type="file" name="upload">
+                                                </span>
+                                                <a href="#" class="btn btn-default fileinput-exists" style="background-color: transparent; color: black; font-family: Arial; border-radius: 5px" data-dismiss="fileinput">Remove</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                @*<hr style="margin-bottom:0px" />*@
+                <div class="row" style="display:@(Model.PersonSettings.isVisibleAddress || Model.PersonSettings.isVisibleCity || Model.PersonSettings.isVisibleZipCode || Model.PersonSettings.isVisiblePhone || Model.PersonSettings.isVisibleMobile || Model.PersonSettings.isVisibleEMail ? "" : "none")">
+                    <h4 class="col-md-12 black">
+                        <span class="glyphicon glyphicon-shopping-cart"></span>
+                        Contact Details
+                    </h4>
+                    <div>
+                        <div class="row">
+                            <div class="col-md-6" style="display:@(Model.PersonSettings.isVisibleAddress ? "" : "none")">
+                                @Html.HiddenFor(m => m.PersonSettings.isVisibleAddress)
+                                @Html.HiddenFor(m => m.PersonSettings.isMandatoryAddress)
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.Address, "Address", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextAreaFor(model => model.Address, new { @class = "form-control col-xs-6 " + (Model.PersonSettings.isMandatoryAddress ? "required" : "") })
+                                        @Html.ValidationMessageFor(model => model.Address)
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6" style="display:@(Model.PersonSettings.isVisibleCity ? "" : "none")">
+                                @Html.HiddenFor(m => m.PersonSettings.isVisibleCity)
+                                @Html.HiddenFor(m => m.PersonSettings.isMandatoryCity)
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.CityId, "City", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.CityId, new { @class = "form-control col-xs-6 height " + (Model.PersonSettings.isMandatoryCity ? "required" : "") })
+                                        @Html.ValidationMessageFor(model => model.CityId)
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6" style="display:@(Model.PersonSettings.isVisibleZipCode ? "" : "none")">
+                                @Html.HiddenFor(m => m.PersonSettings.isVisibleZipCode)
+                                @Html.HiddenFor(m => m.PersonSettings.isMandatoryZipCode)
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.Zipcode, "Zip Code", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.Zipcode, new { @class = "form-control col-xs-6 height " + (Model.PersonSettings.isMandatoryZipCode ? "required" : "") })
+                                        @Html.ValidationMessageFor(model => model.Zipcode)
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6" style="display:@(Model.PersonSettings.isVisiblePhone ? "" : "none")">
+                                @Html.HiddenFor(m => m.PersonSettings.isVisiblePhone)
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.Phone, "Phone", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.Phone, new { @class = "form-control col-xs-6 height" })
+                                        @Html.ValidationMessageFor(model => model.Phone)
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6" style="display:@(Model.PersonSettings.isVisibleMobile ? "" : "none")">
+                                @Html.HiddenFor(m => m.PersonSettings.isVisibleMobile)
+                                @Html.HiddenFor(m => m.PersonSettings.isMandatoryMobile)
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.Mobile, "Mobile", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.Mobile, new { @class = "form-control col-xs-6" + (Model.PersonSettings.isMandatoryMobile ? "required" : "") })
+                                        @Html.ValidationMessageFor(model => model.Mobile)
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6" style="display:@(Model.PersonSettings.isVisibleEMail ? "" : "none")">
+                                @Html.HiddenFor(m => m.PersonSettings.isVisibleEMail)
+                                @Html.HiddenFor(m => m.PersonSettings.isMandatoryEmail)
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.Email, "Email", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.Email, new { @class = "form-control col-xs-6" + (Model.PersonSettings.isMandatoryEmail ? "required" : "") })
+                                        @Html.ValidationMessageFor(model => model.Email)
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+
+                @*<hr style="margin-bottom:0px" />*@
+                <div class="row" style="display:@(Model.PersonSettings.isVisibleCstNo || Model.PersonSettings.isVisibleGstNo || Model.PersonSettings.isVisibleTinNo || Model.PersonSettings.isVisiblePanNo || Model.PersonSettings.isVisibleGuarantor || Model.PersonSettings.isVisibleTdsCategory || Model.PersonSettings.isVisibleTdsGroup || Model.PersonSettings.isVisibleCreditDays || Model.PersonSettings.isVisibleCreditLimit || Model.PersonSettings.isVisibleWorkInDivision || Model.PersonSettings.isVisibleWorkInBranch || Model.PersonSettings.isVisibleSalesTaxGroup || Model.PersonSettings.isVisibleTags || Model.PersonSettings.isVisibleIsSisterConcern ? "" : "none")">
+                    <h4 class="col-md-12 black">
+                        <span class="glyphicon glyphicon-shopping-cart"></span>
+                        Business Details
+                    </h4>
+                    <div>
+                        <div class="row">
+                            <div class="col-md-6" style="display:@(Model.PersonSettings.isVisibleGstNo ? "" : "none")">
+                                @Html.HiddenFor(m => m.PersonSettings.isVisibleGstNo)
+                                @Html.HiddenFor(m => m.PersonSettings.isMandatoryGstNo)
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.GstNo, "Gst No.", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(model => model.GstNo, null, new { @class = "form-control col-xs-6 " + (Model.PersonSettings.isMandatoryGstNo ? "required" : "") })
+                                        @Html.ValidationMessageFor(model => model.GstNo)
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6" style="display:@(Model.PersonSettings.isVisibleCstNo ? "" : "none")">
+                                @Html.HiddenFor(m => m.PersonSettings.isVisibleCstNo)
+                                @Html.HiddenFor(m => m.PersonSettings.isMandatoryCstNo)
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.CstNo, "Cst No.", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(model => model.CstNo, null, new { @class = "form-control col-xs-6 " + (Model.PersonSettings.isMandatoryCstNo ? "required" : "") })
+                                        @Html.ValidationMessageFor(model => model.CstNo)
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6" style="display:@(Model.PersonSettings.isVisibleTinNo ? "" : "none")">
+                                @Html.HiddenFor(m => m.PersonSettings.isVisibleTinNo)
+                                @Html.HiddenFor(m => m.PersonSettings.isMandatoryTinNo)
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.TinNo, "Tin No.", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.TinNo, new { @class = "form-control col-xs-6 height" + (Model.PersonSettings.isMandatoryTinNo ? "required" : "") })
+                                        @Html.ValidationMessageFor(model => model.TinNo)
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6" style="display:@(Model.PersonSettings.isVisiblePanNo ? "" : "none")">
+                                @Html.HiddenFor(m => m.PersonSettings.isVisiblePanNo)
+                                @Html.HiddenFor(m => m.PersonSettings.isMandatoryPanNo)
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.PanNo, "Pan No.", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(model => model.PanNo, null, new { @class = "form-control col-xs-6 " + (Model.PersonSettings.isMandatoryPanNo ? "required" : "") })
+                                        @Html.ValidationMessageFor(model => model.PanNo)
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <div class="col-md-6" style="display:@(Model.PersonSettings.isVisibleAadharNo ? "" : "none")">
+                                @Html.HiddenFor(m => m.PersonSettings.isVisibleAadharNo)
+                                @Html.HiddenFor(m => m.PersonSettings.isMandatoryAadharNo)
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.AadharNo, "Aadhar No.", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(model => model.AadharNo, null, new { @class = "form-control col-xs-6 " + (Model.PersonSettings.isMandatoryAadharNo ? "required" : "") })
+                                        @Html.ValidationMessageFor(model => model.AadharNo)
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <div class="col-md-6" style="display:@(Model.PersonSettings.isVisibleGuarantor ? "" : "none")">
+                                @Html.HiddenFor(m => m.PersonSettings.isVisibleGuarantor)
+                                @Html.HiddenFor(m => m.PersonSettings.isMandatoryGuarantor)
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.GuarantorId, "Guarantor", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.GuarantorId, new { @class = "form-control col-xs-6 height" + (Model.PersonSettings.isMandatoryGuarantor ? "required" : "") })
+                                        @Html.ValidationMessageFor(model => model.GuarantorId)
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6" style="display:@(Model.PersonSettings.isVisibleParent ? "" : "none")">
+                                @Html.HiddenFor(m => m.PersonSettings.isVisibleParent)
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.ParentId, "Parent", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.ParentId, new { @class = "form-control col-xs-6 height" + (Model.PersonSettings.isMandatoryGuarantor ? "required" : "") })
+                                        @Html.ValidationMessageFor(model => model.ParentId)
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6" style="display:@(Model.PersonSettings.isVisibleTdsCategory ? "" : "none")">
+                                @Html.HiddenFor(m => m.PersonSettings.isVisibleTdsCategory)
+                                @Html.HiddenFor(m => m.PersonSettings.isMandatoryTdsCategory)
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.TdsCategoryId, "Tds Category", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.TdsCategoryId, new { @class = "form-control col-xs-6 height" + (Model.PersonSettings.isMandatoryTdsCategory ? "required" : "") })
+                                        @Html.ValidationMessageFor(model => model.TdsCategoryId)
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6" style="display:@(Model.PersonSettings.isVisibleTdsGroup ? "" : "none")">
+                                @Html.HiddenFor(m => m.PersonSettings.isVisibleTdsGroup)
+                                @Html.HiddenFor(m => m.PersonSettings.isMandatoryTdsGroup)
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.TdsGroupId, "Tds Group", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.TdsGroupId, new { @class = "form-control col-xs-6 height" + (Model.PersonSettings.isMandatoryTdsGroup ? "required" : "") })
+                                        @Html.ValidationMessageFor(model => model.TdsGroupId)
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6" style="display:@(Model.PersonSettings.isVisibleCreditDays ? "" : "none")">
+                                @Html.HiddenFor(m => m.PersonSettings.isVisibleCreditDays)
+                                @Html.HiddenFor(m => m.PersonSettings.isMandatoryCreditDays)
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.CreaditDays, "Credit Days", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.CreaditDays, new { @class = "form-control col-xs-6" + (Model.PersonSettings.isMandatoryCreditDays ? "required" : "") })
+                                        @Html.ValidationMessageFor(model => model.CreaditDays)
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6" style="display:@(Model.PersonSettings.isVisibleCreditLimit ? "" : "none")">
+                                @Html.HiddenFor(m => m.PersonSettings.isVisibleCreditLimit)
+                                @Html.HiddenFor(m => m.PersonSettings.isMandatoryCreditLimit)
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.CreaditLimit, "Creadit Limit", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.CreaditLimit, new { @class = "form-control col-xs-6 " + (Model.PersonSettings.isMandatoryCreditLimit ? "required" : "") })
+                                        @Html.ValidationMessageFor(model => model.CreaditLimit)
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6" style="display:@(Model.PersonSettings.isVisibleWorkInDivision ? "" : "none")">
+                                @Html.HiddenFor(m => m.PersonSettings.isVisibleWorkInDivision)
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.DivisionIds, "Work In Division", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.DivisionIds, new { @class = "form-control col-xs-6 " })
+                                        @Html.ValidationMessageFor(m => m.DivisionIds)
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6" style="display:@(Model.PersonSettings.isVisibleWorkInBranch ? "" : "none")">
+                                @Html.HiddenFor(m => m.PersonSettings.isVisibleWorkInBranch)
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.SiteIds, "Work In Branches", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.SiteIds, new { @class = "form-control col-xs-6 " })
+                                        @Html.ValidationMessageFor(m => m.SiteIds)
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6" style="display:@(Model.PersonSettings.isVisibleSalesTaxGroup ? "" : "none")">
+                                @Html.HiddenFor(m => m.PersonSettings.isVisibleSalesTaxGroup)
+                                @Html.HiddenFor(m => m.PersonSettings.isMandatorySalesTaxGroup)
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.SalesTaxGroupPartyId, "Sales Tax Group", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.SalesTaxGroupPartyId, new { @class = "form-control col-xs-6 height" + (Model.PersonSettings.isMandatorySalesTaxGroup ? "required" : "") })
+                                        @Html.ValidationMessageFor(model => model.SalesTaxGroupPartyId, null, new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <div class="col-md-6" style="display:@(Model.PersonSettings.isVisibleLedgerAccountGroup ? "" : "none")">
+                                @Html.HiddenFor(m => m.PersonSettings.isVisibleLedgerAccountGroup)
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.LedgerAccountGroupId, "Ledger A/c Group", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.LedgerAccountGroupId, new { @class = "form-control col-xs-6 height required" })
+                                        @Html.ValidationMessageFor(model => model.LedgerAccountGroupId, null, new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6" style="display:@(Model.PersonSettings.isVisibleTags ? "" : "none")">
+                                @Html.HiddenFor(m => m.PersonSettings.isVisibleTags)
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.Tags, "Tags", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.Tags, null, new { @class = "form-control col-xs-6" })
+                                        @Html.ValidationMessageFor(model => model.Tags, null, new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6" style="display:@(Model.PersonSettings.isVisibleIsSisterConcern ? "" : "none")">
+                                @Html.HiddenFor(m => m.PersonSettings.isVisibleIsSisterConcern)
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.IsSisterConcern, new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6" style=" padding-top:4px">
+                                        @Html.CheckBoxFor(m => m.IsSisterConcern, new { @class = "checkbox col-xs-1" })
+                                        @Html.ValidationMessageFor(model => model.IsSisterConcern)
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+
+
+                @if (Model.PersonSettings.isVisibleContactPersonDetail)
+                {
+                    <hr />
+                    <div class="row">
+                        <h4 class="col-md-12 black" style="margin-top:15px">
+                            <span class="glyphicon glyphicon-shopping-cart"></span>
+                            Contact Person Details
+                        </h4>
+                    </div>
+
+                    <div class="panel-info">
+                        <h5 style="padding:5px 0 3px 0;margin:0px;font-weight:bold">
+                            <span class="glyphicon glyphicon-plus-sign"></span>
+                            @Html.ActionLink("Add New Row ", "_Create", "PersonContact", new { id = @Model.PersonID }, new { data_modal = "", id = "btnCreate", @class = "toolbar", @title = "Add New", @data_toggle = "tooltip" })
+                        </h5>
+                    </div>
+
+                    <div style="padding-right:15px">
+                        <table class="table table-hover ctable">
+                            <thead id="header">
+                            </thead>
+
+                            <tbody id="Result"></tbody>
+                        </table>
+                    </div>
+                }
+
+
+                @if (Model.PersonSettings.isVisibleBankAccountDetail)
+                {
+                    <hr />
+                    <div class="row">
+                        <h4 class="col-md-12 black" style="margin-top:15px">
+                            <span class="glyphicon glyphicon-shopping-cart"></span>
+                            Bank Account Details
+                        </h4>
+                    </div>
+
+                    <div class="panel-info">
+                        <h5 style="padding:5px 0 3px 0;margin:0px;font-weight:bold">
+                            <span class="glyphicon glyphicon-plus-sign"></span>
+                            @Html.ActionLink("Add New Row ", "_Create", "PersonBankAccount", new { id = @Model.PersonID }, new { data_modal = "", id = "btnCreate", @class = "toolbar", @title = "Add New", @data_toggle = "tooltip" })
+                        </h5>
+                    </div>
+
+                    <div style="padding-right:15px">
+                        <table class="table table-hover ctable">
+                            <thead id="BankAccountHeader">
+                            </thead>
+
+                            <tbody id="BankAccoutDetail"></tbody>
+                        </table>
+                    </div>
+                }
+
+                @if (Model.PersonSettings.isVisiblePersonProcessDetail)
+                {
+                    <hr />
+                    <div class="row">
+                        <h4 class="col-md-12 black" style="margin-top:15px">
+                            <span class="glyphicon glyphicon-shopping-cart"></span>
+                            Person Processes
+                        </h4>
+                    </div>
+
+                    <div class="panel-info">
+                        <h5 style="padding:5px 0 3px 0;margin:0px;font-weight:bold">
+                            <span class="glyphicon glyphicon-plus-sign"></span>
+                            @Html.ActionLink("Add New Row ", "_Create", "PersonProcess", new { id = @Model.PersonID }, new { data_modal = "", id = "btnCreate", @class = "toolbar", @title = "Add New", @data_toggle = "tooltip" })
+                        </h5>
+                    </div>
+
+                    <div style="padding-right:15px">
+                        <table class="table table-hover ctable">
+                            <thead id="PersonProcessHeader">
+                            </thead>
+
+                            <tbody id="PersonProcessDetail"></tbody>
+                        </table>
+                    </div>
+                }
+                
+
+                @if (Model.PersonSettings.isVisiblePersonAddressDetail)
+                {
+                    @Html.HiddenFor(m => m.PersonSettings.isVisiblePersonAddressDetail)
+                    <hr />
+                    <div class="row">
+                        <h4 class="col-md-12 black" style="margin-top:15px">
+                            <span class="glyphicon glyphicon-shopping-cart"></span>
+                            Person Address
+                        </h4>
+                    </div>
+                    <div class="panel-info">
+                        <h5 style="padding:5px 0 3px 0;margin:0px;font-weight:bold">
+                            <span class="glyphicon glyphicon-plus-sign"></span>
+                            @Html.ActionLink("Add New Row ", "_Create", "PersonAddress", new { id = @Model.PersonID }, new { data_modal = "", id = "btnCreate", @class = "toolbar", @title = "Add New", @data_toggle = "tooltip" })
+                        </h5>
+                    </div>
+                    <div style="padding-right:15px">
+                        <table class="table table-hover ctable">
+                            <thead id="PersonAddressHeader">
+                            </thead>
+                            <tbody id="PersonAddressDetail"></tbody>
+                        </table>
+                    </div>
+                }
+                
+
+
+                @if (Model.PersonSettings.isVisiblePersonOpeningDetail)
+                {
+                    <hr />
+                    <div class="row">
+                        <h4 class="col-md-12 black" style="margin-top:15px">
+                            <span class="glyphicon glyphicon-shopping-cart"></span>
+                            Person Opening
+                        </h4>
+                    </div>
+
+                    <div class="panel-info">
+                        <h5 style="padding:5px 0 3px 0;margin:0px;font-weight:bold">
+                            <span class="glyphicon glyphicon-plus-sign"></span>
+                            @Html.ActionLink("Add New Row ", "_Create", "PersonOpening", new { id = @Model.PersonID }, new { data_modal = "", id = "btnCreate", @class = "toolbar", @title = "Add New", @data_toggle = "tooltip" })
+                        </h5>
+                    </div>
+
+                    <div style="padding-right:15px">
+                        <table class="table table-hover ctable">
+                            <thead id="PersonOpeningHeader">
+                            </thead>
+                            <tbody id="PersonOpeningDetail"></tbody>
+                        </table>
+                    </div>
+                }
+
+
+            </div>
+        </div>
+    </div>
+}
+
+<script type="text/javascript">
+    $(function()
+    {
+        var TitleCase= '@Session["TitleCase"]';
+        //alert(TitleCase);
+        $('#Name,#Suffix,#Code,#PanNo').focusout(function () {
+            if (TitleCase=="UpperCase")
+            this.value = this.value.toUpperCase() ;
+    });
+    });
+</script>
+
+<script type="text/javascript">
+    CustomSelectFunction($("#CityId"), '/ComboHelpList/GetCity', '/ComboHelpList/SetSingleCity', ' ', false, 0);
+    CustomSelectFunction($("#GuarantorId"), '/ComboHelpList/GetPerson', '/ComboHelpList/SetSinglePerson', ' ', false, 0);
+    CustomSelectFunction($("#ParentId"), '/ComboHelpList/GetPerson', '/ComboHelpList/SetSinglePerson', ' ', false, 0);
+    CustomSelectFunction($("#TdsGroupId"), '/ComboHelpList/GetTdsGroup', '/ComboHelpList/SetSingleTdsGroup', ' ', false, 0);
+    CustomSelectFunction($("#TdsCategoryId"), '/ComboHelpList/GetTdsCategory', '/ComboHelpList/SetSingleTdsCategory', ' ', false, 0);
+    CustomSelectFunction($("#SalesTaxGroupPartyId"), '/ComboHelpList/GetSalesTaxGroupParty', '/ComboHelpList/SetSingleSalesTaxGroupParty', ' ', false, 0);
+    CustomSelectFunction($("#LedgerAccountGroupId"), '/ComboHelpList/GetLedgerAccountGroups', '/ComboHelpList/SetSingleLedgerAccountGroup', ' ', false, 0);
+
+    //For Multi Selection Help
+    CustomSelectFunction($("#DivisionIds"), '/ComboHelpList/GetDivision', '/ComboHelpList/SetDivision', ' ', true, 0);
+    CustomSelectFunction($("#SiteIds"), '/ComboHelpList/GetSite', '/ComboHelpList/SetSite', ' ', true, 0);
+    $("#Tags").select2({tags: true,tokenSeparators: [',', ' ']});
+
+</script>
+
+<script type="text/javascript">
+    var form_clean;
+    $(document).ready(function () {
+
+        //Calling the function to load the table data/ Line information
+        LoadPersonContact();
+        LoadPersonBankDetail();
+        LoadPersonProcess();
+        LoadPersonAddress();
+        LoadPersonOpening();
+        enableModalTransitions();
+
+        form_clean = $("form").serialize();
+
+
+        //For maintaining the data change on the form
+        //To enable of disable save button based on the data changed
+        $("input,select").change(function () {
+            var form_dirty = $("form").serialize();
+            if (form_clean != form_dirty) {
+                $("#submit").removeAttr('disabled');
+            }
+            else
+            {
+                // alert('same form');
+                $("#submit").attr({ "disabled": "disabled" })
+            }
+        });
+    });
+
+
+    var id=@Model.PersonID;
+    if(id==null||id==0)
+    {
+        $(document).find('a#btnCreate').removeAttr('href').removeAttr('data-modal');
+    }
+
+
+
+    //Reloading the table contents on modal hide
+    $('#myModal').on('hidden.bs.modal', function () {
+        LoadPersonContact();
+        LoadPersonBankDetail();
+        LoadPersonProcess();
+        LoadPersonAddress();
+        LoadPersonOpening();
+    });
+
+
+    //Loading the Table data or Line Information
+    function LoadPersonContact() {
+        var groupId=@Model.PersonID;
+        var link="/PersonContact/Index/"+groupId;
+        $.ajax({
+            url: link,
+            type: "GET",
+            success: function (data) {
+                var row = ""
+                var srno=1;
+                var head="<tr style='background-color:#428bca'>  <th style='width:10px'><input type='hidden'  /></th> <th style='width:10px'>Serial</th><th class='center' style='width:50px'>Name</th>   <th class='center' style='width:50px'>Phone</th>      <th class='center' style='width:50px'>Mobile</th>       <th class='center' style='width:50px'>EMail</th> <th style='width:10px'></th>       <th style='width:10px'></th>  </tr>"
+                if(data.length!=0)
+                {
+                    $.each(data, function (index, item) {
+                        row += "<tr><td><input type='hidden' class='id' value='" + item.PersonContactId + "'/></td> <td>"+ srno +"</td> <td>" + ( item.Name==null?"" : item.Name )+ "</td>        <td>" +( item.Phone==null?"":item.Phone )+ "</td>          <td>" + (item.Mobile==null?"":item.Mobile )+ "</td>                  <td>" + ( item.Email==null?"":item.Email  )+ "</td>                  <td><a class='rowEditBlue hidden' Modify href='/PersonContact/_Edit/"+item.PersonContactId+"' ></a></td>       <td><a class='glyphicon glyphicon-trash' data-modal='' delete='' href='/PersonContact/_Edit/"+item.PersonContactId+"' ></a></td>  </tr>";
+                        srno++;
+                    });
+                }
+                else
+                {
+                    row+="<tr><td>No Items Found.</td></tr>";
+                }
+                $("#header").html(head);
+                $("#Result").html(row);
+            },
+            error: function (result) {
+                alert("Error");
+            }
+        });
+    }
+
+
+
+
+
+    //Loading the Table data or Line Information
+    function LoadPersonBankDetail() {
+        var groupId=@Model.PersonID;
+
+        var link="/PersonBankAccount/Index/"+groupId;
+
+        $.ajax({
+            url: link,
+            type: "GET",
+            success: function (data) {
+                var row = ""
+                var srno=1;
+                var head="<tr style='background-color:#428bca'>  <th style='width:10px'><input type='hidden'  /></th> <th style='width:10px'>Serial</th><th class='center' style='width:50px'>Bank Name</th>   <th class='center' style='width:50px'>Bank Branch</th>      <th class='center' style='width:50px'>Bank Code</th>       <th class='center' style='width:50px'>Account No</th>       <th class='center' style='width:50px'>Remark</th> <th style='width:10px'></th>       <th style='width:10px'></th>  </tr>"
+                if(data.length!=0)
+                {
+                    $.each(data, function (index, item) {
+                        row += "<tr><td><input type='hidden' class='id' value='" + item.PersonBankAccountID + "'/></td> <td>"+ srno +"</td> <td>" + (item.BankName==null ? "" :item.BankName )+ "</td>        <td>" + ( item.BankBranch==null?"" : item.BankBranch )+ "</td>          <td>" +( item.BankCode==null ?"" :item.BankCode )+ "</td>                  <td>" + item.AccountNo + "</td>                  <td>" + item.Remark + "</td>                  <td><a class='rowEditBlue hidden' Modify href='/PersonBankAccount/_Edit/"+item.PersonBankAccountID+"' ></a></td>       <td><a class='glyphicon glyphicon-trash' data-modal='' delete='' href='/PersonBankAccount/_Edit/"+item.PersonBankAccountID+"' ></a></td>  </tr>";
+                        srno++;
+                    });
+                }
+                else
+                {
+                    row+="<tr><td>No Items Found.</td></tr>";
+                }
+                $("#BankAccountHeader").html(head);
+                $("#BankAccoutDetail").html(row);
+            },
+            error: function (BankAccoutDetail) {
+                alert("Error");
+            }
+        });
+    }
+
+
+    //Loading the Table data or Line Information
+    function LoadPersonProcess() {
+        var groupId=@Model.PersonID;
+
+        var link="/PersonProcess/Index/"+groupId;
+
+        $.ajax({
+            url: link,
+            type: "GET",
+            success: function (data) {
+                var row = "";
+                var srno=1;
+                var head="<tr style='background-color:#428bca'>  <th style='width:10px'><input type='hidden'  /></th> <th style='width:10px'>Serial</th><th class='center'> Process</th>   <th class='center'>Rate Group</th>     <th style='width:10px'></th>       <th style='width:10px'></th>  </tr>"
+                if(data.length!=0)
+                {
+                    $.each(data, function (index, item) {
+                        row += "<tr><td><input type='hidden' class='id' value='" + item.PersonProcessId + "'/></td> <td>"+ srno +"</td> <td>" + (item.ProcessName==null ? "" :item.ProcessName )+ "</td>        <td>" + ( item.PersonRateGroupName==null?"" : item.PersonRateGroupName )+ "</td>  <td><a class='hidden' Modify href='/PersonProcess/_Edit/"+item.PersonProcessId+"' ></a></td>       <td><a class='glyphicon glyphicon-trash' data-modal='' delete='' href='/PersonProcess/_Edit/"+item.PersonProcessId+"' ></a></td>  </tr>";
+                        srno++;
+                    });
+                }
+                else
+                {
+                    row+="<tr><td>No Items Found.</td></tr>";
+                }
+                $("#PersonProcessHeader").html(head);
+                $("#PersonProcessDetail").html(row);
+            },
+            error: function () {
+                alert("Error");
+            }
+        });
+    }
+
+
+    //Loading the Table data or Line Information
+    function LoadPersonAddress() {
+        var groupId=@Model.PersonID;
+
+        var link="/PersonAddress/Index/"+groupId;
+
+        $.ajax({
+            url: link,
+            type: "GET",
+            success: function (data) {
+                var row = "";
+                var srno=1;
+                var head="<tr style='background-color:#428bca'>  <th style='width:10px'><input type='hidden'  /></th> <th style='width:10px'>Serial</th><th class='center'> Address Type</th>   <th class='center'> Address</th>   <th class='center'>City</th>     <th style='width:10px'></th>       <th style='width:10px'></th>  </tr>"
+                if(data.length!=0)
+                {
+                    $.each(data, function (index, item) {
+                        row += "<tr><td><input type='hidden' class='id' value='" + item.PersonAddressId + "'/></td> <td>"+ srno +"</td> <td>" + (item.AddressType==null ? "" :item.AddressType )+ "</td>        <td>" + (item.Address==null ? "" :item.Address )+ "</td>        <td>" + ( item.CityName==null?"" : item.CityName )+ "</td>  <td><a class='hidden' Modify href='/PersonAddress/_Edit/"+item.PersonAddressId+"' ></a></td>       <td><a class='glyphicon glyphicon-trash' data-modal='' delete='' href='/PersonAddress/_Edit/"+item.PersonAddressId+"' ></a></td>  </tr>";
+                        srno++;
+                    });
+                }
+                else
+                {
+                    row+="<tr><td>No Items Found.</td></tr>";
+                }
+                $("#PersonAddressHeader").html(head);
+                $("#PersonAddressDetail").html(row);
+            },
+            error: function () {
+                alert("Error");
+            }
+        });
+    }
+
+
+
+    //Loading the Table data or Line Information
+    function LoadPersonOpening() {
+        var groupId=@Model.PersonID;
+
+        var link="/PersonOpening/Index/"+groupId;
+
+        $.ajax({
+            url: link,
+            type: "GET",
+            success: function (data) {
+                var row = "";
+                var srno=1;
+                var head="<tr style='background-color:#428bca'>  <th style='width:10px'><input type='hidden'  /></th> <th style='width:10px'>Serial</th><th class='center'> Party Doc No</th>   <th class='center'> Party Doc Date</th>   <th class='center'> Site</th>   <th class='center'> Division</th>   <th class='center'> Amount</th>   <th class='center'> Narration</th>   <th style='width:10px'></th>       <th style='width:10px'></th>  </tr>"
+                if(data.length!=0)
+                {
+                    $.each(data, function (index, item) {
+                        row += "<tr><td><input type='hidden' class='id' value='" + item.LedgerHeaderId + "'/></td> <td>"+ srno +"</td> <td>" + (item.PartyDocNo==null ? "" :item.PartyDocNo )+ "</td>        <td>" + (item.PartyDocDate==null ? "" :formatDate('d/m/Y',new Date(parseInt(item.PartyDocDate.substr(6)))) )+ "</td>        <td>" + (item.SiteName==null ? "" :item.SiteName )+ "</td>        <td>" + (item.DivisionName==null ? "" :item.DivisionName)+ "</td>        <td>" + (item.Amount==null ? "" :item.Amount ) + " " + ( item.DrCr==null?"" : item.DrCr )+ "</td>        <td>" + (item.Narration==null ? "" :item.Narration)+ "</td>        <td><a class='hidden' Modify href='/PersonOpening/_Edit/"+item.LedgerHeaderId+"' ></a></td>       <td><a class='glyphicon glyphicon-trash' data-modal='' delete='' href='/PersonOpening/_Edit/"+item.LedgerHeaderId+"' ></a></td>  </tr>";
+                        srno++;
+                    });
+                }
+                else
+                {
+                    row+="<tr><td>No Items Found.</td></tr>";
+                }
+                $("#PersonOpeningHeader").html(head);
+                $("#PersonOpeningDetail").html(row);
+            },
+            error: function () {
+                alert("Error");
+            }
+        });
+    }
+
+
+
+    //For Populating Modal PopUp on DoubleClick Of Row
+    $('#BankAccoutDetail,#PersonProcessDetail,#PersonAddressDetail,#PersonOpeningDetail,#Result').on("dblclick",'tr',function(){
+        var text = $(this).find(".id").val();
+        var editurl=$(this).find('a[Modify]').attr('href');
+
+
+        $('#myModalContent').load(editurl, function () {
+            //alert('2');
+            $('#myModal').modal({
+                backdrop: 'static',
+                keyboard: true
+            }, 'show');
+
+            bindForm1(this);
+        });
+    });
+
+
+    //For Handling Modal PopUp on Clicking Delete Icon
+    $('#Result,#BankAccoutDetail,#PersonProcessDetail').on("click",'a[delete]', function (e) {
+        $('#myModalContent').load(this.href, function () {
+            //alert('2');
+            $('#myModal').modal({
+                backdrop: 'static',
+                keyboard: true
+            }, 'show');
+
+            bindForm1(this);
+        });
+        return false;
+    });
+
+
+
+
+
+    //For posting the data through ajax and render the contents sent back from the server
+    function bindForm1(dialog) {
+        //alert("binding");
+        $('form', dialog).submit(function () {
+            //alert(this.action);
+            $.ajax({
+                url: this.action,
+                type: this.method,
+                data: $(this).serialize(),
+                success: function (result) {
+                    if (result.success) {
+                        $('#myModal').modal('hide');
+                        //Refresh
+                        //location.reload();
+                        //alert('Data Saved');
+                    }else if(!result.success)
+                    {
+                        $('#myModalContent').html(result);
+                        bindForm1();
+                    }
+                    else {
+                        $('#myModalContent').html(result);
+                        bindForm1();
+                    }
+                }
+            });
+            return false;
+        });
+
+    }
+
+    var IsSaved=false;
+    var ValidationCount=0;
+
+    $('form').submit(function(event){
+
+        if(!IsSaved)
+        {
+            if(!ValidateData())
+            {
+                return false;
+            }
+            IsSaved=true;
+            return IsSaved;
+        }
+        else
+        {
+            return false;
+        }
+
+
+    });
+
+
+    function ValidateData() {
+        var DocId=@Model.PersonID;
+        var TempValue;
+        var ValidationMessage="";
+
+
+
+        //Checking for dulicate key value
+        if(DocId<=0)
+        {
+            TempValue= $('#Code').DuplicateCheckForCreate({ name: 'Person', value: $('#Code').val(), doctype: 0 });
+            if (TempValue){ ValidationMessage=$('#Code').val() + " already exist <br />";}
+        }
+        else
+        {
+            test = $('#Code').DuplicateCheckForEdit({ name: 'Person', value: $('#Code').val(), doctype: 0,headerId:DocId });
+            if (TempValue) {ValidationMessage+=$('#Code').val() + " already exist <br />";}
+        }
+        if(TempValue)
+        {
+            if($('#validationerrormsg').length==0){
+                $('.panel-info').filter(':eq(1)').before('<div class="alert alert-danger" role="alert" id="validationerrormsg">'+ValidationMessage+'</div>');}
+            else
+            {
+                $('#validationerrormsg').html(ValidationMessage);
+            }
+        }
+        return  (ValidationMessage=="");
+
+    }
+
+</script>

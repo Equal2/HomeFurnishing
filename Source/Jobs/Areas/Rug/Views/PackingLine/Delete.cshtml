@@ -1,0 +1,95 @@
+﻿@model Model.ViewModels.PackingLineViewModel
+
+@{
+    ViewBag.Title = "Delete";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h4>
+            <span style="font-family: Calibri,sans-serif,Verdana"> Delete Sale Order Line.</span>
+        </h4>
+    </div>
+    <div class="panel-info" style="padding-left:15px">
+        <div>            
+            <dl class="dl-horizontal">
+                <dt>
+                    @Html.DisplayNameFor(model => model.ProductUidId)
+                </dt>
+
+                <dd>
+                    @Html.DisplayFor(model => model.ProductUidName)
+                </dd>
+
+                <dt>
+                    @Html.DisplayNameFor(model => model.ProductId)
+                </dt>
+
+                <dd>
+                    @Html.DisplayFor(model => model.ProductName)
+                </dd>
+
+                <dt>
+                    @Html.DisplayNameFor(model => model.SaleOrderLineId)
+                </dt>
+
+                <dd>
+                    @Html.DisplayFor(model => model.SaleOrderNo)
+                </dd>
+
+                <dt>
+                    @Html.DisplayNameFor(model => model.Qty)
+                </dt>
+
+                <dd>
+                    @Html.DisplayFor(model => model.Qty)
+                </dd>
+
+                <dt>
+                    @Html.DisplayNameFor(model => model.BaleNo)
+                </dt>
+
+                <dd>
+                    @Html.DisplayFor(model => model.BaleNo)
+                </dd>
+
+                <dt>
+                    @Html.DisplayNameFor(model => model.GrossWeight)
+                </dt>
+
+                <dd>
+                    @Html.DisplayFor(model => model.GrossWeight)
+                </dd>
+
+                <dt>
+                    @Html.DisplayNameFor(model => model.NetWeight)
+                </dt>
+
+                <dd>
+                    @Html.DisplayFor(model => model.NetWeight)
+                </dd>
+
+                <dt>
+                    @Html.DisplayNameFor(model => model.Remark)
+                </dt>
+
+                <dd>
+                    @Html.DisplayFor(model => model.Remark)
+                </dd>
+            </dl>
+            <hr />
+            @using (Html.BeginForm())
+            {
+                @Html.AntiForgeryToken()
+
+                <div class="form-actions no-color">
+                    <input type="submit" value="Delete" class="btn btn-primary btn-sm CurveBorder" /> 
+                    <span style="font-family: Calibri,sans-serif,Verdana;font-size:large">
+                       @Html.ActionLink("Back", "Index", new { PackingHeaderId = @Model.PackingHeaderId }, new { @class="btn btn-primary btn-sm col-md-offset-1 CurveBorder ActionLinkPadding"})
+                    </span>                   
+                </div>
+            }
+        </div>
+    </div>
+</div>

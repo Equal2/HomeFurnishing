@@ -1,0 +1,124 @@
+﻿using System.Data.Entity;
+using System.Data.Entity.Infrastructure;
+using Surya.Planning.Model.Models;
+using Microsoft.AspNet.Identity.EntityFramework;
+using System.ComponentModel.DataAnnotations;
+using System;
+using System.Collections.Generic;
+using Surya.Planning.Data;
+using Surya.Planning.Data.Infrastructure;
+using System.Data.Entity.ModelConfiguration.Conventions;
+
+namespace Surya.Planning.Data.Models
+{
+    public class ApplicationDbContext : DataContext
+    {
+
+        public ApplicationDbContext()
+            : base("DefaultConnection")
+        {
+            Configuration.ProxyCreationEnabled = false;
+        }
+
+        static ApplicationDbContext()
+        {
+           Database.SetInitializer<ApplicationDbContext>(null); // Existing data, do nothing
+          // Database.SetInitializer(new ApplicationDbContextInitializer());
+        }     
+       
+        public new IDbSet<T> Set<T>() where T : class
+        {
+            return base.Set<T>();
+        }
+
+        public DbSet<IdentityUser> Users { get; set; }
+        public DbSet<UserInfo> UserInfo { get; set; }
+        public DbSet<Buyer> Buyers { get; set; }
+        public DbSet<BuyerAccount> BuyerAccounts { get; set; }
+        public DbSet<BuyerDetail> BuyerDetails { get; set; }
+        public DbSet<SalesOrder> SalesOrders { get; set; }
+        public DbSet<SalesOrderDetail> SalesOrderDetails { get; set; }
+        public DbSet<SalesOrderProduct> SalesOrderProducts { get; set; }
+
+        /* ****************/
+        public DbSet<Person> Persons { get; set; }
+        public DbSet<PersonContact> PersonContacts { get; set; }
+        public DbSet<PersonAddress> PersonAddress { get; set; }
+        public DbSet<ProductSample> ProductSamples { get; set; }
+
+        public DbSet<ProductSampleShipment> ProductSampleShipment { get; set; }
+        public DbSet<ProductSampleApproval> ProductSampleApproval { get; set; }
+        public DbSet<ProductSamplePhotoApproval> ProductSamplePhotoApproval { get; set; }
+        public DbSet<SampleToProductMapping> SampleToProductMapping { get; set; }
+        public DbSet<ProductSamplePhoto> ProductSamplePhoto { get; set; }
+
+        public DbSet<ProductTypeAttribute> ProductTypeAttribute { get; set; }
+        public DbSet<ProductAttributes> ProductAttributes { get; set; }
+        //temprory user password store 
+        //ToDo: need to remove after Identity 2.0 implimentation 
+        public DbSet<TempUserStore> TempUserStore { get; set; }
+
+        public DbSet<ProductSampleAttributes> ProductSampleAttributes { get; set; }
+        
+
+        /* ****************/
+        public DbSet<ActivityLog> ActivityLog { get; set; }
+        public DbSet<Product> Products { get; set; }
+        public DbSet<ProductType> ProductTypes { get; set; }
+        public DbSet<ProductGroup> ProductGroups { get; set; }
+        public DbSet<ProductCollection> ProductCollections { get; set; }
+        public DbSet<ProductConstruction> ProductConstructions { get; set; }
+        public DbSet<ProductManufacturingStyle> ProductManufacturingStyles { get; set; }
+        public DbSet<ProductDimension> ProductDimensions { get; set; }
+        public DbSet<ProductSupplier> ProductSupplier { get; set; }
+        public DbSet<ProductPhoto> ProductPhotos { get; set; }
+        public DbSet<Unit> Units { get; set; }
+        public DbSet<UnitConversion> UnitConversion { get; set; }
+        public DbSet<Division> Divisions { get; set; }
+        public DbSet<Currency> Currency { get; set; }
+        public DbSet<ShipMethod> ShipMethod { get; set; }
+        public DbSet<DocumentCategory> DocumentCategory { get; set; }
+        public DbSet<DocumentType> DocumentType { get; set; }
+        public DbSet<DeliveryTerms> DeliveryTerms { get; set; }
+        public DbSet<PurchaseOrderHeader> PurchaseOrderHeader { get; set; }
+        public DbSet<PurchaseOrderHeaderDetail> PurchaseOrderHeaderDetail { get; set; }
+        public DbSet<PurchaseOrderLine> PurchaseOrderLine { get; set; }
+        public DbSet<PurchaseOrderLineDetail> PurchaseOrderLineDetail { get; set; }
+        public DbSet<PurchaseOrderCancelHeader> PurchaseOrderCancelHeader { get; set; }
+        public DbSet<PurchaseOrderCancelLine> PurchaseOrderCancelLine { get; set; }
+        public DbSet<PurchaseGoodsReceiptHeader> PurchaseGoodsReceiptHeader { get; set; }
+        public DbSet<PurchaseGoodsReceiptHeaderDetail> PurchaseGoodsReceiptHeaderDetail { get; set; }
+        public DbSet<PurchaseGoodsReceiptLine> PurchaseGoodsReceiptLine { get; set; }
+        public DbSet<PurchaseGoodsReceiptLineDetail> PurchaseGoodsReceiptLineDetail { get; set; }
+        public DbSet<PurchaseInvoiceHeader> PurchaseInvoiceHeader { get; set; }
+        public DbSet<PurchaseInvoiceLine> PurchaseInvoiceLine { get; set; }
+        public DbSet<Location> Locations { get; set; }
+        public DbSet<Company> Company { get; set; }  
+
+
+        protected override void OnModelCreating(DbModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+           
+            // Change the name of the table to be Users instead of AspNetUsers
+            modelBuilder.Entity<IdentityUser>().ToTable("Users");
+            modelBuilder.Entity<ApplicationUser>().ToTable("Users");
+
+            modelBuilder.Entity<PurchaseOrderHeaderDetail>().ToTable("PurchaseOrderHeaderDetail");
+            modelBuilder.Entity<PurchaseOrderLineDetail>().ToTable("PurchaseOrderLineDetail");
+
+            modelBuilder.Entity<PurchaseGoodsReceiptHeaderDetail>().ToTable("PurchaseGoodsReceiptHeaderDetail");
+            modelBuilder.Entity<PurchaseGoodsReceiptLineDetail>().ToTable("PurchaseGoodsReceiptLineDetail");
+            modelBuilder.Entity<ProductDimension>().ToTable("ProductDimension");
+            //modelBuilder.Entity<ProductDimension>().Map(m => {
+            //        m.ToTable("ProductDimension");
+            //});            
+
+            modelBuilder.Conventions.Remove<OneToManyCascadeDeleteConvention>();
+        }
+
+
+        
+                
+    }
+}

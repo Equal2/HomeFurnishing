@@ -1,0 +1,680 @@
+﻿@model Model.ViewModel.FinishedProductViewModel
+
+@{
+    ViewBag.Title = "Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<script src="~/Scripts/Jasny/jasny-bootstrap.min.js"></script>
+<link href="~/Content/jasny/jasny-bootstrap.min.css" rel="stylesheet" />
+
+
+<!-- modal placeholder-->
+<div id='myModal' class='modal fade in'>
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div id='myModalContent'></div>
+        </div>
+    </div>
+</div>
+
+@using (Html.BeginForm("Post", "FinishedProduct", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(model => model.ProductId)
+    @Html.HiddenFor(m => m.DivisionId)
+    @Html.HiddenFor(m => m.ProductTypeId)
+    @Html.HiddenFor(m => m.ProductTypeName)
+    @Html.HiddenFor(m => m.IsSample)
+    <div class="panel panel-default">
+
+        <div class="panel-heading">
+
+            <h3>
+                <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-file black"></span> @((ViewBag.Sample == false) ? ("Finished Product" + (@ViewBag.Name)) : ("Finished Product Sample" + (@ViewBag.Name)))</span>
+                <input type="submit" value="Save" class="btn btn-primary right" id="submit" style="width: 90px; background-color: #2980b9" />
+            </h3>
+            <hr style="margin-top:0px;margin-bottom:0px" />
+
+            <div class="panel-info">
+                <h4 style="padding:5px 0 0 0;margin:0px">
+                    @Html.ActionLink(" ", " ", " ", null, new { @class = "glyphicon glyphicon-refresh toolbar", @title = "Refresh Page", @data_toggle = "tooltip", @id = "RefreshPage" })
+                    @Html.ActionLink(" ", "Create", "FinishedProduct", new { id = Model.ProductTypeId, sample = ViewBag.Sample }, new { @class = "glyphicon glyphicon-plus toolbar", @title = "Add New", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "History", "FinishedProduct", null, new { @class = "glyphicon glyphicon-user toolbar", @title = "History", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "Email", "FinishedProduct", null, new { @class = "glyphicon glyphicon-envelope toolbar", @title = "Email", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "PrevPage", "FinishedProduct", new { id = @Model.ProductId, tid = Model.ProductTypeId }, new { @class = "glyphicon glyphicon-arrow-left toolbar", @title = "Prev Record", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "NextPage", "FinishedProduct", new { id = @Model.ProductId, tid = Model.ProductTypeId }, new { @class = "glyphicon glyphicon-arrow-right toolbar", @title = "Next Record", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "Index", "FinishedProduct", new { id = Model.ProductTypeId, sample = ViewBag.Sample }, new { @class = "glyphicon glyphicon-list toolbar right", @title = "List", @data_toggle = "tooltip" })
+                </h4>
+            </div>
+
+        </div>
+        <div class="panel-info" style="padding-left:15px">
+
+            <div class="form-horizontal">
+
+                @Html.ValidationSummary(true)
+
+                <div class="row">
+                    <h4 class="col-md-12 black" style="margin-top:15px">
+                        <span class="glyphicon glyphicon-align-justify"></span>
+                        1.Product Detail
+                    </h4>
+                    <div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="form-group" style="margin-top:15px">
+                                            @Html.LabelFor(model => model.ProductName, "Product Name", new { @class = "control-label col-xs-4" })
+                                            <div class="col-xs-6">
+                                                @Html.TextBoxFor(model => model.ProductName, null, new { @class = "form-control col-xs-6 required" })
+                                                @Html.ValidationMessageFor(model => model.ProductName, null, new { @class = "text-danger" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            @Html.LabelFor(model => model.ProductCode, "Product/UPC Code", new { @class = "control-label col-xs-4 " })
+                                            <div class="col-xs-6">
+                                                @Html.TextBoxFor(m => m.ProductCode, null, new { @class = "form-control col-xs-6 required" })
+                                                @Html.ValidationMessageFor(model => model.ProductCode, null, new { @class = "text-danger" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            @Html.LabelFor(model => model.IsActive, "Is Active", new { @class = "control-label col-xs-4" })
+                                            <div class="col-xs-6" style=" padding-top:4px">
+                                                @Html.CheckBoxFor(m => m.IsActive, new { @class = "checkbox col-xs-1" })
+                                                @Html.ValidationMessageFor(model => model.IsActive)
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            @Html.LabelFor(model => model.ProductGroupId, "Group", new { @class = "control-label col-xs-4 " })
+                                            <div class="col-xs-6">
+                                                @Html.TextBoxFor(m => m.ProductGroupId, null, new { @class = "form-control col-xs-6 required" })
+                                                @Html.ValidationMessageFor(model => model.ProductGroupId, null, new { @class = "text-danger" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            @Html.LabelFor(model => model.ProductCategoryId, "Category", new { @class = "control-label col-xs-4 " })
+                                            <div class="col-xs-6">
+                                                @Html.TextBoxFor(m => m.ProductCategoryId, null, new { @class = "form-control col-xs-6 required required" })
+                                                @Html.ValidationMessageFor(model => model.ProductCategoryId, null, new { @class = "text-danger" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+
+                                <div class="row">
+                                    <div class="col-md-offset-4 col-md-8">
+                                        <div class="fileinput fileinput-new" data-provides="fileinput">
+                                            <div class="fileinput-new thumbnail" style="width: 200px; height: 150px;">
+                                                <img src="~/Uploads/@(Model.ImageFolderName)/Medium/@(Model.ImageFileName)" alt="...">
+                                            </div>
+                                            <div class="fileinput-preview fileinput-exists thumbnail" style="max-width: 200px; max-height: 150px;"></div>
+                                            <div>
+                                                <span class="btn btn-default btn-file" style="background-color: transparent; color: black; font-family:Arial; border-radius:5px">
+                                                    <span id="Select" class="fileinput-new">Select</span>
+                                                    <span id="Change" class="fileinput-exists">Change</span>
+                                                    <input type="file" name="upload">
+                                                </span>
+                                                <a href="#" class="btn btn-default fileinput-exists" style="background-color: transparent; color: black; font-family: Arial; border-radius: 5px" data-dismiss="fileinput">Remove</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="row">
+                    <h4 class="col-md-12 black" style="margin-top:15px">
+                        <span class="glyphicon glyphicon-align-justify"></span>
+                        2.Specification
+                    </h4>
+                    <div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.ProductCollectionId, "Collection", new { @class = "control-label col-xs-4 " })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(model => model.ProductCollectionId, null, new { @class = "form-control col-xs-6 required" })
+                                        @Html.ValidationMessageFor(model => model.ProductCollectionId, null, new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.ProductQualityId, "Quality", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.ProductQualityId, null, new { @class = "form-control col-xs-6" })
+                                        @Html.ValidationMessageFor(model => model.ProductQualityId, null, new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.ProductDesignId, "Colour Ways", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.ProductDesignId, null, new { @class = "form-control col-xs-6" })
+                                        @Html.ValidationMessageFor(model => model.ProductDesignId, null, new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.ProductStyleId, "Style", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.ProductStyleId, null, new { @class = "form-control col-xs-6" })
+                                        @Html.ValidationMessageFor(model => model.ProductStyleId, null, new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.ColourId, "Colour", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.ColourId, null, new { @class = "form-control col-xs-6" })
+                                        @Html.ValidationMessageFor(model => model.ColourId, null, new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.ProductManufacturerId, "Designer", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.ProductManufacturerId, null, new { @class = "form-control col-xs-6" })
+                                        @Html.ValidationMessageFor(model => model.ProductManufacturerId, null, new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.SizeId, "Size", new { @class = "control-label col-xs-4 " })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.SizeId, null, new { @class = "form-control col-xs-6 " })
+                                        @Html.ValidationMessageFor(model => model.SizeId, null, new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.ProductSpecification, "Specification", new { @class = "control-label col-xs-4 " })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.ProductSpecification, null, new { @class = "form-control col-xs-6 " })
+                                        @Html.ValidationMessageFor(model => model.ProductSpecification, null, new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+
+                <div class="row">
+                    <h4 class="col-md-12 black" style="margin-top:15px">
+                        <span class="glyphicon glyphicon-align-justify"></span>
+                        3.Production Detail
+                    </h4>
+                    <div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.ProcessSequenceHeaderId, "Process Seq.", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.ProcessSequenceHeaderId, null, new { @class = "form-control col-xs-6 required" })
+                                        @Html.ValidationMessageFor(model => model.ProcessSequenceHeaderId, null, new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.ProductDesignPatternId, "Design Pattern", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.ProductDesignPatternId, null, new { @class = "form-control col-xs-6 required" })
+                                        @Html.ValidationMessageFor(model => model.ProductDesignPatternId, null, new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.ContentId, "Content", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.ContentId, null, new { @class = "form-control col-xs-6 required" })
+                                        @Html.ValidationMessageFor(model => model.ContentId, null, new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.FaceContentId, "Face Content", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.FaceContentId, null, new { @class = "form-control col-xs-6 required" })
+                                        @Html.ValidationMessageFor(model => model.FaceContentId, null, new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+
+                <div class="row">
+                    <h4 class="col-md-12 black" style="margin-top:15px">
+                        <span class="glyphicon glyphicon-align-justify"></span>
+                        4.Shipping Detail
+                    </h4>
+                    <div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.OriginCountryId, "Origin", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.OriginCountryId, null, new { @class = "form-control col-xs-6" })
+                                        @Html.ValidationMessageFor(model => model.OriginCountryId, null, new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.ProductInvoiceGroupId, "InvoiceGroup", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.ProductInvoiceGroupId, null, new { @class = "form-control col-xs-6" })
+                                        @Html.ValidationMessageFor(model => model.ProductInvoiceGroupId, null, new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.DrawBackTariffHeadId, "Drawback Tariff", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.DrawBackTariffHeadId, null, new { @class = "form-control col-xs-6" })
+                                        @Html.ValidationMessageFor(model => model.DrawBackTariffHeadId, null, new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.StandardCost, "Standard Cost", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.StandardCost, null, new { @class = "form-control col-xs-6" })
+                                        @Html.ValidationMessageFor(model => model.StandardCost, null, new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.StandardWeight, "Finished Weight(Pcs)", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.StandardWeight, null, new { @class = "form-control col-xs-6" })
+                                        @Html.ValidationMessageFor(model => model.StandardWeight, null, new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.CBM, "CBM", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.CBM, null, new { @class = "form-control col-xs-6" })
+                                        @Html.ValidationMessageFor(model => model.CBM, null, new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+
+                <div class="row">
+                    <h4 class="col-md-12 black" style="margin-top:15px">
+                        <span class="glyphicon glyphicon-align-justify"></span>
+                        5.Other Detail
+                    </h4>
+                    <div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.SampleId, "Sample", new { @class = "control-label col-xs-4 " })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.SampleId, null, new { @class = "form-control col-xs-6 " })
+                                        @Html.ValidationMessageFor(model => model.SampleId, null, new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.CounterNo, "Counter No", new { @class = "control-label col-xs-4 " })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(model => model.CounterNo, null, new { @class = "form-control col-xs-6" })
+                                        @Html.ValidationMessageFor(model => model.CounterNo, null, new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.Tags, "Tags", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.Tags, null, new { @class = "form-control col-xs-6" })
+                                        @Html.ValidationMessageFor(model => model.Tags, null, new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+
+                <hr />
+                <div class="row">
+                    <h4 class="col-md-12 black" style="margin-top:15px">
+                        <span class="glyphicon glyphicon-shopping-cart"></span>
+                        6.Product Consumed
+                    </h4>
+                </div>
+
+                <div class="panel-info">
+                    <h5 style="padding:5px 0 3px 0;margin:0px;font-weight:bold">
+                        <span class="glyphicon glyphicon-plus-sign"></span>
+                        @Html.ActionLink("Add New Row ", "_Create", "FinishedProductConsumptionLine", new { id = @Model.ProductId }, new { data_modal = "", id = "btnCreate", @class = "toolbar", @title = "Add New", @data_toggle = "tooltip" })
+                    </h5>
+                </div>
+
+                <div style="padding-right:15px">
+                    <table class="table table-hover ctable">
+                        <thead id="OtherContentHeader">
+                        </thead>
+
+                        <tbody id="OtherContentLine"></tbody>
+                    </table>
+                </div>
+
+                <hr />
+                <div class="row">
+                    <h4 class="col-md-12 black" style="margin-top:15px">
+                        <span class="glyphicon glyphicon-shopping-cart"></span>
+                        7.Product Buyer
+                    </h4>
+                </div>
+
+                <div class="panel-info">
+                    <h5 style="padding:5px 0 3px 0;margin:0px;font-weight:bold">
+                        <span class="glyphicon glyphicon-plus-sign"></span>
+                        @Html.ActionLink("Add New Row ", "_Create", "FinishedProduct", new { ProductId = @Model.ProductId }, new { data_modal = "", id = "btnCreateF", @class = "toolbar", @title = "Add New", @data_toggle = "tooltip" })
+                    </h5>
+                </div>
+
+                <div style="padding-right:15px">
+                    <table class="table table-hover ctable">
+                        <thead id="ProductBuyerHeader">
+                        </thead>
+
+                        <tbody id="ProductBuyerLine"></tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+    </div>
+}
+
+<script type="text/javascript">
+    $(function()
+    {
+        var TitleCase= '@Session["TitleCase"]';
+        //alert(TitleCase);
+        $('#ProductName').focusout(function () {
+            if (TitleCase=="UpperCase")
+            this.value = this.value.toUpperCase() ;
+    });
+    });
+</script>
+
+<script type="text/javascript">
+    var tid=@Model.ProductTypeId;
+    $(document).ready(function(){
+        CustomSelectFunction($("#SizeId"), '/ComboHelpList/GetSize', '/ComboHelpList/SetSingleSize', ' ', false, 1);
+        CustomSelectFunction($("#ProductGroupId"), '/ComboHelpList/GetProductGroup', '/ComboHelpList/SetSingleProductGroup', ' ', false, 1);
+        CustomSelectFunction($("#ProductCategoryId"), '/ComboHelpList/GetProductConstruction', '/ComboHelpList/SetSingleProductConstruction', ' ', false, 1);
+        CustomSelectFunction($("#SampleId"), '/ComboHelpList/GetProducts', '/ComboHelpList/SetSingleProducts', ' ', false, 1);
+        CustomSelectFunction($("#ProductCollectionId"), '/ComboHelpList/GetProductCollection', '/ComboHelpList/SetSingleProductCollection', ' ', false, 1);
+        CustomSelectFunction($("#ProductQualityId"), '/ComboHelpList/GetProductQuality', '/ComboHelpList/SetSingleProductQuality', ' ', false, 1);
+        CustomSelectFunction($("#ProductDesignId"), '/ComboHelpList/GetColourWays', '/ComboHelpList/SetSingleColourWays', ' ', false, 1);
+        CustomSelectFunction($("#ProductInvoiceGroupId"), '/ComboHelpList/GetProductInvoiceGroup', '/ComboHelpList/SetSingleProductInvoiceGroup', ' ', false, 1);
+        CustomSelectFunction($("#ProductDesignPatternId"), '/ComboHelpList/GetProductDesignPatterns', '/ComboHelpList/SetSingleProductDesignPattern', ' ', false, 1);
+        CustomSelectFunction($("#DrawBackTariffHeadId"), '/ComboHelpList/GetProductDrawBackTarrif', '/ComboHelpList/SetSingleProductDrawBackTarrif', ' ', false, 1);
+        CustomSelectFunction($("#ProductStyleId"), '/ComboHelpList/GetProductStyle', '/ComboHelpList/SetSingleProductStyle', ' ', false, 1);
+
+        CustomSelectFunction($("#ProductManufacturerId"), '/ComboHelpList/GetProductManufacturer', '/ComboHelpList/SetSingleProductManufacturer', ' ', false, 1);
+        CustomSelectFunction($("#ColourId"), '/ComboHelpList/GetColours', '/ComboHelpList/SetSingleColour', ' ', false, 1);
+        CustomSelectFunction($("#ProcessSequenceHeaderId"), '/ComboHelpList/GetProductProcessSequence', '/ComboHelpList/SetSingleProductProcessSequence', ' ', false, 1);
+        CustomSelectFunction($("#ContentId"), '/ComboHelpList/GetProductContentHeader', '/ComboHelpList/SetSingleProductContentHeaders', ' ', false, 1);
+        CustomSelectFunction($("#FaceContentId"), '/ComboHelpList/GetProductContentHeader', '/ComboHelpList/SetSingleProductContentHeaders', ' ', false, 1);
+        CustomSelectFunction($("#OriginCountryId"), '/ComboHelpList/GetCountry', '/ComboHelpList/SetSingleCountry', ' ', false, 1);
+        $("#Tags").select2({tags: true,tokenSeparators: [',', ' ']});
+
+    });
+
+
+    $(":submit").on("click", function () {
+        var mpoid=@Model.ProductId;
+        var tes;
+        if(mpoid<=0)
+        {
+            tes= $('#FinishedProductName').DuplicateCheckForCreate({ name: 'FinishedProduct', value: $('#ProductName').val(), doctype: 0 });
+        }
+        else
+        {
+            tes = $('#FinishedProductName').DuplicateCheckForEdit({ name: 'FinishedProduct', value: $('#ProductName').val(), doctype: 0,headerId:mpoid });
+        }
+        if (tes) {
+            return false;
+        }
+        else
+        {
+            return;
+        }
+    });
+
+</script>
+
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        //Calling the function to load the table data/ Line information
+        LoadOtherContent();
+        LoadProductBuyer();
+    });
+
+    var id=@Model.ProductId;
+    if(id==null||id==0)
+    {
+        $(document).find('a#btnCreate').removeAttr('href').removeAttr('data-modal');
+        $(document).find('a#btnCreateF').removeAttr('href').removeAttr('data-modal');
+    }
+
+    //Reloading the table contents on modal hide
+    $('#myModal').on('hidden.bs.modal', function () {
+        LoadOtherContent();
+        LoadProductBuyer();
+    });
+
+    $('#myModal').on('shown.bs.modal', function () {
+        $("#ProductId").select2("focus");
+    });
+
+    //Loading the Table data or Line Information
+    function LoadOtherContent() {
+        var groupId=@Model.ProductId;
+
+        var link="/FinishedProductConsumptionLine/Index/"+groupId;
+
+        $.ajax({
+            url: link,
+            type: "GET",
+            success: function (data) {
+                var row = ""
+                var srno=1;
+                var head="<tr style='background-color:#428bca'>  <th style='width:10px'><input type='hidden'  /></th> <th style='width:10px'>Serial</th><th class='center' style='width:50px'>Product</th>   <th class='center' style='width:50px'>Product Group</th>       <th class='center' style='width:50px'>Qty</th>        <th class='center' style='width:50px'>Unit</th> <th style='width:10px'></th>       <th style='width:10px'></th>  </tr>"
+                if(data.length!=0)
+                {
+                    $.each(data, function (index, item) {
+                        row += "<tr><td><input type='hidden' class='id' value='" + item.BomDetailId + "'/></td> <td>"+ srno +"</td> <td>" + item.ProductName + "</td>        <td>" + item.ProductGroupName + "</td>                  <td>" + item.Qty + "</td>                  <td>" + item.UnitName + "</td>                  <td><a class='rowEditBlue hidden' Modify href='/FinishedProductConsumptionLine/_Edit/"+item.BomDetailId+"' ></a></td>       <td><a class='glyphicon glyphicon-trash' data-modal='' delete='' href='/FinishedProductConsumptionLine/_Edit/"+item.BomDetailId+"' ></a></td>  </tr>";
+                        srno++;
+                    });
+                }
+                else
+                {
+                    row+="<tr><td>No Items Found.</td></tr>";
+                }
+                $("#OtherContentHeader").html(head);
+                $("#OtherContentLine").html(row);
+            },
+            error: function (BankAccoutDetail) {
+                alert("Error");
+            }
+        });
+    }
+
+    //Loading the table data or ProductBuyer Information
+    function LoadProductBuyer() {
+        var groupId=@Model.ProductId;
+
+        var link="/FinishedProduct/ProductBuyerIndex/"+groupId;
+
+        $.ajax({
+            url: link,
+            type: "GET",
+            success: function (data) {
+                var row = ""
+                var srno=1;
+                var head="<tr style='background-color:#428bca'>  <th><input type='hidden'  /></th> <th>Serial</th><th class='center' >Product Buyer</th>   <th class='center'>Buyer SKU</th>       <th class='center'>UPC Code</th>   <th></th>     <th></th>  </tr>"
+                if(data.length!=0)
+                {
+                    $.each(data, function (index, item) {
+                        row += "<tr><td><input type='hidden' class='id' value='" + item.ProductBuyerId + "'/></td> <td>"+ srno +"</td> <td>" + item.BuyerName + "</td>        <td>" + item.BuyerSku + "</td>                  <td>" + item.BuyerUpcCode + "</td>          <td><a class='hidden' Modify href='/FinishedProduct/_Edit/"+item.ProductBuyerId+"' ></a></td>       <td><a class='glyphicon glyphicon-trash' data-modal='' delete='' href='/FinishedProduct/_Edit/"+item.ProductBuyerId+"' ></a></td>  </tr>";
+                        srno++;
+                    });
+                }
+                else
+                {
+                    row+="<tr><td>No Items Found.</td></tr>";
+                }
+                $("#ProductBuyerHeader").html(head);
+                $("#ProductBuyerLine").html(row);
+            },
+            error: function (BankAccoutDetail) {
+                alert("Error");
+            }
+        });
+    }
+
+    //For Populating Modal PopUp on DoubleClick Of Row
+    $('#OtherContentLine,#ProductBuyerLine').on("dblclick",'tr',function(){
+        var text = $(this).find(".id").val();
+        var editurl=$(this).find('a[Modify]').attr('href');
+
+
+        $('#myModalContent').load(editurl, function () {
+            //alert('2');
+            $('#myModal').modal({
+                backdrop: 'static',
+                keyboard: true
+            }, 'show');
+
+            bindForm1(this);
+        });
+    });
+
+
+    //For Handling Modal PopUp on Clicking Delete Icon
+    $('#OtherContentLine,#ProductBuyerLine').on("click",'a[delete]', function (e) {
+        $('#myModalContent').load(this.href, function () {
+            //alert('2');
+            $('#myModal').modal({
+                backdrop: 'static',
+                keyboard: true
+            }, 'show');
+
+            bindForm1(this);
+        });
+        return false;
+    });
+
+
+
+    //For posting the data through ajax and render the contents sent back from the server
+    function bindForm1(dialog) {
+        //alert("binding");
+        $('form', dialog).submit(function () {
+            //alert(this.action);
+            $.ajax({
+                url: this.action,
+                type: this.method,
+                data: $(this).serialize(),
+                success: function (result) {
+                    if (result.success) {
+                        $('#myModal').modal('hide');
+                        //Refresh
+                        //location.reload();
+                        //alert('Data Saved');
+                    }else if(!result.success)
+                    {
+                        $('#myModalContent').html(result);
+                        bindForm1();
+                    }
+                    else {
+                        $('#myModalContent').html(result);
+                        bindForm1();
+                    }
+                }
+            });
+            return false;
+        });
+    }
+
+    $(document).ready(function () {
+        enableModalTransitions();
+    })
+</script>
+

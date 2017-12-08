@@ -1,0 +1,36 @@
+﻿@using Presentation.Helper
+@model Model.Models.ProductTypeAttribute
+@using (@Html.BeginCollectionItem("ProductTypeAttributes"))
+{
+    <div class="container">
+        <div class="row">
+
+            <div class="col-md-2">
+                
+                    @Html.LabelFor(t => t.Name) @Html.TextBoxFor(t => t.Name)
+               
+            </div>
+            <div class="col-md-2">
+
+                @Html.LabelFor(t => t.Price) @Html.TextBoxFor(t => t.Price)
+
+            </div>
+            <div class="col-md-2">
+
+                @Html.LabelFor(t => t.IsMandatory) @Html.EditorFor(t => t.IsMandatory)
+
+            </div>
+            <div class="col-md-3">
+
+                @Html.LabelFor(t => t.DataType) @Html.TextBoxFor(t => t.DataType)
+
+            </div>
+            <div class="col-md-3">
+
+                @Html.LabelFor(t => t.ListItem) @Html.TextBoxFor(t => t.ListItem)
+
+            </div>
+        </div>
+      
+    </div>
+}

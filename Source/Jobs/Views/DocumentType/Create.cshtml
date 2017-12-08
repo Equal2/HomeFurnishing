@@ -1,0 +1,252 @@
+﻿@model Model.Models.DocumentType
+
+@{
+    ViewBag.Title = "Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<link href="~/Content/jasny/jasny-bootstrap.min.css" rel="stylesheet" />
+<script src="~/Scripts/Jasny/jasny-bootstrap.min.js"></script>
+
+@using (Html.BeginForm("Post", "DocumentType", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+     @Html.HiddenFor(model => model.DocumentTypeId)
+    <div class="panel panel-default">
+
+        <div class="panel-heading">
+
+            <h3>
+                <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-file black"></span> Document Type</span>
+                @if(@Model.IsSystemDefine)
+                {
+                <input type="submit" value="Save" class="btn btn-primary right" id="submit" style="width: 90px; background-color: #2980b9;margin-left:20px" disabled="disabled"/>
+                <span style="font-family: Calibri,sans-serif,Verdana; font-weight:bold ;font-size: large" class="text-danger right "><span class="glyphicon glyphicon-floppy-remove"></span> System Defined</span>
+                }
+                else
+                {
+                <input type="submit" value="Save" class="btn btn-primary right" id="submit" style="width: 90px; background-color: #2980b9" />
+                }
+            </h3>
+            <hr style="margin-top:0px;margin-bottom:0px" />
+
+            <div class="panel-info">
+                <h4 style="padding:5px 0 0 0;margin:0px">
+                    @Html.ActionLink(" ", " ", " ", null, new { @class = "glyphicon glyphicon-refresh toolbar", @title = "Refresh Page", @data_toggle = "tooltip", @id = "RefreshPage" })
+                    @Html.ActionLink(" ", "Create", "DocumentType", null, new { @class = "glyphicon glyphicon-plus toolbar", @title = "Add New", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "History", "DocumentType", null, new { @class = "glyphicon glyphicon-user toolbar", @title = "History", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "PrevPage", "DocumentType", new { id = @Model.DocumentTypeId }, new { @class = "glyphicon glyphicon-arrow-left toolbar", @title = "Prev Record", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "NextPage", "DocumentType", new { id = @Model.DocumentTypeId }, new { @class = "glyphicon glyphicon-arrow-right toolbar", @title = "Next Record", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "Index", "DocumentType", null, new { @class = "glyphicon glyphicon-list toolbar right", @title = "List", @data_toggle = "tooltip" })
+                </h4>
+            </div>
+
+        </div>
+        <div class="panel-info" style="padding-left:15px">
+
+            <div class="form-horizontal">
+                
+                @Html.ValidationSummary(true)
+
+                <div class="row">
+                    <h4 class="col-md-12 black" style="margin-top:15px">
+                        <span class="glyphicon glyphicon-align-justify"></span>
+                        1.Basic Detail
+                    </h4>
+                    
+                    <div class="col-md-6">
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.DocumentTypeName, "Name", new { @class = "control-label col-xs-5" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.DocumentTypeName, null, new { @class = "form-control col-xs-6 required" })
+                                        @Html.ValidationMessageFor(m => m.DocumentTypeName, null, new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.DocumentTypeShortName, "Short Name", new { @class = "control-label col-xs-5" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.DocumentTypeShortName, null, new { @class = "form-control col-xs-6 required" })
+                                        @Html.ValidationMessageFor(m => m.DocumentTypeShortName, null, new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.DocumentCategoryId, "Document Category", new { @class = "control-label col-xs-5" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.DocumentCategoryId, new { @class = "form-control col-xs-6 required height" })
+                                        @Html.ValidationMessageFor(m => m.DocumentCategoryId, null, new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.VoucherType, "Voucher", new { @class = "control-label col-xs-5" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.VoucherType, new { @class = "form-control col-xs-6 required" })
+                                        @Html.ValidationMessageFor(m => m.VoucherType, null, new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                    </div>
+
+                    <div class="col-md-6">
+
+
+                        <div class="row">
+                            <div class="col-md-offset-5 col-md-7">
+                                <div class="fileinput fileinput-new" data-provides="fileinput">
+                                    <div class="fileinput-new thumbnail" style="width: 200px; height: 150px;">
+                                        <img src="~/Uploads/@(Model.ImageFolderName)/Medium/@(Model.ImageFileName)" alt="...">
+                                    </div>
+                                    <div class="fileinput-preview fileinput-exists thumbnail" style="max-width: 200px; max-height: 150px;"></div>
+                                    <div>
+                                        <span class="btn btn-default btn-file" style="background-color: transparent; color: black; font-family:Arial; border-radius:5px">
+                                            <span id="Select" class="fileinput-new">Select</span>
+                                            <span id="Change" class="fileinput-exists">Change</span>
+                                            <input type="file" name="upload">
+                                        </span>
+                                        <a href="#" class="btn btn-default fileinput-exists" style="background-color: transparent; color: black; font-family: Arial; border-radius: 5px" data-dismiss="fileinput">Remove</a>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                    </div>
+                </div>                
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.ControllerActionId, "Contrl/Actn", new { @class = "control-label col-xs-5" })
+                            <div class="col-xs-6">
+                                @Html.TextBoxFor(m => m.ControllerActionId,  new { @class = "form-control col-xs-6 required" })
+                                @Html.ValidationMessageFor(m => m.ControllerActionId, null, new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.DomainName, "Domain", new { @class = "control-label col-xs-5" })
+                            <div class="col-xs-6">
+                                @Html.DropDownListFor(m => m.DomainName, new SelectList(ViewBag.Domains as System.Collections.IEnumerable, "Value", "Text"),string.Empty, new { @class = "form-control col-xs-6 required height" })
+                                @Html.ValidationMessageFor(m => m.DomainName, null, new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Nature, "Nature", new { @class = "control-label col-xs-5" })
+                            <div class="col-xs-6">
+                                @Html.DropDownListFor(m => m.Nature, new SelectList(ViewBag.Nature as System.Collections.IEnumerable, "Value", "Text"),string.Empty, new { @class = "form-control col-xs-6 required height" })
+                                @Html.ValidationMessageFor(m => m.Nature, null, new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.ReportMenuId, "Report Menu", new { @class = "control-label col-xs-5" })
+                            <div class="col-xs-6">
+                                @Html.TextBoxFor(m => m.ReportMenuId, new { @class = "form-control col-xs-6 required" })
+                                @Html.ValidationMessageFor(m => m.ReportMenuId,"", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.IconDisplayName, "Display Name", new { @class = "control-label col-xs-5" })
+                            <div class="col-xs-6">
+                                @Html.TextBoxFor(m => m.IconDisplayName, new { @class = "form-control col-xs-6" })
+                                @Html.ValidationMessageFor(m => m.IconDisplayName, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.ImageFileName, "Image FileName", new { @class = "control-label col-xs-5" })
+                            <div class="col-xs-6">
+                                @Html.TextBoxFor(m => m.ImageFileName, new { @class = "form-control col-xs-6" })
+                                @Html.ValidationMessageFor(m => m.ImageFileName, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>                   
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.IsActive, "Is Active", new { @class = "control-label col-xs-5" })
+                            <div class="col-xs-6" style=" padding-top:4px">
+                                @Html.CheckBoxFor(m => m.IsActive, new { @class = "checkbox col-xs-1" })
+                                @Html.ValidationMessageFor(model => model.IsActive)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                @*<hr />
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-10">
+                        <input type="submit" value="Create" class="btn btn-primary btn-sm CurveBorder height" style=" border-color: #606264" />
+                        <span style="font-family: Calibri,sans-serif,Verdana;font-size:large">
+                            @Html.ActionLink("Back to List", "Index", null, new { @class = "btn btn-primary btn-sm col-md-offset-1 CurveBorder ActionLinkPadding CustomCss height" })
+
+                        </span>
+                    </div>
+                </div>*@
+            </div>
+        </div>
+    </div>
+}
+<script type="text/javascript">
+
+     $(":submit").on("click", function () {
+         var mpoid=@Model.DocumentTypeId;
+         var tes;
+         if(mpoid<=0)
+         {
+             tes= $('#DocumentTypeName').DuplicateCheckForCreate({ name: 'DocumentType', value: $('#DocumentTypeName').val(), doctype: 0 });
+         }
+         else
+         {
+             tes = $('#DocumentTypeName').DuplicateCheckForEdit({ name: 'DocumentType', value: $('#DocumentTypeName').val(), doctype: 0,headerId:mpoid });
+         }
+         if (tes) {
+             return false;
+         }
+         else
+         {
+             return;
+         }
+     });
+
+    CustomSelectFunction($("#ControllerActionId"), '/ComboHelpList/GetControllerActionHelpList', '/ComboHelpList/SetSingleControllerAction', ' ', false, 1);
+    CustomSelectFunction($("#DocumentCategoryId"), '/ComboHelpList/GetDocumentCategory', '/ComboHelpList/SetSingleDocumentCategory', ' ', false, 1);
+    CustomSelectFunction($("#ReportMenuId"), '/ComboHelpList/GetMenus', '/ComboHelpList/SetSingleMenu', ' ', false, 1);
+</script>

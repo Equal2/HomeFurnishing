@@ -1,0 +1,796 @@
+﻿@model Model.ViewModels.MaterialViewModel
+
+@{
+    ViewBag.Title = "Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<script src="~/Scripts/Jasny/jasny-bootstrap.min.js"></script>
+<link href="~/Content/jasny/jasny-bootstrap.min.css" rel="stylesheet" />
+
+
+<!-- modal placeholder-->
+<div id='myModal' class='modal fade in'>
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div id='myModalContent'></div>
+        </div>
+    </div>
+</div>
+
+
+@using (Html.BeginForm("PostMaterial", "Product", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(m => m.DivisionId)
+    @Html.HiddenFor(m => m.ProductId)    
+    @Html.HiddenFor(m => m.ProductTypeId)    
+    @Html.HiddenFor(m=>m.ProductSiteDetailId)
+    @Html.HiddenFor(m=>m.SiteId)
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3>
+                <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-file black"></span> @ViewBag.Name</span>
+                @if (@Model.IsSystemDefine)
+                {
+                    <input type="submit" value="Save" class="btn btn-primary right" id="submit" style="width: 90px; background-color: #2980b9;margin-left:20px" disabled="disabled" />
+                    <span style="font-family: Calibri,sans-serif,Verdana; font-weight:bold ;font-size: large" class="text-danger right "><span class="glyphicon glyphicon-floppy-remove"></span> System Defined</span>
+                }
+                else
+                {
+                    <input type="submit" value="Save" class="btn btn-primary right" id="submit" style="width: 90px; background-color: #2980b9" />
+                }
+            </h3>
+            <hr style="margin-top:0px;margin-bottom:0px" />
+
+            <div class="panel-info">
+                @*<h4 style="padding:5px 0 0 0;margin:0px">
+                    @Html.ActionLink(" ", " ", " ", null, new { @class = "glyphicon glyphicon-refresh toolbar", @title = "Refresh Page", @data_toggle = "tooltip", @id = "RefreshPage" })
+                    @Html.ActionLink(" ", "CreateMaterial", "Product", new { id = ViewBag.id }, new { @class = "glyphicon glyphicon-plus toolbar", @title = "Add New", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "History", "Product", null, new { @class = "glyphicon glyphicon-user toolbar", @title = "History", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "PrevPageMaterial", "Product", new { id = @Model.ProductId,nid=@Model.ProductGroupId}, new { @class = "glyphicon glyphicon-arrow-left toolbar", @title = "Prev Record", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "NextPageMaterial", "Product", new { id = @Model.ProductId, nid = @Model.ProductGroupId }, new { @class = "glyphicon glyphicon-arrow-right toolbar", @title = "Next Record", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "MaterialIndex", "Product", new { id = ViewBag.id }, new { @class = "glyphicon glyphicon-list toolbar right", @title = "List", @data_toggle = "tooltip" })
+                </h4>*@
+                <div class="btn-group">
+                    @Html.ActionLink(" ", "ChooseType", "Product", new { id = @ViewBag.id }, new { @class = "cbtn btn-circle glyphicon glyphicon-plus toolbar", @title = "Add New", @data_toggle = "tooltip", @data_modal = "" })
+                    @Html.ActionLink(" ", "History", "Product", null, new { @class = "cbtn btn-circle glyphicon glyphicon-user toolbar", @title = "History", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "PrevPageMaterial", "Product", new { id = @Model.ProductId, nid = @Model.ProductGroupId }, new { @class = "cbtn btn-circle glyphicon glyphicon-arrow-left toolbar", @title = "Prev Record", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "NextPageMaterial", "Product", new { id = @Model.ProductId, nid = @Model.ProductGroupId }, new { @class = "cbtn btn-circle glyphicon glyphicon-arrow-right toolbar", @title = "Next Record", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "MaterialIndex", "Product", new { id = ViewBag.id }, new { @class = "cbtn btn-circle glyphicon glyphicon-list", @title = "List", @data_toggle = "tooltip" })
+                </div>
+            </div>
+        </div>
+        <div class="panel-info" style="padding-left:15px">
+            <div class="form-horizontal">
+                @Html.ValidationSummary(true)
+
+                <div class="row">
+                    <h4 class="col-md-12 black" style="margin-top:15px">
+                        <span class="glyphicon glyphicon-align-justify"></span>
+                        @Model.ProductCategoryName Details
+                    </h4>
+                    <div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="form-group" style="margin-top:15px">
+                                            @Html.LabelFor(model => model.ProductName, (Model.ProductTypeSettings.ProductNameCaption ?? "Product Name"), new { @class = "control-label col-xs-4" })
+                                            @Html.HiddenFor(m => m.ProductTypeSettings.ProductNameCaption)
+                                            <div class="col-xs-6">
+                                                @Html.TextBoxFor(model => model.ProductName, null, new { @class = "form-control col-xs-6 height required" })
+                                                @Html.ValidationMessageFor(model => model.ProductName, null, new { @class = "text-danger" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            @Html.LabelFor(model => model.ProductCode, (Model.ProductTypeSettings.ProductCodeCaption ?? "Product Code"), new { @class = "control-label col-xs-4 " })
+                                            @Html.HiddenFor(m => m.ProductTypeSettings.ProductCodeCaption)
+                                            <div class="col-xs-6">
+                                                @Html.TextBoxFor(m => m.ProductCode, null, new { @class = "form-control col-xs-6 required" })
+                                                @Html.ValidationMessageFor(model => model.ProductCode, null, new { @class = "text-danger" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row" style="display:@(Model.ProductTypeSettings.isVisibleProductDescription?"":"none")">
+                                    @Html.HiddenFor(m => m.ProductTypeSettings.isVisibleProductDescription)
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            @Html.LabelFor(model => model.ProductDescription, (Model.ProductTypeSettings.ProductDescriptionCaption ?? "Product Description"), new { @class = "control-label col-xs-4 " })
+                                            @Html.HiddenFor(m => m.ProductTypeSettings.ProductDescriptionCaption)
+                                            <div class="col-xs-6">
+                                                @Html.TextBoxFor(m => m.ProductDescription, null, new { @class = "form-control col-xs-6 required" })
+                                                @Html.ValidationMessageFor(model => model.ProductDescription, null, new { @class = "text-danger" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row" style="display:@(Model.ProductTypeSettings.isVisibleProductSpecification?"":"none")">
+                                    @Html.HiddenFor(m => m.ProductTypeSettings.isVisibleProductSpecification)
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            @Html.LabelFor(model => model.ProductSpecification, (Model.ProductTypeSettings.ProductSpecificationCaption ?? "Specification"), new { @class = "control-label col-xs-4" })
+                                            @Html.HiddenFor(m => m.ProductTypeSettings.ProductSpecificationCaption)
+                                            <div class="col-xs-6">
+                                                @Html.TextBoxFor(m => m.ProductSpecification, null, new { @class = "form-control col-xs-6 " })
+                                                @Html.ValidationMessageFor(model => model.ProductSpecification, null, new { @class = "text-danger" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="row">
+                                    <div class="col-md-offset-4 col-md-8">
+                                        <div class="fileinput fileinput-new" data-provides="fileinput">
+                                            <div class="fileinput-new thumbnail" style="width: 200px; height: 150px;">
+                                                <img src="~/Uploads/@(Model.ImageFolderName)/Medium/@(Model.ImageFileName)" alt="...">
+                                            </div>
+                                            <div class="fileinput-preview fileinput-exists thumbnail" style="max-width: 200px; max-height: 150px;"></div>
+                                            <div>
+                                                <span class="btn btn-default btn-file" style="background-color: transparent; color: black; font-family:Arial; border-radius:5px">
+                                                    <span id="Select" class="fileinput-new">Select</span>
+                                                    <span id="Change" class="fileinput-exists">Change</span>
+                                                    <input type="file" name="upload">
+                                                </span>
+                                                <a href="#" class="btn btn-default fileinput-exists" style="background-color: transparent; color: black; font-family: Arial; border-radius: 5px" data-dismiss="fileinput">Remove</a>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.ProductGroupId, (Model.ProductTypeSettings.ProductGroupCaption ?? "Group"), new { @class = "control-label col-xs-4 " })
+                                    @Html.HiddenFor(m => m.ProductTypeSettings.ProductGroupCaption)
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.ProductGroupId, null, new { @class = "form-control col-xs-6 " })
+                                        @Html.ValidationMessageFor(model => model.ProductGroupId, null, new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6" style="display:@(Model.ProductTypeSettings.isVisibleProductCategory?"":"none")">
+                                @Html.HiddenFor(m => m.ProductTypeSettings.isVisibleProductCategory)
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.ProductCategoryId, (Model.ProductTypeSettings.ProductCategoryCaption ?? "Category"), new { @class = "control-label col-xs-4 " })
+                                    @Html.HiddenFor(m => m.ProductTypeSettings.ProductCategoryCaption)
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.ProductCategoryId, null, new { @class = "form-control col-xs-6 " })
+                                        @Html.ValidationMessageFor(model => model.ProductCategoryId, null, new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.UnitId, "Stock Unit", new { @class = "control-label col-xs-4 " })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.UnitId, null, new { @class = "form-control col-xs-6 " })
+                                        @Html.ValidationMessageFor(model => model.UnitId, null, new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6" style="display:@(Model.ProductTypeSettings.isVisibleSalesTaxGroup?"":"none")">
+                                @Html.HiddenFor(m => m.ProductTypeSettings.isVisibleSalesTaxGroup)
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.SalesTaxGroupProductId, "Sales Tax Group Product", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.SalesTaxGroupProductId, null, new { @class = "form-control col-xs-6 " })
+                                        @Html.ValidationMessageFor(model => model.SalesTaxGroupProductId, null, new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6" style="display:@(Model.ProductTypeSettings.isVisibleSaleRate?"":"none")">
+                                @Html.HiddenFor(m => m.ProductTypeSettings.isVisibleSaleRate)
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.SaleRate, "Sale Rate", new { @class = "control-label col-xs-4 " })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.SaleRate, null, new { @class = "form-control col-xs-6 " })
+                                        @Html.ValidationMessageFor(model => model.SaleRate, null, new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6" style="display:@(Model.ProductTypeSettings.isVisibleStandardCost?"":"none")">
+                                @Html.HiddenFor(m => m.ProductTypeSettings.isVisibleStandardCost)
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.StandardCost, "Purchase Rate/NDP", new { @class = "control-label col-xs-4 " })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.StandardCost, null, new { @class = "form-control col-xs-6 " })
+                                        @Html.ValidationMessageFor(model => model.StandardCost, null, new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6" style="display:@(Model.ProductTypeSettings.isVisibleTags?"":"none")">
+                                @Html.HiddenFor(m => m.ProductTypeSettings.isVisibleTags)
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.Tags, "Tags", new { @class = "control-label col-xs-4 " })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.Tags, null, new { @class = "form-control col-xs-6" })
+                                        @Html.ValidationMessageFor(model => model.Tags)
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6" style="display:@(Model.ProductTypeSettings.isVisibleMinimumOrderQty?"":"none")">
+                                @Html.HiddenFor(m => m.ProductTypeSettings.isVisibleMinimumOrderQty)
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.MinimumOrderQty, "Min Order Qty", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.MinimumOrderQty, new { @class = "form-control col-xs-6" })
+                                        @Html.ValidationMessageFor(model => model.MinimumOrderQty)
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6" style="display:@(Model.ProductTypeSettings.isVisibleReOrderLevel?"":"none")">
+                                @Html.HiddenFor(m => m.ProductTypeSettings.isVisibleReOrderLevel)
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.ReOrderLevel, "Reorder Level", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.ReOrderLevel, new { @class = "form-control col-xs-6" })
+                                        @Html.ValidationMessageFor(model => model.ReOrderLevel)
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6" style="display:@(Model.ProductTypeSettings.isVisibleGodownId?"":"none")">
+                                @Html.HiddenFor(m => m.ProductTypeSettings.isVisibleGodownId)
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.GodownId, "Godown", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.GodownId, new { @class = "form-control col-xs-6" })
+                                        @Html.ValidationMessageFor(model => model.GodownId)
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6" style="display:@(Model.ProductTypeSettings.isVisibleBinLocationId?"":"none")">
+                                @Html.HiddenFor(m => m.ProductTypeSettings.isVisibleBinLocationId)
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.BinLocationId, "Bin Location", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.BinLocationId, new { @class = "form-control col-xs-6" })
+                                        @Html.ValidationMessageFor(model => model.BinLocationId)
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6" style="display:@(Model.ProductTypeSettings.isVisibleProfitMargin?"":"none")">
+                                @Html.HiddenFor(m => m.ProductTypeSettings.isVisibleProfitMargin)
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.ProfitMargin, "Profit Margin", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.ProfitMargin, new { @class = "form-control col-xs-6" })
+                                        @Html.ValidationMessageFor(model => model.ProfitMargin)
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6" style="display:@(Model.ProductTypeSettings.isVisibleCarryingCost?"":"none")">
+                                @Html.HiddenFor(m => m.ProductTypeSettings.isVisibleCarryingCost)
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.CarryingCost, "Carrying Cost", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.CarryingCost, new { @class = "form-control col-xs-6" })
+                                        @Html.ValidationMessageFor(model => model.CarryingCost)
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6" style="display:@(Model.ProductTypeSettings.isVisibleDefaultDimension1?"":"none")">
+                                @Html.HiddenFor(m => m.ProductTypeSettings.isVisibleDefaultDimension1)
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.DefaultDimension1Id, "Default " + (Model.ProductTypeSettings.Dimension1Caption ?? "Dimension1"), new { @class = "control-label col-xs-4" })
+                                    @Html.HiddenFor(m => m.ProductTypeSettings.Dimension1Caption)
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.DefaultDimension1Id, new { @class = "form-control col-xs-6" })
+                                        @Html.ValidationMessageFor(model => model.DefaultDimension1Id)
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <div class="col-md-6" style="display:@(Model.ProductTypeSettings.isVisibleDefaultDimension2?"":"none")">
+                                @Html.HiddenFor(m => m.ProductTypeSettings.isVisibleDefaultDimension2)
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.DefaultDimension2Id, "Default " + (Model.ProductTypeSettings.Dimension2Caption ?? "Dimension2"), new { @class = "control-label col-xs-4" })
+                                    @Html.HiddenFor(m => m.ProductTypeSettings.Dimension2Caption)
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.DefaultDimension2Id, new { @class = "form-control col-xs-6" })
+                                        @Html.ValidationMessageFor(model => model.DefaultDimension2Id)
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <div class="col-md-6" style="display:@(Model.ProductTypeSettings.isVisibleDefaultDimension3?"":"none")">
+                                @Html.HiddenFor(m => m.ProductTypeSettings.isVisibleDefaultDimension3)
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.DefaultDimension3Id, "Default " + (Model.ProductTypeSettings.Dimension3Caption ?? "Dimension3"), new { @class = "control-label col-xs-4" })
+                                    @Html.HiddenFor(m => m.ProductTypeSettings.Dimension3Caption)
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.DefaultDimension3Id, new { @class = "form-control col-xs-6" })
+                                        @Html.ValidationMessageFor(model => model.DefaultDimension3Id)
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6" style="display:@(Model.ProductTypeSettings.isVisibleDefaultDimension4?"":"none")">
+                                @Html.HiddenFor(m => m.ProductTypeSettings.isVisibleDefaultDimension4)
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.DefaultDimension4Id, "Default " + (Model.ProductTypeSettings.Dimension4Caption ?? "Dimension4"), new { @class = "control-label col-xs-4" })
+                                    @Html.HiddenFor(m => m.ProductTypeSettings.Dimension4Caption)
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.DefaultDimension4Id, new { @class = "form-control col-xs-6" })
+                                        @Html.ValidationMessageFor(model => model.DefaultDimension4Id)
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6" style="display:@(Model.ProductTypeSettings.isVisibleDiscontinueDate?"":"none")">
+                                @Html.HiddenFor(m => m.ProductTypeSettings.isVisibleDiscontinueDate)
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.DiscontinueDate, "Discontinue Date ", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.DiscontinueDate, "{0:dd/MMMM/yyyy}", new { @class = "datepicker form-control col-xs-6 " })
+                                        @Html.ValidationMessageFor(model => model.DiscontinueDate)
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6" style="display:@(Model.ProductTypeSettings.isVisibleDiscontinueDate?"":"none")">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.DiscontinueReason, "Discontinue Reason ", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.DiscontinueReason, new { @class = "form-control col-xs-6" })
+                                        @Html.ValidationMessageFor(model => model.DiscontinueReason)
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6" style="display:@(Model.ProductTypeSettings.isVisibleSalesTaxProductCode?"":"none")">
+                                @Html.HiddenFor(m => m.ProductTypeSettings.isVisibleSalesTaxProductCode)
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.SalesTaxProductCodeId, (Model.ProductTypeSettings.SalesTaxProductCodeCaption ?? "Sales Tax Product Code"), new { @class = "control-label col-xs-4" })
+                                    @Html.HiddenFor(m => m.ProductTypeSettings.SalesTaxProductCodeCaption)
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.SalesTaxProductCodeId, new { @class = "form-control col-xs-6" })
+                                        @Html.ValidationMessageFor(model => model.SalesTaxProductCodeId)
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            @if (Model.ProductTypeAttributes != null)
+                            {
+                                for (int i = 0; i < Model.ProductTypeAttributes.Count; i++)
+                                {
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            @Html.Label(Model.ProductTypeAttributes[i].Name, new { @class = "control-label col-md-4 col-sm-2" })
+                                            @Html.HiddenFor(m => Model.ProductTypeAttributes[i].Name)
+                                            @Html.HiddenFor(m => Model.ProductTypeAttributes[i].ProductAttributeId)
+                                            @Html.HiddenFor(m => Model.ProductTypeAttributes[i].ProductTypeAttributeId)
+                                            @if (Model.ProductTypeAttributes[i].DataType == "List")
+                                            {
+                                                List<SelectListItem> tem = new List<SelectListItem>();
+                                                foreach (string item in (Model.ProductTypeAttributes[i].ListItem).Split(',').ToList())
+                                                {
+                                                    tem.Add(new SelectListItem { Text = item, Value = item, Selected = (Model.ProductTypeAttributes[i].DefaultValue == item ? true : false) });
+                                                }
+
+
+                                                <div class="col-md-6 col-sm-10">
+                                                    @Html.DropDownListFor(m => Model.ProductTypeAttributes[i].DefaultValue, new SelectList(tem as System.Collections.IEnumerable, "Value", "Text", Model.ProductTypeAttributes[i].DefaultValue), new { @class = "form-control col-xs-6 height" })
+                                                    @*<input type="text" name="@(item.Name)s" value=@item.DefaultValue class="form-control col-xs-6" />*@
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <div class="col-md-6 col-sm-10">
+                                                    @Html.TextBoxFor(m => Model.ProductTypeAttributes[i].DefaultValue, new { @class = "form-control col-xs-6" })
+                                                </div>
+                                            }
+
+                                        </div>
+                                    </div>
+                                }
+                            }
+                            
+                            <div class="col-md-6" style="display:@(Model.ProductTypeSettings.isVisibleLotManagement?"":"none")">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.LotManagement, "Is Lot Management", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6" style=" padding-top:4px">
+                                        @Html.CheckBoxFor(m => m.LotManagement, new { @class = "checkbox col-xs-1" })
+                                        @Html.ValidationMessageFor(model => model.LotManagement)
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.IsActive, "Is Active", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6" style=" padding-top:4px">
+                                        @Html.CheckBoxFor(m => m.IsActive, new { @class = "checkbox col-xs-1" })
+                                        @Html.ValidationMessageFor(model => model.IsActive)
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                @if (Model.ProductTypeSettings.isVisibleConsumptionDetail)
+                {
+                    <hr />
+                    <div class="row">
+                        <h4 class="col-md-12 black" style="margin-top:15px">
+                            <span class="glyphicon glyphicon-shopping-cart"></span>
+                            Consumption
+                        </h4>
+                    </div>
+                    <div class="panel-info">
+                        <h5 style="padding:5px 0 3px 0;margin:0px;font-weight:bold">
+                            <span class="glyphicon glyphicon-plus-sign"></span>
+                            @Html.ActionLink("Add New Row ", "_Create", "ProductConsumptionLine", new { id = @Model.ProductId }, new { data_modal = "", id = "btnCreate", @class = "toolbar", @title = "Add New", @data_toggle = "tooltip" })/
+                            @Html.ActionLink("Copy From Existing", "CopyFromExistingConsumption", "Product", new { ProductId = @Model.ProductId }, new { data_modal = "", id = "btnCreate", @class = "toolbar", @title = "Add New", @data_toggle = "tooltip" })
+                        </h5>
+                    </div>
+                    <div style="padding-right:15px">
+                        <table class="table table-hover ctable">
+                            <thead id="OtherContentHeader">
+                            </thead>
+                            <tbody id="OtherContentLine"></tbody>
+                        </table>
+                    </div>
+                }
+                
+
+                @if (Model.ProductTypeSettings.isVisibleProductProcessDetail)
+                {
+                    <hr />
+                    <div class="row">
+                        <h4 class="col-md-12 black" style="margin-top:15px">
+                            <span class="glyphicon glyphicon-shopping-cart"></span>
+                            Product Process
+                        </h4>
+                    </div>
+                    <div class="panel-info">
+                        <h5 style="padding:5px 0 3px 0;margin:0px;font-weight:bold">
+                            <span class="glyphicon glyphicon-plus-sign"></span>
+                            @Html.ActionLink("Add New Row ", "_Create", "ProductProcess", new { id = @Model.ProductId }, new { data_modal = "", id = "btnCreate", @class = "toolbar", @title = "Add New", @data_toggle = "tooltip" })
+                        </h5>
+                    </div>
+                    <div style="padding-right:15px">
+                        <table class="table table-hover ctable">
+                            <thead id="ProductProcessHeader">
+                            </thead>
+                            <tbody id="ProductProcessLine"></tbody>
+                        </table>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+}
+
+<script type="text/javascript">
+    $(function()
+    {
+        var TitleCase= '@Session["TitleCase"]';
+        //alert(TitleCase);
+        $('#ProductName,#ProductCode').focusout(function() {
+            if (TitleCase=="UpperCase")
+            this.value = this.value.toUpperCase() ;
+    });
+    });
+</script>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+
+        @*var name='@Model.ProductCategoryName';
+        var id=@Model.ProductTypeId;*@
+
+        var id=@Model.ProductTypeId;
+
+        $("#Tags").select2({tags: true,tokenSeparators: [',', ' ']});
+        CustomSelectFunction($("#GodownId"), '/ComboHelpList/GetGodown', '/ComboHelpList/SetSingleGodown', ' ', false, 0);
+        CustomSelectFunction($("#UnitId"), '/ComboHelpList/GetUnits', '/ComboHelpList/SetSingleUnit', ' ', false, 0);
+        CustomSelectFunction($("#ProductGroupId"), '/ComboHelpList/GetProductGroup', '/ComboHelpList/SetSingleProductGroup', ' ', false, 0,id);
+        CustomSelectFunction($("#ProductCategoryId"), '/ComboHelpList/GetProductCategory', '/ComboHelpList/SetSingleProductCategory', ' ', false, 0,id);
+        CustomSelectFunction($("#SalesTaxGroupProductId"), '/ComboHelpList/GetSalesTaxGroupProduct', '/ComboHelpList/SetSingleSalesTaxGroupProduct', ' ', false, 0);
+        CustomSelectFunction($("#BinLocationId"), '/ComboHelpList/GetBinLocations', '/ComboHelpList/SetSingleBinLocation', ' ', false, 0,0);
+        CustomSelectFunction($("#SalesTaxProductCodeId"), '/ComboHelpList/GetSalesTaxProductCodes', '/ComboHelpList/SetSingleSalesTaxProductCode', ' ', false, 0);
+
+        CustomSelectFunction($("#DefaultDimension1Id"), '/ComboHelpList/GetDimension1', '/ComboHelpList/SetSingleDimension1', ' ', false, 0);
+        CustomSelectFunction($("#DefaultDimension2Id"), '/ComboHelpList/GetDimension2', '/ComboHelpList/SetSingleDimension2', ' ', false, 0);
+        CustomSelectFunction($("#DefaultDimension3Id"), '/ComboHelpList/GetDimension3', '/ComboHelpList/SetSingleDimension3', ' ', false, 0);
+        CustomSelectFunction($("#DefaultDimension4Id"), '/ComboHelpList/GetDimension4', '/ComboHelpList/SetSingleDimension4', ' ', false, 0);
+
+
+
+
+        $("#GodownId").change(function(){
+            $("#BinLocationId").select2("data", { id: null, text: null });
+            CustomSelectFunction($("#BinLocationId"), '/ComboHelpList/GetBinLocations', '/ComboHelpList/SetSingleBinLocation', ' ', false, 0,$("#GodownId").val());
+        });
+
+
+
+    });
+
+
+    $("#ProductGroupId").change(GetProductGroupDetail);
+
+    function GetProductGroupDetail() {
+        var ProcessProgress = $("#Product detail loading progress");
+        ProcessProgress.show();
+        if ($("#ProductGroupId").val() != 0 && $("#ProductGroupId").val() != null) {
+            $.ajax({
+                cache: false,
+                type: "POST",
+                url: "@(Url.Action("GetProductGroupDetailJson"))",
+                data: { ProductGroupId: $("#ProductGroupId").val() },
+            success: function (data) {
+                if (data != null)
+                {
+                    if (data.DefaultSalesTaxProductCodeId != null)
+                    {
+                        $("#SalesTaxProductCodeId").select2('data', { id: data.DefaultSalesTaxProductCodeId, text: data.DefaultSalesTaxProductCodeName });
+                    }
+                    else{
+                        $("#SalesTaxProductCodeId").select2('data', { id: '', text: '' });
+                    }
+                }
+                else{
+                    $("#SalesTaxProductCodeId").select2('data', { id: '', text: '' });
+                }
+            },
+            error: function (xhr, ajaxOptions, thrownError) {
+                alert('Failed to retrieve product details.' + thrownError);
+            }
+        });
+    }}
+
+     $(":submit").on("click", function () {
+         var mpoid=@Model.ProductId;
+         var tes;
+         if(mpoid<=0)
+         {
+             tes= $('#ProductName').DuplicateCheckForCreate({ name: 'Product', value: $('#ProductName').val(), doctype: 0 });
+         }
+         else
+         {
+             tes = $('#ProductName').DuplicateCheckForEdit({ name: 'Product', value: $('#ProductName').val(), doctype: 0,headerId:mpoid });
+         }
+         if (tes) {
+             return false;
+         }
+         else
+         {
+             return;
+         }
+     });
+
+
+
+</script>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        //Calling the function to load the table data/ Line information
+        enableModalTransitions();
+        $("#ProductName").focus();
+
+        LoadOtherContent();
+        LoadProductProcess();
+    });
+
+    var id=@Model.ProductId;
+    if(id==null||id==0)
+    {
+        $(document).find('a#btnCreate').removeAttr('href').removeAttr('data-modal');
+    }
+
+    //Reloading the table contents on modal hide
+    $('#myModal').on('hidden.bs.modal', function () {
+        LoadOtherContent();
+        LoadProductProcess();
+    });
+
+    $('#myModal').on('shown.bs.modal', function () {
+        $("#ProductId").select2("focus");
+    });
+
+    //Loading the Table data or Line Information
+    function LoadOtherContent() {
+        var groupId=@Model.ProductId;
+
+        var link="/ProductConsumptionLine/Index/"+groupId;
+
+        $.ajax({
+            url: link,
+            type: "GET",
+            success: function (data) {
+                var row = ""
+                var srno=1;
+                var head="<tr style='background-color:#428bca'>  <th style='width:10px'><input type='hidden'  /></th> <th style='width:10px'>Serial</th><th class='center' style='width:50px'>Product</th>   <th class='center' style='width:100px'>Process</th>       <th class='center' style='width:50px'>Qty</th>        <th class='center' style='width:50px'>Standard Cost</th>        <th style='width:10px'></th>       <th style='width:10px'></th>  </tr>"
+                if(data.length!=0)
+                {
+                    $.each(data, function (index, item) {
+                        row += "<tr><td><input type='hidden' class='id' value='" + item.BomDetailId + "'/></td> <td>"+ srno +"</td> <td >" + (item.ProductName==null?" ":"<strong>"+item.ProductName+"</strong>") + "<div>"+(item.Dimension1Name==null?" ":item.Dimension1Name+",")+(item.Dimension2Name==null?" ":item.Dimension2Name+",")+(item.Dimension3Name==null?" ":item.Dimension3Name+",")+(item.Dimension4Name==null?" ":item.Dimension4Name+",")+"</div></td>        <td>" + item.ProcessName + "</td>                  <td>" + item.Qty + "<div>" + item.UnitName + "</div></td>              <td>" + (item.StdCost==null?" ":item.StdCost) + "</td>                                        <td><a class='rowEditBlue hidden' Modify href='/ProductConsumptionLine/_Edit/"+item.BomDetailId+"' ></a></td>       <td><a class='glyphicon glyphicon-trash' data-modal='' delete='' href='/ProductConsumptionLine/_Edit/"+item.BomDetailId+"' ></a></td>  </tr>";
+                        srno++;
+                    });
+                }
+                else
+                {
+                    row+="<tr><td>No Items Found.</td></tr>";
+                }
+                $("#OtherContentHeader").html(head);
+                $("#OtherContentLine").html(row);
+            },
+            error: function (BankAccoutDetail) {
+                alert("Error");
+            }
+        });
+    }
+
+
+    //Loading the Table data or Line Information
+    function LoadProductProcess() {
+        var groupId=@Model.ProductId;
+
+        var link="/ProductProcess/Index/"+groupId;
+
+        $.ajax({
+            url: link,
+            type: "GET",
+            success: function (data) {
+                var row = ""
+                var srno=1;
+                var head="<tr style='background-color:#428bca'>  <th><input type='hidden'  /></th> <th style='width:5%'>Sr.No</th><th class='center' style='width:30%'>Process</th>   <th class='center' style='width:30%'>Product Rate Group</th> <th class='center' style='width:30%'>Instructions</th> <th style='width:10%'></th>  </tr>"
+                if(data.length!=0)
+                {
+                    $.each(data, function (index, item) {
+                        row += "<tr><td><input type='hidden' class='id' value='" + item.ProductProcessId + "'/></td> <td>"+srno+"</td> <td>" + item.ProcessName + "</td><td>" + ((item.ProudctRateGroupName==null)?" ":item.ProudctRateGroupName )+ "</td><td>" + ((item.Instructions==null)?" ":item.Instructions ) + "</td>  <td><a class='rowEditBlue hidden' Modify href='/ProductProcess/_Edit/"+item.ProductProcessId+"' ></a></td>       <td><a class='glyphicon glyphicon-trash' data-modal='' delete='' href='/ProductProcess/_Edit/"+item.ProductProcessId+"' ></a></td>   </tr>";
+                        srno++;
+                    });
+
+                }
+                else
+                {
+                    row+="<tr><td>No Items Found.</td></tr>";
+                }
+                $("#ProductProcessHeader").html(head);
+                $("#ProductProcessLine").html(row);
+            },
+            error: function (BankAccoutDetail) {
+                alert("Error");
+            }
+        });
+    }
+
+    //Loading the table data or ProductBuyer Information
+
+    //For Populating Modal PopUp on DoubleClick Of Row
+    $('#OtherContentLine').on("dblclick",'tr',function(){
+        var text = $(this).find(".id").val();
+        var editurl=$(this).find('a[Modify]').attr('href');
+
+
+        $('#myModalContent').load(editurl, function () {
+            //alert('2');
+            $('#myModal').modal({
+                backdrop: 'static',
+                keyboard: true
+            }, 'show');
+
+            bindForm1(this);
+        });
+    });
+
+
+    //For Populating Modal PopUp on DoubleClick Of Row
+    $('#ProductProcessLine').on("dblclick",'tr',function(){
+        var text = $(this).find(".id").val();
+        var editurl=$(this).find('a[Modify]').attr('href');
+
+
+        $('#myModalContent').load(editurl, function () {
+            //alert('2');
+            $('#myModal').modal({
+                backdrop: 'static',
+                keyboard: true
+            }, 'show');
+
+            bindForm1(this);
+        });
+    });
+
+
+    //For Handling Modal PopUp on Clicking Delete Icon
+    $('#OtherContentLine').on("click",'a[delete]', function (e) {
+        $('#myModalContent').load(this.href, function () {
+            //alert('2');
+            $('#myModal').modal({
+                backdrop: 'static',
+                keyboard: true
+            }, 'show');
+
+            bindForm1(this);
+        });
+        return false;
+    });
+
+
+
+    //For Handling Modal PopUp on Clicking Delete Icon
+    $('#ProductProcessLine').on("click",'a[delete]', function (e) {
+        $('#myModalContent').load(this.href, function () {
+            //alert('2');
+            $('#myModal').modal({
+                backdrop: 'static',
+                keyboard: true
+            }, 'show');
+
+            bindForm1(this);
+        });
+        return false;
+    });
+
+
+
+    //For posting the data through ajax and render the contents sent back from the server
+    function bindForm1(dialog) {
+        //alert("binding");
+        $('form', dialog).submit(function () {
+            //alert(this.action);
+            $.ajax({
+                url: this.action,
+                type: this.method,
+                data: $(this).serialize(),
+                success: function (result) {
+                    if (result.success) {
+                        $('#myModal').modal('hide');
+                        //Refresh
+                        //location.reload();
+                        //alert('Data Saved');
+                    }else if(!result.success)
+                    {
+                        $('#myModalContent').html(result);
+                        bindForm1();
+                    }
+                    else {
+                        $('#myModalContent').html(result);
+                        bindForm1();
+                    }
+                }
+            });
+            return false;
+        });
+    }
+
+</script>

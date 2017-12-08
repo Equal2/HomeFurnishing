@@ -1,0 +1,450 @@
+﻿@model Model.ViewModel.PurchaseWaybillViewModel
+
+@{
+    ViewBag.Title = "Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<!-- modal placeholder-->
+<div id='myModal' class='modal fade in'>
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div id='myModalContent'></div>
+        </div>
+    </div>
+</div>
+
+@using (Html.BeginForm("Post", "PurchaseWaybill", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(m=>m.PurchaseWaybillId)
+    @Html.HiddenFor(m=>m.SiteId)
+    @Html.HiddenFor(m => m.DocTypeId)
+    @Html.HiddenFor(m=>m.DivisionId)   
+        
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3>
+                <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"> <span class="glyphicon glyphicon-file black"></span>@ViewBag.Name</span>
+                <input type="submit" value="Save" class="btn btn-primary right" id="submit" style="width: 90px; background-color: #2980b9" />
+            </h3>
+            <hr style="margin-top:0px;margin-bottom:0px" />
+
+            <div class="panel-info">
+                 <div class="btn-group">
+                    @Html.ActionLink(" ", "Create", "PurchaseWaybill", new { @id = ViewBag.id }, new { @class = "cbtn btn-circle glyphicon glyphicon-plus toolbar", @title = "Add New", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "History", "PurchaseWaybill", null, new { @class = "cbtn btn-circle glyphicon glyphicon-user toolbar", @title = "History", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "Print", "PurchaseWaybill", new { id = @Model.PurchaseWaybillId }, new { @class = "cbtn btn-circle glyphicon glyphicon-print toolbar", @title = "Print", @data_toggle = "tooltip", target = "_blank" })
+                    @Html.ActionLink(" ", "Email", "PurchaseWaybill", null, new { @class = "cbtn btn-circle glyphicon glyphicon-envelope toolbar", @title = "Email", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "PrevPage", "PurchaseWaybill", new { id = @Model.PurchaseWaybillId }, new { @class = "cbtn btn-circle glyphicon glyphicon-arrow-left toolbar", @title = "Prev Record", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "NextPage", "PurchaseWaybill", new { id = @Model.PurchaseWaybillId }, new { @class = "cbtn btn-circle glyphicon glyphicon-arrow-right toolbar", @title = "Next Record", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "Index", "PurchaseWaybill", new { @id = ViewBag.id }, new { @class = "cbtn btn-circle glyphicon glyphicon-list", @title = "List", @data_toggle = "tooltip" })
+                </div>
+            </div>
+        </div>
+
+        <div class="panel-info" style="padding-left:15px">
+            <div class="form-horizontal" role="form">
+                @Html.ValidationSummary(true)
+                <div>
+                    <h4 class="col-md-12 black">
+                        <span class="glyphicon glyphicon-align-justify"></span>
+                        1.Document Details
+                    </h4> 
+                    <div>
+                        <div>
+
+                            <div class="col-md-6">
+                                <div class="form-group" style="margin-top:15px">
+                                    @Html.LabelFor(model => model.EntryNo, "Entry No", new { @class = "control-label  col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextBoxFor(m => m.EntryNo, new { @class="form-control required"})
+                                        @Html.ValidationMessageFor(model => model.EntryNo,null,new{@class="text-danger"})
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group" style="margin-top:15px">
+                                    @Html.LabelFor(model => model.DocNo, "Waybill No", new { @class = "control-label  col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextBoxFor(m => m.DocNo, null, new { @class = "form-control required" })
+                                        @Html.ValidationMessageFor(model => model.DocNo, null, new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.DocDate, "Entry Date", new { @class = "control-label  col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextBoxFor(m => m.DocDate, "{0:dd/MMMM/yyyy}", new { @class = "datepickerWithNFD form-control required" })
+                                        @Html.ValidationMessageFor(model => model.DocDate, null, new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.TransporterId, "Transporter", new { @class = "control-label  col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextBoxFor(a => a.TransporterId, null, new { @class = "form-control required" })
+                                        @Html.ValidationMessageFor(model => model.TransporterId, null, new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                          
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.ConsignerId, "Consigner", new { @class = "control-label  col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextBoxFor(m => m.ConsignerId, new { @class = "form-control required" })
+                                        @Html.ValidationMessageFor(model => model.ConsignerId, null, new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.ReferenceDocNo, "Ref. DocumentNo", new { @class = "control-label  col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextBoxFor(a => a.ReferenceDocNo, null, new { @class = "form-control" })
+                                        @Html.ValidationMessageFor(model => model.ReferenceDocNo)
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <hr />
+                <div>
+                    <h4 class="col-md-12 black">
+                        <span class="glyphicon glyphicon-align-justify"></span>
+                        2.Waybill Details
+                    </h4>
+                    <div>
+                        <div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.ShipMethodId, "Shipment Through", new { @class = "control-label  col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.DropDownListFor(m => m.ShipMethodId, new SelectList(ViewBag.ShipMethodList as System.Collections.IEnumerable,"ShipMethodId","ShipMethodName"),string.Empty,new { @class = "form-control required height" })
+                                        @Html.ValidationMessageFor(model => model.ShipMethodId, null, new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.DeliveryPoint, "Delivery Point", new { @class = "control-label  col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextBoxFor(m => m.DeliveryPoint, null, new { @class = "form-control" })
+                                        @Html.ValidationMessageFor(model => model.DeliveryPoint)
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.EstimatedDeliveryDate, "Estd.Delivery Date", new { @class = "control-label  col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextBoxFor(m => m.EstimatedDeliveryDate, "{0:dd/MMMM/yyyy}", new { @class = "datepicker form-control" })
+                                        @Html.ValidationMessageFor(model => model.EstimatedDeliveryDate, null, new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.FreightType, "Freight Type", new { @class = "control-label  col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.DropDownListFor(a => a.FreightType, new SelectList(ViewBag.FreightTypeList as System.Collections.IEnumerable, "Value", "Text"), string.Empty, new { @class = "form-control required height" })
+                                        @Html.ValidationMessageFor(model => model.FreightType, null, new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.FromCityId, "From City", new { @class = "control-label  col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextBoxFor(m => m.FromCityId, new { @class = "form-control required" })
+                                        @Html.ValidationMessageFor(model => model.FromCityId, null, new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.ToCityId, "To City", new { @class = "control-label  col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextBoxFor(a => a.ToCityId, null, new { @class = "form-control required" })
+                                        @Html.ValidationMessageFor(model => model.ToCityId, null, new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.ProductDescription, "Product Description", new { @class = "control-label  col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextBoxFor(m => m.ProductDescription, new { @class = "form-control" })
+                                        @Html.ValidationMessageFor(model => model.ProductDescription)
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.PrivateMark, "Private Mark", new { @class = "control-label  col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextBoxFor(a => a.PrivateMark, null, new { @class = "form-control" })
+                                        @Html.ValidationMessageFor(model => model.PrivateMark)
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.NoOfPackages, "No of Packages", new { @class = "control-label  col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextBoxFor(m => m.NoOfPackages, new { @class = "form-control required" })
+                                        @Html.ValidationMessageFor(model => model.NoOfPackages, null, new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.ActualWeight, "Actual Weight", new { @class = "control-label  col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextBoxFor(a => a.ActualWeight, null, new { @class = "form-control required" })
+                                        @Html.ValidationMessageFor(model => model.ActualWeight, null, new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.ChargedWeight, "Charged Weight", new { @class = "control-label  col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextBoxFor(m => m.ChargedWeight, new { @class = "form-control" })
+                                        @Html.ValidationMessageFor(model => model.ChargedWeight)
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.ContainerNo, "Container No", new { @class = "control-label  col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextBoxFor(a => a.ContainerNo, null, new { @class = "form-control" })
+                                        @Html.ValidationMessageFor(model => model.ContainerNo)
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <hr />
+                <div>
+                    <h4 class="col-md-12 black">
+                        <span class="glyphicon glyphicon-align-justify"></span>
+                        3.Freight Details
+                    </h4>
+                    <div>
+                        <div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.FreightAmt, "Freight", new { @class = "control-label  col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextBoxFor(m => m.FreightAmt, new { @class = "form-control" })
+                                        @Html.ValidationMessageFor(model => model.FreightAmt)
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.OtherCharges, "Other Charges", new { @class = "control-label  col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextBoxFor(m => m.OtherCharges, null, new { @class = "form-control" })
+                                        @Html.ValidationMessageFor(model => model.OtherCharges)
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.ServiceTaxPer, "Service Tax", new { @class = "control-label  col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10" style="padding:0px;">
+                                        <div class="col-xs-5" style="padding-right:0px;display:inline-flex">
+                                            @Html.TextBoxFor(m => m.ServiceTaxPer, new { @class = "form-control" })   <span style="padding-top:7px;padding-left:5px">%</span>
+                                            @Html.ValidationMessageFor(model => model.ServiceTaxPer)
+                                        </div>
+
+                                        <div class="col-xs-7">
+                                            @Html.TextBoxFor(m => m.ServiceTax, new { @class = "form-control" })
+                                            @Html.ValidationMessageFor(model => model.ServiceTax)
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.TotalAmount, "Total Amount", new { @class = "control-label  col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextBoxFor(a => a.TotalAmount, null, new { @class = "form-control" })
+                                        @Html.ValidationMessageFor(model => model.TotalAmount)
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.FreightDescription, "Freight Description", new { @class = "control-label  col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextAreaFor(a => a.FreightDescription, new { @class = "form-control" })
+                                        @Html.ValidationMessageFor(model => model.FreightDescription)
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <hr />
+                <div>
+                    <h4 class="col-md-12 black">
+                        <span class="glyphicon glyphicon-align-justify"></span>
+                        4.Other Details
+                    </h4>
+                    <div>
+                        <div>
+                           
+                            <div class="col-md-6">
+                                <div class="form-group" style="margin-top:15px">
+                                    @Html.LabelFor(model => model.IsDoorDelivery, "Door Delivery?", new { @class = "control-label  col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10" style=" padding-top:4px">
+                                        @Html.CheckBoxFor(m => m.IsDoorDelivery, new { @class = "checkbox col-xs-1" })
+                                        @Html.ValidationMessageFor(model => model.IsDoorDelivery)
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group" style="margin-top:15px">
+                                    @Html.LabelFor(model => model.IsPOD, "Payment On Delivery", new { @class = "control-label  col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10" style=" padding-top:4px">
+                                        @Html.CheckBoxFor(m => m.IsPOD, new { @class = "checkbox col-xs-1" })
+                                        @Html.ValidationMessageFor(model => model.IsPOD)
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.Remark, "Remark", new { @class = "control-label  col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextAreaFor(m => m.Remark, new { @class = "form-control" })
+                                        @Html.ValidationMessageFor(model => model.Remark, null, new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+              <div class="row"></div>
+
+            </div>
+        </div>
+    </div>
+}
+
+
+<script>
+    $(document).ready(function () {
+        CustomSelectFunction($("#TransporterId"), '/ComboHelpList/GetTransporters', '/ComboHelpList/SetSingleTransporter', 'Enter Transporter Name', false, 0);
+        CustomSelectFunction($("#ConsignerId"), '/ComboHelpList/GetPerson', '/ComboHelpList/SetSinglePerson', 'Enter Consignee Name', false, 0);
+        CustomSelectFunction($("#SaleInvoiceHeaderId"), '/ComboHelpList/GetSaleInvoices', '/ComboHelpList/SetSingleSaleInvoice', 'Enter Invoice No', false, 0);        
+        CustomSelectFunction($("#FromCityId"), '/ComboHelpList/GetCity', '/ComboHelpList/SetSingleCity', 'Enter From City', false, 0);
+        CustomSelectFunction($("#ToCityId"), '/ComboHelpList/GetCity', '/ComboHelpList/SetSingleCity', 'Enter To City', false, 0);        
+    });
+</script>
+
+
+
+<script type="text/javascript">
+   
+
+    $("#FreightAmt,#OtherCharges,#ServiceTaxPer,#ServiceTaxAmount").keyup(Calculation);
+
+
+    function Calculation() {
+        var ServiceTax = 0;
+        var FreightAmt = 0;
+        var OtherCharges = 0;
+        var ServiceTaxPer = 0;
+        var TotalAmount = 0;
+
+
+
+        if ($('#ServiceTax').val() == "" || $('#ServiceTax').val() == null ) { ServiceTax = 0 } else { ServiceTax = $('#ServiceTax').val()  }
+        if ($('#FreightAmt').val() == "" || $('#FreightAmt').val() == null) { Freight = 0 } else { FreightAmt = $('#FreightAmt').val() }
+        if ($('#OtherCharges').val() == "" || $('#OtherCharges').val() == null ) { OtherCharges = 0 } else { OtherCharges = $('#OtherCharges').val()  }
+        if ($('#ServiceTaxPer').val() == "" || $('#ServiceTaxPer').val() == null ) { ServiceTaxPer = 0 } else { ServiceTaxPer = $('#ServiceTaxPer').val()  }
+        //if ($('#TotalAmount').val() == "" || $('#TotalAmount').val() == null ) { TotalAmount = 0 }
+
+        if (ServiceTaxPer != 0) {
+            $('#ServiceTax').val((parseFloat(FreightAmt) + parseFloat(OtherCharges)) * ServiceTaxPer / 100)
+            ServiceTax = $('#ServiceTax').val();
+        }
+        $('#TotalAmount').val(parseFloat(FreightAmt) + parseFloat(OtherCharges) + parseFloat(ServiceTax));
+    }
+
+    $('#ActualWeight').change(function () {
+        $('#ChargedWeight').val($('#ActualWeight').val());
+    })
+
+
+</script>
+
+
+
+@*<script type="text/javascript">
+    $("#submit").on("click", function () {
+        var mpoid=$('#PurchaseWaybillId').val();
+        var tes;
+        if(mpoid<=0)
+        {
+            tes= $('#DocNo').DuplicateCheckForCreate({ name: 'PurchaseWaybill', value: $('#DocNo').val(), doctype: $('#DocTypeId').val() });
+        }
+        else
+        {
+            tes = $('#DocNo').DuplicateCheckForEdit({ name: 'PurchaseWaybill', value: $('#DocNo').val(), doctype: $('#DocTypeId').val(),headerId:mpoid });
+        }
+        if (tes) {
+            return false;
+        }
+        else
+        {
+            return;
+        }
+    });
+</script>*@
+

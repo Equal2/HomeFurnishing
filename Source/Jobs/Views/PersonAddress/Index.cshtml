@@ -1,0 +1,45 @@
+﻿@using GridMvc.Html
+@model IEnumerable<Model.Models.PersonAddress>
+@{
+    ViewBag.Title = "Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="panel panel-default" style="padding:5px">
+
+    <div class="panel panel-heading">
+
+        <h4>
+            <span style="font-family: Calibri,sans-serif,Verdana"> Address List</span>
+        </h4>
+
+    </div>
+    <div class="panel panel-info" style="padding:5px">
+
+        @Html.ActionLink("Add New address", "Create", new { personID = ViewBag.PersonId }, new { @class = "btn btn-primary" })
+
+    </div>
+    
+          
+            <div class="form-group">
+               @Html.Grid(Model).Columns(columns =>
+               {
+                   columns.Add(foo => foo.PersonAddressID, true);
+                   columns.Add(foo => foo.Person.Name).Titled("Name").SetWidth(30);
+                   columns.Add(foo => foo.AddressType).Titled("Address Type").SetWidth(30);
+                   columns.Add(foo => foo.Address).Titled("Address").SetWidth(30);
+                   columns.Add(foo => foo.PhoneNo).Titled("Mob No").SetWidth(30);
+                   columns.Add(foo => foo.Email).Titled("Email").SetWidth(30);
+                   columns.Add(foo => foo.Zipcode).Titled("Zip").SetWidth(30);
+                   columns.Add().Encoded(false).Sanitized(false).SetWidth(30).RenderValueAs(d => @Html.ActionLink(" ", "Edit", "PersonAddress", new { id = d.PersonAddressID }, new { @class = "rowEditBlue" }));
+
+               }).WithPaging(25).EmptyText("No records found.")
+
+
+
+            </div>            
+        
+    
+
+</div>
+

@@ -1,0 +1,517 @@
+﻿@{
+    ViewBag.Title = "Payment Cancel";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<link href="~/Content/DataTables/css/jquery.dataTables.min.css" rel="stylesheet" />
+<link href="~/Content/DataTables/css/scroller.bootstrap.min.css" rel="stylesheet" />
+
+<script src="~/Scripts/DataTables/jquery.dataTables.min.js"></script>
+<script src="~/Scripts/DataTables/dataTables.scroller.js"></script>
+<style type="text/css">
+    .DTHidden {
+        display: none;
+    }
+
+    .TextRight {
+        text-align: right;
+    }
+
+    .dataTable {
+        font-size: 13px !important;        
+    }
+    td{
+        height:22px;
+    }
+
+    table.dataTable tbody td {
+        padding: 2px 10px;
+    }
+
+    .Filters.fSelected.label {
+        display: inline-block;
+    }
+
+    .Filters.fSelected .label-danger {
+        border-radius: 10px;
+    }
+
+    .Filters.fSelected strong {
+        padding: 5px;
+    }
+
+   
+</style>
+
+<!-- modal placeholder-->
+<div id='myModal' class='modal fade in'>
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div id='myModalContent'></div>
+        </div>
+    </div>
+</div>
+
+
+
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" style="font-size:13px">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="exampleModalLabel">Summary</h4>
+            </div>
+            <div class="modal-body" id="SelectedSummary">
+                <div class="row" style="margin-left:0px;margin-right:0px;margin-bottom:7px">
+                    <div class='row-index block' style='width:5%'>  <strong>Sr</strong>  </div>
+                    <div class='block' style='width:93%'>
+
+                        <div class='block' style='width:25%'>
+                            <strong>Voucher</strong>
+                        </div>
+                        <div class='block' style='width: 25%'>
+                            <strong>LedgerAc/Cr</strong>
+                        </div>
+                        <div class='block' style='width:20%'>
+                            <strong>LedgerAc/Dr</strong>
+                        </div>
+                        <div class='block text-right' style='width:15%'>
+                            <strong>ChqNo</strong>
+                        </div>
+                        <div class='block text-right' style='width:15%'>
+                            <strong>Amount</strong>
+                        </div>
+                    </div>
+                </div>
+                <div id="SummaryContent" style="max-height:350px;overflow-y:scroll">
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3>
+            <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"> <span class="glyphicon glyphicon-file black"></span> @ViewBag.Name</span>
+            @Html.ActionLink(" ", "ConfirmedJobInvoices", "PaymentCancelWizard", null, new { @class = "glyphicon glyphicon-hand-right toolbar right", @title = "Proceed", @data_toggle = "tooltip", @id = "Proceed" })
+            <a href="#" class="glyphicon glyphicon-shopping-cart toolbar right" id="CartSum"></a>
+            @Html.ActionLink(" ", "Filters", "PaymentCancelWizard", null, new { data_modalCustom = "", id = "btnCreateF", @class = "glyphicon glyphicon-filter toolbar right", @title = "Filters", @data_toggle = "tooltip" })
+        </h3>
+    </div>
+
+    <div class="panel-info" style="padding-left:15px">
+        <div class="form-horizontal">
+            @Html.ValidationSummary(true)
+            <div class="row">
+                <div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group" style="margin-top:15px">
+                                @Html.Label("Cancel Remark", new { @class = "control-label col-xs-4" })
+                                <div class="col-xs-6">
+                                    @Html.TextBox(" ", "", new { @class = "form-control col-xs-6 required", id = "Remark" })
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <hr style="margin-top:0px;margin-bottom:0px" />
+
+        <div style="margin:20px;">
+            <div class="Filters fSelected" id="sFilter">
+            </div>
+
+            <table id="example" class="display" cellspacing="0" width="100%">
+                <thead style="background: #428bca;color:white">
+                    <tr>
+                        <th>DocNo</th>
+                        <th>DocDate</th>
+                        <th>DocType</th>
+                        <th>Ac/Cr</th>
+                        <th>Ac/Dr</th>
+                        <th>ChqNo</th>
+                        <th>Amt</th>
+                        <th>CostCenter</th>
+                        <th>Remark</th>
+                        <th>LedgerLineId</th>
+                        <th>LedgerHeaderId</th>
+                    </tr>
+                </thead>
+                <tfoot>
+                    <tr>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">  
+
+    $(document).ready(function () {
+
+        var selected = [];
+        var Id = '@ViewBag.id';
+        var ProcId = '@ViewBag.ProcessId';
+        var Filters = new AssignFilters();
+
+        var tab = $('#example').DataTable({
+            serverSide: false,
+            ordering: false,
+            searchDelay: 1000,
+            //ajax: {
+            //    "url": "/PaymentCancelWizard/AjaxGetJsonData/",
+            //    "data": function (d) {
+            //        d.DocType = Id;
+            //    },
+            //    "type": "POST"
+            //},
+            columns: [
+                 { "data": "DocNo", "width": "12%", "sortable": false },
+                 { "data": "SDocDate", "width": "12%", "sortable": false },
+                 { "data": "DocTypeName", "width": "12%", "sortable": false },
+                 { "data": "LedgerAcCr", "width": "10%", "sortable": false },
+                 { "data": "LedgerAcDr", "width": "13%", "sortable": false },
+                 { "data": "ChqNo", "width": "10%", "sortable": false },
+                 { "data": "Amount", "width": "10%", "sortable": false },
+                 { "data": "CostCenterName", "width": "10%", "sortable": false },
+                 { "data": "Remark", "width": "10%", "sortable": false },
+                 { "data": "LedgerLineId" },
+                 { "data": "LedgerHeaderId" },
+            ],
+            columnDefs: [
+   { "targets": 9, "searchable": false, className: "DTHidden", },
+   { "targets": 10, "searchable": false, className: "DTHidden", },
+            ],
+            scrollY: "250px",
+            dom: 'ftirp',
+            scroller: {
+                loadingIndicator: true,               
+            },
+            language: {
+                "loadingRecords": "Please wait - loading..."
+            },
+            scrollCollapse: true,
+            //ForRowSelecting in ServerSideLogic--Commented cuz not needed in this entry point
+            //"rowCallback": function (row, data) {
+            //    var indx = GetIndexOfId(selected, data.LedgerLineId);
+            //    if (data.LedgerLineId && indx !== -1) {
+            //        $(row).addClass('selected');
+            //    }
+            //}
+        });
+
+        $('#example tbody').on('click', 'tr', function () {
+            var table = $('#example').DataTable();
+
+            var Rec = table.row($(this)).data();
+
+            var index = GetIndexOfId(selected, Rec.LedgerLineId);
+
+            if (index === -1) {
+                selected.push({ Id: Rec.LedgerLineId, val: Rec.Amount, HId: Rec.LedgerHeaderId });
+            } else {
+                selected.splice(index, 1);
+            }
+
+            CalculateTotal()
+
+            $(this).toggleClass('selected');
+
+            //if (Rec.OldRate - $(this).val() != 0 && $(this).val() != 0) {
+            //    if (index === -1) {
+            //        selected.push({ Id: Rec.JobInvoiceLineId, Rate: $(this).val() });
+            //    } else {
+            //        selected[index].Rate = $(this).val();
+            //    }
+            //    if (!$(this).closest('tr').hasClass('selected'))
+            //        $(this).closest('tr').addClass('selected');
+            //}
+            //else {
+            //    selected.splice(index, 1);
+            //    $(this).closest('tr').removeClass('selected');
+            //}
+        });
+
+
+        function CalculateTotal() {
+
+            var amt = 0;
+
+            $.each(selected, function (index, value) {
+                amt += value.val;
+            })
+
+            $(tab.column(4).footer()).html(
+                       "Total :"
+                 );
+            $(tab.column(5).footer()).html(
+                       amt.toFixed(2)
+                 );
+        }
+
+
+
+
+        $('a#Proceed').click(function () {
+
+            //alert($(this).attr('href'));
+
+            if ($('#Remark').val()) {
+                $.ajax({
+                    url: $(this).attr('href'),
+                    type: "POST",
+                    data: { ConfirmedList: GetSelectedData(), DocTypeId: Id, UserRemark: $('#Remark').val() },
+                    success: function (result) {
+                        if (result.Success == true) {
+                            UpdateDataTable(result);
+                        } else if (result.Success == "URL") {
+                            window.location.href = result.Data;
+                        }
+                        else if (!result.Success) {
+                            alertify.error(message = result.Data, wait = '0')
+                        }
+                        else { }
+                    },
+                });
+
+            }
+            else
+                return false;
+
+
+
+            return false;
+
+        });
+
+        function GetSelectedData() {
+            var arr = [];
+
+            $.each(selected, function (index, value) {
+                arr.push({ LedgerLineId: value.Id, LedgerHeaderId: value.HId });
+            })
+
+            return arr;
+        }
+
+
+        function GetIndexOfId(array, Id) {
+            var index = -1;
+            array.some(function (entry, i) {
+                if (entry.Id == Id) {
+                    index = i;
+                    return true;
+                }
+            });
+            return index;
+        }
+
+
+        function GenerateSummaryString() {
+            var Summary = "";
+            Summary += "<div class='row' style='margin:0px'>"
+
+            var test = tab.rows('.selected').data();
+            var List = "";
+            var srno = 1;
+            var QtyTotal = 0;
+            var AmtTotal = 0;
+            $.each(test, function (index, value) {
+
+                Summary += " <div class='row crow grid-body' style='margin:0px;padding:0px'>"
+                    + "      <div class='row-index block'  style='width:5%'>" + srno + "</div>"
+                    + "          <div class='block'  style='width:95%'>"
+                    + "                  <div class='block' style='width:25%'>" + (value.DocNo == null ? " " : "<strong>" + value.DocNo + "</strong>")
+                    + "                  <div>" + value.SDocDate + "</div>"
+                    + "                  </div>"
+                    + "                  <div class='block' style='width:25%'>" + (value.LedgerAcCr == null ? " " : "<strong>" + value.LedgerAcCr + "</strong>")
+                    + "                  </div>"
+                    + "                  <div class='block'  style='width:20%'>" + (value.LedgerAcDr == null ? " " : value.LedgerAcDr) + "</span>"
+                    + "                   </div>"
+                    + "                  <div class='block text-right'  style='width:15%'>" + (value.ChqNo == null ? " " : value.ChqNo) + ""
+                    + "                   </div>"
+                    + "                  <div class='block text-right'  style='width:15%'>" + (value.Amount == null ? " " : value.Amount) + ""
+                    + "                   </div>"
+                    + "          </div>"
+                    + "  </div>"
+                    + "<hr style='margin-top:0px;margin-bottom:0px'/>";
+                srno++;
+                //arr.push({ ProdOrderLineId: value.ProdOrderLineId, Qty: value.Qty, BalanceQty: value.Qty, RefDocTypeId: value.RefDocTypeId, RefDocLineId: value.RefDocLineId, DesignName: value.DesignName, Size: value.Size, Rate: value.Rate, Incentive: value.Incentive });
+            });
+            Summary += "</div>"
+
+            $('#SummaryContent').html(Summary);
+        }
+
+
+        //For Populating Modal PopUp on DoubleClick Of Row
+        //$(document).on("click", "a#CartSum", function () {
+        //    var editurl = $(this).attr('href');
+        //    $('#myModalContent').load(editurl, { SelectedRecords: GetSelectedData() }, function () {
+        //        //alert('2');
+        //        $('#myModal').modal({
+        //            backdrop: 'static',
+        //            keyboard: true
+        //        }, 'show');
+
+        //    });
+        //    return false;
+        //});
+
+        $('#CartSum').click(function () {
+            GenerateSummaryString();
+            $('#exampleModal').modal('toggle');
+        })
+
+        $(function () {
+
+            $("a[data-modalCustom]").on("click", function (e) {
+                // hide dropdown if any
+                if (this.href == "") {
+                    return false;
+                }
+
+                var data = new GenerateFiltersForParameter();
+                $.ajax({
+                    url: this.href,
+                    type: "POST",
+                    data: data,
+                    success: function (result) {
+                        $('#myModalContent').html(result);
+                        $('#myModal').modal({
+                            backdrop: 'static',
+                            keyboard: true
+                        }, 'show');
+
+                        bindForm1('#myModalContent');
+                    },
+                });
+                return false;
+            });
+        });
+
+        function bindForm1(dialog) {
+            $('form#modform', dialog).submit(function () {
+                Filters = new AssignFilters();
+               
+                $('#sFilter').html(GenerateFiltersForHtml());
+                var Data = [];
+
+                var datatable = $('#example').dataTable().api();
+
+                $.ajax({
+                    url: "/PaymentCancelWizard/AjaxGetJsonData/",
+                    data: {
+                        ProcessId: ProcId, DocType: Id,
+                        FromDate: Filters.FromDate ? Filters.FromDate : null,
+                        ToDate: Filters.ToDate ? Filters.ToDate : null,
+                        LedgerHeaderId: Filters.LedgerHeaderId.length > 0 ? $.map(Filters.LedgerHeaderId, function (val, i) { return (val.id) }).join(',') : "",
+                        LedgerAcCr: Filters.LedgerAcCr.length > 0 ? $.map(Filters.LedgerAcCr, function (val, i) { return (val.id) }).join(',') : "",
+                        LedgerAcDr: Filters.LedgerAcDr.length > 0 ? $.map(Filters.LedgerAcDr, function (val, i) { return (val.id) }).join(',') : "",
+                        CostCenter: Filters.CostCenter.length > 0 ? $.map(Filters.CostCenter, function (val, i) { return (val.id) }).join(',') : "",
+                        ChqNo: Filters.ChqNo,
+                        Amount: Filters.Amount ? Filters.Amount : 0,
+                    },
+                    type: "POST",
+                    success: function (result) {
+                        if (result.Success) {
+
+                            $('#myModal').modal('hide');
+
+                            selected = [];
+                            datatable.clear();
+                            datatable.rows.add(result.Data);
+                            datatable.draw();
+                            tab.rows().every(function (rowIdx, tableLoop, rowLoop) {
+                                var data = this.data();
+                                var indx = GetIndexOfId(selected, data.LedgerLineId);
+                                if (data.LedgerLineId && data.Amount == Filters.Amount && data.Amount!=0 && indx === -1) {
+                                    $(this.node()).addClass('selected');
+                                    selected.push({ Id: data.LedgerLineId, HId: data.LedgerHeaderId });
+                                }
+                            });
+                        }
+                        else {
+                            //$("body").CustomNotify({ message: "No of records exceeding 1000. Check the filters." })
+                            if (!$('#modform').find('.modal-body #errormsg').length)
+                                $('#modform').find('.modal-body').prepend("<div class='alert alert-danger'><span id=errormsg >" + result.Message + " Check the filters.</span></div>")
+                            else
+                                $('span#errormsg').text(result.Message);
+                        }
+                    }
+                });
+
+                return false;
+
+            });
+        }
+
+        function AssignFilters() {
+            var self = this;
+
+            self.FromDate = $('#FromDate', '.modal-body').val();
+            self.ToDate = $('#ToDate', '.modal-body').val();
+            self.LedgerHeaderId = $('#LedgerHeaderId', '.modal-body').select2('data');
+            self.LedgerAcCr = $('#LedgerAcCr', '.modal-body').select2('data');
+            self.LedgerAcDr = $('#LedgerAcDr', '.modal-body').select2('data');
+            self.CostCenter = $('#CostCenter', '.modal-body').select2('data');
+            self.ChqNo = $('#ChqNo', '.modal-body').val();
+            self.Amount = $('#Amount', '.modal-body').val();
+        }
+
+        function GenerateFiltersForParameter() {
+
+            var self = this;
+            self.ProcessId = ProcId, self.DocTypeId = Id;
+            self.FromDate = Filters.FromDate ? Filters.FromDate : null;
+            self.ToDate = Filters.ToDate ? Filters.ToDate : null;
+            self.LedgerHeaderId = Filters.LedgerHeaderId.length > 0 ? $.map(Filters.LedgerHeaderId, function (val, i) { return (val.id) }).join(',') : "";
+            self.LedgerAcCr = Filters.LedgerAcCr.length > 0 ? $.map(Filters.LedgerAcCr, function (val, i) { return (val.id) }).join(',') : "";
+            self.LedgerAcDr = Filters.LedgerAcDr.length > 0 ? $.map(Filters.LedgerAcDr, function (val, i) { return (val.id) }).join(',') : "";
+            self.CostCenter = Filters.CostCenter.length > 0 ? $.map(Filters.CostCenter, function (val, i) { return (val.id) }).join(',') : "";
+            self.ChqNo = Filters.ChqNo;
+            self.Amount = Filters.Amount ? Filters.Amount : null;
+
+        }
+
+        function GenerateFiltersForHtml() {
+
+            var html = "";
+
+            html += Filters.FromDate ? "<strong>FromDate:</strong> <span class='label label-danger'> " + Filters.FromDate + " </span>" : "";
+            html += Filters.ToDate ? "<strong>ToDate:</strong> <span class='label label-danger'> " + Filters.ToDate + " </span>" : "";
+            html += Filters.LedgerHeaderId.length > 0 ? "<strong>DocNo:</strong>" + $.map(Filters.LedgerHeaderId, function (val, i) { return ("<span class='label label-danger'>" + val.text + "</span>") }).join(' ') : "";
+            html += Filters.LedgerAcCr.length > 0 ? "<strong>LedgerAcCr:</strong>" + $.map(Filters.LedgerAcCr, function (val, i) { return ("<span class='label label-danger'>" + val.text + "</span>") }).join(' ') : "";
+            html += Filters.LedgerAcDr.length > 0 ? "<strong>LedgerAcDr:</strong>" + $.map(Filters.LedgerAcDr, function (val, i) { return ("<span class='label label-danger'>" + val.text + "</span>") }).join(' ') : "";
+            html += Filters.CostCenter.length > 0 ? "<strong>CostCenter:</strong>" + $.map(Filters.CostCenter, function (val, i) { return ("<span class='label label-danger'>" + val.text + "</span>") }).join(' ') : "";
+            html += Filters.ChqNo ? "<strong>ChqNo:</strong> <span class='label label-danger'> " + Filters.ChqNo + " </span>" : "";
+            html += Filters.Amount ? "<strong>Amount:</strong> <span class='label label-danger'> " + Filters.Amount + " </span>" : "";
+
+            return html;
+        }
+
+
+        $('#CartSum').on('hidden.bs.modal', function (e) {
+            $('#SummaryContent').html("");
+            $('#QtyTotal').html(0);
+            $('#AmtTotal').html(0);
+        })
+    });
+
+</script>

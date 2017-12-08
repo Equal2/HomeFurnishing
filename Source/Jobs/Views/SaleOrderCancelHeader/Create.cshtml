@@ -1,0 +1,447 @@
+﻿@model Model.ViewModels.SaleOrderCancelHeaderIndexViewModel
+@using Core.Common
+@{
+    ViewBag.Title = "Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<!-- modal placeholder-->
+<div id='myModal' class='modal fade in'>
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div id='myModalContent'></div>
+        </div>
+    </div>
+</div>
+
+@using (Html.BeginForm("HeaderPost", "SaleOrderCancelHeader", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(m => m.SiteId)
+    @Html.HiddenFor(m => m.DivisionId)
+    @Html.HiddenFor(m=>m.SaleOrderCancelHeaderId)
+    @Html.HiddenFor(m=>m.DocTypeId)
+    @Html.HiddenFor(m=>m.CreatedDate)
+    <div class="panel panel-default">
+        <div class="panel-heading">
+          
+            @CustomHelpers.RenderHeaderInfo(ViewBag.transactionType, (int?)ViewBag.PendingToSubmit, (int?)ViewBag.PendingToReview, ViewBag.Name)
+            
+              @*@if (ViewBag.transactionType == "submit")
+            {<h3>
+                <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"> <span class="glyphicon glyphicon-file black"></span>Submit @ViewBag.Name</span>
+                <input type="submit" value="Submit" name="Command:Submit" class="btn btn-primary right" style="width: 90px; background-color: #2980b9" />
+            </h3>}
+           else if (ViewBag.transactionType == "review" || ViewBag.transactionType == "ReviewContinue")
+            {<h3 style="border-bottom:0px solid #e1dada;padding-bottom:0px;">
+                    <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"> <span class="glyphicon glyphicon-file black"></span> Review @ViewBag.Name</span>
+                    <button type="submit" name="Command:Review" class="btn btn-primary right" style="margin-left:5px" id="ReviewContinue">Review & Next<span class='badge'>@(ViewBag.PendingToReview != 0 ? ViewBag.PendingToReview : "")</span></button>
+                    <button type="submit" class="btn btn-primary right" name="Command:Review">Review</button>
+                    <input type="hidden" id="IsContinue" name="IsContinue" value="" />
+                </h3>
+            }
+            else if (ViewBag.transactionType == "detail")
+            {
+                <h3 style="border-bottom:1px solid #e1dada;padding-bottom:10px;">
+                    <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"> <span class="glyphicon glyphicon-file black"></span> @ViewBag.Name</span>
+                </h3>
+            }
+            else
+            {
+                <h3>
+                    <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"> <span class="glyphicon glyphicon-file black"></span>@ViewBag.Name</span>
+                    <input type="submit" value="Save" class="btn btn-primary right" id="submit" style="width: 90px; background-color: #2980b9" />
+                </h3>                
+            }*@
+
+            @*@Html.ActionLink("For Order", "_CreateMultiple", "SaleOrderCancelLine", new { id = @Model.SaleOrderCancelHeaderId, bid = @Model.BuyerId }, new { data_modal = "", id = "btnCreateF", @class = "btn btn-primary borderradii", @title = "For SaleOrder", @data_toggle = "tooltip", @data_detailDeleted = "true" })*@
+
+            @*<hr style="margin-top:0px;margin-bottom:0px" />*@
+            @{
+                string EditAction = "";
+                if (Model.Status == (int)StatusConstants.Drafted || Model.Status == (int)StatusConstants.Import)
+                {
+                    EditAction = "Modify";
+                }
+                else if ((Model.Status == (int)StatusConstants.Submitted || Model.Status == (int)StatusConstants.Modified))
+                {
+                    EditAction = "ModifyAfter_Submit";
+                }
+                else
+                {
+                    EditAction = "DetailInformation";
+                }
+            }
+            <div class="panel-info">
+                @*<h4 style="padding:5px 0 0 0;margin:0px">
+                    @Html.ActionLink(" ", " ", " ", null, new { @class = "glyphicon glyphicon-refresh toolbar", @title = "Refresh Page", @data_toggle = "tooltip", @id = "RefreshPage" })
+                    @Html.ActionLink(" ", "Create", "SaleOrderCancelHeader", new { @id = ViewBag.id }, new { @class = "glyphicon glyphicon-plus toolbar", @title = "Add New", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "History", "SaleOrderCancelHeader", null, new { @class = "glyphicon glyphicon-user toolbar", @title = "History", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "GeneratePrints", "SaleOrderCancelHeader", new { Ids = Model.SaleOrderCancelHeaderId, DocTypeId = Model.DocTypeId }, new { @class = "glyphicon glyphicon-print toolbar", @title = "Print", @data_toggle = "tooltip", @id = "PrintRecordC", target = "_blank" })
+                    @Html.ActionLink(" ", "Email", "SaleOrderCancelHeader", null, new { @class = "glyphicon glyphicon-envelope toolbar", @title = "Email", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "PrevPage", "SaleOrderCancelHeader", new { DocId = @Model.SaleOrderCancelHeaderId, DocTypeId = Model.DocTypeId }, new { @class = "glyphicon glyphicon-arrow-left toolbar", @title = "Prev Record", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "NextPage", "SaleOrderCancelHeader", new { DocId = @Model.SaleOrderCancelHeaderId, DocTypeId = Model.DocTypeId }, new { @class = "glyphicon glyphicon-arrow-right toolbar", @title = "Next Record", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "Index", "SaleOrderCancelHeader", new { @id = ViewBag.id, IndexType = ViewBag.IndexStatus }, new { @class = "glyphicon glyphicon-list toolbar right", @title = "List", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "Report", "SaleOrderCancelHeader", new { @id = ViewBag.id }, new { @class = "glyphicon glyphicon-th toolbar right", @title = "Report", @data_toggle = "tooltip" })
+                </h4>*@
+                <div class="btn-group">
+                    @Html.ActionLink(" ", "Create", "SaleOrderCancelHeader", new { @id = ViewBag.id }, new { @class = "cbtn btn-circle glyphicon glyphicon-plus toolbar", @title = "Add New", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", EditAction, "SaleOrderCancelHeader", new { @id = Model.SaleOrderCancelHeaderId, IndexType = ViewBag.IndexStatus }, new { @class = "cbtn btn-circle glyphicon glyphicon-edit", @title = "Edit", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "GeneratePrints", "SaleOrderCancelHeader", new { Ids = Model.SaleOrderCancelHeaderId, DocTypeId = Model.DocTypeId }, new { @class = "cbtn btn-circle glyphicon glyphicon-print toolbar", @title = "Print", @data_toggle = "tooltip", @id = "PrintRecordC", target = "_blank" })
+                    @Html.ActionLink(" ", "PrevPage", "SaleOrderCancelHeader", new { DocId = @Model.SaleOrderCancelHeaderId, DocTypeId = Model.DocTypeId }, new { @class = "cbtn btn-circle glyphicon glyphicon-arrow-left toolbar", @title = "Prev Record", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "NextPage", "SaleOrderCancelHeader", new { DocId = @Model.SaleOrderCancelHeaderId, DocTypeId = Model.DocTypeId }, new { @class = "cbtn btn-circle glyphicon glyphicon-arrow-right toolbar", @title = "Next Record", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "Index", "SaleOrderCancelHeader", new { @id = ViewBag.id, IndexType = ViewBag.IndexStatus }, new { @class = "cbtn btn-circle glyphicon glyphicon-list toolbar", @title = "List", @data_toggle = "tooltip" })
+                 </div>
+                <div class="btn-group">
+                    <a class="cbtn btn-circle glyphicon glyphicon-option-horizontal dropdown-toggle"   title="More Option"  aria-expanded="false" style="padding-top: 6px;padding-bottom: 6px;" href="#" data-toggle="dropdown" id="dropdownMenu1">
+                    </a>
+                    <ul class="dropdown-menu pull-right" aria-labelledby="dropdownMenu1">
+                        <li><a id="DocHistory" data-modal="" href="@Url.Action("GetHistory", "LogHistory", new { Ids = Model.SaleOrderCancelHeaderId, DocTypeId = Model.DocTypeId })"><span class="glyphicon glyphicon-user"> </span> History</a></li>
+                        <li><a href="@Url.Action("Email", "SaleOrderCancelHeader")"><span class="glyphicon glyphicon-envelope"> </span> Email</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="@Url.Action("Report", "SaleOrderCancelHeader")"><span class="glyphicon glyphicon-th"> </span> Report</a></li>
+                    </ul>
+                 </div>
+            </div>
+        </div>
+        <div class="panel-info" style="padding-left:15px">
+
+            <div class="form-horizontal" role="form">
+                @Html.ValidationSummary(true)
+                <div>
+                    <h4 class="col-md-12 black">
+                        <span class="glyphicon glyphicon-align-justify"></span>
+                        1.Document Details
+                    </h4> 
+                    <div>
+                    <div>
+                      
+                        <div class="col-md-6">
+                            <div class="form-group" style="margin-top:15px">
+                                @Html.LabelFor(model => model.DocDate, "Cancel Date", new { @class = "control-label col-md-4 col-sm-2" })
+                                <div class="col-md-7 col-sm-10">
+                                    @*@Html.TextBoxFor(m => m.DocDate, "{0:dd/MMMM/yyyy}", new { @class = "datepickerWithNFD form-control col-xs-6 required" })*@
+                                    @Html.TextBoxFor(m => m.DocDate, "{0:dd/MMMM/yyyy}", new
+                                   {
+                                       @class = "datepickerWithNFD form-control col-xs-6 required updateDocNo",
+                                       data_tabl = "SaleOrderCancelHeaders",
+                                       data_doctype = Model.DocTypeId,
+                                       data_divId = Model.DivisionId,
+                                       data_sitId = Model.SiteId,
+                                   })
+                                    @Html.ValidationMessageFor(m => m.DocDate, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group" style="margin-top:15px">
+                                @Html.LabelFor(model => model.DocNo, "Cancel No", new { @class = "control-label col-md-4 col-sm-2" })
+                                <div class="col-md-7 col-sm-10">
+                                    @Html.TextBoxFor(m => m.DocNo, null, new { @class = "form-control col-xs-6 required" })
+                                    @Html.ValidationMessageFor(m => m.DocNo, "", new { @class = "text-danger" })
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                        <div>
+                           
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.BuyerId, "Buyer", new { @class = "control-label col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextBoxFor(m => m.BuyerId, null, new { @class = "form-control col-xs-6 required" })
+                                        @Html.ValidationMessageFor(m => m.BuyerId, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>   
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.ReasonId, "Reason", new { @class = "control-label col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.DropDownListFor(m => m.ReasonId, new SelectList(ViewBag.ReasonList as System.Collections.IEnumerable, "ReasonId", "ReasonName"), new { @class = "form-control col-xs-6 height required" })
+                                        @Html.ValidationMessageFor(m => m.ReasonId, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>                        
+                        </div>
+                    </div>
+                    <div>
+                      
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.Remark, "Remark", new { @class = "control-label col-md-4 col-sm-2" })
+                                <div class="col-md-7 col-sm-10">
+                                    @Html.TextBoxFor(m => m.Remark, null, new { @class = "form-control col-xs-6 required"})
+                                    @Html.ValidationMessageFor(m => m.Remark, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <hr />
+                <div class="row">
+                    <h4 class="col-md-12 black" style="margin-top:15px">
+                        <span class="glyphicon glyphicon-shopping-cart"></span>
+                        2.Products
+                    </h4>
+                </div>
+
+                @*<div class="panel-info">
+                    <h5 style="padding:5px 0 3px 0;margin:0px;font-weight:bold">
+                        <span class="glyphicon glyphicon-plus-sign"></span>
+                        @{string Action = "";
+                        if (Model.Status == (int)StatusConstants.Drafted)
+                        { Action = "CreateLine"; }
+                        else if (Model.Status == (int)StatusConstants.Submitted || Model.Status == (int)StatusConstants.Modified)
+                        { Action = "CreateLineAfter_Submit"; }
+                        }
+                        @Html.ActionLink("Add New ", Action, "SaleOrderCancelLine", new { id = @Model.SaleOrderCancelHeaderId, bid = @Model.BuyerId }, new { data_modal = "", id = "btnCreate", @class = "toolbar", @title = "Add New", @data_toggle = "tooltip", @data_detailDisabled = "true" })
+                    </h5>
+                </div>*@
+                <div class="panel-info" style="height:40px">
+                    <div class="btn-group" style="padding:5px 0 3px 0;margin:0px;font-weight:bold">
+                        <span class="glyphicon glyphicon-plus-sign"></span>
+                        @{string Action = "";
+                            if (Model.Status == (int)StatusConstants.Drafted)
+                            { Action = "CreateLine"; }
+                            else if (Model.Status == (int)StatusConstants.Submitted || Model.Status == (int)StatusConstants.Modified)
+                            { Action = "CreateLineAfter_Submit"; }
+                        }
+                        @Html.ActionLink("Add New ", Action, "SaleOrderCancelLine", new { id = @Model.SaleOrderCancelHeaderId, bid = @Model.BuyerId }, new { data_modal = "", id = "btnCreate", @class = "toolbar", @title = "Add New", @data_toggle = "tooltip", @data_detailDisabled = "true" })
+                    </div>
+                    <div class="btn-group right" style="padding-right:15px">
+                        @Html.ActionLink(" ", "_CreateMultiple", "SaleOrderCancelLine", new { id = @Model.SaleOrderCancelHeaderId, bid = @Model.BuyerId }, new { data_modal = "", id = "btnCreateF", @class = "cbtn btn-circle glyphicon glyphicon-link toolbar right", @title = "For SaleOrder", @data_toggle = "tooltip", @data_detailDeleted = "true" })
+                      </div>
+                 </div>
+                <div style="padding-right:15px">
+
+                    <table class="table table-hover ctable">
+                        <thead id="header">
+                        </thead>
+
+                        <tbody id="Result"></tbody>
+                    </table>
+                </div>
+
+                @*<hr style="margin-bottom:0px" />
+                <div class="form-group">
+                    <div class="col-sm-offset-2 col-md-10">
+                        <input type="submit" value="CancelMultiple" class="btn btn-primary btn-sm CurveBorder height" name="command" id="btnSave" style=" border-color: #606264" />
+                        <input type="submit" value="CancelCustom" name="command" class="btn btn-primary btn-sm CurveBorder col-md-offset-1 height" id="btnSave2" style=" border-color: #606264" />
+                        <span style="font-family: Calibri,sans-serif,Verdana;font-size:large">
+                            @if (HttpContext.Current.User.Identity.IsAuthenticated)
+                            {
+                                @Html.ActionLink("Back", "Index", "SaleOrderCancelHeader", new { @class = "btn btn-primary btn-sm col-md-offset-1 CurveBorder ActionLinkPadding CustomCss height" })
+                            }
+                        </span>
+                    </div>
+                </div>*@
+            </div>
+        </div>
+    </div>
+}
+
+
+@if ((ViewBag.Mode == "Add") || (ViewBag.Mode == "Edit"))
+{
+    <script type="text/javascript">
+
+        //For Populating Modal PopUp on DoubleClick Of Row
+        $('#Result').on("dblclick",'tr',function(){
+            var text = $(this).find(".id").val();
+            var editurl=$(this).find('a[edit]').attr('href');
+            $('#myModalContent').load(editurl, function () {           
+                $('#myModal').modal({
+                    backdrop: 'static',
+                    keyboard: true
+                }, 'show');
+
+                bindForm1(this);
+            });
+        });
+
+
+        //For Handling Modal PopUp on Clicking Delete Icon
+        $('#Result').on("click",'a[delete]', function (e) {
+            $('#myModalContent').load(this.href, function () {
+                //alert('2');
+                $('#myModal').modal({
+                    backdrop: 'static',
+                    keyboard: true
+                }, 'show');
+
+                bindForm1(this);
+            });
+            return false;
+        });
+
+
+        //For posting the data through ajax and render the contents sent back from the server
+        function bindForm1(dialog) {        
+            $('form#modform', dialog).submit(function () {
+                //alert(this.action);
+                $.ajax({
+                    url: this.action,
+                    type: this.method,
+                    data: $(this).serialize(),
+                    success: function (result) {
+                        if (result.success) {
+                            $('#myModal').modal('hide');
+                            //Refresh
+                            //location.reload();
+                            //alert('Data Saved');
+                        }else if(!result.success)
+                        {
+                            $('#myModalContent').html(result);
+                            bindForm1();
+                        }
+                        else {
+                            $('#myModalContent').html(result);
+                            bindForm1();
+                        }
+                    }
+                });
+                return false;
+            });
+
+        }
+
+        $(document).ready(function(){
+            enableModalTransitions();
+        })
+
+
+    </script>
+
+}
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        //CustomSelectFunction($("#BuyerId"), '/ComboHelpList/GetBuyers', '/ComboHelpList/SetSingleBuyer', ' ', false, 1);
+        CustomSelectFunction($("#BuyerId"), '/SaleOrderCancelHeader/GetCustomPerson', '/ComboHelpList/SetSinglePerson', ' ', false, 1,$('#DocTypeId').val());
+        //Calling the function to load the table data/ Line information
+        LoadProducts();
+    });
+
+
+    var id=@Model.SaleOrderCancelHeaderId;
+    if(id==null||id==0)
+    {
+        $(document).find('a#btnCreate').removeAttr('href').removeAttr('data-modal');
+        $(document).find('a#btnCreateF').removeAttr('href').removeAttr('data-modal');
+    }
+
+
+
+    //Reloading the table contents on modal hide
+    $('#myModal').on('hidden.bs.modal', function () {
+        LoadProducts();
+    });
+
+
+    //To focus on the first element on modal load
+    $('#myModal').on('shown.bs.modal', function () {
+        $("#ProductId").select2("focus");
+    });
+
+
+
+    //Loading the Table data or Line Information
+    function LoadProducts() {
+        
+        var groupId=@Model.SaleOrderCancelHeaderId;
+        var status='@Model.Status';
+        var LineEditUrl="";
+        var LineDeleteUrl="";
+        if(status==StatusContstantsEnum.Drafted)
+        {
+            LineEditUrl="/SaleOrderCancelLine/_ModifyLine/";
+            LineDeleteUrl="/SaleOrderCancelLine/_DeleteLine/";
+        }
+        else if(status==StatusContstantsEnum.Submitted || status == StatusContstantsEnum.Modified )
+        {
+            LineEditUrl="/SaleOrderCancelLine/_ModifyLineAfterSubmit/";
+            LineDeleteUrl="/SaleOrderCancelLine/_DeleteLine_AfterSubmit/";
+        }
+        else
+        {
+            LineEditUrl="/SaleOrderCancelLine/_Detail/";
+            LineDeleteUrl="/SaleOrderCancelLine/_Detail/";
+        }   
+        var link="/SaleOrderCancelLine/Index/"+groupId;
+      
+        $.ajax({
+            url: link,
+            type: "GET",
+            success: function (data) {
+                var row = ""
+                var QtyCount=0;
+                var srno=1;
+                var head="<tr style='background-color:#428bca'>  <th style='width:10px'><input type='hidden'  /></th> <th style='width:10px'>Sr</th><th class='center' style='width:50px'>Product</th> <th class='center' style='width:50px'>Order.No</th> <th class='text-right' style='width:50px'> Qty</th> <th style='width:50px'>Remark</th> <th style='width:10px'></th>       <th style='width:10px'></th>  </tr>"
+                if(data.length!=0)
+                {
+                    $.each(data, function (index, item) {
+                        row += "<tr><td><input type='hidden' class='id' value='" + item.SaleOrderCancelLineId + "'/></td> <td>"+srno+"</td> <td>" + ((item.ProductName==null)?" ":item.ProductName ) + " <div>"+(item.Dimension1Name==null?" ":item.Dimension1Name+",")+(item.Dimension2Name==null?" ":item.Dimension2Name)+"</div>  </td> <td>" + item.DocNo + "</td><td class='text-right'>" + ((item.Qty==null)?" ":item.Qty ) + "</td><td> "+((item.LineRemark==null)?" ":item.LineRemark )+"</td> <td><a  edit='' href='"+LineEditUrl+item.SaleOrderCancelLineId+"'></a></td>       <td  style='padding-top:0px;padding-bottom:0px'><a class='glyphicon glyphicon-trash icon-Cus-Size' data-modal='' delete='' href='"+LineDeleteUrl+item.SaleOrderCancelLineId+"' ></a></td>  </tr>";
+                        QtyCount+=item.Qty;
+                        srno++;
+                    });
+
+                    row += "<tr><td colspan='2' class='text-center'><strong>Total</strong></td> <td colspan='2'></td><td class='text-right'><strong>" +QtyCount + "</strong></td><td> </td> <td></td>       <td></a></td>  </tr>";
+                    $("#BuyerId").attr({'readonly':'true'});
+                }
+                else
+                {
+                    row+="<tr><td>No Items Found.</td></tr>";
+                }
+                $("#header").html(head);
+                $("#Result").html(row);
+            },
+            error: function (result) {
+                alert("Error");
+            }
+        });
+    }
+
+
+  
+
+</script>
+
+
+
+@if ((ViewBag.Mode != "Add") && (ViewBag.Mode != "Edit"))
+{
+    <script type="text/javascript">
+
+
+        $(document).ready(function(){
+            DisablePageNavigation();
+        })
+
+        //RemoveFields();
+
+        //function RemoveFields(){
+        //    //Disabling input fields
+        //    $(':input:not(:submit)').attr('disabled','disabled');
+
+        //    //Removing all the events from the newly created lines
+        //    $('#gbody').unbind();
+
+        //    //Removing Add New Row ActionLink
+        //    $('a#btnCreate').parents('h5')[0].remove();
+
+        //    $('a#btnCreateF').remove();
+
+
+        //    //Preventing the click event on newly created elements
+        //    $(document).on('click','#Result a',function(event){
+        //        event.preventDefault();
+        //    })
+        //    //Removing the action link from the form so that the request will be redirected to the Submit function in the controller instead of the hardcoded path
+        //    $('form:last').prop('action','');
+        //}
+
+
+    </script>
+}

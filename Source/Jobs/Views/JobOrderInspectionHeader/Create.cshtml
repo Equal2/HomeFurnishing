@@ -1,0 +1,751 @@
+﻿@model Model.ViewModel.JobOrderInspectionHeaderViewModel
+@using Core.Common
+@{
+    ViewBag.Title = "Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<!-- modal placeholder-->
+<div id='myModal' class='modal fade in'>
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div id='myModalContent'></div>
+        </div>
+    </div>
+</div>
+
+@using (Html.BeginForm("Post", "JobOrderInspectionHeader", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(m => m.SiteId)
+    @Html.HiddenFor(m => m.DivisionId)
+    @Html.HiddenFor(m => m.Status)
+    @Html.HiddenFor(m => m.JobOrderInspectionHeaderId)
+    @Html.HiddenFor(m => m.DocTypeId)
+    @Html.HiddenFor(m => m.ProcessId)
+    @Html.HiddenFor(m => m.CreatedDate)
+    @Html.HiddenFor(m => m.JobOrderInspectionSettings.ProcessId)
+
+    <div class="panel panel-default">
+        <div class="panel-heading">
+
+            @CustomHelpers.RenderResHeaderInfo(ViewBag.transactionType, (int?)ViewBag.PendingToSubmit, (int?)ViewBag.PendingToReview, ViewBag.Name)
+
+            @*@if (ViewBag.transactionType == "submit" || ViewBag.transactionType == "submitContinue")
+            {<h3 style="border-bottom:0px solid #e1dada;padding-bottom:0px;">
+                <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"> <span class="glyphicon glyphicon-file black"></span>Submit @ViewBag.Name</span>
+                <button type="submit" name="Command:Submit" class="btn btn-primary right" id="SubmitContinue" style="margin-left:5px;">Submit & Next<span class='badge'>@(ViewBag.PendingToSubmit != 0 ? ViewBag.PendingToSubmit : "")</span></button>
+                <button type="submit" name="Command:Submit" class="btn btn-primary right">Submit</button>
+                <input type="hidden" id="IsContinue" name="IsContinue" value="" />
+            </h3>}
+            else if (ViewBag.transactionType == "review" || ViewBag.transactionType == "ReviewContinue")
+            {<h3 style="border-bottom:0px solid #e1dada;padding-bottom:0px;">
+                <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"> <span class="glyphicon glyphicon-file black"></span>Review @ViewBag.Name</span>
+                <button type="submit" name="Command:Review" class="btn btn-primary right" style="margin-left:5px" id="ReviewContinue">Review & Next<span class='badge'>@(ViewBag.PendingToReview != 0 ? ViewBag.PendingToReview : "")</span></button>
+                <button type="submit" class="btn btn-primary right" name="Command:Review">Review</button>
+                <input type="hidden" id="IsContinue" name="IsContinue" value="" />
+            </h3>}
+            else if (ViewBag.transactionType == "detail")
+            {
+                <h3>
+                    <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"> <span class="glyphicon glyphicon-file black"></span>@ViewBag.Name</span>
+                </h3>
+            }
+            else
+            {
+                <h3 style="border-bottom:0px solid #e1dada;padding-bottom:0px;">
+                    <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"> <span class="glyphicon glyphicon-file black"></span> @ViewBag.Name</span>
+                    <input type="submit" value="Save" class="btn btn-primary right" id="submit" style="width: 90px; background-color: #2980b9" />
+                </h3>
+            }*@
+
+            @*@Html.ActionLink("For Order", "_ForOrder", "JobOrderInspectionLine", new { id = @Model.JobOrderInspectionHeaderId, sid = @Model.JobWorkerId }, new { data_modal = "", id = "btnCreateF", @class = "btn btn-primary borderradii", @title = "For Order", @data_toggle = "tooltip", @style = "background-color:#2980b9", @data_detailDeleted = "true" })
+            @Html.ActionLink("For Request", "_ForRequest", "JobOrderInspectionLine", new { id = @Model.JobOrderInspectionHeaderId, sid = @Model.JobWorkerId }, new { data_modal = "", id = "btnCreateFR", @class = "btn btn-primary borderradii", @title = "For Order", @data_toggle = "tooltip", @style = "background-color:#2980b9", @data_detailDeleted = "true" })*@
+
+            <hr style="margin-top: 5px; margin-bottom: 5px; border-top: 1px solid #d8d5d5" />
+
+            @{
+                string EditAction = "";
+                if (Model.Status == (int)StatusConstants.Drafted || Model.Status == (int)StatusConstants.Import)
+                {
+                    EditAction = "Modify";
+                }
+                else if ((Model.Status == (int)StatusConstants.Submitted || Model.Status == (int)StatusConstants.Modified))
+                {
+                    EditAction = "ModifyAfter_Submit";
+                }
+                else
+                {
+                    EditAction = "DetailInformation";
+                }
+            }
+            <div class="panel-info">
+                @*<h4 style="padding:5px 0 0 0;margin:0px">
+                        @Html.ActionLink(" ", " ", " ", null, new { @class = "glyphicon glyphicon-refresh toolbar", @title = "Refresh Page", @data_toggle = "tooltip", @id = "RefreshPage" })
+                         @Html.ActionLink(" ", "Create", "JobOrderInspectionHeader", new { @id = ViewBag.id }, new { @class = "glyphicon glyphicon-plus toolbar", @title = "Add New", @data_toggle = "tooltip" })
+                         @Html.ActionLink(" ", "GetHistory", "LogHistory", new { Ids = Model.JobOrderInspectionHeaderId, DocTypeId = Model.DocTypeId }, new { @class = "glyphicon glyphicon-user toolbar", @title = "History", @data_toggle = "tooltip", @id = "DocHistory", @data_modal = "" })
+                         @Html.ActionLink(" ", "GeneratePrints", "JobOrderInspectionHeader", new { Ids = Model.JobOrderInspectionHeaderId, DocTypeId = Model.DocTypeId }, new { @class = "glyphicon glyphicon-print toolbar", @title = "Print", @data_toggle = "tooltip", @id = "PrintRecordC", target = "_blank" })
+                         @Html.ActionLink(" ", "Email", "JobOrderInspectionHeader", null, new { @class = "glyphicon glyphicon-envelope toolbar", @title = "Email", @data_toggle = "tooltip" })
+                         @Html.ActionLink(" ", "PrevPage", "JobOrderInspectionHeader", new { DocId = @Model.JobOrderInspectionHeaderId, DocTypeId = Model.DocTypeId }, new { @class = "glyphicon glyphicon-arrow-left toolbar", @title = "Prev Record", @data_toggle = "tooltip" })
+                         @Html.ActionLink(" ", "NextPage", "JobOrderInspectionHeader", new { DocId = @Model.JobOrderInspectionHeaderId, DocTypeId = Model.DocTypeId }, new { @class = "glyphicon glyphicon-arrow-right toolbar", @title = "Next Record", @data_toggle = "tooltip" })*@
+                        @*@Html.ActionLink(" ", " ", " ", null, new { @class = "glyphicon glyphicon-trash toolbar", @title = "Delete", @data_toggle = "tooltip" })*@
+                        @*@Html.ActionLink(" ", "Index", "JobOrderInspectionHeader", new { @id = ViewBag.id, IndexType = ViewBag.IndexStatus }, new { @class = "glyphicon glyphicon-list toolbar right", @title = "List", @data_toggle = "tooltip" })
+                        @Html.ActionLink(" ", "Report", "JobOrderInspectionHeader", null, new { @class = "glyphicon glyphicon-th toolbar right", @title = "Report", @data_toggle = "tooltip" })
+                        </h4>*@
+
+                <div class="btn-group">
+                    @Html.ActionLink(" ", "Create", "JobOrderInspectionHeader", new { @id = ViewBag.id }, new { @class = "cbtn btn-circle glyphicon glyphicon-plus toolbar", @title = "Add New", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", EditAction, "JobOrderHeader", new { @id = Model.JobOrderInspectionHeaderId, IndexType = ViewBag.IndexStatus }, new { @class = "cbtn btn-circle glyphicon glyphicon-edit", @title = "Edit", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "GeneratePrints", "JobOrderInspectionHeader", new { Ids = Model.JobOrderInspectionHeaderId, DocTypeId = Model.DocTypeId }, new { @class = "cbtn btn-circle glyphicon glyphicon-print toolbar", @title = "Print", @data_toggle = "tooltip", @id = "PrintRecordC", target = "_blank" })
+                    @Html.ActionLink(" ", "PrevPage", "JobOrderInspectionHeader", new { DocId = @Model.JobOrderInspectionHeaderId, DocTypeId = Model.DocTypeId }, new { @class = "cbtn btn-circle glyphicon glyphicon-arrow-left toolbar", @title = "Prev Record", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "NextPage", "JobOrderInspectionHeader", new { DocId = @Model.JobOrderInspectionHeaderId, DocTypeId = Model.DocTypeId }, new { @class = "cbtn btn-circle glyphicon glyphicon-arrow-right toolbar", @title = "Next Record", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "Index", "JobOrderInspectionHeader", new { @id = ViewBag.id, IndexType = ViewBag.IndexStatus }, new { @class = "cbtn btn-circle glyphicon glyphicon-list", @title = "List", @data_toggle = "tooltip" })
+                </div>
+                <div class="btn-group">
+                    <a class="cbtn btn-circle glyphicon glyphicon-option-horizontal dropdown-toggle" title="More Option" aria-expanded="false" style="padding-top: 6px;padding-bottom: 6px;" href="#" data-toggle="dropdown" id="dropdownMenu1">
+                    </a>
+                    <ul class="dropdown-menu pull-right" aria-labelledby="dropdownMenu1">
+                        <li><a id="DocHistory" data-modal="" href="@Url.Action("GetHistory", "LogHistory", new { Ids = Model.JobOrderInspectionHeaderId, DocTypeId = Model.DocTypeId })"><span class="glyphicon glyphicon-user"> </span> History</a></li>
+                        <li><a href="@Url.Action("Email", "JobOrderInspectionHeader")"><span class="glyphicon glyphicon-envelope"> </span> Email</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="@Url.Action("Report", "JobOrderInspectionHeader", new { @ViewBag.id })"><span class="glyphicon glyphicon-th"> </span> Report</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="panel-info" style="padding-left:15px">
+            <div class="form-horizontal">
+                @Html.ValidationSummary(true)
+
+                <div>
+                    <h4 class="col-md-12 black">
+                        <span class="glyphicon glyphicon-align-justify"></span>
+                        1.Document Details
+                    </h4>
+                    <div>
+                        <div>
+                            <div class="col-md-6">
+                                <div class="form-group" style="margin-top:15px">
+                                    @Html.LabelFor(model => model.DocDate, "Inspection Date", new { @class = "control-label col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @*@Html.TextBoxFor(m => m.DocDate, "{0:dd/MMMM/yyyy}", new { @class = "datepickerWithNFD form-control required" })*@
+                                        @Html.TextBoxFor(m => m.DocDate, "{0:dd/MMMM/yyyy}", new
+                                   {
+                                       @class = "datepickerWithNFD form-control col-xs-6 required updateDocNo",
+                                       data_tabl = "JobOrderInspectionHeaders",
+                                       data_doctype = Model.DocTypeId,
+                                       data_divId = Model.DivisionId,
+                                       data_sitId = Model.SiteId,
+                                   })
+                                        @Html.ValidationMessageFor(model => model.DocDate, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group" style="margin-top:15px">
+                                    @Html.LabelFor(model => model.DocNo, "Inspection No", new { @class = "control-label col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextBoxFor(m => m.DocNo, null, new { @class = "form-control required" })
+                                        @Html.ValidationMessageFor(m => m.DocNo, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div>
+
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.JobWorkerId, (Model.DocumentTypeSettings.PartyCaption ?? "Party"), new { @class = "control-label col-md-4 col-sm-2" })
+                                    @Html.HiddenFor(m => m.DocumentTypeSettings.PartyCaption)
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextBoxFor(m => m.JobWorkerId, new { @class = "form-control required" })
+                                        @Html.ValidationMessageFor(m => m.JobWorkerId, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.InspectionById, "InspectionBy", new { @class = "control-label col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextBoxFor(m => m.InspectionById, null, new { @class = "form-control" })
+                                        @Html.ValidationMessageFor(m => m.InspectionById, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.Remark, "Remark", new { @class = "control-label col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextAreaFor(m => m.Remark, new { @class = "form-control" })
+                                        @Html.ValidationMessageFor(m => m.Remark, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+
+                <hr />
+                <div class="row">
+                    <h4 class="col-md-12 black" style="margin-top:15px">
+                        <span class="glyphicon glyphicon-shopping-cart"></span>
+                        2.Products
+                    </h4>
+                </div>
+
+                @*<div class="panel-info">
+                    <h5 style="padding:5px 0 3px 0;margin:0px;font-weight:bold">
+                        <span class="glyphicon glyphicon-plus-sign"></span>
+                        @{string Action = "";
+                        if (Model.Status == (int)StatusConstants.Drafted)
+                        { Action = "CreateLine"; }
+                        else if (Model.Status == (int)StatusConstants.Submitted || Model.Status == (int)StatusConstants.Modified || Model.Status == (int)StatusConstants.ModificationSubmitted)
+                        { Action = "CreateLineAfter_Submit"; }
+                        }
+                        @Html.ActionLink("Add New Row ", Action, "JobOrderInspectionLine", new { id = @Model.JobOrderInspectionHeaderId, JobWorkerId = @Model.JobWorkerId, InsReq = false }, new { data_modal = "", id = "btnCreate", @class = "toolbar", @title = "Add New", @data_toggle = "tooltip", @data_detailDisabled = "true" })/
+                        @Html.ActionLink("Ins-Request", Action, "JobOrderInspectionLine", new { id = @Model.JobOrderInspectionHeaderId, JobWorkerId = @Model.JobWorkerId, InsReq = true }, new { data_modal = "", id = "btnCreate", @class = "toolbar", @title = "Add New", @data_toggle = "tooltip", @data_detailDisabled = "true" })
+                    </h5>
+                </div>*@
+
+                <div class="panel-info" style="height:40px">
+                    <div class="btn-group" style="padding:5px 0 3px 0;margin:0px;font-weight:bold">
+                        <span class="glyphicon glyphicon-plus-sign"></span>
+                        @{string Action = "";
+                            if (Model.Status == (int)StatusConstants.Drafted)
+                            { Action = "CreateLine"; }
+                            else if (Model.Status == (int)StatusConstants.Submitted || Model.Status == (int)StatusConstants.Modified || Model.Status == (int)StatusConstants.ModificationSubmitted)
+                            { Action = "CreateLineAfter_Submit"; }
+                        }
+                        @Html.ActionLink("Add New Row ", Action, "JobOrderInspectionLine", new { id = @Model.JobOrderInspectionHeaderId, JobWorkerId = @Model.JobWorkerId, InsReq = false }, new { data_modal = "", id = "btnCreate", @class = "toolbar", @title = "Add New", @data_toggle = "tooltip", @data_detailDisabled = "true" })/
+                        @Html.ActionLink("Ins-Request", Action, "JobOrderInspectionLine", new { id = @Model.JobOrderInspectionHeaderId, JobWorkerId = @Model.JobWorkerId, InsReq = true }, new { data_modal = "", id = "btnCreate", @class = "toolbar", @title = "Add New", @data_toggle = "tooltip", @data_detailDisabled = "true" })
+                        </div>
+                 
+                    <div class="btn-group right" style="padding-right:15px" onreadystatech>
+                        
+
+                        <a class="cbtn btn-circle glyphicon glyphicon-link dropdown-toggle" aria-expanded="false" style="padding-top: 6px;padding-bottom: 6px;" href="#" data-toggle="dropdown" id="dropdownMenu2">
+                        </a>
+                        @*@if (@Model.JobOrderInspectionHeaderId != 0)
+                        {*@
+                           <ul class="dropdown-menu pull-right" aria-labelledby="dropdownMenu2">
+                           <li><a id="btnCreateF" data-modal="" href="@Url.Action("_ForOrder", "JobOrderInspectionLine", new { id = @Model.JobOrderInspectionHeaderId, sid = @Model.JobWorkerId })"><span class="glyphicon glyphicon-user"> </span> For Order</a></li>
+                            <li><a id="btnCreateFR" data-modal="" href="@Url.Action("_ForRequest", "JobOrderInspectionLine", new { id = @Model.JobOrderInspectionHeaderId, sid = @Model.JobWorkerId })"><span class="glyphicon glyphicon-user"> </span> For Request</a></li>
+                            </ul>
+                        @*}*@
+                    </div>
+                    </div>
+                <div style="padding-right:15px">
+
+                    @*<table class="table table-hover ctable">
+                            <thead id="header">
+                            </thead>
+
+                            <tbody id="Result"></tbody>
+                        </table>*@
+
+                    <div class="panel panel-default" id="grid">
+                        <div class="panel-heading headrow" >
+                            <div class="row grid-head">
+                                <div class="block" style="width:5%">
+                                    Srl.
+                                </div>
+                                <div class="block" style="width:90%">
+                                    <div class="row">
+                                        @*ProductInfo*@
+                                        <div class="block" style="width:25%">
+                                            Product Name
+
+                                        </div>
+                                        @*PopContext*@
+                                        <div class="block" style="width:15%">
+                                            Request No
+                                        </div>
+                                        @*Qty*@
+                                        <div class="block text-right" style="width:15%">
+                                            Qty
+                                        </div>
+                                        <div class="block" style="width:15%">
+                                            Unit
+                                        </div>
+                                        <div class="block text-right" style="width:15%">
+                                            Ins-Qty
+                                        </div>
+                                        <div class="block text-right" style="width:15%">
+                                            Marks
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="block" style="width:5%">
+
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="panel-info" id="gbody">
+
+
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+
+
+@if ((ViewBag.Mode == "Add") || (ViewBag.Mode == "Edit"))
+{
+
+    <script type="text/javascript">
+
+
+        //Reloading the table contents on modal hide
+        $('#myModal').on('hidden.bs.modal', function () {
+            LoadProducts();
+        });
+
+        $(document).ready(function(){
+            enableModalTransitions();
+        })
+
+     
+        //$('#gbody').on("dblclick",'.grid-body',function(){
+
+        //    var editurl=$(this).find('a[edit]').attr('href');
+        //    $('#myModalContent').load(editurl, function () {
+        //        //alert('2');
+        //        $('#myModal').modal({
+        //            backdrop: 'static',
+        //            keyboard: true
+        //        }, 'show');
+
+        //        bindForm1(this);
+        //    });
+        //});
+
+
+        ////For Handling Modal PopUp on Clicking Delete Icon
+        //$('#gbody').on("click",'a[delete]', function (e) {
+        //    $('#myModalContent').load(this.href, function () {
+        //        //alert('2');
+        //        $('#myModal').modal({
+        //            backdrop: 'static',
+        //            keyboard: true
+        //        }, 'show');
+
+        //        bindForm1(this);
+        //    });
+        //    return false;
+        //});
+
+        ////For Handling Modal PopUp on Clicking Delete Icon
+        //$('#gbody').on("click",'a[Detail]', function (e) {
+        //    $('#myModalContent').load(this.href, function (response, status, xhr) {
+        //        //alert('2');
+        //        if ( status == "error" ) {
+        //            var msg = "Sorry but there was an error: ";
+        //        }
+        //        else
+        //        {
+        //            $('#myModal').modal({
+        //                backdrop: 'static',
+        //                keyboard: true
+        //            }, 'show');
+
+        //            bindForm1(this);}
+        //    });
+        //    return false;
+        //});
+
+        //Reloading the table contents on modal hide
+        $('#myModal').on('hidden.bs.modal', function () {
+            LoadProducts();
+            var id=@Model.JobOrderInspectionHeaderId;
+        });
+
+
+
+        ////For posting the data through ajax and render the contents sent back from the server
+        //function bindForm1(dialog) {
+        //    //alert("binding1");
+        //    $('form#modform', dialog).submit(function () {
+        //        $.ajax({
+        //            url: this.action,
+        //            type: this.method,
+        //            data:$(this).serialize(),
+        //            success: function (result) {
+        //                if (result.success) {
+        //                    $('#myModal').modal('hide');
+        //                    //Refresh
+        //                    //location.reload();
+        //                    //alert('Data Saved');
+        //                }else if(!result.success)
+        //                {//alert('Data Saved1');
+        //                    $('#myModalContent').html(result);
+        //                    bindForm1();
+        //                }
+        //                else {
+        //                    //alert('Data Saved2');
+        //                    $('#myModalContent').html(result);
+        //                    bindForm1();
+        //                }
+        //            },
+        //        });
+        //        return false;
+        //    });
+
+        //}
+
+        //$(function () {
+
+        //    $.ajaxSetup({ cache: false });
+
+        //    $("a[data-modalCustom]").on("click", function (e) {
+        //        // hide dropdown if any
+        //        if(this.href=="")
+        //        {
+        //            return false;
+        //        }
+        //        //alert(' Script');
+        //        $('#myModalContent').load(this.href, function () {
+        //            $('#myModal').modal({
+        //                backdrop: 'static',
+        //                keyboard: true
+        //            }, 'show');
+
+        //            bindForm1(this);
+        //        });
+
+        //        return false;
+        //    });
+        //});
+
+
+        var IsSaved=false;
+        var ValidationCount=0;
+
+        $('form').submit(function(event){
+
+            if(!IsSaved)
+            {
+                if(!ValidateData())
+                {
+                    return false;
+                }
+                IsSaved=true;
+                return IsSaved;
+            }
+            else
+            {
+                return false;
+            }
+
+
+        });
+
+
+        function ValidateData() {
+            var DocId=@Model.JobOrderInspectionHeaderId;
+            var TempValue;
+            var ValidationMessage="";
+
+
+
+            //Checking for dulicate key value
+            if(DocId<=0)
+            {
+                TempValue= $('#DocNo').DuplicateCheckForCreate({ name: 'JobOrderInspectionHeaders', value: $('#DocNo').val(), doctype: $('#DocTypeId').val() });
+                if (TempValue){ ValidationMessage=$('#DocNo').val() + " already exist <br />";}
+            }
+            else
+            {
+                TempValue = $('#DocNo').DuplicateCheckForEdit({ name: 'JobOrderInspectionHeaders', value: $('#DocNo').val(), doctype: $('#DocTypeId').val(),headerId:DocId });
+                if (TempValue) {ValidationMessage+=$('#DocNo').val() + " already exist <br />";}
+            }
+            if(TempValue)
+            {
+                if($('#validationerrormsg').length==0){
+                    $('.panel-info').filter(':eq(1)').before('<div class="alert alert-danger" role="alert" id="validationerrormsg">'+ValidationMessage+'</div>');}
+                else
+                {
+                    $('#validationerrormsg').html(ValidationMessage);
+                }
+            }
+
+            return  (ValidationMessage=="");
+
+        }
+
+
+
+
+
+    </script>
+
+
+}
+
+<script type="text/javascript">
+    $(document).ready(function () {
+
+        //Calling the function to load the table data/ Line information
+        LoadProducts();
+
+        //Adding Hidden Input Fields
+        AddFields();
+
+    });
+
+
+    //CustomSelectFunction($("#ProcessId"), '/ComboHelpList/GetProcess', '/ComboHelpList/SetSingleProcess', ' ', false, 1);
+    //CustomSelectFunction($("#JobWorkerId"), '/ComboHelpList/GetJobWorkersWithProcess', '/ComboHelpList/SetSingleJobWorker', ' ', false, 1, $('#ProcessId').val());
+    CustomSelectFunction($("#JobWorkerId"), '/JobOrderInspectionHeader/GetCustomPerson', '/ComboHelpList/SetSinglePerson', ' ', false, 1,$('#DocTypeId').val());
+    CustomSelectFunction($("#InspectionById"), '/ComboHelpList/GetEmployees', '/ComboHelpList/SetSingleEmployee', ' ', false, 1);
+
+    var id=@Model.JobOrderInspectionHeaderId;
+    if(id==null||id==0)
+    {
+        $(document).find('a#btnCreate').removeAttr('href').removeAttr('data-modal');
+        $("#btnCreateF").attr('disabled','disabled');
+        $("#btnCreateFR").attr('disabled','disabled');
+        $("#dropdownMenu2").prop("disabled", true);
+       
+    }
+    $("#JobWorkerId").select2('focus');
+
+
+
+    //Loading the Table data or Line Information
+    function LoadProducts() {
+        var DomainName='@System.Configuration.ConfigurationManager.AppSettings["AdminSetupDomain"]';
+        var SelectedRecord='@ViewBag.DocLineId';
+        var groupId=@Model.JobOrderInspectionHeaderId;
+        var status='@Model.Status';
+        var LineEditUrl;
+        var LineDeleteUrl;
+        if(status==StatusContstantsEnum.Drafted)
+        {
+            LineEditUrl="/JobOrderInspectionLine/_ModifyLine/";
+            LineDeleteUrl="/JobOrderInspectionLine/_DeleteLine/";
+        }
+        else if(status==StatusContstantsEnum.Submitted || status == StatusContstantsEnum.Modified )
+        {
+            LineEditUrl="/JobOrderInspectionLine/_ModifyLineAfterSubmit/";
+            LineDeleteUrl="/JobOrderInspectionLine/_DeleteLine_AfterSubmit/";
+        }
+        var link="/JobOrderInspectionLine/Index/"+groupId;
+        var QtyCount=0;
+        var InspectedQtyCount=0;
+        var unit=true;
+        var prevunit;
+        var decimal=0;
+        var DealQty=0;
+        $.ajax({
+            url: link,
+            type: "GET",
+            success: function (data) {
+                var row = ""
+                var srno=1;
+                if(data.length!=0)
+                {
+                    $('#JobWorkerId').attr('readonly','true');
+
+                    $.each(data, function (index, item) {
+
+                        var OrderUrl=DomainName+"/Redirect/RedirectToDocument?DocTypeId="+item.OrderDocTypeId+"&DocId="+item.OrderHeaderId+"&DocLineId="+item.JobOrderLineId;
+                        var BarCodeUrl=DomainName+"/Redirect/BarCodeDetail?BarCode="+item.ProductUidName;
+
+                        row += " <div class='row crow grid-body' style='margin-left:0px;margin-right:0px'id='"+item.JobOrderInspectionLineId+"'>"
+                            +"      <div class='row-index block'  style='width:5%'>"+srno+"<input type='hidden' class='id' value='"+item.JobOrderInspectionLineId+"' /></div>"
+                            +"          <div class='block'  style='width:90%'>"
+                            +"              <div class='row'>"
+                            +"                   <div class='block' style='width:25%'>"+(item.ProductName==null?" ":"<strong>"+item.ProductName+"</strong>")
+                            +"                       <div>"+(item.Specification==null?" ":item.Specification)+"</div>"
+                            +"                           <div>"+(item.Dimension1Name==null?" ":item.Dimension1Name+",")+(item.Dimension2Name==null?" ":item.Dimension2Name)+(item.Dimension3Name==null?" ":item.Dimension3Name)+(item.Dimension4Name==null?" ":item.Dimension4Name)+"</div>"
+                            +"                              <div>"+(item.ProductUidName==null?" ":"Product UID : <a href='"+BarCodeUrl+"' target='_blank'> "+item.ProductUidName+"</a>")+"</div>"
+                            +"                   </div>"
+                            +"                   <div class='block'  style='width:15%'>"+(item.JobOrderDocNo==null?" ":"<a href='"+OrderUrl+"' class='nav' style='color:black'> <span class='small' style='font-weight:bold'>Order:"+item.JobOrderDocNo+"</span></a>")
+                            +"                   <div>"+(item.JobOrderInspectionRequestDocNo==null?" ":"<a href='"+OrderUrl+"' class='nav' style='color:black'> <span class='small' style='font-weight:bold'>Request:"+item.JobOrderInspectionRequestDocNo+"</span></a>")+"</div>"
+                            +"                   </div>"
+                            +"                   <div class='text-right block'  style='width:15%'>"+(item.Qty==null?" ":item.Qty.toFixed(item.UnitDecimalPlaces))+"<br />"
+                            +"                   </div>"
+                            +"                   <div class='block'  style='width:15%'>"+(item.UnitName==null?" ":item.UnitName)
+                            +"                   </div>"
+                            +"                   <div class='text-right block'  style='width:15%'>"+(item.InspectedQty==null?" ":item.InspectedQty.toFixed(item.UnitDecimalPlaces))
+                            +"                   </div>"
+                            +"                   <div class='text-right block'  style='width:15%'>"+(item.Marks==null?" ":item.Marks.toFixed(0))
+                            +"                   </div>"
+                            +"              </div>"
+                            +"          </div>"
+                            +"      <div class='block'  style='width:5%'>"
+                            +"          <a class='glyphicon glyphicon-trash icon-Cus-Size' data-modal data-detailDisabled='true' delete='' href='"+LineDeleteUrl+item.JobOrderInspectionLineId+"'></a>"
+                            +"          <a  edit='' href='"+LineEditUrl+item.JobOrderInspectionLineId+"'></a>"
+                            +"      </div>"
+                            +"  </div>"
+                            +"<hr style='margin-top:0px;margin-bottom:0px'/>";
+                        QtyCount+=item.Qty;                        
+                        InspectedQtyCount+=item.InspectedQty;
+                        
+                        DealQty+=item.PassQty*item.UnitConversionMultiplier;
+                        if(srno!=1)
+                        {
+                            if(item.UnitName==prevunit && unit!=false)
+                            {}
+                            else
+                            {unit=false;}
+                        }
+
+                        if(decimal- parseInt(item.UnitDecimalPlaces) < 0){decimal=item.UnitDecimalPlaces;}
+                        srno++;
+                        prevunit=item.UnitName;
+
+                    });
+
+                    row+="<div class='row tfooter' style='padding-top:10px;margin-left:0px;margin-right:0px'>"
+                        +"  <div class='block' style='width:5%'>"
+                        +"  </div>"
+                        +"  <div class='block' style='width:90%'>"
+                        +"      <div class='row'> "
+                        +"          <div class='block'  style='width:25%'><strong>Total</strong></div>"
+                        +"          <div class='block' style='width:15%'><strong>"
+                        +"          </strong></div>"
+                        +"          <div class='block text-right' style='width:15%'><strong>"
+                        +               (QtyCount.toFixed(decimal))+"</strong>"
+                        +"          </div>"
+                        +"          <div class='block' style='width:15%'><strong>"
+                        +               ((unit==true)?prevunit:"")+"</strong>"
+                        +"          </div>"
+                        +"          <div class='block text-right' style='width:15%'><strong>"+(InspectedQtyCount.toFixed(decimal))
+                        +"          </strong></div>"
+                        +"          <div class='block text-right' style='width:15%'><strong>"
+                        +"          </strong></div>"
+                        +"      </div>"
+                        +"  </div>"
+                        +"  <div class='block'  style='width:5%'>"
+                        +"  </div>"
+                        +"</div>"
+                }
+                else
+                {
+
+                }
+                $("#gbody").html(row);
+                if(SelectedRecord && SelectedRecord!=0)
+                {
+                    var Id="#"+SelectedRecord
+                    NavigateToLineRecord(Id);}
+            },
+            error: function (result) {
+                alert("Error");
+            }
+        });
+    }
+
+</script>
+
+
+@if ((ViewBag.Mode != "Add") && (ViewBag.Mode != "Edit"))
+{
+    <script type="text/javascript">
+
+        $(document).ready(function(){
+            DisablePageNavigation();
+        })
+
+    </script>
+}
+
+@if ((Model.Status == (int)ActivityTypeContants.Modified || Model.Status == (int)ActivityTypeContants.Submitted)
+    && (ViewBag.transactionType == "submit" || ViewBag.transactionType == "submitContinue" || ViewBag.transactionType == "review" || ViewBag.transactionType == "ReviewContinue"))
+{
+    <script type="text/javascript">
+
+        $(document).ready(function(){
+            enableActivityLogReason();
+        })
+
+        //var href = '/ActivityLog/LogEditReason'
+        //var $btnClicked;
+
+        //$(':submit').bind('click', function () {
+        //    $btnClicked=$(this);
+        //    $('#myModalContent').load(href, function () {
+
+        //        $('#myModal').modal({
+        //            backdrop: 'static',
+        //            keyboard: true
+        //        }, 'show');
+
+        //        bindForm1(this);
+        //    });
+
+        //    return false;
+        //})
+
+        //function bindForm1(dialog) {
+
+        //    $('#modformr', dialog).submit(function () {
+
+        //        $.ajax({
+        //            url: this.action,
+        //            type: this.method,
+        //            data: $(this).serialize(),
+        //            success: function (result) {
+        //                if (result.success) {
+        //                    $('#myModal').modal('hide');
+
+        //                    $(':submit').unbind();
+
+        //                    $('input[name="UserRemark"]').val(result.UserRemark);
+
+        //                    $btnClicked.trigger('click');
+
+        //                } else {
+        //                    $('#myModalContent').html(result);
+        //                    bindForm1();
+        //                }
+        //            }
+        //        });
+        //        return false;
+        //    });
+
+        //}
+
+    </script>
+}
+@if (ViewBag.transactionType != null && (ViewBag.transactionType == "submitContinue" || ViewBag.transactionType == "ReviewContinue"))
+{
+    <script type="text/javascript">
+       
+        $(document).ready(function(){
+            CreateTrasitionEffect();
+        })
+        //CreateTrasitionEffectForSubmit();
+
+        //function CreateTrasitionEffectForSubmit() {
+
+        //    //$('body').find('.container.body-content > div.row ').wrap("<div class='animsition' data-animsition-in='fade-in-right-lg' data-animsition-out='fade-out-left-lg' style='animation-duration: 1.5s; -webkit-animation-duration: 1.5s; opacity: 0;'> </div>");
+
+        //    $('body').find('form').filter(":last").wrapInner("<div class='animsition' data-animsition-in='fade-in-right-lg' data-animsition-out='fade-out-left-lg' style='animation-duration: 1.5s; -webkit-animation-duration: 1.5s; opacity: 0;'> </div>");
+
+        //    var script = document.createElement('script');
+
+        //    script.setAttribute('type', 'text/javascript');
+
+        //    script.text = " $(document).ready(function () {$('.animsition').animsition().one('animsition.start', function () {}).one('animsition.end', function () {$(this).find('.animsition-child').addClass('zoom-in').css({'opacity': 1});})});";
+
+        //    $('body').append(script);
+
+        //}
+
+    </script>
+}

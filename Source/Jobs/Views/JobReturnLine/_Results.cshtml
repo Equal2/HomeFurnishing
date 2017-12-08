@@ -1,0 +1,322 @@
+﻿@model Model.ViewModel.JobReturnMasterDetailModel
+@using Core.Common
+
+<div class="modal-content Custom-modal">
+    <div class="modal-header" style="border-bottom: 1px solid #8E8888">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"> <span class="glyphicon glyphicon-remove"></span></button>
+        <h3>
+            <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-file black"></span> Receipts & Quantities</span>
+        </h3>
+    </div>
+    <div>
+        @using (Html.BeginForm("_ResultsPost", "JobReturnLine", FormMethod.Post, new { enctype = "multipart/form-data", id = "modform" }))
+        { 
+            @Html.ValidationLog((string)TempData["CSEXCL"])
+            @Html.AntiForgeryToken()
+
+            <div class="form-horizontal modal-body">
+
+                <div style="padding-right:15px">
+                    <div class="row">
+                        <div class="form-horizontal">
+                            @Html.ValidationSummary(true)
+
+                            <div class="panel panel-default" id="grid">
+                                <div class="panel-heading headrow" style="background-image: -webkit-linear-gradient(top, #428bca 0%, #428bca 100%);color:white">
+                                    <div class="row grid-head">
+                                        <div class="col-xs-1 text-left">
+                                            Srl.
+                                        </div>
+                                        <div class="col-xs-11">
+                                            <div class="row">
+                                                @*ProductInfo*@
+                                                <div class="col-sm-4">
+                                                    Product
+
+                                                </div>
+                                                <div class="col-sm-2">
+                                                    Receipt No
+                                                </div>
+                                                @*Qty*@
+                                                <div class="col-sm-2 text-right">
+                                                    <a href="#" id="ToReturn" style="color:white">Receipt Qty</a>
+                                                </div>
+                                                <div class="col-sm-2 text-right" style="padding-right:30px">
+                                                    Return Qty
+                                                </div>
+                                                <div class="col-sm-2" style="padding-right:30px">
+                                                    Remark
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+                                </div>
+                                <div class="panel-info" id="gbody" style="max-height:250px;overflow-y:scroll">
+                                    @{
+            decimal ReturnQty = 0;
+            decimal ReceiptQty = 0;
+            int MaxUnitDecPlaces = 0;
+            int MaxDealUnitDecPlaces = 0;
+                                    }
+                                    @for (int i = 0; i < Model.JobReturnLineViewModel.Count; i++)
+                                    {
+                                        <div class='row crow grid-body' style='margin-left:0px;margin-right:0px'>
+
+                                            @Html.HiddenFor(m => Model.JobReturnLineViewModel[i].ProductId)
+                                            @Html.HiddenFor(m => Model.JobReturnLineViewModel[i].DealUnitId)
+                                            @Html.HiddenFor(m => Model.JobReturnLineViewModel[i].ProductName)
+                                            @Html.HiddenFor(m => Model.JobReturnLineViewModel[i].Specification)
+                                            @Html.HiddenFor(m => Model.JobReturnLineViewModel[i].Dimension1Name)
+                                            @Html.HiddenFor(m => Model.JobReturnLineViewModel[i].Dimension2Name)
+                                            @Html.HiddenFor(m => Model.JobReturnLineViewModel[i].Dimension3Name)
+                                            @Html.HiddenFor(m => Model.JobReturnLineViewModel[i].Dimension4Name)
+                                            @Html.HiddenFor(m => Model.JobReturnLineViewModel[i].Dimension1Id)
+                                            @Html.HiddenFor(m => Model.JobReturnLineViewModel[i].Dimension2Id)
+                                            @Html.HiddenFor(m => Model.JobReturnLineViewModel[i].Dimension3Id)
+                                            @Html.HiddenFor(m => Model.JobReturnLineViewModel[i].Dimension4Id)
+                                            @Html.HiddenFor(m => Model.JobReturnLineViewModel[i].JobReceiveLineId)
+                                            @Html.HiddenFor(m => Model.JobReturnLineViewModel[i].JobReturnHeaderId)
+                                            @Html.HiddenFor(m => Model.JobReturnLineViewModel[i].JobReceiveHeaderDocNo)
+                                            @Html.HiddenFor(m => Model.JobReturnLineViewModel[i].GoodsReceiptBalQty)
+                                            @Html.HiddenFor(m => Model.JobReturnLineViewModel[i].DealUnitId)
+                                            @Html.HiddenFor(m => Model.JobReturnLineViewModel[i].DealQty)
+                                            @Html.HiddenFor(m => Model.JobReturnLineViewModel[i].UnitConversionMultiplier)
+                                            @Html.HiddenFor(m => Model.JobReturnLineViewModel[i].UnitId)
+                                            @Html.HiddenFor(m => Model.JobReturnLineViewModel[i].unitDecimalPlaces, new { @class = "UDec" })
+                                            @Html.HiddenFor(m => Model.JobReturnLineViewModel[i].DealunitDecimalPlaces, new { @class = "DelUDec" })
+
+                                            @if (MaxDealUnitDecPlaces < Model.JobReturnLineViewModel[i].DealunitDecimalPlaces)
+                                            {
+                                            MaxDealUnitDecPlaces = Model.JobReturnLineViewModel[i].DealunitDecimalPlaces;
+                                            }
+                                            @if (MaxUnitDecPlaces < Model.JobReturnLineViewModel[i].unitDecimalPlaces)
+                                            {
+                                            MaxUnitDecPlaces = Model.JobReturnLineViewModel[i].unitDecimalPlaces;
+                                            }
+
+                                            <div class='col-xs-1 row-index'>
+                                                @(i + 1)
+                                                <input type='hidden' class='id' value="@Model.JobReturnLineViewModel[i].JobReturnHeaderId" />
+                                            </div>
+                                            <div class='col-xs-11'>
+                                                <div class='row'>
+                                                    <div class='col-sm-4'>
+                                                        <strong>@Model.JobReturnLineViewModel[i].ProductName</strong>
+                                                        <br />
+                                                        @Model.JobReturnLineViewModel[i].Specification
+                                                        @{
+                                        var Dim1 = (string.IsNullOrEmpty(Model.JobReturnLineViewModel[i].Dimension1Name)) ? "" : Model.JobReturnLineViewModel[i].Dimension1Name + ",";
+                                        var Dim2 = (string.IsNullOrEmpty(Model.JobReturnLineViewModel[i].Dimension2Name)) ? "" : Model.JobReturnLineViewModel[i].Dimension2Name + ",";
+                                        var Dim3 = (string.IsNullOrEmpty(Model.JobReturnLineViewModel[i].Dimension3Name)) ? "" : Model.JobReturnLineViewModel[i].Dimension3Name + ",";
+                                        var Dim4 = (string.IsNullOrEmpty(Model.JobReturnLineViewModel[i].Dimension4Name)) ? "" : Model.JobReturnLineViewModel[i].Dimension4Name;
+                                        
+
+
+                                                        }
+                                                        <div>@Dim1 @Dim2
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-2 text-center">
+                                                        @Model.JobReturnLineViewModel[i].JobReceiveHeaderDocNo
+                                                    </div>
+                                                    <div class='col-sm-2 text-right'>
+                                                        <a href="#" class="ToReturn" style="color:black">
+                                                            <span id="ReceiptQty">
+                                                                @string.Format("{" + "0:0.".PadRight(@Model.JobReturnLineViewModel[i].unitDecimalPlaces + 4, '0') + "}", Model.JobReturnLineViewModel[i].GoodsReceiptBalQty)
+                                                            </span>
+                                                            <div>
+                                                                <small>@Model.JobReturnLineViewModel[i].UnitId</small>
+                                                            </div>
+                                                        </a>
+                                                    </div>
+                                                    @{ReceiptQty += Model.JobReturnLineViewModel[i].GoodsReceiptBalQty;}
+                                                    <div class='col-sm-2 text-right'>
+                                                        @Html.TextBoxFor(m => Model.JobReturnLineViewModel[i].Qty, new { @class = "form-control text-right ReturnQty multiple-modal" })
+                                                        @Html.ValidationMessageFor(m => Model.JobReturnLineViewModel[i].Qty, "", new { @class = "text-danger" })
+                                                        @{ReturnQty += Model.JobReturnLineViewModel[i].Qty;}
+                                                    </div>
+                                                    <div class='col-sm-2'>
+                                                        @Html.TextBoxFor(m => Model.JobReturnLineViewModel[i].Remark, new { @class = "form-control text-right multiple-modal" })
+                                                        @Html.ValidationMessageFor(m => Model.JobReturnLineViewModel[i].Remark, "", new { @class = "text-danger" })
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                        <hr style='margin-top:0px;margin-bottom:0px' />
+                                    }
+                                </div>
+                            </div>
+
+                            <div class="row grid-head" style='margin-left:0px;margin-right:0px'>
+                                <div class="col-xs-1 text-left">
+
+                                </div>
+                                <div class="col-xs-11">
+                                    <div class="row">
+                                        @*ProductInfo*@
+                                        <div class="col-sm-4">
+                                            <strong> Total</strong>
+
+                                        </div>
+                                        <div class="col-sm-2">
+
+                                        </div>
+                                        @*Qty*@
+                                        <div class="col-sm-2 text-right">
+                                            @string.Format("{" + "0:0.".PadRight(MaxUnitDecPlaces + 4, '0') + "}", ReceiptQty)
+                                        </div>
+                                        <div class="col-sm-2 text-right" style="padding-right:30px">
+                                            <strong><span id="ReturnQty">@string.Format("{" + "0:0.".PadRight(MaxDealUnitDecPlaces + 4, '0') + "}", ReturnQty)</span></strong>
+                                        </div>
+                                        <div class="col-sm-2" style="padding-right:30px">
+
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+
+
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer " style="padding: 19px 20px 0 20px; border-top:1px solid #8E8888">
+                    <button class="btn custom" name="Command:Edit" type="submit" id="submit"><h2 style="margin:0px" title="Proceed"><span class="glyphicon glyphicon-floppy-disk black black"></span> </h2></button>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+
+<script type="text/javascript">
+
+
+    var reset = false;
+    var IsSaved = false;
+    var ValidationCount = 0;
+
+    $('#modform').bind('submit', function (event) {
+
+        if (!IsSaved) {
+            if (!ValidateData()) {
+                return false;
+            }
+            IsSaved = true;
+            $('button:submit').attr('disabled', 'disabled');
+            return IsSaved;
+        }
+        else {
+            return false;
+        }
+
+
+    });
+
+
+    function ValidateData() {
+        var ValidationMessage = "";
+
+        //Client Side Validaion.....
+
+        return (ValidationMessage == "");
+
+    }
+
+
+    $('input.ReturnQty').change(function () {
+
+        var $div = $(this).closest('div.row');
+        var ReceiptQty = parseFloat($div.find('#ReceiptQty').text()) || 0;
+
+        var ReturnQty = parseFloat($div.find('input.ReturnQty').val()) || 0;
+
+        var bal = (ReturnQty) - (ReceiptQty);
+
+        if (bal > 0) {
+            $('#modform').find('#submit').attr('disabled', 'disabled');
+            if (!$('#modform').find('.modal-body #errormsg').length) {
+                $('#modform').find('.modal-body').prepend("<div class='alert alert-danger'><span id=errormsg >Qty exceeding Balance Qty</span></div>")
+            }
+            else {
+                $('#modform').find('#errormsg').text("Qty exceeding Required Qty");
+            }
+        }
+        else {
+            $('#modform').find('#submit:disabled').removeAttr('disabled');
+            if ($('#modform').find('.modal-body #errormsg').length) {
+                $('#modform').find('#errormsg').parent().remove();
+            }
+        }
+        CalculateTotal();
+
+    })
+
+    function CalculateTotal() {
+        var Receipt = 0;
+
+        $('.row.crow.grid-body', '.modal-body').each(function () {
+
+            if ($(this).find('input.ReturnQty').val()) {
+                Receipt += parseFloat($(this).find('input.ReturnQty').val());
+            }
+
+        })
+        $('#ReturnQty', '.modal-body').text(Receipt);
+    }
+
+    $('.ToReturn').click(function () {
+
+        var $Hidiv = $(this).closest('div.row.crow');
+
+        var unitDecPlaces = parseFloat($Hidiv.find('.UDec').val()) || 0;
+
+        var $div = $(this).closest('div.row');
+
+        var OrderQty = parseFloat($div.find('#ReceiptQty').text()) || 0;
+
+        if ($div.find('input.ReturnQty').val() && $div.find('input.ReturnQty').val() > 0) {
+            $div.find('input.ReturnQty').val(0);
+        }
+
+        else {
+            $div.find('input.ReturnQty').val(OrderQty.toFixed(unitDecPlaces));
+        }
+
+        CalculateTotal();
+
+    })
+
+    $('#ToReturn').click(function () {
+        if (reset) {
+            $('div.row.crow', "#gbody.panel-info").each(function (index) {
+
+                var $Hidiv = $(this);
+
+                var unitDecPlaces = parseFloat($Hidiv.find('.UDec').val()) || 0;
+
+                var ReturnQty = parseFloat($Hidiv.find('#ReceiptQty').text()) || 0;
+
+                $Hidiv.find('input.ReturnQty').val(ReturnQty.toFixed(unitDecPlaces));
+
+            })
+            CalculateTotal();
+            reset = false;
+        }
+        else if (!reset) {
+            $('div.row.crow', "#gbody.panel-info").each(function (index) {
+
+                var $Hidiv = $(this);
+
+                $Hidiv.find('input.ReturnQty').val(0);
+
+            })
+            CalculateTotal();
+            reset = true;
+        }
+    })
+
+</script>

@@ -1,0 +1,164 @@
+﻿@model Model.ViewModel.PurchaseGoodsReceiptLineFilterViewModel
+@using Core.Common
+
+<div class="modal-content">
+    <div class="modal-header" style="border-bottom: 1px solid #8E8888">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"> <span class="glyphicon glyphicon-remove"></span></button>
+        <h3>
+            <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-file black"></span> Filters</span>
+        </h3>
+    </div>
+    <div>
+        @using (Html.BeginForm("_FilterPost", "PurchaseGoodsReceiptLine", FormMethod.Post, new { enctype = "multipart/form-data", id = "modform" }))
+        {
+           
+
+            <div class="form-horizontal modal-body">
+
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                @Html.AntiForgeryToken()
+                @Html.HiddenFor(m => m.SupplierId)
+                @Html.HiddenFor(model => model.PurchaseGoodsReceiptHeaderId)
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.PurchaseOrderHeaderId, "Purchase Order", new { @class = "control-label  col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-107">
+                                @Html.TextBoxFor(model => model.PurchaseOrderHeaderId, new { @class = "form-control col-xs-7 required" })
+                                @Html.ValidationMessageFor(model => model.PurchaseOrderHeaderId, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                   
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.ProductId, "Product ", new { @class = "control-label  col-md-4 col-sm-2 " })
+                                <div class="col-md-7 col-sm-10">
+                                    @Html.TextBoxFor(model => model.ProductId, new { @class = "form-control col-xs-7 required" })
+                                    @Html.ValidationMessageFor(model => model.ProductId, "", new { @class = "text-danger" })
+                                    <span id="status" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>                                                  
+                </div>
+              
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.ProductGroupId, "Product Group", new { @class = "control-label  col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.ProductGroupId, new { @class = "form-control col-xs-7 required" })
+                                @Html.ValidationMessageFor(model => model.ProductGroupId, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer " style="padding: 19px 20px 0 20px; border-top:1px solid #8E8888">
+                    <button class="btn custom" name="Command:Edit" type="submit"><h2 style="margin:0px" id="submit" title="Proceed" ><span class="glyphicon glyphicon-arrow-right black"></span> </h2></button>                  
+                </div>
+
+            </div>
+
+        }
+    </div>
+</div>
+
+
+<script type="text/javascript">
+
+
+    $(document).ready(function () {
+        $("#ProductId").select2("focus");
+
+        //CustomSelectFunction($("#ProductId"), '/ComboHelpList/GetProducts', '/ComboHelpList/SetProducts', 'Enter Product Name', true, 3);
+        //CustomSelectFunction($("#PurchaseOrderHeaderId"), '/ComboHelpList/GetPurchaseOrders', '/ComboHelpList/SetPurchaseOrders', 'Enter Order Name', true, 1);
+        CustomSelectFunction($("#ProductGroupId"), '/ComboHelpList/GetProductGroup', '/ComboHelpList/SetProductGroup', 'Enter Group Name', true, 1);
+    });
+
+
+
+    var DocID = $('#PurchaseGoodsReceiptHeaderId', '.modal-body').val();
+    var URL = '/PurchaseGoodsReceiptLine/GetPurchaseOrders/' + DocID;
+    $("#PurchaseOrderHeaderId").select2({
+        minimumInputLength: 0,
+        multiple: true,
+        ajax: {
+            url: URL,
+            dataType: 'json',
+            type: "GET",
+            quietMillis: 1000,
+            data: function (term) {
+                return {
+                    term: term,
+                };
+            },
+            results: function (data) {
+                return {
+                    results: $.map(data, function (item) {
+                        return {
+                            text: item.DocNo,
+                            id: item.PurchaseOrderHeaderId
+                        }
+                    })
+
+                };
+            }
+        },
+
+
+    });
+
+
+    var URL = '/PurchaseGoodsReceiptLine/GetProducts/';
+    $("#ProductId").select2({
+        minimumInputLength: 1,
+        multiple: true,
+        ajax: {
+            url: URL,
+            dataType: 'json',
+            type: "GET",
+            quietMillis: 1000,
+            data: function (term) {
+                return {
+                    term: term,
+                };
+            },
+            results: function (data) {
+                return {
+                    results: $.map(data, function (item) {
+                        return {
+                            text: item.PropFirst,
+                            id: item.Id
+                        }
+                    })
+
+                };
+            }
+        },
+        initSelection: function (element, callback) {
+
+            var xval = element.val();
+            if (xval != 0) {
+                $.ajax({
+                    cache: false,
+                    type: "POST",
+                    url: SetAction,
+                    data: { Ids: element.val() },
+                    success: function (data) {
+                        callback(data);
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        alert('Failed to Retrive Qty' + thrownError);
+                    }
+                })
+            }
+            //callback([{ id: "1", text: "arpit" }, { id: "2", text: "akash" }]);
+        }
+
+
+    });
+
+
+</script>

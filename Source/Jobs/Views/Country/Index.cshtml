@@ -1,0 +1,73 @@
+﻿@model IEnumerable<Model.Models.Country>
+@using GridMvc.Html;
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!-- modal placeholder-->
+<div id='myModal' class='modal fade in'>
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div id='myModalContent'></div>
+        </div>
+    </div>
+</div>
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3>
+            <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-list black"></span> Country List</span>
+        </h3>
+        <hr style="margin-top:0px;margin-bottom:0px" />
+
+        <div class="panel-info">
+            <h4 style="padding:5px 0 0 0;margin:0px">
+                @Html.ActionLink(" ", " ", " ", null, new { @class = "glyphicon glyphicon-refresh toolbar", @title = "Refresh Page", @data_toggle = "tooltip", @id = "RefreshPage" })
+                @Html.ActionLink(" ", "Create", "Country", null, new { @class = "glyphicon glyphicon-plus toolbar", @title = "Add New", @data_toggle = "tooltip" })   
+                @Html.ActionLink(" ", "History", "Country", null, new { @class = "glyphicon glyphicon-user toolbar", @title = "History", @data_toggle = "tooltip" })
+                @Html.ActionLink(" ", "Delete", "Country", null, new { @class = "glyphicon glyphicon-trash toolbar", @title = "Delete", @data_toggle = "tooltip", @id = "DeleteRecord", @data_modal = "" })
+                @Html.ActionLink(" ", "Report", "Country", null, new { @class = "glyphicon glyphicon-stats toolbar right", @title = "Report", @data_toggle = "tooltip", target = "_blank" })
+                @Html.ActionLink(" ", "Index", "Country", null, new { @class = "glyphicon glyphicon-list toolbar right", @title = "List", @data_toggle = "tooltip" })
+                @Html.ActionLink(" ", "", "", null, new { @class = "glyphicon glyphicon-export toolbar right", @title = "Export", @data_toggle = "tooltip" })
+            </h4>
+        </div>
+
+    </div>
+    <div class="panel-info" style="padding-left:5px;padding-top:2px">
+        @Html.Grid(Model).Columns(columns =>
+           {
+               columns.Add(foo => foo.CountryId, true);
+               columns.Add(foo => foo.CountryName).Sortable(true).Titled("Name").Filterable(true);
+               columns.Add(m => m.IsActive).Sortable(true).Titled("Is Active").Filterable(true);                
+           }).WithPaging(25).EmptyText("No records found.")
+    </div>
+</div>
+<script type="text/javascript">
+
+    $('table.grid-table td').dblclick(function () {
+        var $this = $(this);
+        var row = $this.closest("tr");
+        var editid = row.find('[data-name="CountryId"]').text();
+        var url = '@Url.Action("Edit", "Country")' + "/" + editid;
+        window.location.href = url;
+
+    });
+
+    $('a#DeleteRecord').click(function (e) {
+       
+        var tes = DeleteValidation();
+        if (!tes) {
+            e.stopImmediatePropagation();
+            return false;
+        }
+        var editiiid = $('table.grid-table .grid-row.grid-row-selected').find('[data-name="CountryId"]').text();
+
+        var url = '/Country/Delete/' + editiiid;
+        $(this).attr('href', url);
+        return;
+    })
+    $('#myModal').on('shown.bs.modal', function () {
+        $("#Reason").focus();
+    });
+</script>

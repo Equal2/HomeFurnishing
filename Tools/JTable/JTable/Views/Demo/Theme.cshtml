@@ -1,0 +1,115 @@
+﻿@{
+    ViewBag.Title = "Theme Demo";
+}
+@section CssImport 
+{
+    <style type="text/css">
+        #SelectedRowList
+        {
+            margin-top: 5px;
+            border: 1px solid #999;
+            background-color: #EEE;
+            padding: 5px;
+        }
+    </style>
+}
+
+<!-- Container for jTable -->
+<div id="StudentTableContainer"></div>
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+
+        //Prepare jtable plugin
+        $('#StudentTableContainer').jtable({
+            title: 'Student List',
+            paging: true,
+            sorting: true,
+            defaultSorting: 'Name ASC',
+            selecting: true, //Enable selecting
+            multiselect: true, //Allow multiple selecting
+            selectingCheckboxes: true, //Show checkboxes on first column
+            //selectOnRowClick: false, //Enable this to only select using checkboxes
+            actions: {
+                listAction: '@Url.Action("StudentList")',
+                deleteAction: '@Url.Action("DeleteStudent")',
+                updateAction: '@Url.Action("UpdateStudent")',
+                createAction: '@Url.Action("CreateStudent")'
+            },
+            fields: {
+                StudentId: {
+                    key: true,
+                    create: false,
+                    edit: false,
+                    list: false
+                },
+                Name: {
+                    title: 'Name',
+                    width: '23%',
+                    inputClass: 'validate[required]'
+                },
+                EmailAddress: {
+                    title: 'Email address',
+                    list: false,
+                    inputClass: 'validate[required,custom[email]]'
+                },
+                Password: {
+                    title: 'User Password',
+                    type: 'password',
+                    list: false,
+                    inputClass: 'validate[required]'
+                },
+                Gender: {
+                    title: 'Gender',
+                    width: '13%',
+                    options: { 'M': 'Male', 'F': 'Female' }
+                },
+                CityId: {
+                    title: 'City',
+                    width: '12%',
+                    options: '@Url.Action("GetCityOptions")'
+                },
+                BirthDate: {
+                    title: 'Birth date',
+                    width: '15%',
+                    type: 'date',
+                    displayFormat: 'yy-mm-dd',
+                    inputClass: 'validate[required,custom[date]]'
+                },
+                Education: {
+                    title: 'Education',
+                    list: false,
+                    type: 'radiobutton',
+                    options: { '1': 'Primary school', '2': 'High school', '3': 'University' },
+                    inputClass: 'validate[required]'
+                },
+                About: {
+                    title: 'About this person',
+                    type: 'textarea',
+                    list: false
+                },
+                IsActive: {
+                    title: 'Status',
+                    width: '12%',
+                    type: 'checkbox',
+                    values: { 'false': 'Passive', 'true': 'Active' },
+                    defaultValue: 'true'
+                },
+                RecordDate: {
+                    title: 'Record date',
+                    width: '15%',
+                    type: 'date',
+                    displayFormat: 'yy-mm-dd',
+                    create: false,
+                    edit: false,
+                    sorting: false
+                }
+            }
+        });
+
+        //Load student list from server
+        $('#StudentTableContainer').jtable('load');
+    });
+   
+</script>

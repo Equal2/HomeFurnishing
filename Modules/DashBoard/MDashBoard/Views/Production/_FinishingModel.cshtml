@@ -1,0 +1,126 @@
+﻿
+@model MDashBoard.Models.SubProductionDataset
+
+<style type="text/css">
+    .cusleftnormal {
+        border-bottom-left-radius: 0pc !important;
+        border-top-left-radius: 0px !important;
+    }
+
+    .cusrightnormal {
+        border-bottom-right-radius: 0px !important;
+        border-top-right-radius: 0px !important;
+    }
+</style>
+
+
+@{
+    int I = DateTime.Now.Month;
+    string fromdate;
+    if (I < 4)
+    {
+        fromdate = "01/Apr/" + DateTime.Now.AddYears(-1).Year.ToString();
+    }
+    else
+    {
+        fromdate = "01/Apr/" + DateTime.Now.Year.ToString();
+    }
+
+}
+@{ 
+    
+  Double? TotalFinishing;
+  TotalFinishing = Model.ProcessName.Sum(m => m.Area);
+  string Mindate;
+  string Maxdate;
+  Mindate = Model.MinMaxDate.FirstOrDefault().MinDate;
+  Maxdate = Model.MinMaxDate.FirstOrDefault().MaxDate;  
+  }
+
+@functions
+{
+
+    public string SpanColor(Double? Value, Double? Total)
+    {
+        string Color = null;
+        double? divided = 0;
+        divided = (Value / Total) * 100;
+
+        if (divided > 0 && divided <= 25)
+        {
+            Color = "bg-red";
+        }
+        else if (divided > 25 && divided <= 50)
+        {
+            Color = "bg-light-blue";
+        }
+        else if (divided > 50 && divided <= 75)
+        {
+            Color = "bg-yellow";
+        }
+        else if (divided > 75 && divided <= 100)
+        {
+            Color = "bg-green";
+        }
+        return Color;
+    }
+}
+<div class="modal-content">
+    <div class="modal-header" style="border-bottom: 1px solid #8E8888; padding-top: 8px; padding-bottom: 8px;">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"> <span class="glyphicon glyphicon-remove"></span></button>
+        <div class="glyphicon glyphicon-file black" style="font-size:3.2em;width:auto;height:auto;float:left;"></div>
+        <div>
+            <span class="info-box-number">Finishing &nbsp;&nbsp; (@string.Format("{0:0}", TotalFinishing).ToString() Sq.Yard)</span>
+            <span class="info-box-text">@Mindate To  @Maxdate</span>
+        </div>  
+    </div>
+    <div class="modal-body">
+        <div class="row">
+            <div class="col-md-12">
+                <!-- Widget: user widget style 1 -->
+                <div class="box box-widget widget-user-2">
+                    <!-- Add the bg color to the header using any of the bg-* classes -->
+                    <div class="widget-user-header bg-blue-gradient" style="padding-bottom: 1px;padding-top: 3px;">
+                        <div class="widget-user-image">
+                           
+                           
+
+                            <div class="row">
+                                <div class="col-md-4 col-xs-4"><div class="glyphicon glyphicon-transfer" style="font-size: 2.5em; width: auto; height: auto; float: left;">
+</div><h4><span class="text-bold">Process</span></h4> </div>
+
+                                <div class="col-md-4 col-xs-4" style="text-align:right"><h4><span class="text-bold">Today</span></h4></div>
+                                <div class="col-md-4 col-xs-4" style="text-align:right"><h4><span class="text-bold">Month</span></h4></div>
+                            </div>
+                        </div>
+                        <!-- /.widget-user-image -->
+                         
+                    </div>
+                    <div class="box-footer no-padding">
+                        <ul class="nav nav-stacked">
+                            @foreach (var item in Model.ProcessName.ToList())
+                        {
+                                
+                                 <li><a href="/Production/FinishingMonthModel?Process=@item.ProcessName" class="small-box-footer" data-modal="">
+    <div class="row">
+        <div class="col-md-4 col-xs-4">@item.ProcessName</div>
+        <div class="col-md-4 col-xs-4" style="text-align:right">@string.Format("{0:0}", item.TodayArea).ToString()</div>
+        <div class="col-md-4 col-xs-4" style="text-align:right">@string.Format("{0:0}", item.Area).ToString()</div>        
+    </div>
+</a></li>
+                        }
+                        </ul>
+                    </div>
+                </div>
+                <!-- /.widget-user -->
+            </div>
+            <!-- /.col -->
+            
+
+            <!-- /.col -->
+            
+
+            <!-- /.col -->
+        </div>
+    </div>
+</div>

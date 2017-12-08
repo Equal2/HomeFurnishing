@@ -1,0 +1,19 @@
+﻿@model Surya.Planning.Model.Models.Product
+
+@{
+    ViewBag.Title = "Image";
+    Layout = null;
+}
+
+@{
+    byte[] photo = Model.ProductPhoto.Photo ;
+    string imageSrc = null;
+    if (photo != null)
+    {
+        MemoryStream ms = new MemoryStream();
+        ms.Write(photo, 0, photo.Length); // strip out 78 byte OLE header (don't need to do this for normal images)
+        string imageBase64 = Convert.ToBase64String(ms.ToArray());
+        imageSrc = string.Format("data:image/gif;base64,{0}", imageBase64);
+    }
+}
+<img src="@imageSrc" alt="Product Photo" border="0" height="600" width="450" />

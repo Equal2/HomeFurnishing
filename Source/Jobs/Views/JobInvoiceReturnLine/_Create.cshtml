@@ -1,0 +1,782 @@
+﻿@model Model.ViewModel.JobInvoiceReturnLineViewModel
+@using Core.Common
+
+<style type="text/css">
+    .cusleftnormal {
+        border-bottom-left-radius: 0pc !important;
+        border-top-left-radius: 0px !important;
+    }
+
+    .cusrightnormal {
+        border-bottom-right-radius: 0px !important;
+        border-top-right-radius: 0px !important;
+    }
+
+    .ui-autocomplete {
+        max-height: 250px;
+        overflow-y: auto;
+        /* prevent horizontal scrollbar */
+        overflow-x: hidden;
+    }
+</style>
+
+<div class="modal-content">
+    <div class="modal-header" style="border-bottom: 1px solid #8E8888">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"> <span class="glyphicon glyphicon-remove"></span></button>
+        <h3>
+            <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-file black"></span> Products</span>
+        </h3>
+    </div>
+    <div>
+        @using (Html.BeginForm("_CreatePost", "JobInvoiceReturnLine", FormMethod.Post, new { enctype = "multipart/form-data", id = "modform" }))
+        {
+            @Html.ValidationLog((string)TempData["CSEXCL"])
+            <div class="form-horizontal modal-body">
+
+                @Html.AntiForgeryToken()
+
+                @Html.HiddenFor(model => model.JobInvoiceReturnHeaderId)
+                @Html.HiddenFor(m => m.JobInvoiceReturnLineId)
+                @*@Html.HiddenFor(m => m.JobInvoiceLineId)*@
+                @Html.HiddenFor(m => m.JobWorkerId)
+                @Html.HiddenFor(m => m.SalesTaxGroupPersonId)
+                @Html.HiddenFor(m => m.CalculateDiscountOnRate)
+                @Html.HiddenFor(m => m.InvoiceBalQty)
+                @Html.HiddenFor(m => m.DocTypeId)
+                @Html.HiddenFor(m => m.SiteId)
+                @Html.HiddenFor(m => m.DivisionId)
+                @Html.HiddenFor(m => m.ProductId)
+                @Html.HiddenFor(m => m.Nature)
+                @Html.HiddenFor(m=>m.ProductUidId)
+                @Html.HiddenFor(m => m.CalculationId)
+                @Html.HiddenFor(m => m.JobInvoiceSettings.isPostedInStock)
+                @Html.HiddenFor(m => m.JobInvoiceSettings.ProcessId)
+
+
+                @Html.ValidationSummary(true, "", new { @class = "alert alert-danger" })
+                <div class="row">
+
+                    <div class="col-md-6" style="display:@(Model.JobInvoiceSettings.isVisibleProductUID ? "" : "none")">
+                        @Html.HiddenFor(m => m.JobInvoiceSettings.isVisibleProductUID)
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.ProductUidId, (Model.DocumentTypeSettings.ProductUidCaption ?? "Product Uid"), new { @class = "control-label col-md-4 col-sm-2 " })
+                            @Html.HiddenFor(m => m.DocumentTypeSettings.ProductUidCaption)
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.ProductUidName, new { @class = "form-control required" })
+                                @Html.ValidationMessageFor(model => model.ProductUidId, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    @*<div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.JobInvoiceLineId, "Invoice No", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBox(" ", "", new { @class = "form-control", @id = "acinvoices" })
+                                @Html.ValidationMessageFor(model => model.JobInvoiceLineId, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.ProductId, (Model.DocumentTypeSettings.ProductCaption ?? "Product"), new { @class = "control-label col-md-4 col-sm-2 " })
+                            @Html.HiddenFor(m => m.DocumentTypeSettings.ProductCaption)
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.ProductId, new { @class = "form-control  required", @readonly = "true" })
+                                @Html.ValidationMessageFor(model => model.ProductId, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>*@
+
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.JobInvoiceLineId, (Model.DocumentTypeSettings.ProductCaption ?? "Product"), new { @class = "control-label col-md-4 col-sm-10" })
+                            @Html.HiddenFor(m => m.DocumentTypeSettings.ProductCaption)
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.JobInvoiceLineId, new { @class = "form-control  required" })
+                                @Html.ValidationMessageFor(model => model.JobInvoiceLineId, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.JobInvoiceHeaderDocNo, (Model.DocumentTypeSettings.ContraDocTypeCaption ?? "Invoice No."), new { @class = "control-label col-md-4 col-sm-2" })
+                            @Html.HiddenFor(m => m.DocumentTypeSettings.ContraDocTypeCaption)
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(m => m.JobInvoiceHeaderDocNo, new { @class = "form-control", @readonly = "true" })
+                                @Html.ValidationMessageFor(model => model.JobInvoiceHeaderDocNo, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6" style="display:@(Model.JobInvoiceSettings.isVisibleDimension1 ? "" : "none")">
+                        @Html.HiddenFor(m => m.JobInvoiceSettings.isVisibleDimension1)
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Dimension1Name, (Model.DocumentTypeSettings.Dimension1Caption ?? "Dimension1"), new { @class = "control-label col-md-4 col-sm-2" })
+                            @Html.HiddenFor(m => m.DocumentTypeSettings.Dimension1Caption)
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.Dimension1Name, new { @class = "form-control required", @readonly = true })
+                                @Html.ValidationMessageFor(model => model.Dimension1Name, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6" style="display:@(Model.JobInvoiceSettings.isVisibleDimension2 ? "" : "none")">
+                        @Html.HiddenFor(m => m.JobInvoiceSettings.isVisibleDimension2)
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Dimension2Name, (Model.DocumentTypeSettings.Dimension2Caption ?? "Dimension2"), new { @class = "control-label col-md-4 col-sm-2" })
+                            @Html.HiddenFor(m => m.DocumentTypeSettings.Dimension2Caption)
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.Dimension2Name, new { @class = "form-control required", @readonly = true })
+                                @Html.ValidationMessageFor(model => model.Dimension2Name, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6" style="display:@(Model.JobInvoiceSettings.isVisibleDimension3 ? "" : "none")">
+                        @Html.HiddenFor(m => m.JobInvoiceSettings.isVisibleDimension3)
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Dimension3Name, (Model.DocumentTypeSettings.Dimension3Caption ?? "Dimension3"), new { @class = "control-label col-md-4 col-sm-2" })
+                            @Html.HiddenFor(m => m.DocumentTypeSettings.Dimension3Caption)
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.Dimension3Name, new { @class = "form-control required", @readonly = true })
+                                @Html.ValidationMessageFor(model => model.Dimension3Name, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6" style="display:@(Model.JobInvoiceSettings.isVisibleDimension4 ? "" : "none")">
+                        @Html.HiddenFor(m => m.JobInvoiceSettings.isVisibleDimension4)
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Dimension4Name, (Model.DocumentTypeSettings.Dimension4Caption ?? "Dimension4"), new { @class = "control-label col-md-4 col-sm-2" })
+                            @Html.HiddenFor(m => m.DocumentTypeSettings.Dimension4Caption)
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.Dimension4Name, new { @class = "form-control required", @readonly = true })
+                                @Html.ValidationMessageFor(model => model.Dimension4Name, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6" style="display:@(Model.JobInvoiceSettings.isVisibleSpecification ? "" : "none")">
+                        @Html.HiddenFor(m => m.JobInvoiceSettings.isVisibleSpecification)
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Specification, "Specification", new { @class = "control-label col-md-4 col-sm-2 " })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.Specification, new { @class = "form-control required", @readonly = true })
+                                @Html.ValidationMessageFor(model => model.Specification, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6" style="display:@(Model.JobInvoiceSettings.isVisibleCostCenter?"":"none")">
+                        @Html.HiddenFor(m => m.JobInvoiceSettings.isVisibleCostCenter)
+                        @Html.HiddenFor(m => m.DocumentTypeSettings.CostCenterCaption)
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.CostCenterId, (Model.DocumentTypeSettings.CostCenterCaption ?? "Cost Center"), new { @class = "control-label col-md-4 col-sm-2 " })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.CostCenterId, new { @class = "form-control " })
+                                @Html.ValidationMessageFor(model => model.CostCenterId, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6" style="display:@(Model.JobInvoiceSettings.isVisibleSalesTaxGroupProduct?"":"none")">
+                        @Html.HiddenFor(m => m.JobInvoiceSettings.isVisibleSalesTaxGroupProduct)
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.SalesTaxGroupProductId, "Sales Tax Group Product", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.SalesTaxGroupProductId, new { @class = "form-control required" })
+                                @Html.ValidationMessageFor(model => model.SalesTaxGroupProductId, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="col-md-6" style="display:@(Model.JobInvoiceSettings.isVisibleLotNo ? "" : "none")">
+                        @Html.HiddenFor(m => m.JobInvoiceSettings.isVisibleLotNo)
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.LotNo, "Lot No", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.LotNo, new { @class = "form-control required", @readonly = true })
+                                @Html.ValidationMessageFor(model => model.LotNo, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Qty, "Qty", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10" style="padding:0px">
+                            <div class="col-xs-7" style="padding-right:0px;">
+                                @Html.TextBoxFor(model => model.Qty, new { @class = "form-control required cusrightnormal" })
+                                @Html.ValidationMessageFor(model => model.Qty, "", new { @class = "text-danger" })
+                            </div>
+                            <div class="col-xs-5" style="padding-left:0px">
+                                @Html.TextBoxFor(m => m.UnitId, new { @class = "form-control cusleftnormal", @readonly = "true" })
+                            </div>
+                         </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.DealUnitId, "Deal Unit& Multiplier", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10" style="padding:0px">
+                            <div class="col-xs-7" style="padding-right:0px;">
+                                @Html.TextBoxFor(m => m.DealUnitId, new { @class = "form-control col-xs-2 cusleftnormal", @readonly = "true" })
+                                @Html.ValidationMessageFor(model => model.DealUnitId, "", new { @class = "text-danger" })
+                            </div>
+                            <div class="col-xs-5" style="padding-left:0px">
+                                @Html.TextBoxFor(model => model.UnitConversionMultiplier, new { @class = "form-control col-xs-7 required", @readonly = true })
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+
+
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Rate, "Rate", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.Rate, new { @class = "form-control required", @readonly = true })
+                                @Html.ValidationMessageFor(model => model.Rate, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.DealQty, "Deal Qty", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.DealQty, new { @class = "form-control required cusrightnormal", @readonly = true })
+                                @Html.ValidationMessageFor(model => model.DealQty, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.DiscountPer, "Discount %", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.DiscountPer, new { @class = "form-control text-right" })
+                                @Html.ValidationMessageFor(model => model.DiscountPer, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Amount, "Amount", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.Amount, new { @class = "form-control required", @readonly = true })
+                                @Html.ValidationMessageFor(model => model.Amount, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Weight, "Weight", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.Weight, new { @class = "form-control required", @readonly = true })
+                                @Html.ValidationMessageFor(model => model.Weight, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Remark, "Remark", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextAreaFor(model => model.Remark, new { @class = "form-control required" })
+                                @Html.ValidationMessageFor(model => model.Remark, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+
+                <div class="modal-footer " style="padding: 19px 20px 0 20px; border-top:1px solid #8E8888">
+                    @if (ViewBag.LineMode == "Edit" || ViewBag.LineMode == "Create")
+                    {
+                        <button class="btn custom left" name="Command:Edit" type="submit" id="submit"><h2 style="margin:0px"><span class="glyphicon glyphicon-floppy-disk black"></span> </h2></button>}
+                    @if (ViewBag.LineMode == "Delete")
+                    {
+                        <button class="btn custom" name="Command:Delete" id="delete" type="submit"><h2 style="margin:0px"><span class="glyphicon glyphicon-trash black"></span> </h2></button>}
+
+                </div>
+
+            </div>
+        }
+    </div>
+</div>
+
+@if (Model.JobInvoiceLineId <= 0)
+{
+    <script type="text/javascript">
+        $(function(){
+
+            $.ajax({
+                cache: false,
+                url: "/TaxCalculation/GetMaxLineId/",
+                data: { HeaderId: parseInt($('#JobInvoiceReturnHeaderId').val()), LineTable:"Web.JobInvoiceReturnLines" , LineKeyField: "JobInvoiceReturnLineId" ,HeaderKeyField:"JobInvoiceReturnHeaderId"},
+                success: function (data) {
+                    AddCalculation(data);
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    alert('Failed to retrive calculation footer' + thrownError);
+                },
+            });
+
+
+            function AddCalculation(MaxLineId)
+            {
+                AddCalculationFields(parseInt($('#JobInvoiceReturnHeaderId').val()),false,'@Model.CalculationId',"Web.JobInvoiceReturnHeaderCharges","Web.JobInvoiceReturnLineCharges",MaxLineId, $('#DocTypeId','.modal-body').val(),$('#SiteId','.modal-body').val(),$('#DivisionId','.modal-body').val());
+            }
+
+        })
+    </script>
+}
+else
+{
+    <script type="text/javascript">
+        $(function(){
+            AddCalculationFieldsEdit(parseInt($('#JobInvoiceReturnHeaderId').val()),$('#JobInvoiceReturnLineId').val(),false,"Web.JobInvoiceReturnHeaderCharges","Web.JobInvoiceReturnLineCharges");
+        })
+    </script>
+}
+
+<script type="text/javascript">
+
+    //var cachearray={};
+
+    $(document).ready(function () {
+        var DocID = $('#JobInvoiceReturnHeaderId', '.modal-body').val();
+        CustomSelectFunction($("#JobInvoiceLineId"), '/JobInvoiceReturnLine/GetJobInvoiceForProduct', '/JobInvoiceReturnLine/SetSingleJobInvoiceLine', ' ', false, 0,DocID);
+        //CustomSelectFunction($("#ProductId"), '/ComboHelpList/GetProducts', '/ComboHelpList/SetSingleProducts', 'Enter Product', false, 3);
+        CustomSelectFunction($("#SalesTaxGroupProductId"), '/ComboHelpList/GetSalesTaxGroupProduct', '/ComboHelpList/SetSingleSalesTaxGroupProduct', ' ', false, 0);
+        CustomSelectFunction($("#CostCenterId"), '/JobInvoiceReturnLine/GetCostCenterForPerson', '/ComboHelpList/SetSingleCostCenter', ' ', false, 0,DocID);
+
+        var Nature='@Model.Nature';
+        if (Nature != "Return")
+        {
+            //$('#Qty').attr("readonly","true");
+            $("#Rate").removeAttr('readonly');
+            $("#Amount").removeAttr('readonly');
+        }
+        
+
+
+        $('.datepicker').datepicker({
+            format: 'dd/MM/yyyy',
+            "setDate": new Date(),
+            "autoclose": true
+        })
+
+        var id=@Model.JobInvoiceReturnLineId;
+        if(id>0)
+        {
+            var tex='@Model.JobInvoiceHeaderDocNo';
+            //$("#acinvoices").val(tex);
+            //LockFields();
+            $('#JobInvoiceLineId').attr("readonly","true");
+            $('#ProductId').attr('readonly','true');
+            //$('#acinvoices').attr('disabled','disabled');
+            if ($('#ProductUidId').val()) {
+                $('#ProductUidName').attr('readonly', 'true');
+                $('#Qty').attr('readonly', 'true');
+            }
+        }
+
+        $('#delete','.modal-content').click(function (e) {
+            if(id>0)
+            {
+                var url = '/JobInvoiceReturnLine/DeletePost';
+                $('form#modform').attr('action',url);
+                DeletingProductCharges();
+                return;
+            }
+            else
+            {
+                return false;
+            }
+        })
+    });
+
+    $('#SalesTaxGroupProductId').change(function(){
+        Validate_SalesTaxGroupProductId();
+    })
+
+    function Validate_SalesTaxGroupProductId()
+    {
+        if ($("#SalesTaxGroupProductId").val() != 0 && $("#SalesTaxGroupProductId").val() != null) {
+            GetChargeRates('@Model.CalculationId',$('#DocTypeId','.modal-body').val(),$('#SiteId','.modal-body').val(),$('#DivisionId','.modal-body').val(),$('#JobInvoiceSettings_ProcessId','.modal-body').val(),$('#SalesTaxGroupPersonId','.modal-body').val(),$('#SalesTaxGroupProductId','.modal-body').val(),$('#ProductId','.modal-body').val())
+            Calculation();
+        }
+    }
+
+    function LockFields(){
+        $("#Dimension1Name").attr('readonly','true');
+        $("#Dimension2Name").attr('readonly','true');
+        $("#Dimension3Name").attr('readonly','true');
+        $("#Dimension4Name").attr('readonly','true');
+        $('#Qty').attr('readonly','true');
+        $('#LotNo').attr('readonly','true');
+        $('#Specification').attr('readonly','true');
+    }
+    function UnLockFields(){
+        $("#Dimension1Name").removeAttr('readonly');
+        $("#Qty").removeAttr('readonly');
+        $("#Dimension2Name").removeAttr('readonly');
+        $("#Dimension3Name").removeAttr('readonly');
+        $("#Dimension4Name").removeAttr('readonly');
+        $("#LotNo").removeAttr('readonly');
+        $("#Specification").removeAttr('readonly');
+    }
+
+    $('#Qty,#Rate,#Amount,#DiscountPer').keyup(function () {
+        ValidateQty();
+        Calculation();
+    })
+
+
+    function ValidateQty(){
+        if (($('#InvoiceBalQty').val() - $('#Qty').val()) < 0) {
+            $('#submit', '.modal-body').attr('disabled', 'disabled');
+            if ($('#Qty').closest('div.col-xs-4').find('span#cerror').length == 0)
+            {
+                $('#Qty').parents('.col-xs-4').append("<span class='text-danger' id='cerror'>Qty exceeding InvoiceQty</span>")
+            }
+        }
+        else
+        {
+            $('#submit', '.modal-body').removeAttr('disabled');
+            if ($('#Qty').closest('div.col-xs-4').find('span#cerror').length > 0)
+            {
+                $('#Qty').closest('.col-xs-4').find('span#cerror').remove();
+            }
+        }
+    }
+
+    function Calculation(){
+        var TempAmount = 0;
+        var DiscountAmount = 0;
+        var TempRate = 0;
+
+        $('#DealQty').val($('#UnitConversionMultiplier').val()*$('#Qty').val());
+
+        //$('#Amount').val($('#Rate').val()*$('#DealQty').val());
+
+        if ($('#Rate').val() != null && $('#Rate').val() != "" && $('#Rate').val() != 0)
+        {
+            TempAmount = ($('#DealQty').val() * $('#Rate').val())
+
+            if ($('#CalculateDiscountOnRate').val() != 0 &&  $('#CalculateDiscountOnRate').val() != null) {
+                TempRate = $('#Rate').val() - ($('#Rate').val() * $('#DiscountPer').val() / 100)
+                $('#Amount').val(($('#DealQty').val() * TempRate).toFixed(2));
+            }
+            else{
+                DiscountAmount = TempAmount * $('#DiscountPer').val() / 100;
+                $('#Amount').val((TempAmount - DiscountAmount).toFixed(2));
+            }
+        }
+
+
+
+
+        ChargeCalculation();
+    }
+
+</script>
+
+
+@if (Model.JobInvoiceReturnLineId <= 0)
+{
+    <script type="text/javascript">
+
+        $('#ProductUidName').on('change', function (e) {
+
+            var temp = InitializePopover(this, $("#ProductUidName").val(), $('#JobInvoiceSettings_isPostedInStock').val(), $('#GodownId').val(), TransactionTypeConstantsEnum.Issue);
+            $(this).popover('show');
+            setTimeout(function () { $('#ProductUidName').popover('destroy') }, 10000);
+            if (temp.status) {
+                GetJobInvoiceLineId();
+            }
+        })
+
+        function GetJobInvoiceLineId() {
+            if ($('#ProductUidName').val() != "") {
+                $.ajax({
+                    cache: false,
+                    type: "POST",
+                    url: "@(Url.Action("GetProductUidDetail"))",
+                    data: { ProductUidName: $("#ProductUidName").val(), filter: $("#JobInvoiceReturnHeaderId","#modform").val() },
+                success: function (data) {
+                    if (data.Success) {
+
+                        if ($('#modform').find('.modal-body #errormsg').length) {
+                            $('#modform').find('#errormsg').parent().remove();
+                        }
+
+                        $("#ProductUidId").val(data.ProductUidId);
+                        $("#JobInvoiceLineId").val(data.JobInvoiceLineId);
+                        //$("#acinvoices").val(data.JobInvoiceDocNo);
+                        GetInvoiceDetail();
+                        //$('#acinvoices').attr('readonly', 'true');                        
+                        $('#Qty').attr('readonly', 'true');
+
+                    }
+                    else {
+                        if (!$('#modform').find('.modal-body #errormsg').length) {
+                            $('#modform').find('.modal-body').prepend("<div class='alert alert-danger'><span id=errormsg >Bar Code does not belong to supplier</span></div>")
+                        }
+                        $('#submit').attr('disabled', 'disabled');
+                    }
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    alert('Failed to retrieve product details.' + thrownError);
+                }
+            });
+        }
+        else if ($('#JobReceiveLineId').val() == "") {
+            $('#ProductUidId').val("");
+            $('#JobReceiveLineId').val("");
+            $("#JobReceiveLineId").text("");
+        }
+        }
+
+
+        //$( "#acinvoices" ).focusout(function( event, ui ) {
+        //    if (!$(this).val()) {
+        //        $("#acinvoices").val("");
+        //        $('#JobInvoiceLineId').val("");
+        //    }
+
+        //    if($("#acinvoices").val()=="")
+        //    {
+        //        $('#JobInvoiceLineId').val("");
+        //    }
+
+        //    if($('#JobInvoiceLineId').val()!="")
+        //    {
+        //        GetInvoiceDetail();
+        //    }
+        //    else if($('#JobInvoiceLineId').val()=="")
+        //    {
+        //        $('#Qty').val(0);
+        //        $('#UnitConversionMultiplier').val(0);
+        //        $('#DealUnitId').val(0);
+        //        $('#InvoiceBalQty').val(0);
+        //        $('#LotNo').val("");
+        //        $('#UnitId').val(0);
+        //        $('#Specification').val("");
+        //        $("#Dimension1Name").val("");
+        //        $("#Dimension2Name").val("");
+        //        $("#Dimension3Name").val("");
+        //        $("#Dimension4Name").val("");
+        //        $('#Rate').val(0).trigger("keyup");
+        //        //Calculation();
+        //    }
+        //});
+
+
+        $("#JobInvoiceLineId").change(function(){
+            Validate_JobInvoiceLine();
+        });
+
+        function Validate_JobInvoiceLine()
+        {
+            if ($("#JobInvoiceLineId").val() != 0 && $("#JobInvoiceLineId").val() != null)
+            {
+                $.ajax({
+                    cache: false,
+                    type: "POST",
+                    url: "@(Url.Action("GetInvoiceDetail"))",
+                    data: { InvoiceLineId: $("#JobInvoiceLineId").val() },
+                    success: function (data) {
+                        $('#Qty').val(data.Qty);
+                        $('#UnitId').val(data.UnitId);
+                        $('#InvoiceBalQty').val(data.Qty);
+                        $('#JobInvoiceHeaderDocNo').val(data.InvoiceDocNo);
+                        $('#UnitConversionMultiplier').val(data.UnitConversionMultiplier);
+                        //$("#ProductId").select2('data', { id: data.ProductId, text: data.ProductName });
+                        $('#ProductId').val(data.ProductId);
+                        $('#DealUnitId').val(data.DealUnitId);
+                        $('#Specification').val(data.Specification);
+                        $('#LotNo').val(data.LotNo);
+                        $("#Dimension1Name").val(data.Dimension1Name)
+                        $("#Dimension2Name").val(data.Dimension2Name)
+                        $("#Dimension3Name").val(data.Dimension3Name)
+                        $("#Dimension4Name").val(data.Dimension4Name)
+                        $("#Weight").val(data.Weight)
+                        $('#Amount').val(data.Amount);
+                        (data.CostCenterId==null)?(1==1):($("#CostCenterId").select2("data", {id: data.CostCenterId, text: data.CostCenterName}));
+                        $('#Rate').val(data.Rate).trigger('keyup');
+                        (data.SalesTaxGroupProductId==null)?(1==1):($("#SalesTaxGroupProductId").select2("data", {id: data.SalesTaxGroupProductId, text: data.SalesTaxGroupProductName}));
+                        $("#SalesTaxGroupPersonId").val(data.SalesTaxGroupPersonId);
+                        CopyInvoiceCharges(data.RHeaderCharges,data.RLineCharges);
+                        GetChargeRates('@Model.CalculationId',$('#DocTypeId','.modal-body').val(),$('#SiteId','.modal-body').val(),$('#DivisionId','.modal-body').val(),$('#JobInvoiceSettings_ProcessId','.modal-body').val(),$('#SalesTaxGroupPersonId','.modal-body').val(),$('#SalesTaxGroupProductId','.modal-body').val())
+                        //LockFields();
+                        ChargeCalculation();
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        alert('Failed to retrieve product details.' + thrownError);
+                    }
+                });
+            }
+            else{
+                $('#Qty').val(0);
+                $('#UnitId').val("");
+                $('#InvoiceBalQty').val(0);
+                $('#JobInvoiceHeaderDocNo').val("");
+                $('#UnitConversionMultiplier').val(0);
+                //$("#ProductId").select2('data', { id: data.ProductId, text: data.ProductName });
+                $('#ProductId').val("");
+                $('#DealUnitId').val("");
+                $('#Specification').val("");
+                $('#LotNo').val("");
+                $("#Dimension1Name").val("")
+                $("#Dimension2Name").val("")
+                $("#Dimension3Name").val("")
+                $("#Dimension4Name").val("")
+                $("#Weight").val(0)
+                $('#Amount').val(0);
+                $('#Rate').val(0).trigger('keyup');
+
+            }
+        }
+
+
+
+
+        function CopyInvoiceCharges(HeaderCharges,LineCharges)
+        {
+            $.each(HeaderCharges,function(index,value){
+
+                var $ModalBody=$('div.modal-body');
+                var selector="#CALH_"+value.ChargeCode+"RATE";
+                if($ModalBody.find(selector).length)
+                {
+                    $ModalBody.find(selector).val(value.Rate);
+                }
+
+            })
+
+            $.each(LineCharges,function(index,value){
+
+                var $ModalBody=$('div.modal-body');
+                var selector="#CALL_"+value.ChargeCode+"RATE";
+
+                if($ModalBody.find(selector).length)
+                {
+                    $ModalBody.find(selector).val(value.Rate);
+                }
+
+            })
+
+            $.each(LineCharges,function(index,value){
+
+                var $ModalBody=$('div.modal-body');
+                var selector="#CALL_"+value.ChargeCode+"ACCR";
+
+
+                if($ModalBody.find(selector).length)
+                {
+                    $ModalBody.find(selector).val(value.LedgerAccountDrId);
+                }
+
+                var selector="#CALL_"+value.ChargeCode+"ACDR";
+                if($ModalBody.find(selector).length)
+                {
+                    $ModalBody.find(selector).val(value.LedgerAccountCrId);
+                }
+            })
+        }
+
+        @*$(function() {
+            $("#acinvoices").autocomplete({
+                minLength:3,
+                source: function(request,response){
+                    $.ajax({
+                        cache: false,
+                        type: "POST",
+                        url: "@(Url.Action("GetPendingInvoices"))",
+                        data: { JobInvoiceReturnHeaderId:$("#JobInvoiceReturnHeaderId",".modal-body").val(),term:request.term,Limit:20 },
+                        success: function (data) {
+                            if(data.length>0){
+                                var cachearray = data.error ? [] : $.map(data, function(m) {
+                                    return {
+                                        value: m.DocNo,
+                                        Receive: m.ReceiveDocNo,
+                                        key: m.JobInvoiceLineId,
+                                        prodname:m.ProductName,
+                                        dim1: m.Dimension1Name,
+                                        dim2:m.Dimension2Name,
+                                        dim3: m.Dimension3Name,
+                                        dim4:m.Dimension4Name,
+                                        balqty:m.BalanceQty,
+
+                                    };
+                                });
+                                response(cachearray);
+                            }
+                            else
+                            {
+                                var dimensions = { width: 10};
+                                var cachearray=$.map(dimensions,function(value,key){
+                                    return{
+                                        value:"No Record Found!",
+                                        key:null
+                                    }
+                                })
+                                response(cachearray);
+                            }
+                        },
+                        error: function (xhr, ajaxOptions, thrownError) {
+                            alert('Failed to retrieve Pending Indents.' + thrownError);
+                        }
+
+                    });
+
+
+                },
+                appendTo : $("#myModalContent"),
+                select: function(event, ui) {
+                    // prevent autocomplete from updating the textbox
+                    // navigate to the selected item's url
+                    if($("#acinvoices").val()=="")
+                    {
+                        $('#JobInvoiceLineId').val("");
+                    }
+                    else
+                        $("#JobInvoiceLineId").val(ui.item.key);
+
+                },
+
+            }).data("ui-autocomplete")._renderItem = function(ul, item) {
+                var $a = $("<a></a>");
+                if(item.prodname)
+                    $("<strong></strong>").text(item.prodname).appendTo($a);
+                if(item.value)
+                    $("<br /><small></small>").text("Inv:"+item.value).appendTo($a);
+                if(item.Receive)
+                    $("<small></small>").text(", Rec:"+item.Receive).appendTo($a);
+
+                (item.dim1==null)?(""):($("<br /><span class='small'></span>").text(item.dim1+",").appendTo($a));
+                (item.dim2==null)?(""):($("<span class='small'></span>").text(item.dim2).appendTo($a));
+                (item.balqty==null)?(""):($("<br /><span class='small'></span>").text("BalQty:"+item.balqty).appendTo($a));
+
+                return $("<li></li>").append($a).appendTo(ul);
+            }
+        });*@
+
+
+    </script>
+}

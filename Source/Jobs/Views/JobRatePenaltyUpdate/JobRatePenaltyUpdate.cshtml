@@ -1,0 +1,317 @@
+﻿@{
+    ViewBag.Title = "Job Rate Penalty Update";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<link href="~/Content/DataTables/css/jquery.dataTables.min.css" rel="stylesheet" />
+<script src="~/Scripts/DataTables/jquery.dataTables.min.js"></script>
+@*<script src="~/Scripts/DataTables/dataTables.scroller.js"></script>*@
+<script src="~/Scripts/DataTables/dataTables.scroller.min.js"></script>
+<style type="text/css">
+    .DTHidden {
+        display: none;
+    }
+
+    .TextRight {
+        text-align: right;
+    }
+
+    .dataTables_scroll {
+        font-size: 13px !important;
+        line-height: 1;
+    }
+
+    table.dataTable tbody td {
+        padding: 2px 10px;
+    }
+</style>
+<!-- modal placeholder-->
+<div id='myModal' class='modal fade in'>
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div id='myModalContent'></div>
+        </div>
+    </div>
+</div>
+
+
+
+@*<input type="button" id="button" />*@
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3>
+            <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-list black"></span> @ViewBag.Title </span>
+            @*@Html.ActionLink(" ", "Filters", "JobRatePenaltyUpdate", null, new { data_modalCustom = "", id = "btnCreateF", @class = "glyphicon glyphicon-filter toolbar right", @title = "Filters", @data_toggle = "tooltip" })*@
+        </h3>
+        <hr style="margin-top:0px;margin-bottom:0px" />
+    </div>
+    <div class="Filters fSelected" id="sFilter">
+        @*<strong>JobOrder:</strong>
+            <span class="label label-danger">
+                Star
+            </span>*@
+    </div>
+
+    <div class="panel-info tab" style="padding-left:5px;padding-top:20px">
+        <table id="example" class="display" cellspacing="0" width="100%">
+            <thead style="background: #428bca;color:white">
+                <tr>
+                    <th>JobReceiveLineId</th>
+                    <th>JobOrderLineId</th>
+                    <th>JobReceiveQAPenaltyId</th>
+                    <th>Carpet No</th>
+                    <th>Receive No</th>
+                    <th>Receive Date</th>
+                    <th>JobWorker</th>
+                    <th>Order No</th>
+                    <th>Product</th>
+                    <th>Deal Qty</th>
+                    <th>Rate</th>
+                    <th>Penalty</th>
+                    <th>Remark</th>
+                    <th>P. Amount</th>
+                </tr>
+            </thead>
+            <tfoot>
+                <tr>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+</div>
+<!-- The Modal -->
+<div id="myImgModal" class="Imgmodal">
+
+    <!-- Modal Content (The Image) -->
+    <div class="Imgcontainer" style="
+    width: 600px;
+    height: 600px;
+    margin-left: auto;
+    margin-right: auto;
+">
+        <!-- The Close Button -->
+        @*<span class="close" onclick="document.getElementById('myModal').style.display='none'">&times;</span>*@
+        <img class="Imgmodal-content" id="img01" style="max-width: 100%; max-height: 100%; width: auto; height: auto">
+    </div>
+</div>
+
+<script type="text/javascript">
+
+
+    $(document).ready(function () {
+
+        var Filters = new AssignFilters();
+        Filters.TransactionType = "@ViewBag.TransactionType";
+        //$('#sFilter').html(GenerateFiltersForHtml());
+        var DocumentTypeId = @ViewBag.DocumentTypeId;
+
+        var PageLoadFirst = true;
+        var Url = "/JobRatePenaltyUpdate/JobReceiveList/";
+        var tab = $('#example').DataTable({
+            scrollY: "300px",
+            scrollCollapse: false,
+            scroller: true,
+            sort : true,
+            lengthChange : false,
+            bInfo: false,
+            //ajax: Url,
+            ajax: {
+                "url": Url,
+                "type": "POST",
+                "data": function (d) {
+                    d.TransactionType = Filters.TransactionType ? Filters.TransactionType : null;
+                    d.FromDate = Filters.FromDate ? Filters.FromDate : null;
+                    d.ToDate = Filters.ToDate ? Filters.ToDate : null;
+                    d.DocumentTypeId = DocumentTypeId;
+                },
+            },
+
+            columns: [
+                { "data": "JobReceiveLineId", "width": "0%" },
+                { "data": "JobOrderLineId", "width": "0%" },
+                { "data": "JobReceiveQAPenaltyId", "width": "0%" },
+                { "data": "ProductUidName", "width": "6%" },
+                { "data": "DocNo", "width": "6%"  },
+                { "data": "DocDate", "width": "6%"  },
+                { "data": "JobWorkerName", "width": "15%"  },
+                { "data": "OrderNo", "width": "10%"  },
+                { "data": "ProductName", "width": "25%" , "sortable": false},      
+                { "data": "DealQty", "width": "5%" ,  className: "TextRight","sortable": false},
+                { "data": "Rate", "width": "5%", className: "TextRight", "render": function (data, type, row) { return '<input style="width:100%;" class="Rate TextRight"  type="text" value="' + (row.Rate == null ? '' : row.Rate) + '" name="Rate' + row.JobOrderLineId + '" id="Rate' + row.JobOrderLineId + '" />'; }, "sortable": false },
+                { "data": "PenaltyResion", "width": "8%" , "sortable": false},
+                { "data": "PenaltyRemark", "width": "8%" , "sortable": false},
+                { "data": "PenaltyAmount", "width": "5%", className: "TextRight", "render": function (data, type, row) { return '<input style="width:100%;" class="PenaltyAmount TextRight"  type="text" value="' + (row.PenaltyAmount == null ? '' : row.PenaltyAmount) + '" name="PenaltyAmount' + row.JobReceiveLineId + '" id="PenaltyAmount' + row.JobReceiveLineId + '" />'; }, "sortable": false },
+            ],
+            columnDefs: [
+                { "targets": 0, "searchable": false, className: "DTHidden JobReceiveLineId", },
+                { "targets": 1, "searchable": false, className: "DTHidden JobOrderLineId", },
+                { "targets": 2, "searchable": false, className: "DTHidden JobReceiveQAPenaltyId", },
+
+            ],
+            dom: 'T<"clear">lfrti',
+            TableTools: {
+                "sRowSelect": "os",
+                "aButtons": [
+                "select_all", "select_none"
+                ]
+            },
+            tableTools: {
+                "sSwfPath": "../../Content/DataTables/swf/copy_csv_xls_pdf.swf"
+            }
+
+
+        });
+
+
+
+
+
+        $(document).on('change', ' td > input', function () {
+            var eXPenaltyAmount=0;
+            var eXRate=0;
+
+            if ($(this).val() && $(this).hasClass('PenaltyAmount'))
+                eXPenaltyAmount = $(this).val();
+            else if ($(this).val() && $(this).hasClass('Rate'))
+            { eXRate = $(this).val(); }
+
+            var td = $(this).closest('td').get(0);
+            var JData = $(this).closest('tr');
+            var PenaltyAmount = JData.find('.PenaltyAmount').val()|| 0;
+            var Rate = JData.find('.Rate').val() || 0;
+
+
+            if ($(this).val() && $(this).hasClass('PenaltyAmount')) 
+            {
+                var data = tab.rows(JData).data();
+                $.ajax({
+
+                    url: '/JobRatePenaltyUpdate/UpdateJobReceiveQAPenaltyAmount',
+                    type: "POST",
+                    data: { JobReceiveQAPenaltyId: data[0].JobReceiveQAPenaltyId, PenaltyAmount: PenaltyAmount },
+                    success: function (result) {
+                        if (result.Success == true) {
+
+                        }
+                        else if (!result.Success) {
+                            alert('Something went wrong');
+                        }
+                    },
+                    error: function () {
+
+                    },
+                });
+            }
+
+            if ($(this).val() && $(this).hasClass('Rate')) {
+                var data = tab.rows(JData).data();
+                $.ajax({
+
+                    url: '/JobRatePenaltyUpdate/UpdateJobOrderLineRate',
+                    type: "POST",
+                    data: { JobOrderLineId: data[0].JobOrderLineId, Rate: Rate },
+                    success: function (result) {
+                        if (result.Success == true) {
+
+                        }
+                        else if (!result.Success) {
+                            alert('Something went wrong');
+                        }
+                    },
+                    error: function () {
+
+                    },
+                });
+            }
+
+            return true;
+        });
+
+        $(document).on('focusin', ' td > input', function () {
+            var eXPenaltyAmount=0;
+            if (eXPenaltyAmount && $(this).hasClass('PenaltyAmount') && !$(this).val())
+            { $(this).val(eXPenaltyAmount).trigger('change'); }
+        })
+
+
+        $(function () {
+
+            $("a[data-modalCustom]").on("click", function (e) {
+                // hide dropdown if any
+                if (this.href == "") {
+                    return false;
+                }
+                //alert("Go");
+                var url = this.href;
+                var data = new GenerateFiltersForParameter();
+                $.ajax({
+                    url: url,
+                    type: "POST",
+                    data: data,
+                    success: function (result) {
+                        $('#myModalContent').html(result);
+                        $('#myModal').modal({
+                            backdrop: 'static',
+                            keyboard: true
+                        }, 'show');
+
+                        bindForm1('#myModalContent');
+                    },
+                });
+                return false;
+            });
+        });
+
+
+
+
+        function AssignFilters() {
+            var self = this;
+
+            self.TransactionType = $('#TransactionType', '.modal-body').val();
+            self.FromDate = $('#FromDate', '.modal-body').val();
+            self.ToDate = $('#ToDate', '.modal-body').val();
+        }
+
+        function GenerateFiltersForParameter() {
+            var self = this;
+
+            self.TransactionType = Filters.TransactionType ? Filters.TransactionType : null;
+            self.FromDate = Filters.FromDate ? Filters.FromDate : null;
+            self.ToDate = Filters.ToDate ? Filters.ToDate : null;
+
+        }
+
+        function GenerateFiltersForHtml() {
+
+            var html = "";
+            html += Filters.TransactionType ? "<strong>Type:</strong> <span class='label label-danger'> " + Filters.TransactionType + " </span>" : "";
+            html += Filters.FromDate ? "<strong>From Date:</strong> <span class='label label-danger'> " + Filters.FromDate + " </span>" : "";
+            html += Filters.ToDate ? "<strong>To Date:</strong> <span class='label label-danger'> " + Filters.ToDate + " </span>" : "";
+
+            return html;
+        }
+
+
+        var DocumentTypeId = @ViewBag.DocumentTypeId;
+
+
+
+
+
+
+
+
+    });
+
+
+
+
+
+
+
+</script>

@@ -1,0 +1,75 @@
+﻿@model Model.Models.ReportLine
+
+@{
+    ViewBag.Title = "Delete";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="panel panel-default">
+
+    <div class="panel-heading">
+
+        <h4>
+            <span style="font-family: Calibri,sans-serif,Verdana">Delete ReportLine.</span>
+        </h4>
+
+    </div>
+    <div class="panel-info" style="padding-left:15px">
+        <div>
+
+           
+            <dl class="dl-horizontal">
+                <dt>
+                    @Html.DisplayNameFor(model => model.DataType)
+                </dt>
+
+                <dd>
+                    @Html.DisplayFor(model => model.DataType)
+                </dd>
+
+                <dt>
+                    @Html.DisplayNameFor(model => model.CreatedBy)
+                </dt>
+
+                <dd>
+                    @Html.DisplayFor(model => model.CreatedBy)
+                </dd>
+
+                <dt>
+                    @Html.DisplayNameFor(model => model.ModifiedBy)
+                </dt>
+
+                <dd>
+                    @Html.DisplayFor(model => model.ModifiedBy)
+                </dd>
+
+                <dt>
+                    @Html.DisplayNameFor(model => model.CreatedDate)
+                </dt>
+
+                <dd>
+                    @Html.DisplayFor(model => model.CreatedDate)
+                </dd>
+
+                <dt>
+                    @Html.DisplayNameFor(model => model.ModifiedDate)
+                </dt>
+
+                <dd>
+                    @Html.DisplayFor(model => model.ModifiedDate)
+                </dd>
+
+            </dl>
+            <hr />
+            @using (Html.BeginForm())
+            {
+                @Html.AntiForgeryToken()
+
+                <div class="form-actions no-color">
+                    <input type="submit" value="Delete" class="btn-primary xxlarge" /> |
+                    @Html.ActionLink("Back to List", "Index", new { id=Model.ReportHeaderId})
+                </div>
+            }
+        </div>
+    </div>
+</div>

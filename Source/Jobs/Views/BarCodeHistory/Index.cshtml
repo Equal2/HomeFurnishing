@@ -1,0 +1,363 @@
+﻿@{
+    ViewBag.Title = "Barcode History";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<style type="text/css">
+    .DTHidden {
+        display: none;
+    }
+
+    .TextRight {
+        text-align: right;
+    }
+
+    .dataTable {
+        font-size: 13px !important;
+        line-height: 1.5;
+    }
+    table.dataTable tbody td {
+        padding: 2px 10px;
+    }
+</style>
+
+<link href="~/Content/DataTables/css/dataTables.bootstrap.css" rel="stylesheet" />
+<link href="~/Content/DataTables/css/scroller.bootstrap.min.css" rel="stylesheet" />
+
+<script src="~/Scripts/DataTables/jquery.dataTables.min.js"></script>
+<script src="~/Scripts/DataTables/dataTables.scroller.js"></script>
+
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3>
+            <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"> <span class="glyphicon glyphicon-file black"></span> BarCode History</span>
+        </h3>
+    </div>
+
+    <div class="panel-info" style="padding-left:15px">
+        <div class="form-horizontal">
+
+           
+            <div>
+                <h3 class="col-md-12 black">
+                    <span class="glyphicon glyphicon-align-justify"></span>
+                    1.BarCode Detail
+                </h3>
+                <div>
+                    <div>
+                        <div class="col-md-6">
+                            <div class="form-group" style="margin-top:15px">
+                                <label class="control-label col-md-3 col-sm-1" for="BarCode">BarCode</label>
+                                <div class="col-md-7 col-sm-10">
+                                    <input class="form-control col-xs-6 required" data-val="true" data-val-required="The BarCode field is required." id="BarCode" name="BarCode" type="text" value="@ViewBag.ProductUid">
+                                    <span class="field-validation-valid text-danger" data-valmsg-for="BarCode" data-valmsg-replace="true"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group" style="margin-top:15px">
+                                <label class="control-label col-md-3 col-sm-1" for="Product">Product</label>
+                                <div class="col-md-7 col-sm-10">
+                                    <input class="form-control col-xs-6" id="ProductName" name="ProductName" type="text" readonly="readonly">
+                                    <span class="field-validation-valid text-danger" data-valmsg-for="Product" data-valmsg-replace="true"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="control-label col-md-3 col-sm-1" for="Godown">Godown</label>
+                                <div class="col-md-7 col-sm-10">
+                                    <input class="form-control col-xs-6" data-val="true" data-val-required="The Godown field is required." id="Godown" name="Godown" type="text" readonly="readonly">
+                                    <span class="field-validation-valid text-danger" data-valmsg-for="Godown" data-valmsg-replace="true"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="control-label col-md-3 col-sm-1" for="Status">Status</label>
+                                <div class="col-md-7 col-sm-10">
+                                    <input class="form-control col-xs-6" id="Status" name="Status" type="text" readonly="readonly">
+                                    <span class="field-validation-valid text-danger" data-valmsg-for="Status" data-valmsg-replace="true"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <hr style="margin-bottom:0px" />
+
+            <div>
+                <h3 class="col-md-12 black">
+                    <span class="glyphicon glyphicon-align-justify"></span>
+                    2.Generation Detail
+                </h3>
+                <div>
+                    <div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="control-label  col-md-3 col-sm-1" for="BarCode">DocType</label>
+                                <div class="col-md-7 col-sm-10">
+                                    <input class="form-control col-xs-6" data-val="true" data-val-required="The BarCode field is required." id="DocType" name="DocType" type="text" disabled="disabled">
+                                    <span class="field-validation-valid text-danger" data-valmsg-for="BarCode" data-valmsg-replace="true"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="control-label  col-md-3 col-sm-1" for="BarCode">DocNo</label>
+                                <div class="col-md-7 col-sm-10">
+                                    <input class="form-control col-xs-6" data-val="true" data-val-required="The BarCode field is required." id="DocNo" name="DocNo" type="text" disabled="disabled">
+                                    <span class="field-validation-valid text-danger" data-valmsg-for="BarCode" data-valmsg-replace="true"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="control-label col-md-3 col-sm-1" for="BarCode">DocDate</label>
+                                <div class="col-md-7 col-sm-10">
+                                    <input class="form-control col-xs-6" data-val="true" data-val-required="The BarCode field is required." id="DocDate" name="DocDate" type="text" disabled="disabled">
+                                    <span class="field-validation-valid text-danger" data-valmsg-for="BarCode" data-valmsg-replace="true"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="control-label col-md-3 col-sm-1" for="BarCode">Person</label>
+                                <div class="col-md-7 col-sm-10">
+                                    <input class="form-control col-xs-6" data-val="true" data-val-required="The BarCode field is required." id="Person" name="Person" type="text" disabled="disabled">
+                                    <span class="field-validation-valid text-danger" data-valmsg-for="BarCode" data-valmsg-replace="true"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+
+            @*<hr style="margin-top:0px;margin-bottom:0px" />*@
+            <div class="row"></div>
+            <hr style="margin-bottom:0px" />
+            <h3 class="col-md-12 black">
+                <span class="glyphicon glyphicon-align-justify"></span>
+                3.Issue/Receive Detail
+            </h3>
+            <div style="margin:20px;">
+                <table id="example" class="table table-striped" cellspacing="0" width="100%">
+                    <thead style="background: #428bca;color:white">
+                        <tr>
+                            <th>DocType</th>
+                            <th>DocNo</th>
+                            <th>DocDate</th>
+                            <th>Person</th>
+                            <th>Godown</th>
+                            <th>Process</th>
+                            <th>Remark</th>
+                            <th>StockId</th>
+                        </tr>
+                    </thead>
+                    <tfoot>
+                        <tr>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+
+
+
+
+
+            <hr style="margin-bottom:0px" />
+            <h3 class="col-md-12 black">
+                <span class="glyphicon glyphicon-align-justify"></span>
+                4.Financial Detail
+            </h3>
+            <div style="margin:20px;">
+                <table id="Ledger" class="table table-striped" cellspacing="0" width="100%">
+                    <thead style="background: #428bca;color:white">
+                        <tr>
+                            <th>DocType</th>
+                            <th>DocNo</th>
+                            <th>DocDate</th>
+                            <th>Person</th>
+                            <th>Amount</th>
+                            <th>Process</th>
+                            <th>Remark</th>
+                            <th>LedgerId</th>
+                        </tr>
+                    </thead>
+                    <tfoot>
+                        <tr>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        FetGenData($('#BarCode').val());
+        var tab = $('#example').DataTable({
+            serverSide: true,
+            ordering: false,
+            searching: false,
+            searchDelay: 1000,
+            ajax: {
+                "url": "/BarCodeHistory/AjaxGetJsonData/?ProductUid=" + ($('#BarCode').val()),
+                "type": "POST"
+            },
+            columns: [
+              { "data": "DocTypeName", "width": "15%", "sortable": false },
+                 { "data": "DocNo", "width": "10%", "sortable": false },
+                 { "data": "sDocDate", "width": "10%", "sortable": false },
+                 { "data": "PersonName", "width": "16%", "sortable": false },
+                 { "data": "GodownName", "width": "15%", "sortable": false },
+                 { "data": "ProcessName", "width": "15%", "sortable": false },
+                 { "data": "Remark", "width": "15%", "sortable": false },
+                 { "data": "StockId" },
+            ],
+            columnDefs: [
+   { "targets": 7, "searchable": false, className: "DTHidden Id", },
+            ],
+            scrollY: "600px",
+            dom: 'tirp',
+            scroller: {
+                loadingIndicator: true
+            },
+            language: {
+                "loadingRecords": "Please wait - loading..."
+            },
+            scrollCollapse: true,
+        });
+
+        $('#BarCode').on('change', function () {
+            var table = $('#example').DataTable();
+            table.ajax.url("/BarCodeHistory/AjaxGetJsonData/?ProductUid=" + $(this).val()).load();
+
+
+            var Ledgertable = $('#Ledger').DataTable();
+            Ledgertable.ajax.url("/BarCodeHistory/AjaxGetLedgerData/?ProductUid=" + $(this).val()).load();
+
+            FetGenData($(this).val());
+          
+        })
+
+
+
+
+
+
+
+
+
+        function FetGenData(val)
+        {
+            $.get("/BarCodeHistory/AjaxGetGeneration", { ProductUid: val }).done(function (data) {
+                if (data.Success) {
+                    $('#DocNo').val(data.DocNo);
+                    $('#DocDate').val(data.DocDate);
+                    $('#DocType').val(data.DocType);
+                    $('#Person').val(data.Person);
+                    $('#ProductName').val(data.Product);
+                    $('#Godown').val(data.Godown);
+                    $('#Status').val(data.Status);
+                }
+                else {
+                    $('#DocNo').val("");
+                    $('#DocDate').val("");
+                    $('#DocType').val("");
+                    $('#Person').val("");
+                    $('#ProductName').val("");
+                    $('#Godown').val("");
+                    $('#Status').val("");
+                }
+            });
+        }
+
+        $('#example tbody').on('dblclick', 'tr', function () {
+            var id = parseInt($(this).find("td.Id:first").html());
+            window.location.href = '/BarCodeHistory/RecordMenu/' + id;
+        });
+
+
+
+
+
+
+
+
+        var Ledgertab = $('#Ledger').DataTable({
+            serverSide: true,
+            ordering: false,
+            searching: false,
+            searchDelay: 1000,
+            ajax: {
+                "url": "/BarCodeHistory/AjaxLedgerData/?ProductUid=" + ($('#BarCode').val()),
+                "type": "POST"
+            },
+            columns: [
+              { "data": "DocTypeName", "width": "15%", "sortable": false },
+                 { "data": "DocNo", "width": "12%", "sortable": false },
+                 { "data": "sDocDate", "width": "10%", "sortable": false },
+                 { "data": "PersonName", "width": "20%", "sortable": false },
+                 { "data": "Amount", "width": "15%", "sortable": false },
+                 { "data": "ProcessName", "width": "15%", "sortable": false },
+                 { "data": "Remark", "width": "13%", "sortable": false },
+                 { "data": "LedgerId" },
+            ],
+            columnDefs: [
+   { "targets": 7, "searchable": false, className: "DTHidden Id", },
+            ],
+            scrollY: "600px",
+            dom: 'tirp',
+            scroller: {
+                loadingIndicator: true
+            },
+            language: {
+                "loadingRecords": "Please wait - loading..."
+            },
+            scrollCollapse: true,
+        });
+
+
+    });
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,118 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{B1053A2D-A1EA-412F-BA95-19CE794F8891}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Core</RootNamespace>
+    <AssemblyName>Core</AssemblyName>
+    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
+    <RestorePackages>true</RestorePackages>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <UseVSHostingProcess>true</UseVSHostingProcess>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="log4net, Version=1.2.15.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
+      <HintPath>..\packages\log4net.2.0.5\lib\net45-full\log4net.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Remotion.Data.Linq">
+      <HintPath>..\..\Libs\Remotion.Data.Linq.dll</HintPath>
+    </Reference>
+    <Reference Include="Remotion.Interfaces">
+      <HintPath>..\..\Libs\Remotion.Interfaces.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data.Entity" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Web.Mvc, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\Libs\System.Web.Mvc.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Common\CommanExtensions.cs" />
+    <Compile Include="Common\CookieGenerator.cs" />
+    <Compile Include="Common\FileTypeConstant.cs" />
+    <Compile Include="Common\ReportFileTypeConstant.cs" />
+    <Compile Include="Common\ActivityConstants.cs" />
+    <Compile Include="Common\ObjectShredder.cs" />
+    <Compile Include="Common\ChargeTypeConstants.cs" />
+    <Compile Include="Common\StatusConstants.cs" />
+    <Compile Include="Common\DocumentCategoryConstants.cs" />
+    <Compile Include="Common\ValidationResult.cs" />
+    <Compile Include="CookieMgr\CookieManager.cs" />
+    <Compile Include="CookieMgr\UserPreferences.cs" />
+    <Compile Include="Crypto\AESStringCrypto.cs" />
+    <Compile Include="EntityBase\EntityBase.cs" />
+    <Compile Include="EntityBase\IHistoryLog.cs" />
+    <Compile Include="EntityBase\IndexAttribute.cs" />
+    <Compile Include="EntityBase\IndexInitializer.cs" />
+    <Compile Include="EntityBase\IObjectState.cs" />
+    <Compile Include="EntityBase\ObjectState.cs" />
+    <Compile Include="Excel\Attributes\ExcelColumnAttribute.cs" />
+    <Compile Include="Excel\Domain\Cell.cs" />
+    <Compile Include="Excel\Domain\DatabaseEngine.cs" />
+    <Compile Include="Excel\Domain\Row.cs" />
+    <Compile Include="Excel\Domain\RowNoHeader.cs" />
+    <Compile Include="Excel\Domain\StrictMappingException.cs" />
+    <Compile Include="Excel\ExcelQueryFactory.cs" />
+    <Compile Include="Excel\Extensions\CommonExtensions.cs" />
+    <Compile Include="Excel\IExcelQueryFactory.cs" />
+    <Compile Include="Excel\Query\ExcelQueryable.cs" />
+    <Compile Include="Excel\Query\ExcelQueryArgs.cs" />
+    <Compile Include="Excel\Query\ExcelQueryConstructorArgs.cs" />
+    <Compile Include="Excel\Query\ExcelQueryExecutor.cs" />
+    <Compile Include="Excel\Query\ExcelUtilities.cs" />
+    <Compile Include="Excel\Query\ProjectorBuildingExpressionTreeVisitor.cs" />
+    <Compile Include="Excel\Query\ResultObjectMapping.cs" />
+    <Compile Include="Excel\Query\SqlGeneratorQueryModelVisitor.cs" />
+    <Compile Include="Excel\Query\SqlParts.cs" />
+    <Compile Include="Excel\Query\StrictMappingType.cs" />
+    <Compile Include="Excel\Query\TrimSpacesType.cs" />
+    <Compile Include="Excel\Query\WhereClauseExpressionTreeVisitor.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

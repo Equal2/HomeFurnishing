@@ -1,0 +1,166 @@
+﻿
+@* @model MDashBoard.Models.Dataset *@
+@model MDashBoard.Models.SubProductionDataset
+
+<style type="text/css">
+    .cusleftnormal {
+        border-bottom-left-radius: 0pc !important;
+        border-top-left-radius: 0px !important;
+    }
+
+    .cusrightnormal {
+        border-bottom-right-radius: 0px !important;
+        border-top-right-radius: 0px !important;
+    }
+</style>
+
+
+@{
+    int I = DateTime.Now.Month;
+    string fromdate;
+
+    if (I < 4)
+    {
+        fromdate = "01/Apr/" + DateTime.Now.AddYears(-1).Year.ToString();
+    }
+    else
+    {
+        fromdate = "01/Apr/" + DateTime.Now.Year.ToString();
+    }
+
+}
+@{
+    double? TotalProduction;
+    string Maxdate;
+    string Mindate;
+    Mindate = Model.MinMaxDate.FirstOrDefault().MinDate;
+    Maxdate = Model.MinMaxDate.FirstOrDefault().MaxDate;
+    @*TotalProduction = Model.Month.Sum(m => m.Value);*@
+    TotalProduction = Model.Month.Sum(m => m.Qty);
+    
+     
+  }
+
+
+
+@functions
+{
+   
+ public string SpanColor(double? Value,double? Total)
+    {
+     string Color = null;
+     double? divided = 0;
+     //divided = (Value / Total) * 100;
+     divided =double.Parse(string.Format("{0:0}", (Value / Total) * 100).ToString());
+         
+     if (divided > 0 && divided <= 25)
+     {
+         Color ="bg-red";
+     }
+     else if (divided > 25 && divided <= 50)
+     {
+         Color = "bg-yellow";
+     }
+     else if (divided > 50 && divided <= 75)
+     {
+         Color = "bg-blue";
+     }
+     else if (divided > 75 && divided <= 100)
+     {
+         Color = "bg-green";
+     }
+   return Color; 
+ }
+}
+
+<div class="modal-content">
+    <div class="modal-header" style="border-bottom: 1px solid #8E8888; padding-top: 8px; padding-bottom: 8px;">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"> <span class="glyphicon glyphicon-remove"></span></button>
+       
+        <div class="glyphicon glyphicon-file black" style="font-size:3.2em;width:auto;height:auto;float:left;"></div>
+        <div>
+            <span class="info-box-number">Dyeing Plan Balance &nbsp;&nbsp; (@string.Format("{0:0}", TotalProduction).ToString())</span>
+            <span class="info-box-text">@Mindate To  @Maxdate</span>
+        </div>
+    </div>
+    <div class="modal-body">
+        <div class="row">
+            <div class="col-md-4">
+                <!-- Widget: user widget style 1 -->
+                <div class="box box-widget widget-user-2">
+                    <!-- Add the bg color to the header using any of the bg-* classes -->
+                    <div class="widget-user-header @ViewBag.Color" style="padding-bottom: 4px;padding-top: 4px;">
+                        <div class="widget-user-image">
+                            <!-- <img class="img-circle" src="../dist/img/user7-128x128.jpg" alt="User Avatar">-->
+                            <div class="glyphicon glyphicon-calendar" style="font-size: 2.5em; width: auto; height: auto; float: left;">
+                            </div>
+                        </div>
+                        <!-- /.widget-user-image -->
+                        <h4><span class="text-bold">Month</span></h4>
+                        <!--<h3 class="widget-user-username" style="font-weight:bold">Month</h3>
+        <h5 class="widget-user-desc">Production &nbsp;(Sq.Yard)</h5>-->
+                    </div>
+
+                    <div class="box-footer no-padding">
+                        <ul class="nav nav-stacked">
+                            @foreach (var item in Model.Month.ToList())
+                        {
+                                <li><a href="/Production/SubDyeinPlanBalance?Type=Month&Value=@item.Month" class="small-box-footer" data-modal="">
+    <div class="row">
+        <div class="col-md-5 col-xs-5">@item.Month</div>
+        <div class="col-md-2 col-xs-2"><span class="badge @SpanColor(item.Qty, TotalProduction)">@string.Format("{0:0}", (item.Qty / TotalProduction) * 100).ToString()%</span></div>
+        <div class="col-md-5 col-xs-5" style="text-align:right">@string.Format("{0:0}", item.Qty).ToString()</div>
+    </div>
+</a></li>
+
+                        }
+                        </ul>
+                    </div>
+                </div>
+                <!-- /.widget-user -->
+            </div>
+            <!-- /.col -->
+            <div class="col-md-8">
+                <!-- Widget: user widget style 1 -->
+                <div class="box box-widget widget-user-2">
+                    <!-- Add the bg color to the header using any of the bg-* classes -->
+                    <div class="widget-user-header @ViewBag.Color" style="padding-bottom: 4px;padding-top: 4px;">
+                        <div class="widget-user-image">
+                            <!-- <img class="img-circle" src="../dist/img/user7-128x128.jpg" alt="User Avatar">-->
+                            <div class="ion ion-person" style="font-size:3.2em;width:auto;height:auto;float:left;">
+                            </div>
+                        </div>
+                        <!-- /.widget-user-image
+        <h3 class="widget-user-username" style="font-weight:bold">Job Worker</h3>-->
+                        <h4><span class="text-bold">Buyer Name</span></h4>
+                    </div>
+                    <div class="box-footer no-padding">
+                        <ul class="nav nav-stacked" id="Temp1">
+
+                            @foreach (var item in Model.Name.ToList())
+                        {
+                                
+                                <li><a href="/Production/SubDyeinPlanBalance?Type=Name&Value=@item.Name" class="small-box-footer" data-modal="">
+    <div class="row">
+        <div class="col-md-5 col-xs-5">@item.Name</div>
+        <div class="col-md-2 col-xs-2"><span class="badge @SpanColor(item.Qty, TotalProduction)">@string.Format("{0:00}", (item.Qty / TotalProduction) * 100).ToString()%</span></div>
+        <div class="col-md-5 col-xs-5" style="text-align:right">@string.Format("{0:0}", item.Qty).ToString()</div>
+    </div>
+</a></li>
+                                                                        }
+
+
+
+                        </ul>
+                    </div>
+                </div>
+                <!-- /.widget-user -->
+            </div>
+
+            <!-- /.col -->
+            
+
+            <!-- /.col -->
+        </div>
+    </div>
+</div>

@@ -1,0 +1,52 @@
+﻿@model Model.ViewModels.AddToExistingContactViewModel
+
+
+@using Core.Common
+
+<div class="modal-content">
+    <div class="modal-header" style="border-bottom: 1px solid #8E8888">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"> <span class="glyphicon glyphicon-remove"></span></button>
+        <h3>
+            <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-file black"></span>Create Contact</span>
+        </h3>
+    </div>
+
+    <div>
+        @using (Html.BeginForm("AddToExisting", "JobWorker", FormMethod.Post, new { @class = "modal-form", id = "modform" }))
+        {
+               @Html.AntiForgeryToken()
+
+            <div class="modal-body" style="height:250px">
+                @*<div class="row">
+                    @Html.ActionLink("Create New Contact", "Create", "JobWorker", null, new { @class = "btn btn-primary left col-md-12 ", @title = "Create New", @data_toggle = "tooltip" })
+                </div>
+
+                <div class="row">
+                    @Html.ActionLink("Add To Existing", "AddToExisting", "JobWorker", null, new { @class = "btn btn-primary left col-md-12 ", @title = "Create New", @data_toggle = "tooltip", @data_modal = "", @id = "AddToExisting" })
+                </div>*@
+                <div class="col-xs-6 text-center" style="border-right:1px solid grey">
+                    <a href="@Url.Action("Create", "JobWorker")">
+                        <h1>
+                            <span class="glyphicon glyphicon-file" style="font-size:3.7em">
+
+                            </span>
+                        </h1>
+                        <h4 class="black">Add New</h4>
+                    </a>
+                </div>
+                <div class="col-xs-6 text-center">
+                    <a href="/JobWorker/AddToExisting" id="AddToExisting" data-modal="">
+                        <h1>
+                            <span class="glyphicon glyphicon-duplicate" style="font-size:3.7em">
+
+                            </span>
+                        </h1>
+                        <h4 class="black">Copy From Existing</h4>
+                    </a>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+

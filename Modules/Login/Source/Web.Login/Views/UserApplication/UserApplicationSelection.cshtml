@@ -1,0 +1,43 @@
+﻿<!DOCTYPE html>
+@{
+    Layout = null;
+}
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+    <title>User Application Selection</title>
+    <link href="~/Content/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Content/AdminLTE.css" rel="stylesheet" />
+
+</head>
+<body>
+    <style>
+    </style>
+    
+    <div class="container">
+        <legend class="text-center">Choose Project</legend>
+        <div class="box">
+            <!-- /.box-header -->
+            <!-- form start -->
+            @using (Html.BeginForm("SelectedApplication", "UserApplication", FormMethod.Post, new { @class = "form-horizontal" }))
+            {  
+                @Html.AntiForgeryToken()
+                <div class="box-body">
+                    <div class="form-group">
+                        @Html.Label("Project", new { @class = "control-label col-sm-2", @style = "padding-top:8px;" })
+                        <div class="col-sm-10">
+                            @Html.DropDownList("id", new SelectList(ViewBag.UserAppList as System.Collections.IEnumerable, "ApplicationId", "ApplicationDescription"), new { @class = "form-control required" })
+                        </div>
+                    </div>
+                </div>
+                <!-- /.box-body -->
+                <div class="box-footer with-border">
+                    <button type="submit" class="btn btn-success center-block">continue</button>
+                </div>
+                <!-- /.box-footer -->
+            }
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,156 @@
+﻿@model Model.ViewModels.DispatchWaybillHeaderMasterDetailModel
+
+@{
+    ViewBag.Title = "Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<style type="text/css">
+    .CurveBorder {
+        border-radius: 5px;
+        width: 8em;
+        height: 3em;
+    }
+</style>
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h4>
+            <span style="font-family: Calibri,sans-serif,Verdana">
+                @if (ViewBag.transactionType == "submit")
+                {<h2>Submit Dispatch Waybill</h2>}
+                else if (ViewBag.transactionType == "approve")
+                {<h2>Approve Dispatch Waybill</h2>}
+                else if (ViewBag.transactionType == "delete")
+                {<h2>Delete Dispatch Waybill</h2>}
+                else
+                {<h2>Dispatch Waybill Detail</h2>}
+            </span>
+        </h4>
+
+    </div>
+    <div class="panel-info" style="padding-left:15px">
+        @using (Html.BeginForm())
+        {
+            @Html.AntiForgeryToken()
+            <div class="row">
+                <div class="col-md-6">
+                    <hr />
+                    <dl class="dl-horizontal">
+                        @Html.HiddenFor(m => m.DispatchWaybillHeaderId)
+                        @Html.HiddenFor(m => m.DispatchWaybillHeaderViewModelWithLog.DispatchWaybillHeaderId)
+                        @Html.HiddenFor(m => m.DispatchWaybillHeaderViewModelWithLog.DocNo)
+                        <dt>
+                            @Html.DisplayNameFor(model => model.DispatchWaybillHeaderViewModelWithLog.DocTypeName)    :
+                        </dt>
+
+                        <dd>
+                            @Html.DisplayFor(model => model.DispatchWaybillHeaderViewModelWithLog.DocTypeName)
+                        </dd>
+
+                        <dt>
+                            @Html.DisplayNameFor(model => model.DispatchWaybillHeaderViewModelWithLog.DocDate)    :
+                        </dt>
+
+                        <dd>
+                            @Html.DisplayFor(model => model.DispatchWaybillHeaderViewModelWithLog.DocDate)
+                        </dd>
+
+                        <dt>
+                            @Html.DisplayNameFor(model => model.DispatchWaybillHeaderViewModelWithLog.DocNo)    :
+                        </dt>
+
+                        <dd>
+                            @Html.DisplayFor(model => model.DispatchWaybillHeaderViewModelWithLog.DocNo)
+                        </dd>
+
+                        <dt>
+                            @Html.DisplayNameFor(model => model.DispatchWaybillHeaderViewModelWithLog.ConsigneeName)    :
+                        </dt>
+
+                        <dd>
+                            @Html.DisplayFor(model => model.DispatchWaybillHeaderViewModelWithLog.ConsigneeName)
+                        </dd>
+
+
+                    </dl>
+                </div>
+
+                <div class="col-md-6">
+                    <hr />
+                    <dl class="dl-horizontal">
+                        <dt>
+                            @Html.DisplayNameFor(model => model.DispatchWaybillHeaderViewModelWithLog.TransporterName)    :
+                        </dt>
+
+                        <dd>
+                            @Html.DisplayFor(model => model.DispatchWaybillHeaderViewModelWithLog.TransporterName)
+                        </dd>
+
+                        <dt>
+                            @Html.DisplayNameFor(model => model.DispatchWaybillHeaderViewModelWithLog.DeliveryOffice)    :
+                        </dt>
+
+                        <dd>
+                            @Html.DisplayFor(model => model.DispatchWaybillHeaderViewModelWithLog.DeliveryOffice)
+                        </dd>
+
+                        <dt>
+                            @Html.DisplayNameFor(model => model.DispatchWaybillHeaderViewModelWithLog.Remark)    :
+                        </dt>
+
+                        <dd>
+                            @Html.DisplayFor(model => model.DispatchWaybillHeaderViewModelWithLog.Remark)
+                        </dd>
+
+                        @if (ViewBag.transactionType == "delete")
+                        {
+                            <dt>                                
+                                Delete Reason*
+                            </dt>
+
+                            <dd>
+                                @Html.EditorFor(model => model.DispatchWaybillHeaderViewModelWithLog.LogReason)<span style="font-family:'Arial Rounded MT'">Min 20 Characters</span>
+                                @Html.ValidationMessageFor(m => m.DispatchWaybillHeaderViewModelWithLog.LogReason)
+                            </dd>
+                        }
+                    </dl>
+                </div>
+            </div>
+
+
+            <hr />
+            <div class="form-actions no-color">
+                @if (ViewBag.transactionType == "submit")
+                {
+                    <input type="submit" name="Command:Submit" value="Submit" class="btn btn-primary btn-sm CurveBorder" />
+                    <span style="font-family: Calibri,sans-serif,Verdana;font-size:large">
+
+                        @Html.ActionLink("Back", "Index", null, new { @class = "btn btn-primary btn-sm col-md-offset-1 CurveBorder ActionLinkPadding" })
+                    </span>
+                }
+
+                else if (ViewBag.transactionType == "approve")
+                {
+                    <input type="submit" name="Command:Approve" value="Approve" class="btn btn-primary btn-sm CurveBorder" />
+                    <span style="font-family: Calibri,sans-serif,Verdana;font-size:large">
+
+                        @Html.ActionLink("Back", "Index", null, new { @class = "btn btn-primary btn-sm col-md-offset-1 CurveBorder ActionLinkPadding" })
+                    </span>
+                }
+                else if (ViewBag.transactionType == "delete")
+                {
+                    <input type="submit" name="Command:Delete" value="Delete" class="btn btn-primary btn-sm CurveBorder" />
+                    <span style="font-family: Calibri,sans-serif,Verdana;font-size:large">
+
+                        @Html.ActionLink("Back", "Index", null, new { @class = "btn btn-primary btn-sm col-md-offset-1 CurveBorder ActionLinkPadding" })
+                    </span>
+                }
+                else
+                {
+                    <span style="font-family: Calibri,sans-serif,Verdana;font-size:large">
+                        @Html.ActionLink("Back", "Index", null, new { @class = "btn btn-primary btn-sm col-md-offset-0 CurveBorder ActionLinkPadding" })
+                    </span>
+                }
+            </div>
+        }
+    </div>
+</div>

@@ -1,0 +1,128 @@
+﻿@model Model.ViewModels.SaleInvoiceFillProducts
+
+
+@using Core.Common
+
+<div class="modal-content">
+    <div class="modal-header" style="border-bottom: 1px solid #8E8888">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"> <span class="glyphicon glyphicon-remove"></span></button>
+        <h3>
+            <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-file black"></span>Product Detail</span>
+        </h3>
+    </div>
+    <div>
+        @using (Html.BeginForm("FillProducts", "SaleInvoiceLine", FormMethod.Post, new { @class = "modal-form", id = "modform" }))
+        {
+            
+            @Html.AntiForgeryToken()
+            @Html.HiddenFor(m => m.SaleInvoiceHeaderId)
+            @Html.HiddenFor(m => m.SaleDispatchHeaderId)
+
+            <div class="form-horizontal modal-body">
+
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.PackingHeaderIds, "Packing No", new { @class = "control-label col-xs-4 " })
+                            <div class="col-xs-6">
+                                @Html.TextBoxFor(m => m.PackingHeaderIds, null, new { @class = "form-control col-xs-6 required" })
+                                @Html.ValidationMessageFor(m => m.PackingHeaderIds, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+
+                        <script>
+                            $('#Reason').focus();
+                        </script>
+
+                    </div>
+                </div>
+
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.DealUnitId, "Deal Unit", new { @class = "control-label col-xs-4" })
+                            <div class="col-xs-4" style="padding-right:0px">
+                                @*@Html.DropDownListFor(model => model.DealUnitId, new SelectList(ViewBag.DealUnitList as System.Collections.IEnumerable, "UnitId", "UnitName"), new { @class = "form-control height cusrightnormal required" })*@
+                                @Html.DropDownList("DealUnitId", null, new { @class = "form-control col-xs-6 height" })
+                                @Html.ValidationMessageFor(model => model.DealUnitId, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="modal-footer " style="padding: 19px 20px 0 20px; border-top:1px solid #8E8888">
+                    <button class="btn custom right" name="Command:submit" type="submit"><h2 style="margin:0px" id="submit"><span class="glyphicon glyphicon-floppy-disk black"></span> </h2></button>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+
+<script type="text/javascript">
+
+    //For Multi Selection Help
+    GetPackingList($("#PackingHeaderIds"), '/Rug/SaleInvoiceLine/GetPackingNoPendingForInvoice', '/ComboHelpList/SetPackingNo', ' ', true, 0);
+
+
+    function GetPackingList(Id, GetAction, SetAction, placehold, multiple, length) {
+        var geturl = GetAction;
+        //The url we will send our get request to
+        var attendeeUrl = GetAction;
+        var pageSize = 20;
+        var saledispatchheaderid = @Model.SaleDispatchHeaderId;
+        Id.select2(
+        {
+
+            placeholder: placehold,
+            //Does the user have to enter any data before sending the ajax request
+            minimumInputLength: length,
+            allowClear: true,
+            multiple: multiple,
+            ajax: {
+                //How long the user has to pause their typing before sending the next request
+                quietMillis: 150,
+                //The url of the json service
+                url: attendeeUrl,
+                dataType: 'jsonp',
+                //Our search term and what page we are on
+                data: function (term, page) {
+                    return {
+                        pageSize: pageSize,
+                        pageNum: page,
+                        searchTerm: term,
+                        saledispatchheaderid: saledispatchheaderid
+                    };
+                },
+                results: function (data, page) {
+                    //Used to determine whether or not there are more results available,
+                    //and if requests for more data should be sent in the infinite scrolling
+                    var more = (page * pageSize) < data.Total;
+                    return { results: data.Results, more: more };
+                }
+            },
+            initSelection: function (element, callback) {
+
+                var xval = element.val();
+                if (xval != 0) {
+                    $.ajax({
+                        cache: false,
+                        type: "POST",
+                        url: SetAction,
+                        data: { Ids: element.val() },
+                        success: function (data) {
+                            callback(data);
+                        },
+                        error: function (xhr, ajaxOptions, thrownError) {
+                            alert('Failed to Retrive Qty' + thrownError);
+                        }
+                    })
+                }
+                //callback([{ id: "1", text: "arpit" }, { id: "2", text: "akash" }]);
+            }
+        });
+    }
+</script>

@@ -1,0 +1,31 @@
+﻿@model List<Model.Models.ImportMessage>
+@using System.Text.RegularExpressions
+@{
+    ViewBag.Title = "Import Status";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@if (Model.Where(m => m.ValueType == "Error").Count() > 0)
+{
+    <h2>Import Completed With Errors</h2>    
+}
+else
+{
+    <h2>Import Completed Successfully</h2>    
+}
+
+
+
+@foreach (var item in Model)
+{
+    <div>
+        @Html.DisplayFor(modelItem => item.Head) :
+        @Html.DisplayFor(modelItem => item.Value)
+    </div>
+}
+
+
+
+
+
+

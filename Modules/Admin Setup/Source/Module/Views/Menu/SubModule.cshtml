@@ -1,0 +1,482 @@
+﻿@model IEnumerable<AdminSetup.Models.ViewModels.SubModuleViewModel>
+@using AdminSetup.Models.ViewModels;
+@{
+    ViewBag.Title = "Menus";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<style type="text/css">
+    .nav-stacked > li {
+        border: 0px;
+        border-radius: 10px;
+    }
+
+    .cuscontainer {
+        padding: 20px 20px 20px 20px;
+    }
+
+    .CustomCssFonts {
+        font-family: "Noto Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+        font-size: 18px;
+        line-height: 1.42857143;
+    }
+
+    a {
+        color: black;
+        background: transparent;
+        border-radius: 10px !important;
+    }
+
+    .popover-content .Permissions {
+        height: 300px;
+        overflow-y: scroll;
+        width: 100%;
+    }
+
+    .popover {
+        width: 320px;
+    }
+</style>
+
+@if (ViewBag.RolePermissions == true)
+{
+    <style type="text/css">
+        .nav-pills > li.active > a, .nav-pills > li.active > a:hover, .nav-pills > li.active > a:focus {
+            background-color: @(!string.IsNullOrEmpty((string)System.Web.HttpContext.Current.Session["UserPermissionSiteColour"]) ?  (string)System.Web.HttpContext.Current.Session["UserPermissionSiteColour"] : "#0ed3a9");
+        }
+
+        .panel-heading {
+            background-color: @(!string.IsNullOrEmpty((string)System.Web.HttpContext.Current.Session["UserPermissionSiteColour"]) ?  (string)System.Web.HttpContext.Current.Session["UserPermissionSiteColour"] : "#0ed3a9") !important;
+        }
+    </style>
+    <script src="~/Scripts/bootstrap.min.js"></script>
+}
+<div class="panel panel-default">
+
+    <div class="panel-heading">
+        <h3>
+            <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-file black"></span>@ViewBag.MName Module</span>
+
+        </h3>
+    </div>
+
+
+
+    @if (Model.Count() > 0)
+    {
+
+        List<MenuModouleViewModel> ma = new List<MenuModouleViewModel>();
+
+        ma = (List<MenuModouleViewModel>)System.Web.HttpContext.Current.Session["UserModuleList"];
+        int SelectedSubModule = ma.Where(m => m.ModuleId == Model.FirstOrDefault().ModuleId).FirstOrDefault().SelectedSubModuleId;
+
+        <div class="panel-info" style="padding-left:15px">
+
+            <div class="cuscontainer">
+
+                <div class="row CustomCssFonts">
+                    <div role="tabpanel">
+                        <div class="col-md-3">
+
+
+                            <!-- Nav tabs -->
+                            <ul class="nav nav-pills nav-stacked" role="tablist">
+                                @foreach (var item in Model)
+                                {
+                                    if (Model.FirstOrDefault().SubModuleId == item.SubModuleId && SelectedSubModule == 0)
+                                    {
+                                        <li role="presentation" class="active"><a href="#@item.SubModuleId" aria-controls="@item.SubModuleId" role="tab" data-toggle="tab" class="subModStack" data-moduleid="@item.ModuleId" data-submoduleid="@item.SubModuleId"><span class="@item.SubModuleIconName"> </span> @item.SubModuleName</a></li>
+                                    }
+                                    else
+                                    {
+                                        <li role="presentation" class="@(item.SubModuleId==SelectedSubModule ? "active" : "" )"><a href="#@item.SubModuleId" aria-controls="@item.SubModuleId" role="tab" data-toggle="tab" class="subModStack" data-moduleid="@item.ModuleId" data-submoduleid="@item.SubModuleId"><span class="@item.SubModuleIconName"> </span> @item.SubModuleName</a></li>
+                                    }
+                                }
+
+                            </ul>
+                        </div>
+
+                        <div class="col-md-9">
+                            <div class="panel panel-default" style="border:0px;">
+
+
+
+                                <!-- Tab panes -->
+                                <div class="tab-content" style="padding-top:0px;font-weight:bold;border-left:0px;border-right:0px">
+
+
+                                    @foreach (var item in Model)
+                                    {
+                                        if (Model.FirstOrDefault().SubModuleId == item.SubModuleId && SelectedSubModule == 0)
+                                        {
+                                            <div role="tabpanel" class="tab-pane active" id="@item.SubModuleId">
+
+
+                                                <div class="panel-heading" style="background-color: #428bca; color: white; ">
+
+                                                    <h4 style="margin-top:5px;margin-bottom:5px"><span class="@item.SubModuleIconName"></span> @item.SubModuleName</h4>
+
+                                                </div>
+
+                                                <ul class="list-group">
+
+                                                    @foreach (var sitem in item.MenuViewModel)
+                                                    {
+                                                        <li class="list-group-item">
+                                                            <div class="row">
+
+                                                                @*<a href="/Menu/MenuSelection/@sitem.ControllerActionId?MenuId=@sitem.MenuId" class="menuname">*@
+                                                                @if (ViewBag.RolePermissions == true)
+                                                                {
+                                                                    <div class="col-sm-6">
+                                                                        <a href="#" data-id="@sitem.MenuId" class="">
+                                                                            <span class="@sitem.IconName"> </span>
+                                                                            @sitem.MenuName
+                                                                        </a>
+                                                                    </div>
+                                                                    <div class="col-sm-3">
+                                                                        <a href="#" data-id="@sitem.MenuId" class="PermIndexHeader" style="font-weight:100" onclick="return false;">
+                                                                            Headers
+                                                                        </a>
+                                                                    </div>
+                                                                    <div class="col-sm-2">
+                                                                        <a href="#" data-id="@sitem.MenuId" class="PermIndexLine" style="font-weight:100" onclick="return false;">
+                                                                            Lines
+                                                                        </a>
+                                                                    </div>
+                                                                }
+                                                                else
+                                                                {
+                                                                    <div class="col-sm-6">
+                                                                        <a href="/Menu/MenuSelection/@sitem.MenuId" class="menuname">
+                                                                            <span class="@sitem.IconName"> </span>
+                                                                            @sitem.MenuName
+                                                                        </a>
+                                                                    </div>
+                                                                    <div class="col-sm-5">
+                                                                        <span class="text-muted" style="font-weight:normal">@sitem.Description</span>
+                                                                    </div>
+                                                                }
+
+
+                                                                <div class="col-sm-1">
+                                                                    @if (ViewBag.RolePermissions == true)
+                                                                    {
+                                                                        <a href="@sitem.MenuId" style="color: rgb(181, 167, 167)" class="permission @((sitem.PermissionAssigned==true)?"Assigned":"")">
+                                                                            <span class="glyphicon glyphicon-star"></span>
+                                                                        </a>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <a href="@sitem.MenuId" style="color: rgb(181, 167, 167)" class="bookmark @((sitem.BookMarked==true)?"BookMarked":"")">
+                                                                            <span class="glyphicon glyphicon-star"></span>
+                                                                        </a>
+                                                                    }
+
+                                                                </div>
+                                                            </div>
+                                                        </li>
+                                                    }
+
+                                                </ul>
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <div role="tabpanel" class="tab-pane @(item.SubModuleId==SelectedSubModule ? "active" : "" )" id="@item.SubModuleId">
+
+
+                                                <div class="panel-heading" style="background-color: #428bca; color:white">
+
+                                                    <h4 style="margin-top:5px;margin-bottom:5px"><span class="@item.SubModuleIconName"></span> @item.SubModuleName</h4>
+
+                                                </div>
+
+
+                                                <ul class="list-group">
+
+                                                    @foreach (var sitem in item.MenuViewModel)
+                                                    {
+                                                        <li class="list-group-item">
+                                                            <div class="row">
+
+                                                                @if (ViewBag.RolePermissions == true)
+                                                                {
+                                                                    <div class="col-sm-6">
+                                                                        <a href="#" data-id="@sitem.MenuId" class="">
+                                                                            <span class="@sitem.IconName"> </span>
+                                                                            @sitem.MenuName
+                                                                        </a>
+                                                                    </div>
+                                                                    <div class="col-sm-3">
+                                                                        <a href="" data-id="@sitem.MenuId" class="PermIndexHeader" style="font-weight:100" onclick="return false;">
+                                                                            Headers
+                                                                        </a>
+                                                                    </div>
+                                                                    <div class="col-sm-2">
+                                                                        <a href="" data-id="@sitem.MenuId" class="PermIndexLine" style="font-weight:100" onclick="return false;">
+                                                                            Lines
+                                                                        </a>
+                                                                    </div>
+                                                                }
+                                                                else
+                                                                {<div class="col-sm-6">
+                                                                    <a href="/Menu/MenuSelection/@sitem.MenuId" class="menuname">
+                                                                        <span class="@sitem.IconName"> </span>
+                                                                        @sitem.MenuName
+                                                                    </a>
+                                                                </div>
+                                                                    <div class="col-sm-5">
+                                                                        <span class="text-muted" style="font-weight:normal">@sitem.Description</span>
+                                                                    </div>
+                                                                }
+
+
+
+                                                                <div class="col-sm-1">
+                                                                    @if (ViewBag.RolePermissions == true)
+                                                                    {
+                                                                        <a href="@sitem.MenuId" style="color: rgb(181, 167, 167)" class="permission @((sitem.PermissionAssigned==true)?"Assigned":"")">
+                                                                            <span class="glyphicon glyphicon-star"></span>
+                                                                        </a>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <a href="@sitem.MenuId" style="color: rgb(181, 167, 167)" class="bookmark @((sitem.BookMarked==true)?"BookMarked":"")">
+                                                                            <span class="glyphicon glyphicon-star"></span>
+                                                                        </a>
+                                                                    }
+                                                                </div>
+                                                            </div>
+                                                        </li>
+                                                    }
+                                                </ul>
+                                            </div>
+                                        }
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    }
+
+</div>
+@if (ViewBag.RolePermissions == true)
+{
+    <script type="text/javascript">
+
+        $('.PermIndexHeader').popover({
+            trigger: 'click', html: true, placement: 'bottom', container: 'body', content: function () {
+                return GetData($(this).data('id'));
+            }
+        });
+
+        $('.PermIndexHeader').click(function () {
+            $('.PermIndexHeader').not(this).popover('hide');
+        })
+
+        $('.PermIndexLine').popover({
+            trigger: 'click', html: true, placement: 'bottom', container: 'body', content: function () {
+                return GetLineData($(this).data('id'));
+            }
+        });
+
+        $('.PermIndexLine').click(function () {
+            $('.PermIndexLine').not(this).popover('hide');
+        })
+
+        function GetData(MenId) {
+            var row = "";
+            var DataArray;
+            var status;
+            var url = "/AdminSetup/GetActionsForMenu";
+            $.ajax({
+                async: false,
+                url: url,
+                data: { MenuId: MenId },
+                success: function (data) {
+
+                    row += "<div><button id='popovercloseid' type='button' class='close' style='float:right'>&times;</button></div><ul class='list-group Permissions'>  <li class='list-group-item active'> Actions List <input type='checkbox' style='float:right' class='MID' value='" + MenId + "' /> </li>  ";
+                    $.each(data, function (index, item) {
+                        row += " <li class='list-group-item'><span class='glyphicon glyphicon-book'> </span> " + (item.ActionName == null ? "" : item.ActionName) + "<input type='hidden' class='CAID' value='" + item.ControllerActionId + "'></input> <input class='AssignPermission' style='float:right' type='checkbox' " + (item.IsAssigned == true ? "checked" : "") + " /> <br />  </li>"
+                    });
+                    row += "</ul>";
+
+                }
+            });
+            return row;
+
+        }
+
+        function GetLineData(MenId) {
+            var row = "";
+            var DataArray;
+            var status;
+            var url = "/AdminSetup/GetLineActionsForMenu";
+            $.ajax({
+                async: false,
+                url: url,
+                data: { MenuId: MenId },
+                success: function (data) {
+
+                    row += "<div><button id='popovercloseid' type='button' class='close' style='float:right'>&times;</button></div><ul class='list-group Permissions'>  <li class='list-group-item active'> Actions List <input type='checkbox' style='float:right' class='MLID' value='" + MenId + "' /> </li>  ";
+                    $.each(data, function (index, item) {
+                        row += " <li class='list-group-item'><span class='glyphicon glyphicon-align-justify'> </span> " + (item.ActionName == null ? "" : item.ActionName) + "<input type='hidden' class='CAID' value='" + item.ControllerActionId + "'></input> <input class='AssignPermission' style='float:right' type='checkbox' " + (item.IsAssigned == true ? "checked" : "") + " /> <br /><div><small> " + item.ControllerName + " </small></div>  </li>"
+                    });
+                    row += "</ul>";
+
+                }
+            });
+            return row;
+
+        }
+
+
+        $(document).on("click", 'input[type=checkbox].AssignPermission', function () {
+
+            if ($(this).prop('checked')) {
+                $.ajax({
+                    cache: false,
+                    type: 'POST',
+                    url: "/UserPermission/AddPermissionForAction/",
+                    data: { ActionId: $(this).closest('.list-group-item').find('input.CAID').val() },
+                    success: function (data) {
+
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        alert('Failed to create Permission' + thrownError);
+                    },
+                });
+            }
+            else
+                $.ajax({
+                    cache: false,
+                    type: 'POST',
+                    url: "/UserPermission/RemovePermissionForAction/",
+                    data: { ActionId: $(this).closest('.list-group-item').find('input.CAID').val() },
+                    success: function (data) {
+
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        alert('Failed to Delete Permission' + thrownError);
+                    },
+                });
+
+        });
+
+        $(document).on('click', 'input[type=checkbox].MID', function () {
+
+            var RawElem = this;
+            if ($(this).prop('checked')) {
+
+                $.ajax({
+                    cache: false,
+                    type: 'POST',
+                    url: "/UserPermission/AddPermissionForMenu/",
+                    data: { MenuId: $(this).closest('.list-group').find('input.MID').val() },
+                    success: function (data) {
+                        SelectAll(RawElem);
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        alert('Failed to create Permission' + thrownError);
+                    },
+                });
+            }
+            else
+                $.ajax({
+                    cache: false,
+                    type: 'POST',
+                    url: "/UserPermission/RemovePermissionForMenu/",
+                    data: { MenuId: $(this).closest('.list-group').find('input.MID').val() },
+                    success: function (data) {
+                        DeSelectAll(RawElem);
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        alert('Failed to Delete Permission' + thrownError);
+                    },
+                });
+
+        })
+
+        $(document).on('click', 'input[type=checkbox].MLID', function () {
+
+            var RawElem = this;
+            if ($(this).prop('checked')) {
+
+                $.ajax({
+                    cache: false,
+                    type: 'POST',
+                    url: "/UserPermission/AddLinePermissionForMenu/",
+                    data: { MenuId: $(this).closest('.list-group').find('input.MLID').val() },
+                    success: function (data) {
+                        SelectAll(RawElem);
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        alert('Failed to create Permission' + thrownError);
+                    },
+                });
+            }
+            else
+                $.ajax({
+                    cache: false,
+                    type: 'POST',
+                    url: "/UserPermission/RemoveLinePermissionForMenu/",
+                    data: { MenuId: $(this).closest('.list-group').find('input.MLID').val() },
+                    success: function (data) {
+                        DeSelectAll(RawElem);
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        alert('Failed to Delete Permission' + thrownError);
+                    },
+                });
+
+        })
+
+        function SelectAll(RawElem) {
+
+            $Block = $(RawElem).closest('ul');
+
+            $('li', $Block).each(function () {
+                $(this).find('input[type=checkbox].AssignPermission').attr('checked', 'checked');
+            })
+
+        }
+
+        function DeSelectAll(RawElem) {
+
+            $Block = $(RawElem).closest('ul');
+
+            $('li', $Block).each(function () {
+                $(this).find('input[type=checkbox].AssignPermission').removeAttr('checked');
+            })
+
+        }
+
+
+        $(document).on('click', '#popovercloseid', function () {
+            var popover = $(this).closest('div.popover.bottom').attr('id');
+            $('.PermIndexHeader').popover('hide');
+            $('.PermIndexLine').popover('hide');
+        })
+
+
+    </script>
+}
+else
+{
+
+    <script type="text/javascript">
+
+
+        //$('a.subModStack').click(function () {
+        //    $.get("/Menu/SetSelectedSubModule", { ModuleId: $(this).attr('data-moduleId'), SubModuleId: $(this).attr('data-subModuleId') }, function (data, ts, xhr) {
+        //        return;
+        //    })
+        //})
+
+
+    </script>
+}

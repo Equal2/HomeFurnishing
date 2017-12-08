@@ -1,0 +1,410 @@
+﻿@model Model.ViewModels.ImportMasterViewModel
+@using System.Text.RegularExpressions
+
+@{
+    ViewBag.Title = Model.ImportHeader.ImportName;
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<style>
+    .btn-file {
+        position: relative;
+        overflow: hidden;
+    }
+
+        .btn-file input[type=file] {
+            position: absolute;
+            top: 0;
+            right: 0;
+            min-width: 100%;
+            min-height: 100%;
+            font-size: 100px;
+            text-align: right;
+            filter: alpha(opacity=0);
+            opacity: 0;
+            outline: none;
+            background: white;
+            cursor: inherit;
+            display: block;
+        }
+
+    .form-horizontal .control-label {
+        text-align: left !important; /* !important added for priority in SO snippet. */
+        font-weight: normal !important;
+        padding-top: 0;
+        padding-bottom: 0;
+    }
+</style>
+
+<!-- modal placeholder-->
+<div id='myModal' class='modal fade in'>
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div id='myModalContent'></div>
+        </div>
+    </div>
+</div>
+
+@using (Html.BeginForm("Import", "Import", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+<div class="panel panel-default">
+
+        <div class="panel-heading">
+            <h4>
+                <span> @Model.ImportHeader.ImportName </span>
+                <input type="submit" name="Import" value="Import" id="Import" class="btn btn-primary btn-sm CurveBorder height" style="float : right ; " />
+            </h4>
+        </div>
+
+        <div class="panel-info" style="padding-left:15px">
+
+            @if (!string.IsNullOrEmpty(Model.ImportHeader.Notes))
+            {
+                <div class="alert alert-info alert-dismissible" role="alert">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <strong>Notes: </strong> @Model.ImportHeader.Notes
+                </div>
+            }
+
+            @Html.AntiForgeryToken()
+            @Html.HiddenFor(m => m.ImportHeaderId)
+            @Html.HiddenFor(m => m.DocTypeId)
+            @Html.HiddenFor(m => m.ImportHeader.ImportName)
+            <div class="form-horizontal" role="form">
+                @Html.ValidationSummary(true)
+
+                <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+                    
+                    @if (ViewBag.ImportMessageCnt > 0)
+                    {
+                        <div class="alert alert-warning">
+                            <strong>System has got some errors last time in  @Model.ImportHeader.ImportName  @Html.ActionLink("View Errors ", "_ImportMessages", "Import", new { id = @Model.ImportHeaderId }, new { data_modal = "", id = "btnCreate", @class = "toolbar", @title = "View Errors", @data_toggle = "tooltip", @Styles = "colour:red" })</strong>
+                        </div>
+                    }
+
+                    @for (int i = 0; i < Model.ImportLine.Count(); i++)
+                    {
+                        @Html.HiddenFor(m => Model.ImportLine[i].Type)
+                        @Html.HiddenFor(m => Model.ImportLine[i].FileNo)
+                        @Html.HiddenFor(m => Model.ImportLine[i].IsCollapse)
+                        @Html.HiddenFor(m => Model.ImportLine[i].DisplayName)
+                        @Html.HiddenFor(m => Model.ImportLine[i].FieldName)
+                        @Html.HiddenFor(m => Model.ImportLine[i].DefaultValue)
+                        @Html.HiddenFor(m => Model.ImportLine[i].DataType)
+                    }
+
+                    @foreach (var item in Model.ImportLine.GroupBy(m => new { m.Type, m.FileNo, m.IsCollapse }).OrderBy(m => m.Key.FileNo))
+                    {
+                        Regex rexp = new Regex(@"[\d\W]");
+                        string key = rexp.Replace(item.Key.Type, "");
+                        <div class="panel-heading" role="tab" id="@( key + item.Key.IsCollapse)h">
+                            <h4 class="panel-title">
+                                <span role="button" data-toggle="collapse" data-parent="#accordion" href="#@(key + item.Key.IsCollapse)d" aria-expanded="@(item.Key.IsCollapse?"false":"true")" aria-controls="@(key + item.Key.IsCollapse)d">
+                                    <span style="color:black" class="glyphicon glyphicon-@(item.Key.IsCollapse?"plus-sign":"minus-sign") collapse_Ico"></span>
+                                    @(item.Key.Type)
+                                </span>
+                            </h4>
+                        </div>
+                        <div id="@(key + item.Key.IsCollapse)d" class="panel-collapse collapse @(item.Key.IsCollapse?"":"in")" role="tabpanel" aria-labelledby="@( key + item.Key.IsCollapse)h">
+                            <div class="panel-body">
+                                <div class="row">
+                                    @*<div class="col-md-12">
+                                        <div class="form-group">
+                                            @Html.Label("Column Name", new { @class = "control-label col-xs-4"})
+                                            <div class="col-xs-6">
+                                                @Html.Label("Data Type", new { @class = "control-label col-xs-6" })
+                                            </div>
+                                        </div>
+                                    </div>*@
+                                    @foreach (var temp in item)
+                                    {
+                                            <div class="col-md-12" style="display:@(temp.IsVisible ? "" : "none")">
+
+                                                <div class="form-group">
+                                                    @if (temp.DataType != "Constant Value")
+                                                {
+                                                        @Html.Label(temp.DisplayName, new { @class = "control-label col-xs-4" })
+                                                }
+
+
+                                                    <div class="col-xs-6">
+                                                        @switch (temp.DataType)
+                                                    {
+                                                        case "Input-Text":
+                                                            {
+
+                                                                @Html.TextBox(temp.FieldName, temp.DefaultValue, new { @class = "form-control col-xs-6 height" + (temp.IsMandatory && temp.IsVisible ? " required" : ""), @placeholder = temp.PlaceHolder, @title = temp.ToolTip, @data_toggle = "tooltip" })
+
+
+                                                                break;
+                                                            }
+                                                        case "Input-Number":
+                                                            {
+                                                                @Html.TextBox(temp.FieldName, temp.DefaultValue, new { @class = "form-control col-xs-6 height" + (temp.IsMandatory && temp.IsVisible ? " required" : ""), @placeholder = temp.PlaceHolder, @title = temp.ToolTip, @data_toggle = "tooltip" })
+
+                                                                break;
+                                                            }
+                                                        case "Input-Date":
+                                                            {
+                                                                if (!string.IsNullOrEmpty(temp.DefaultValue) && temp.DefaultValue == "Today")
+                                                                {
+                                                                    @Html.TextBox(temp.FieldName, DateTime.Now, "{0:dd/MMM/yyyy}", new { @class = "datepicker form-control col-xs-6 height" + (temp.IsMandatory && temp.IsVisible ? " required" : ""), @placeholder = temp.PlaceHolder, @title = temp.ToolTip, @data_toggle = "tooltip" })
+                                                                }
+                                                                else
+                                                                {
+                                                                    @Html.TextBox(temp.FieldName, null, new { @class = "datepicker form-control col-xs-6 height" + (temp.IsMandatory && temp.IsVisible ? " required" : ""), @placeholder = temp.PlaceHolder, @title = temp.ToolTip, @data_toggle = "tooltip" })
+                                                                }
+                                                                break;
+                                                            }
+                                                        case "Single Select":
+                                                            {
+
+                                                                if (!string.IsNullOrEmpty(temp.ListItem))
+                                                                {
+                                                                    List<SelectListItem> tem = new List<SelectListItem>();
+                                                                    foreach (string Litem in (temp.ListItem).Split(',').ToList())
+                                                                    {
+                                                                        if (Litem == temp.DefaultValue)
+                                                                        {
+                                                                            tem.Add(new SelectListItem { Text = Litem, Value = Litem, Selected = true });
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            tem.Add(new SelectListItem { Text = Litem, Value = Litem });
+                                                                        }
+                                                                    }
+                                                                    @Html.DropDownList(temp.FieldName, new SelectList(tem as System.Collections.IEnumerable, "Value", "Text", temp.DefaultValue), string.Empty, new { @class = "form-control col-xs-6 height" + (temp.IsMandatory && temp.IsVisible ? " required" : ""), @placeholder = temp.PlaceHolder, @title = temp.ToolTip, @data_toggle = "tooltip" })
+                                                                    break;
+                                                                }
+                                                                else
+                                                                {
+                                                                    @Html.TextBox(temp.FieldName, temp.DefaultValue, new { @class = "form-control col-xs-6 height" + (temp.IsMandatory && temp.IsVisible ? " required" : ""), @placeholder = temp.PlaceHolder, @title = temp.ToolTip, @data_toggle = "tooltip" })
+                                                                    <input type="hidden" id="@(temp.FieldName)s" name="@(temp.FieldName)names" value="@temp.DefaultValue" />
+                                                                    break;
+                                                                }
+                                                            }
+
+                                                        case "Multi Select":
+                                                            {
+                                                                <input type='hidden' name='@temp.FieldName' id='@temp.FieldName' value="@temp.DefaultValue" class="form-control col-xs-6 @(temp.IsMandatory && temp.IsVisible ? "required" : "")" placeholder="@temp.PlaceHolder" title="@temp.ToolTip" />
+                                                                <input type="hidden" id="@(temp.FieldName)s" name="@(temp.FieldName)names" />
+                                                                break;
+                                                            }
+
+                                                        default:
+                                                            {
+                                                                @Html.Label(temp.DataType, temp.DataType, new { @class = "control-label col-xs-6" + (temp.IsMandatory && temp.IsVisible ? " required" : ""), @placeholder = temp.PlaceHolder, @title = temp.ToolTip, @data_toggle = "tooltip" })
+
+                                                                break;
+                                                            }
+                                                    }
+                                                    </div>
+                                                </div>
+                                            </div>
+                                    }
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                @*@Html.Label("", "Select File", new { @class = "control-label file-input-button" })*@
+                                <div class="col-md-10">
+                                    <div class="row">
+                                        <div class="col-md-3" style="padding-top:8px">
+                                            <input type="file" name="FileUpload1" />
+                                        </div>
+                                    </div>
+                                    @*@Html.ValidationSummary(true, "", new { @class = "text-danger" })*@
+                                </div>
+                            </div>
+                    }
+                </div>
+
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-10">
+
+                        <span style="font-family: Calibri,sans-serif,Verdana;font-size:large">
+                            @*@Html.ActionLink("Back to List", "Index", "ImportHeader")*@
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+
+
+        </div>
+    </div>
+}
+<script type="text/javascript">
+
+    $(function () {
+
+        $('[data-toggle="tooltip"]').tooltip({
+        });
+
+
+        var tdate = $("#DocDate").val();
+        $("#DocDate").change(function () {
+
+            tdate = $("#DocDate").val();
+        });
+
+        $(document).ready(function(){
+            enableModalTransitions();
+        })
+
+        var students =@Html.Raw(Json.Encode(Model.ImportLine));
+        var closeOnSelect='@Model.closeOnSelect';
+
+        $.each(students, function () {
+
+            if (this.DataType == "Multi Select"||this.DataType=="Single Select" && !(this.ListItem))
+            {
+                var getFunction= '/ComboHelpList/GetSelect2Data';
+                //var getFunction= '/ComboHelpList/GetPerson'
+                var setFunction= '/ComboHelpList/SetSingleSelect2Data';
+                //var setFunction= '/ComboHelpList/SetSinglePerson';
+                var NoofChar=0;
+                var elementId= '#' + this.FieldName;
+                var bool=this.DataType=="Single Select"?false:true
+
+
+
+                if(!this.SqlProcGetSet)
+                    CustomSelectFunction($(elementId), getFunction, setFunction, ' ', bool, NoofChar);
+                else
+                    CustomSelectFunction2($(elementId), getFunction, setFunction, ' ', bool, NoofChar,this.SqlProcGetSet,(closeOnSelect=='True' ? false:true ));
+
+            }
+            else if(this.DataType=="Date" )
+            {
+                var getFunction='/ComboHelpList/SetDate' +"?Proc="+this.SqlProcGetSet;
+                if(this.SqlProcGetSet)
+                    SetDate(getFunction,'#'+this.FieldName);
+            }
+
+        });
+
+        function SetDate(url,elem)
+        {
+            $.get(url,function(data){
+                $(elem).datepicker('update',data);
+            })
+
+        }
+
+
+
+        var IsSaved=false;
+        var ValidationCount=0;
+
+        $(':submit').click(function(){
+            if(!IsSaved)
+            {
+                if(!ValidateData())
+                {
+                    return false;
+                }
+                IsSaved=true;
+                $('button:submit').attr('disabled','disabled');
+                return IsSaved;
+            }
+            else
+            {
+                alert("Already Processing.....");
+                return false;
+            }
+        });
+
+        function ValidateData() {
+            var ValidationMessage = "";
+
+            //Client Side Validaion.....
+            if($('input.has-error').length)
+            {
+                
+                ValidationMessage = "Please select all the mandatory fields";
+                return false;
+            }
+
+            return  (ValidationMessage=="");
+        }
+
+        $(':submit').click(function(){
+            if($('input.has-error').length)
+            {
+                
+                alertify.error(message = "Please select all the mandatory fields", wait = '0')
+                return false;
+            }
+            $.each(students, function () {
+
+                if (this.DataType == "Multi Select")
+                {
+                    var poarr=[];
+                    var elementId='#'+this.FieldName;
+                    var hiddenId= '#' + this.FieldName+'s';
+                    var products = (JSON.stringify($(elementId).select2('data')));
+                    var obj = jQuery.parseJSON(products);
+                    $.each(obj, function (key, value) {
+                        poarr.push(value.text);
+                    });
+                    $(hiddenId).val(poarr);
+                    
+                }
+                if (this.DataType=="Single Select")
+                {
+                    var poarr=[];
+                    var elementId='#'+this.FieldName;
+                    var hiddenId= '#' + this.FieldName+'s';
+                    $(hiddenId).val($(elementId).select2('data').text);
+                }
+
+            });
+
+        })
+
+    });
+
+
+    $('.collapse').on('hidden.bs.collapse', toggleSign);
+    $('.collapse').on('shown.bs.collapse', toggleSign);
+
+    function toggleSign(e)
+    {
+        $(e.target).prev('.panel-heading').find('span.collapse_Ico').toggleClass("glyphicon-plus-sign glyphicon-minus-sign")
+    }
+
+    $(document).on("mouseover",".select2-container",function(){
+        $(".select2-container").tooltip({
+            title: function(){
+                return $(this).next('input').attr("title");
+            },
+        });
+    })
+
+    $('input:checkbox').click(function(e){
+
+        if($(e.target).is(":checked"))
+        {
+            $.ajax({
+                async:true,
+                type:"POST",
+                url:"/ImportLayout/SetSelectOption",
+                data:{Checked:$('#closeOnSelect').is(":checked")},
+                success:function(data)
+                {
+                    if(data.success)
+                        window.location.reload();
+                }
+            })
+        }
+        else
+        {
+            $('select2-input').select2({
+                "closeOnSelect": true,
+            });
+        }
+
+    })
+
+
+</script>

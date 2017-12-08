@@ -1,0 +1,309 @@
+﻿@{
+    ViewBag.Title = "Stock In Hand";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<link href="~/Content/Slick/slick.grid.css" rel="stylesheet" />
+<link href="~/Content/Slick/css/smoothness/jquery-ui-1.8.16.custom.css" rel="stylesheet" />
+<link href="~/Content/Slick/slick-default-theme.css" rel="stylesheet" />
+
+<style type="text/css">
+    .slick-header-column.ui-state-default {
+        background-color: #428bca;
+        color: white;
+        height: 35px;
+        line-height: 35px;
+    }
+
+    .slick-row.ui-widget-content, .slick-cell {
+        height: 30px;
+        line-height: 30px;
+    }
+
+    #myGrid * {
+        box-sizing: content-box !important;
+    }
+
+    .hidden {
+        display: none;
+    }
+
+    .Total {
+        color: black !important;
+        background-color: #ffffff !important;
+    }
+      .totals {
+      font-weight: bold;
+      text-align:right;
+      color:  black;
+    }
+ .rightMargin {
+      margin-right: 2px;
+    }
+</style>
+
+@using (Html.BeginForm("Prints", "StockProcessDisplay", FormMethod.Post))
+{
+<div class="panel panel-default">
+   <div class="panel-heading">
+        <h3>
+            <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-list black"></span> Stock Process </span>
+            <span style="font-family: Calibri,sans-serif,Verdana;font-size:medium" class="black"> @ViewBag.FilterRemark </span> 
+                @Html.ActionLink(" ", "ProductTypeIndex", "StockProcessDisplay", null, new { @class = "cbtn btn-circle glyphicon glyphicon-list right rightMargin", @title = "List", @data_toggle = "tooltip" })
+                @Html.ActionLink(" ", "Create", "StockInHandSetting", new { ProductTypeId = @ViewBag.id, ControllerName=@ViewBag.ControllerName }, new { @class = "cbtn btn-circle glyphicon glyphicon-cog toolbar right rightMargin", @title = "List", @data_toggle = "tooltip" })
+                @Html.ActionLink(" ", " ", " ", null, new { @class = "cbtn btn-circle glyphicon glyphicon-refresh toolbar right rightMargin", @title = "Refresh Page", @data_toggle = "tooltip", @id = "RefreshPage" })
+                @*@Html.ActionLink(" ", "GeneratePrints", "StockInHand", new { ActionName = "StockInHand", Id = @ViewBag.id }, new { @class = "cbtn btn-circle glyphicon glyphicon-print toolbar right rightMargin", @title = "Print", @data_toggle = "tooltip", @id = "PrintRecord" })*@
+                @Html.ActionLink(" ", "", "", null, new { @class = "cbtn btn-circle glyphicon glyphicon-print toolbar right rightMargin", @title = "Print", @data_toggle = "tooltip", @id = "PrintRecord" })
+                <input type="text" id="txtSearch2" class="right toolbar small" placeholder="Search" style="height:25px;margin:5px;max-width:20%">
+         </h3>
+    </div>
+
+    <div class="panel-info tab" style="padding-left:0px">
+        <div style="width: 100%;">
+            <div id="myGrid" style="width: 100%; height: 450px; font-size: 12px; "></div>
+        </div>
+    </div>
+</div>
+}
+
+<script src="~/Scripts/Slick/lib/jquery.event.drag-2.2.js"></script>
+<script src="~/Scripts/Slick/slick.core.js"></script>
+<script src="~/Scripts/Slick/slick.grid.js"></script>
+<script src="~/Scripts/Slick/slick.dataview.js"></script>
+<script src="~/Scripts/Slick/slick.rowselectionmodel.js"></script>
+
+<script>
+
+    var GroupOn = '@ViewBag.GroupOn';
+    var GroupOnGodown = GroupOn.indexOf(StockInHandGroupOnConstants.Godown);
+    var GroupOnProcess = GroupOn.indexOf(StockInHandGroupOnConstants.Process);
+    var GroupOnProduct = GroupOn.indexOf(StockInHandGroupOnConstants.Product);
+    var GroupOnDimension1 = GroupOn.indexOf(StockInHandGroupOnConstants.Dimension1);
+    var GroupOnDimension2 = GroupOn.indexOf(StockInHandGroupOnConstants.Dimension2);
+    var GroupOnDimension3 = GroupOn.indexOf(StockInHandGroupOnConstants.Dimension3);
+    var GroupOnDimension4 = GroupOn.indexOf(StockInHandGroupOnConstants.Dimension4);
+    var GroupOnLotNo = GroupOn.indexOf(StockInHandGroupOnConstants.LotNo);
+    if (!GroupOn.length)
+        GroupOnProduct = 1;
+    var data;
+    var options;
+    var grid;
+
+
+    //Columns Specification
+    var columns = [];
+    if (GroupOnProduct > -1)
+        columns.push({ id: "ProductName", name: "@ViewBag.ProductNameCaption", field: "ProductName", headerCssClass: "Bold", minWidth: 50, hasTotalName: true })
+
+    if (GroupOnDimension1 > -1)
+        columns.push({ id: "Dimension1Name", name: "@ViewBag.Dimension1Caption", field: "Dimension1Name", headerCssClass: "Bold", minWidth: 50 })
+
+    if (GroupOnDimension2 > -1)
+        columns.push({ id: "Dimension2Name", name: "@ViewBag.Dimension2Caption", field: "Dimension2Name", headerCssClass: "Bold", minWidth: 50 })
+
+    if (GroupOnDimension3 > -1)
+        columns.push({ id: "Dimension3Name", name: "@ViewBag.Dimension3Caption", field: "Dimension3Name", headerCssClass: "Bold", minWidth: 50 })
+
+    if (GroupOnDimension4 > -1)
+        columns.push({ id: "Dimension4Name", name: "@ViewBag.Dimension4Caption", field: "Dimension4Name", headerCssClass: "Bold", minWidth: 50 })
+
+    if (GroupOnProcess > -1)
+        columns.push({ id: "ProcessName", name: "Process", field: "ProcessName", headerCssClass: "Bold", minWidth: 100 })
+
+    if (GroupOnLotNo > -1)
+        columns.push({ id: "LotNo", name: "LotNo", field: "LotNo", headerCssClass: "Bold", minWidth: 70 })
+
+    if (GroupOnGodown > -1)
+        columns.push({ id: "GodownName", name: "Godown", field: "GodownName", headerCssClass: "Bold", minWidth: 100 })
+
+    columns.push({
+        id: "Opening", name: "Opening", field: "Opening", cssClass: "text-right", headerCssClass: "text-right Bold", minWidth: 70, hasTotal: true, formatter: DecimalFormatter
+    }, {
+        id: "RecQty", name: "Receive", field: "RecQty", cssClass: "text-right", headerCssClass: "text-right Bold", minWidth: 70, hasTotal: true, formatter: DecimalFormatter
+    }, {
+        id: "IssQty", name: "Issue", field: "IssQty", cssClass: "text-right", headerCssClass: "text-right Bold", minWidth: 70, hasTotal: true, formatter: DecimalFormatter
+    }, {
+        id: "BalQty", name: "Balance", field: "BalQty", cssClass: "text-right", headerCssClass: "text-right Bold", minWidth: 70, hasTotal: true, formatter: DecimalFormatter
+    });
+
+
+    function DecimalFormatter(row, cell, value, columnDef, dataContext) {
+
+        if (value == null || value == "") {
+
+            return "";
+
+        } else {
+
+            return Number(value).toFixed(2);
+
+        }
+
+    }
+
+    //Options Initialization
+    options = {
+        editable: false,
+        enableCellNavigation: true,
+        enableColumnReorder: false,
+        forceFitColumns: true,
+        showFooterRow: true,
+        explicitInitialization: true
+    };
+
+    //Creating Custom FilterFunction that can be passed to slickgrid for search
+    var searchString = "";
+    function myFilter(item, args) {
+        var ProductString = (item["ProductName"]).toLowerCase() + (item["Dimension1Name"]).toLowerCase() + (item["Dimension2Name"]).toLowerCase() + (item["Dimension3Name"]).toLowerCase() + (item["Dimension3Name"]).toLowerCase() + (item["LotNo"]).toLowerCase();
+        if (args.searchString != "" && ProductString.indexOf(args.searchString.toLowerCase()) == -1) {
+            return false;
+        }
+        return true;
+    }
+
+    //Instantiating the Grid
+    var dataView = new Slick.Data.DataView({ inlineFilters: true });
+    grid = new Slick.Grid("#myGrid", dataView, columns, options);
+
+    //Adding Grid functionalities
+    grid.setSelectionModel(new Slick.RowSelectionModel());
+
+
+    //Functionality for adding Totals on cell render
+    grid.onFooterRowCellRendered.subscribe(function (e, args) {
+        if (args.column.hasTotal) {
+            $(args.node).empty();
+            $("<span></span>").text((getColumnTotal(args.column.field, grid.getData())).toFixed(2))
+               .appendTo(args.node);
+            $(args.node).addClass("totals");
+        }
+        else if (args.column.hasTotalName) {
+            $(args.node).empty();
+            $("<span></span>").text("Total")
+               .appendTo(args.node);
+            $(args.node).addClass("totals");
+        }
+    });
+
+    //Functionality for Enter key navigation
+    grid.onKeyDown.subscribe(function (e) {
+        if (e.which == 13) {
+            var row = grid.getDataItem(grid.getSelectedRows());
+            var ProductId = row.ProductId;
+            var GodownId = row.GodownId;
+            var ProcessId = row.ProcessId;
+            var Dimension1Id = row.Dimension1Id;
+            var Dimension2Id = row.Dimension2Id;
+            var Dimension3Id = row.Dimension3Id;
+            var Dimension4Id = row.Dimension4Id;
+            var LotNo = row.LotNo;
+            window.location.href = '/StockProcessDisplay/GetStockLedger/?ProductId=' + ProductId + '&Godown=' + GodownId + '&Process=' + ProcessId + '&Dim1=' + Dimension1Id + '&Dim2=' + Dimension2Id + '&Dim3=' + Dimension3Id + '&Dim4=' + Dimension4Id + '&LotNo=' + LotNo + '';
+        }
+    });
+
+
+    //Functionality for search events
+    $("#txtSearch,#txtSearch2").keyup(function (e) {
+        Slick.GlobalEditorLock.cancelCurrentEdit();
+        // clear on Esc
+        if (e.which == 27) {
+            this.value = "";
+        }
+        searchString = this.value;
+        updateFilter();
+    });
+    function updateFilter() {
+        dataView.setFilterArgs({
+            searchString: searchString
+        });
+        dataView.refresh();
+    }
+
+    // wire up model events to drive the grid
+    dataView.onRowCountChanged.subscribe(function (e, args) {
+        grid.updateRowCount();
+        grid.render();
+    });
+
+    dataView.onRowsChanged.subscribe(function (e, args) {
+        grid.invalidateRows(args.rows);
+        grid.render();
+    });
+
+
+    //Data Fetching
+    var url = '@Url.Action("GetStockInHandJson", "StockProcessDisplay", new { id = @ViewBag.id })';
+
+    $(document).ready(function () {
+        $.ajax({
+            url: url,
+            async: true,
+            success: function (rest) {
+                data = rest.data;
+                InitializeGrid();
+            },
+            error: function () {
+                onError(fromPage, toPage)
+            }
+        });
+    })
+
+    //Initializing the Grid
+    function InitializeGrid() {
+        // initialize the model after all the events have been hooked up
+        dataView.beginUpdate();
+        dataView.setItems(data, "Id");
+        dataView.setFilterArgs({
+            searchString: searchString
+        });
+        dataView.setFilter(myFilter);
+        dataView.endUpdate();
+
+        // if you don't want the items that are not visible (due to being filtered out
+        // or being on a different page) to stay selected, pass 'false' to the second arg
+        dataView.syncGridSelection(grid, true);
+
+        grid.init();
+    }
+
+    $('#myGrid').on('dblclick', '.ui-widget-content.slick-row', function () {
+        var row = grid.getDataItem(grid.getSelectedRows());
+        var ProductId = row.ProductId;
+        var GodownId = row.GodownId;
+        var ProcessId = row.ProcessId;
+        var Dimension1Id = row.Dimension1Id;
+        var Dimension2Id = row.Dimension2Id;
+        var Dimension3Id = row.Dimension3Id;
+        var Dimension4Id = row.Dimension4Id;
+        var LotNo = row.LotNo;
+        window.location.href = '/StockProcessDisplay/GetStockLedger/?ProductId=' + ProductId + '&Godown=' + GodownId + '&Process=' + ProcessId + '&Dim1=' + Dimension1Id + '&Dim2=' + Dimension2Id + '&Dim3=' + Dimension3Id + '&Dim4=' + Dimension4Id + '&LotNo=' + LotNo + '';
+    });
+
+    $(window).resize(function (e) {
+        grid.resizeCanvas();
+    })
+
+
+
+
+    $(document).on("click", "#PrintRecord", function (e) {
+        var data = dataView;
+        var rowIdx = data.getLength();
+        alert(rowIdx);
+        window.location.href = '/StockProcessDisplay/Prints/?Data=' + data;
+
+
+        //$.ajax({
+        //    url: "/StockInHand/Prints",
+        //    data: data,
+        //    success: function () {
+        //        //anything you want on success...
+        //    }
+        //});
+
+
+
+    });
+
+</script>

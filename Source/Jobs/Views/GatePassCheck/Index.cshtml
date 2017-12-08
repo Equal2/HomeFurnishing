@@ -1,0 +1,186 @@
+﻿@{
+    ViewBag.Title = "Barcode History";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<style type="text/css">
+    .gatePassBlock {
+        padding: 15px;
+        margin: 15px;
+        border: 1px solid #808080;
+    }
+
+    .gatePassCheckbox {
+        height: 25px;
+        width: 25px;
+    }
+
+    #gatePasses {
+        max-height: 300px;
+        overflow-y: scroll;
+    }
+</style>
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3>
+            <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"> <span class="glyphicon glyphicon-file black"></span> Supplier</span>
+        </h3>
+    </div>
+    <div class="panel-info" style="padding-left:15px;padding-right:15px">
+
+        <div class="form-horizontal">
+
+            <div class="row">
+                <h3 class="col-md-12 black" style="padding-top:15px">
+                    <span class="glyphicon glyphicon-align-justify"></span>
+                    Person Detail
+                </h3>
+                <div>
+                    <div>
+                        <div class="col-md-12">
+                            <div class="form-group" style="margin-top:15px">
+                                <label class="control-label col-md-3 col-sm-1" for="Person">Person</label>
+                                <div class="col-md-7 col-sm-10">
+                                    @Html.TextBox(" ", " ", new { @class = "form-control col-xs-3 required", @id = "PersonId" })
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <div>
+                        <div class="col-md-12">
+                            <div class="form-group" style="margin-top:15px">
+                                <label class="control-label col-md-3 col-sm-1" for="Person">Tags</label>
+                                <div class="col-md-7 col-sm-10">
+                                    @Html.TextBox(" ", "", new { @class = "form-control col-xs-3 required", @id = "tagId" })
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <hr />
+
+
+
+            <div>
+                <div class="row">
+                    <h3 class="col-md-12 black">
+                        <span class="glyphicon glyphicon-align-justify"></span>
+                        GatePass List
+                    </h3>
+                </div>
+                <div id="gatePasses">
+                    <div class="row gatePassBlock">
+
+                        <div class="col-xs-10">
+                            <div class="">
+                                Kallar Prajapatp, Ugapur<br />
+                                GP.No : 16120004<br />
+                                Product : Woollen Yarn<br />
+                                Qty:120KG
+                            </div>
+                        </div>
+                        <div class="col-xs-2">
+                            <h1>
+                                <input type="checkbox" class="gatePassCheckbox" />
+                            </h1>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<script type="text/javascript">
+
+    CustomSelectFunction($("#PersonId"), '/GatePassCheck/GetJobWorkersForActiveGatePass', '/ComboHelpList/SetSingleJobWorker', ' ', false, 1);
+
+    CustomTagFunction($("#tagId"), '/GatePassCheck/GetJobWorkersForActiveGatePass', '/ComboHelpList/SetSingleJobWorker','Select', 3, null, 1);
+
+    $('#PersonId').change(function () {
+
+        var PersonId = $(this).val();
+
+        $.ajax({
+            url: '/GatePassCheck/JobWorkerGatePasses',
+            type: 'GET',
+            data: { SupplierId: PersonId },
+            success: function (data) {
+                AddGatePasses(data);
+            },
+            error: function (result) {
+                alert('Error');
+            }
+        })
+
+    })  
+
+    function AddGatePasses(data) {
+
+        var gatepassTemplate = "";
+
+        $.each(data, function (i, val) {
+            gatepassTemplate += " <div class='row gatePassBlock'>"
+
+                    + "<div class='col-xs-10'>"
+                        + "<div class=''>"
+                        + val.Name + "<br />GP.No: " + val.DocNo + "<br />Product: " + val.Product + "<br />Qty :" + val.Qty + "<small> " + val.UnitName + " </small>"
+                        + "</div>"
+                    + "</div>"
+                    + "<div class='col-xs-2'>"
+                        + "<h1>"
+                         + "   <input type='checkbox' class='gatePassCheckbox' data-id='" + val.GatePassHeaderId + "' />"
+                        + "</h1>"
+                    + "</div>"
+                + "</div>";
+        })
+
+        $('#gatePasses').html(gatepassTemplate);
+
+    }
+
+    $(document).on('click', '.gatePassCheckbox', function () {
+
+        if (this.checked)
+            PostGatePassCheck(this);
+    })
+
+    function PostGatePassCheck(elem) {
+        LockCheckBox(true);
+
+        $.ajax({
+            url: '/GatePassCheck/PostGatePassCheck',
+            type: 'POST',
+            data: { GatePassHeaderId: $(elem).data('id') },
+            success: function (data) {
+                if (data.success) {
+                    var GatePassBlock = $(elem).closest('.row.gatePassBlock');
+
+                    $(GatePassBlock).hide('slow',function () { $(GatePassBlock).remove()});
+
+                }
+                else {
+                    alert(data.Message);
+                }
+                LockCheckBox(false);
+            },
+            error: function (data) {
+                LockCheckBox(false);
+            },
+        })
+    }
+
+    function LockCheckBox(lock) {
+        if (lock)
+            $('#gatePasses').find('input:checkbox').attr('disabled', 'disabled');
+        else
+            $('#gatePasses').find('input:checkbox').removeAttr('disabled');
+    }
+
+</script>

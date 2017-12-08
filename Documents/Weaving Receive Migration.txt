@@ -1,0 +1,596 @@
+DROP TRIGGER [Web].[Mig_Tr_JobReceiveLine_Add] 
+
+INSERT INTO Web.JobReceiveLines (
+JobReceiveHeaderId, 
+JobOrderLineId, 
+Qty, 
+PassQty, 
+Weight,
+LossPer, 
+LossQty, 
+PenaltyAmt, 
+LotNo, 
+Remark, 
+CreatedBy, 
+ModifiedBy, 
+CreatedDate, 
+ModifiedDate, 
+OMSId)
+
+SELECT Convert(NVARCHAR,WJr.JobReceiveHeaderId) AS JobReceiveHeaderId, 
+Convert(NVARCHAR,WJol.JobOrderLineId) AS JobOrderLineId, 1 AS Qty, 
+1 AS PassQty, CASE WHEN L.Qty <> 0 THEN Round(L.Weight / L.Qty,3) ELSE 0 END AS Weight, 
+L.LossPer, L.LossQty, Round(L.Penalty / L.Qty,2) AS PenaltyAmt, L.LotNo, L.Remark, 
+H.EntryBy AS CreatedBy, H.EntryBy AS ModifiedBy, 
+H.EntryDate AS CreatedDate, H.EntryDate AS ModifiedDate, 'Job Receive-' +  L.DocId + Convert(NVARCHAR,L.Sr) AS OMSId
+FROM JobReceiveDetail L With (NoLock)
+LEFT JOIN JobIssRec H  With (NoLock) ON L.DocId = H.DocID
+LEFT JOIN JobOrderDetail Jod  With (NoLock) ON L.JobOrder = Jod.DocId AND L.JobOrderSr = Jod.Sr
+LEFT JOIN Web.JobReceiveHeaders WJr  With (NoLock) ON H.OMSId = 'Job Receive-' + Convert(NVARCHAR,WJr.JobReceiveHeaderId)
+LEFT JOIN Web.JobOrderLines WJol  With (NoLock) ON JOd.OMSId = 'Job Order-' + Convert(NVARCHAR,WJol.JobOrderLineId)
+LEFT JOIN MultiRow Mr ON L.Qty >= Mr.Serial 
+WHERE H.V_Type = 'WVREC'
+AND L.WeavingOMSId IS NULL
+AND WJol.JobOrderLineId IS NOT NULL
+AND H.V_Date < '31/Mar/2015'
+--AND L.DocId = 'D1 WVREC 2014    2129' AND L.Sr = 49
+ORDER BY L.DocId, L.Sr
+
+
+
+CREATE TRIGGER [Web].[Mig_Tr_JobReceiveLine_Add] ON [Web].[JobReceiveLines] AFTER INSERT 
+AS 
+DECLARE @GetId int
+Select @GetId = JobReceiveLineId from Inserted 
+EXEC  Web.Mig_JobReceiveLine_Add @GetId
+GO
+
+
+
+
+
+
+UPDATE JobReceiveDetail
+SET JobReceiveDetail.WeavingOMSId = SubString(V1.WeavingOMSId, 1,len(V1.WeavingOMSId)-1)
+FROM (
+	SELECT  L.DocId, L.Sr,
+	(SELECT '|' + Convert(NVARCHAR,JobReceiveLineId) + '|,'
+	FROM Web.JobReceiveLines
+	WHERE OMSId = 'Job Receive-' + L.DocId + Convert(NVARCHAR,L.Sr)
+	FOR XML Path ('')
+	) AS WeavingOMSId
+	FROM JobIssRec H WITH (NOLock)
+	LEFT JOIN JobReceiveDetail L  WITH (NOLock) ON H.DocID = L.DocId
+	WHERE H.V_Type = 'WVREC'
+	AND L.WeavingOMSId IS NULL
+) AS V1
+WHERE JobReceiveDetail.DocId = V1.DocId AND JobReceiveDetail.Sr = V1.Sr
+AND JobReceiveDetail.WeavingOMSId IS NULL
+
+
+
+
+INSERT INTO Web.JobInvoiceHeaders (DocTypeId, DocDate, DocNo, DivisionId, SiteId, Status, Remark, CreatedBy, ModifiedBy, CreatedDate, ModifiedDate, OMSId, ProcessId, CreditDays, JobWorkerDocNo, JobWorkerDocDate, LedgerHeaderId, JobWorkerId, JobReceiveHeaderId)
+SELECT 641 AS DocTypeId, H.DocDate, H.DocNo, H.DivisionId, H.SiteId, H.Status, H.Remark, 
+H.CreatedBy, H.ModifiedBy, H.CreatedDate, H.ModifiedDate, H.OMSId, H.ProcessId, NULL AS CreditDays,
+NULL AS JobWorkerDocNo, NULL AS JobWorkerDocDate, NULL AS LedgerHeaderId, H.JobWorkerId, H.JobReceiveHeaderId 
+FROM Web.JobReceiveHeaders H 
+WHERE H.DocTypeId = 448
+
+
+
+
+
+
+
+DROP TRIGGER [Web].[Mig_Tr_JobInvoiceLine_Add] 
+
+
+INSERT INTO Web.JobInvoiceLines (JobInvoiceHeaderId, JobReceiveLineId, DealUnitId, DealQty, Rate, Amount, CreatedBy, ModifiedBy, CreatedDate, ModifiedDate, OMSId, Remark, JobWorkerId, UnitConversionMultiplier, JobOrderLineId)
+SELECT Jih.JobInvoiceHeaderId, L.JobReceiveLineId, Jol.DealUnitId, L.Qty * JOl.UnitConversionMultiplier AS DealQty,
+Jol.Rate, L.Qty * JOl.UnitConversionMultiplier * Jol.Rate AS Amount, L.CreatedBy, L.ModifiedBy, L.CreatedDate, L.ModifiedDate,
+L.OMSId, L.Remark,H.JobWorkerId, Jol.UnitConversionMultiplier, Jol.JobOrderLineId
+FROM Web.JobReceiveLines L 
+LEFT JOIN Web.JobReceiveHeaders h ON L.JobReceiveHeaderId = H.JobReceiveHeaderId
+LEFT JOIN Web.JobInvoiceHeaders Jih ON H.JobReceiveHeaderId = Jih.JobReceiveHeaderId
+LEFT JOIN Web.JobOrderLines Jol ON L.JobOrderLineId = Jol.JobOrderLineId
+WHERE h.DocTypeId = 448
+AND h.DocDate < '31/Mar/2013'
+
+
+
+INSERT INTO Web.JobInvoiceLines (JobInvoiceHeaderId, JobReceiveLineId, DealUnitId, DealQty, Rate, Amount, CreatedBy, ModifiedBy, CreatedDate, ModifiedDate, OMSId, Remark, JobWorkerId, UnitConversionMultiplier, JobOrderLineId)
+SELECT Jih.JobInvoiceHeaderId, L.JobReceiveLineId, Jol.DealUnitId, L.Qty * JOl.UnitConversionMultiplier AS DealQty,
+Jol.Rate, L.Qty * JOl.UnitConversionMultiplier * Jol.Rate AS Amount, L.CreatedBy, L.ModifiedBy, L.CreatedDate, L.ModifiedDate,
+L.OMSId, L.Remark,H.JobWorkerId, Jol.UnitConversionMultiplier, Jol.JobOrderLineId
+FROM Web.JobReceiveLines L 
+LEFT JOIN Web.JobReceiveHeaders h ON L.JobReceiveHeaderId = H.JobReceiveHeaderId
+LEFT JOIN Web.JobInvoiceHeaders Jih ON H.JobReceiveHeaderId = Jih.JobReceiveHeaderId
+LEFT JOIN Web.JobOrderLines Jol ON L.JobOrderLineId = Jol.JobOrderLineId
+WHERE h.DocTypeId = 448
+AND h.DocDate >= '31/Mar/2013' AND h.DocDate < '31/Mar/2014'
+
+
+INSERT INTO Web.JobInvoiceLines (JobInvoiceHeaderId, JobReceiveLineId, DealUnitId, DealQty, Rate, Amount, CreatedBy, ModifiedBy, CreatedDate, ModifiedDate, OMSId, Remark, JobWorkerId, UnitConversionMultiplier, JobOrderLineId)
+SELECT Jih.JobInvoiceHeaderId, L.JobReceiveLineId, Jol.DealUnitId, L.Qty * JOl.UnitConversionMultiplier AS DealQty,
+Jol.Rate, L.Qty * JOl.UnitConversionMultiplier * Jol.Rate AS Amount, L.CreatedBy, L.ModifiedBy, L.CreatedDate, L.ModifiedDate,
+L.OMSId, L.Remark,H.JobWorkerId, Jol.UnitConversionMultiplier, Jol.JobOrderLineId
+FROM Web.JobReceiveLines L 
+LEFT JOIN Web.JobReceiveHeaders h ON L.JobReceiveHeaderId = H.JobReceiveHeaderId
+LEFT JOIN Web.JobInvoiceHeaders Jih ON H.JobReceiveHeaderId = Jih.JobReceiveHeaderId
+LEFT JOIN Web.JobOrderLines Jol ON L.JobOrderLineId = Jol.JobOrderLineId
+WHERE h.DocTypeId = 448
+AND h.DocDate >= '31/Mar/2014' AND h.DocDate < '31/Mar/2015'
+
+
+INSERT INTO Web.JobInvoiceLines (JobInvoiceHeaderId, JobReceiveLineId, DealUnitId, DealQty, Rate, Amount, CreatedBy, ModifiedBy, CreatedDate, ModifiedDate, OMSId, Remark, JobWorkerId, UnitConversionMultiplier, JobOrderLineId)
+SELECT Jih.JobInvoiceHeaderId, L.JobReceiveLineId, Jol.DealUnitId, L.Qty * JOl.UnitConversionMultiplier AS DealQty,
+Jol.Rate, L.Qty * JOl.UnitConversionMultiplier * Jol.Rate AS Amount, L.CreatedBy, L.ModifiedBy, L.CreatedDate, L.ModifiedDate,
+L.OMSId, L.Remark,H.JobWorkerId, Jol.UnitConversionMultiplier, Jol.JobOrderLineId
+FROM Web.JobReceiveLines L 
+LEFT JOIN Web.JobReceiveHeaders h ON L.JobReceiveHeaderId = H.JobReceiveHeaderId
+LEFT JOIN Web.JobInvoiceHeaders Jih ON H.JobReceiveHeaderId = Jih.JobReceiveHeaderId
+LEFT JOIN Web.JobOrderLines Jol ON L.JobOrderLineId = Jol.JobOrderLineId
+WHERE h.DocTypeId = 448
+AND h.DocDate >= '31/Mar/2015' 
+
+
+
+CREATE TRIGGER [Web].[Mig_Tr_JobInvoiceLine_Add] ON [Web].[JobInvoiceLines] AFTER INSERT 
+AS 
+DECLARE @GetId int
+Select @GetId = JobInvoiceLineId from Inserted 
+EXEC  Web.Mig_JobInvoiceLine_Add @GetId
+GO
+
+
+
+
+DROP TRIGGER [Web].[Mig_Tr_StockHeader_Add]
+
+
+INSERT INTO Web.StockHeaders (DocHeaderId, DocTypeId, DocDate, DocNo, DivisionId, SiteId, CurrencyId, PersonId, ProcessId, FromGodownId, GodownId, Remark, Status, CreatedBy, ModifiedBy, CreatedDate, ModifiedDate, OMSId, CostCenterId, MachineId)
+SELECT H.JobReceiveHeaderId AS DocHeaderId, H.DocTypeId, H.DocDate, H.DocNo, H.DivisionId, H.SiteId,
+NULL AS CurrencyId, H.JobWorkerId AS PersonId, 11 AS ProcessId, NULL AS FromGodownId, H.GodownId, H.Remark, H.Status, H.CreatedBy, H.ModifiedBy, H.CreatedDate, H.ModifiedDate,
+NULL AS OMSId, NULL AS CostCenterId, NULL AS MachineId
+FROM Web.JobReceiveHeaders H With (NoLock)
+WHERE H.DocTypeId = 448
+
+
+UPDATE Web.JobReceiveHeaders
+SET Web.JobReceiveHeaders.StockheaderId = Web.StockHeaders.stockHeaderId
+FROM Web.StockHeaders
+WHERE Web.JobReceiveHeaders.JobReceiveHeaderId = Web.StockHeaders.DocHeaderId	
+AND Web.JobReceiveHeaders.DocTypeId = Web.StockHeaders.DocTypeId
+AND Web.JobReceiveHeaders.SiteId = Web.StockHeaders.SiteId
+AND Web.JobReceiveHeaders.DivisionId = Web.StockHeaders.DivisionId
+AND Web.JobReceiveHeaders.DocTypeId = 448
+
+
+
+
+
+CREATE TRIGGER [Web].[Mig_Tr_StockHeader_Add] ON Web.StockHeaders AFTER INSERT 
+AS 
+DECLARE @GetId int
+Select @GetId = StockHeaderId from inserted 
+
+IF (SELECT DocHeaderId FROM Web.StockHeaders WHERE StockHeaderId = @GetId) IS NULL
+BEGIN
+	EXEC  Web.Mig_StockHeader_Add @GetId
+END
+GO
+
+
+
+
+
+INSERT INTO Web.Stocks (StockHeaderId, ProductId, ProcessId, GodownId, LotNo, CostCenterId, Qty_Iss, Qty_Rec, 
+Rate, ExpiryDate, Specification, Dimension1Id, Dimension2Id, OMSId, CreatedBy, ModifiedBy, CreatedDate, ModifiedDate, DocDate, DocLineId)
+SELECT H.StockHeaderId, Jol.ProductId, 11 AS ProcessId, H.GodownId, L.LotNo, NULL AS CostCenterId, 
+0 AS Qty_Iss, L.Qty AS Qty_Rec, NULL AS Rate, NULL AS ExpiryDate, Jol.Specification, Jol.Dimension1Id, Jol.Dimension2Id,
+NULL AS OMSId, L.CreatedBy, L.ModifiedBy, L.CreatedDate, L.ModifiedDate, Convert(DATE,L.CreatedDate), L.JobReceiveLineId AS DocLineId
+FROM Web.JobReceiveLines L With (NoLock)
+LEFT JOIN Web.JobReceiveHeaders H  With (NoLock) ON L.JobReceiveHeaderId = H.JobReceiveHeaderId
+LEFT JOIN Web.JobOrderLines Jol  With (NoLock) ON L.JobOrderLineId = Jol.JobOrderLineId
+WHERE H.DocTypeId = 448
+AND H.DocDate < '31/Mar/2013'
+
+
+INSERT INTO Web.Stocks (StockHeaderId, ProductId, ProcessId, GodownId, LotNo, CostCenterId, Qty_Iss, Qty_Rec, 
+Rate, ExpiryDate, Specification, Dimension1Id, Dimension2Id, OMSId, CreatedBy, ModifiedBy, CreatedDate, ModifiedDate, DocDate, DocLineId)
+SELECT H.StockHeaderId, Jol.ProductId, 11 AS ProcessId, H.GodownId, L.LotNo, NULL AS CostCenterId, 
+0 AS Qty_Iss, L.Qty AS Qty_Rec, NULL AS Rate, NULL AS ExpiryDate, Jol.Specification, Jol.Dimension1Id, Jol.Dimension2Id,
+NULL AS OMSId, L.CreatedBy, L.ModifiedBy, L.CreatedDate, L.ModifiedDate, Convert(DATE,L.CreatedDate), L.JobReceiveLineId AS DocLineId
+FROM Web.JobReceiveLines L With (NoLock)
+LEFT JOIN Web.JobReceiveHeaders H  With (NoLock) ON L.JobReceiveHeaderId = H.JobReceiveHeaderId
+LEFT JOIN Web.JobOrderLines Jol  With (NoLock) ON L.JobOrderLineId = Jol.JobOrderLineId
+WHERE H.DocTypeId = 448
+AND H.DocDate >= '31/Mar/2013'  AND H.DocDate < '31/Dec/2013'
+
+
+
+INSERT INTO Web.Stocks (StockHeaderId, ProductId, ProcessId, GodownId, LotNo, CostCenterId, Qty_Iss, Qty_Rec, 
+Rate, ExpiryDate, Specification, Dimension1Id, Dimension2Id, OMSId, CreatedBy, ModifiedBy, CreatedDate, ModifiedDate, DocDate, DocLineId)
+SELECT H.StockHeaderId, Jol.ProductId, 11 AS ProcessId, H.GodownId, L.LotNo, NULL AS CostCenterId, 
+0 AS Qty_Iss, L.Qty AS Qty_Rec, NULL AS Rate, NULL AS ExpiryDate, Jol.Specification, Jol.Dimension1Id, Jol.Dimension2Id,
+NULL AS OMSId, L.CreatedBy, L.ModifiedBy, L.CreatedDate, L.ModifiedDate, Convert(DATE,L.CreatedDate), L.JobReceiveLineId AS DocLineId
+FROM Web.JobReceiveLines L With (NoLock)
+LEFT JOIN Web.JobReceiveHeaders H  With (NoLock) ON L.JobReceiveHeaderId = H.JobReceiveHeaderId
+LEFT JOIN Web.JobOrderLines Jol  With (NoLock) ON L.JobOrderLineId = Jol.JobOrderLineId
+WHERE H.DocTypeId = 448
+AND H.DocDate >= '31/Dec/2013'  AND H.DocDate < '31/Mar/2014'
+
+
+
+INSERT INTO Web.Stocks (StockHeaderId, ProductId, ProcessId, GodownId, LotNo, CostCenterId, Qty_Iss, Qty_Rec, 
+Rate, ExpiryDate, Specification, Dimension1Id, Dimension2Id, OMSId, CreatedBy, ModifiedBy, CreatedDate, ModifiedDate, DocDate, DocLineId)
+SELECT H.StockHeaderId, Jol.ProductId, 11 AS ProcessId, H.GodownId, L.LotNo, NULL AS CostCenterId, 
+0 AS Qty_Iss, L.Qty AS Qty_Rec, NULL AS Rate, NULL AS ExpiryDate, Jol.Specification, Jol.Dimension1Id, Jol.Dimension2Id,
+NULL AS OMSId, L.CreatedBy, L.ModifiedBy, L.CreatedDate, L.ModifiedDate, Convert(DATE,L.CreatedDate), L.JobReceiveLineId AS DocLineId
+FROM Web.JobReceiveLines L With (NoLock)
+LEFT JOIN Web.JobReceiveHeaders H  With (NoLock) ON L.JobReceiveHeaderId = H.JobReceiveHeaderId
+LEFT JOIN Web.JobOrderLines Jol  With (NoLock) ON L.JobOrderLineId = Jol.JobOrderLineId
+WHERE H.DocTypeId = 448
+AND H.DocDate >= '31/Mar/2014'  AND H.DocDate < '31/Mar/2015'
+
+
+INSERT INTO Web.Stocks (StockHeaderId, ProductId, ProcessId, GodownId, LotNo, CostCenterId, Qty_Iss, Qty_Rec, 
+Rate, ExpiryDate, Specification, Dimension1Id, Dimension2Id, OMSId, CreatedBy, ModifiedBy, CreatedDate, ModifiedDate, DocDate, DocLineId)
+SELECT H.StockHeaderId, Jol.ProductId, 11 AS ProcessId, H.GodownId, L.LotNo, NULL AS CostCenterId, 
+0 AS Qty_Iss, L.Qty AS Qty_Rec, NULL AS Rate, NULL AS ExpiryDate, Jol.Specification, Jol.Dimension1Id, Jol.Dimension2Id,
+NULL AS OMSId, L.CreatedBy, L.ModifiedBy, L.CreatedDate, L.ModifiedDate, Convert(DATE,L.CreatedDate), L.JobReceiveLineId AS DocLineId
+FROM Web.JobReceiveLines L With (NoLock)
+LEFT JOIN Web.JobReceiveHeaders H  With (NoLock) ON L.JobReceiveHeaderId = H.JobReceiveHeaderId
+LEFT JOIN Web.JobOrderLines Jol  With (NoLock) ON L.JobOrderLineId = Jol.JobOrderLineId
+WHERE H.DocTypeId = 448
+AND H.DocDate >= '31/Mar/2015'  
+
+
+
+DROP TRIGGER [Web].[Mig_Tr_JobReceiveLine_Update] 
+
+
+
+UPDATE Web.JobReceiveLines
+SET Web.JobReceiveLines.StockId = V1.StockId
+FROM (
+	SELECT TOP 100000 L.JobReceiveLineId, S.StockId
+	FROM Web.JobReceiveLines L With (NoLock)
+	LEFT JOIN Web.JobReceiveHeaders H  With (NoLock) ON L.JobReceiveHeaderId = H.JobReceiveHeaderId
+	LEFT JOIN web.JobOrderLines Jol  With (NoLock) ON L.JobOrderLineId = Jol.JobOrderLineId 
+	LEFT JOIN web.Stocks S  With (NoLock) ON H.StockHeaderId = S.StockHeaderId 
+		AND L.JobReceiveLineId = S.DocLineId
+	WHERE H.DocTypeId = 448
+	AND L.StockId IS NULL
+) AS V1
+WHERE Web.JobReceiveLines.JobReceiveLineId = V1.JobReceiveLineId
+
+
+
+
+CREATE  TRIGGER [Web].[Mig_Tr_JobReceiveLine_Update] ON [Web].[JobReceiveLines] AFTER UPDATE 
+AS 
+DECLARE @GetId int
+select @GetId = JobReceiveLineId from Inserted 
+Exec Web.Mig_JobReceiveLine_Update @GetId
+GO
+
+
+
+
+DROP TRIGGER [Web].[Mig_Tr_JobReceiveBom_Add]
+
+
+INSERT INTO Web.JobReceiveBoms (JobReceiveHeaderId, JobReceiveLineId, ProductId, Qty, Dimension1Id, Dimension2Id, LotNo, CreatedBy, ModifiedBy, CreatedDate, ModifiedDate, OMSId, StockProcessId)
+SELECT JrH.JobReceiveHeaderId, NULL AS JobReceiveLineId, P.ProductId, L.Qty_Iss AS Qty, D1.Dimension1Id,
+NULL AS Dimension2Id, NULL AS LotNo, Jrh.CreatedBy, Jrh.ModifiedBy, Jrh.CreatedDate, Jrh.ModifiedDate,
+'Stock Process-' + L.DocID + Convert(NVARCHAR,L.Sr) AS OMSId, NULL AS StockProcessId
+FROM JobIssRec H WITH (NoLock)
+LEFT JOIN StockProcess L  WITH (NoLock) ON H.DocID = L.DocID
+LEFT JOIN RUG_YarnSKU Ys WITH (NoLock)  ON L.Item = Ys.Code
+LEFT JOIN Item I WITH (NoLock)  ON IsNull(Ys.Yarn,L.Item) = I.Code
+LEFT JOIN RUG_SHADE S WITH (NoLock)  ON Ys.SHADE = S.Code
+LEFT JOIN Web.JobReceiveHeaders JrH WITH (NoLock)  ON H.OMSId = 'Job Receive-' + COnvert(NVARCHAR,Jrh.JobReceiveHeaderId)
+LEFT JOIN Web.Products P WITH (NoLock)  ON I.OMSId = 'Product-' + Convert(NVARCHAR,P.ProductId)
+LEFT JOIN Web.Dimension1 D1 WITH (NoLock)  ON S.OMSId = 'Dimension1-' + Convert(NVARCHAR,D1.Dimension1Id)
+WHERE H.V_Type = 'WVREC' AND H.V_Date <= '31/Mar/2013'
+AND L.DocID IS NOT NULL
+AND L.Item IS NOT NULL
+
+
+INSERT INTO Web.JobReceiveBoms (JobReceiveHeaderId, JobReceiveLineId, ProductId, Qty, Dimension1Id, Dimension2Id, LotNo, CreatedBy, ModifiedBy, CreatedDate, ModifiedDate, OMSId, StockProcessId)
+SELECT JrH.JobReceiveHeaderId, NULL AS JobReceiveLineId, P.ProductId, L.Qty_Iss AS Qty, D1.Dimension1Id,
+NULL AS Dimension2Id, NULL AS LotNo, Jrh.CreatedBy, Jrh.ModifiedBy, Jrh.CreatedDate, Jrh.ModifiedDate,
+'Stock Process-' + L.DocID + Convert(NVARCHAR,L.Sr) AS OMSId, NULL AS StockProcessId
+FROM JobIssRec H WITH (NoLock)
+LEFT JOIN StockProcess L  WITH (NoLock) ON H.DocID = L.DocID
+LEFT JOIN RUG_YarnSKU Ys WITH (NoLock)  ON L.Item = Ys.Code
+LEFT JOIN Item I WITH (NoLock)  ON IsNull(Ys.Yarn,L.Item) = I.Code
+LEFT JOIN RUG_SHADE S WITH (NoLock)  ON Ys.SHADE = S.Code
+LEFT JOIN Web.JobReceiveHeaders JrH WITH (NoLock)  ON H.OMSId = 'Job Receive-' + COnvert(NVARCHAR,Jrh.JobReceiveHeaderId)
+LEFT JOIN Web.Products P WITH (NoLock)  ON I.OMSId = 'Product-' + Convert(NVARCHAR,P.ProductId)
+LEFT JOIN Web.Dimension1 D1 WITH (NoLock)  ON S.OMSId = 'Dimension1-' + Convert(NVARCHAR,D1.Dimension1Id)
+WHERE H.V_Type = 'WVREC' AND H.V_Date > '31/Mar/2013' AND H.V_Date <= '31/Mar/2014'
+AND L.DocID IS NOT NULL
+AND L.Item IS NOT NULL
+
+
+
+
+INSERT INTO Web.JobReceiveBoms (JobReceiveHeaderId, JobReceiveLineId, ProductId, Qty, Dimension1Id, Dimension2Id, LotNo, CreatedBy, ModifiedBy, CreatedDate, ModifiedDate, OMSId, StockProcessId)
+SELECT JrH.JobReceiveHeaderId, NULL AS JobReceiveLineId, P.ProductId, L.Qty_Iss AS Qty, D1.Dimension1Id,
+NULL AS Dimension2Id, NULL AS LotNo, Jrh.CreatedBy, Jrh.ModifiedBy, Jrh.CreatedDate, Jrh.ModifiedDate,
+'Stock Process-' + L.DocID + Convert(NVARCHAR,L.Sr) AS OMSId, NULL AS StockProcessId
+FROM JobIssRec H WITH (NoLock)
+LEFT JOIN StockProcess L  WITH (NoLock) ON H.DocID = L.DocID
+LEFT JOIN RUG_YarnSKU Ys WITH (NoLock)  ON L.Item = Ys.Code
+LEFT JOIN Item I WITH (NoLock)  ON IsNull(Ys.Yarn,L.Item) = I.Code
+LEFT JOIN RUG_SHADE S WITH (NoLock)  ON Ys.SHADE = S.Code
+LEFT JOIN Web.JobReceiveHeaders JrH WITH (NoLock)  ON H.OMSId = 'Job Receive-' + COnvert(NVARCHAR,Jrh.JobReceiveHeaderId)
+LEFT JOIN Web.Products P WITH (NoLock)  ON I.OMSId = 'Product-' + Convert(NVARCHAR,P.ProductId)
+LEFT JOIN Web.Dimension1 D1 WITH (NoLock)  ON S.OMSId = 'Dimension1-' + Convert(NVARCHAR,D1.Dimension1Id)
+WHERE H.V_Type = 'WVREC' AND H.V_Date > '31/Mar/2014' AND H.V_Date <= '31/Mar/2015'
+AND L.DocID IS NOT NULL
+AND L.Item IS NOT NULL
+
+
+
+INSERT INTO Web.JobReceiveBoms (JobReceiveHeaderId, JobReceiveLineId, ProductId, Qty, Dimension1Id, Dimension2Id, LotNo, CreatedBy, ModifiedBy, CreatedDate, ModifiedDate, OMSId, StockProcessId)
+SELECT H.V_Date, JrH.JobReceiveHeaderId, NULL AS JobReceiveLineId, P.ProductId, L.Qty_Iss AS Qty, D1.Dimension1Id,
+NULL AS Dimension2Id, NULL AS LotNo, Jrh.CreatedBy, Jrh.ModifiedBy, Jrh.CreatedDate, Jrh.ModifiedDate,
+'Stock Process-' + L.DocID + Convert(NVARCHAR,L.Sr) AS OMSId, NULL AS StockProcessId
+FROM JobIssRec H WITH (NoLock)
+LEFT JOIN StockProcess L  WITH (NoLock) ON H.DocID = L.DocID
+LEFT JOIN RUG_YarnSKU Ys WITH (NoLock)  ON L.Item = Ys.Code
+LEFT JOIN Item I WITH (NoLock)  ON IsNull(Ys.Yarn,L.Item) = I.Code
+LEFT JOIN RUG_SHADE S WITH (NoLock)  ON Ys.SHADE = S.Code
+LEFT JOIN Web.JobReceiveHeaders JrH WITH (NoLock)  ON H.OMSId = 'Job Receive-' + COnvert(NVARCHAR,Jrh.JobReceiveHeaderId)
+LEFT JOIN Web.Products P WITH (NoLock)  ON I.OMSId = 'Product-' + Convert(NVARCHAR,P.ProductId)
+LEFT JOIN Web.Dimension1 D1 WITH (NoLock)  ON S.OMSId = 'Dimension1-' + Convert(NVARCHAR,D1.Dimension1Id)
+WHERE H.V_Type = 'WVREC' AND H.V_Date > '31/Mar/2015' 
+AND L.DocID IS NOT NULL
+AND L.Item IS NOT NULL
+AND P.ProductId IS NOT NULL
+
+
+CREATE TRIGGER [Web].[Mig_Tr_JobReceiveBom_Add] ON [Web].[JobReceiveBoms] AFTER INSERT 
+AS 
+DECLARE @GetId int
+Select @GetId = JobReceiveBomId from Inserted 
+EXEC  Web.Mig_JobReceiveBom_Add @GetId
+GO
+
+
+
+
+UPDATE StockProcess
+SET StockProcess.OMSId = V1.OMSId
+FROM (
+	SELECT L.DocId, L.Sr, 'Job Receive Bom-' + Convert(NVARCHAR,Jrb.JobReceiveBomId) AS OMSId
+	FROM StockProcess L
+	LEFT JOIN Web.JobReceiveBoms Jrb ON 'Stock Process-' + L.DocID + Convert(NVARCHAR,L.Sr) = Jrb.OMSId
+	WHERE L.OMSId IS NULL
+	AND Jrb.JobReceiveBomId IS NOT NULL
+) AS V1
+WHERE StockProcess.DocID = V1.DocID AND StockProcess.Sr = V1.Sr
+
+
+
+INSERT INTO Web.StockProcesses (StockHeaderId, ProductId, ProcessId, GodownId, LotNo, CostCenterId, Qty_Iss, Qty_Rec, 
+Rate, ExpiryDate, Specification, Dimension1Id, Dimension2Id, OMSId, CreatedBy, ModifiedBy, CreatedDate, ModifiedDate, DocDate, DocLineId)
+SELECT H.StockHeaderId, L.ProductId, NULL AS ProcessId, H.GodownId, L.LotNo, NULL AS CostCenterId, 
+L.Qty AS Qty_Iss, 0 AS Qty_Rec, NULL AS Rate, NULL AS ExpiryDate, NULL AS Specification, L.Dimension1Id, L.Dimension2Id,
+NULL AS OMSId, L.CreatedBy, L.ModifiedBy, L.CreatedDate, L.ModifiedDate, Convert(DATE,L.CreatedDate), L.JobReceiveLineId AS DocLineId
+FROM Web.JobReceiveBoms L With (NoLock)
+LEFT JOIN Web.JobReceiveHeaders H  With (NoLock) ON L.JobReceiveHeaderId = H.JobReceiveHeaderId
+WHERE H.DocTypeId = 448
+AND H.DocDate <= '31/Mar/2013' 
+ORDER BY L.JobReceiveBomId
+
+
+INSERT INTO Web.StockProcesses (StockHeaderId, ProductId, ProcessId, GodownId, LotNo, CostCenterId, Qty_Iss, Qty_Rec, 
+Rate, ExpiryDate, Specification, Dimension1Id, Dimension2Id, OMSId, CreatedBy, ModifiedBy, CreatedDate, ModifiedDate, DocDate, DocLineId)
+SELECT H.StockHeaderId, L.ProductId, NULL AS ProcessId, H.GodownId, L.LotNo, NULL AS CostCenterId, 
+L.Qty AS Qty_Iss, 0 AS Qty_Rec, NULL AS Rate, NULL AS ExpiryDate, NULL AS Specification, L.Dimension1Id, L.Dimension2Id,
+NULL AS OMSId, L.CreatedBy, L.ModifiedBy, L.CreatedDate, L.ModifiedDate, Convert(DATE,L.CreatedDate), L.JobReceiveLineId AS DocLineId
+FROM Web.JobReceiveBoms L With (NoLock)
+LEFT JOIN Web.JobReceiveHeaders H  With (NoLock) ON L.JobReceiveHeaderId = H.JobReceiveHeaderId
+WHERE H.DocTypeId = 448
+AND H.DocDate > '31/Mar/2013' AND H.DocDate <= '31/Oct/2013' 
+ORDER BY L.JobReceiveBomId
+
+
+INSERT INTO Web.StockProcesses (StockHeaderId, ProductId, ProcessId, GodownId, LotNo, CostCenterId, Qty_Iss, Qty_Rec, 
+Rate, ExpiryDate, Specification, Dimension1Id, Dimension2Id, OMSId, CreatedBy, ModifiedBy, CreatedDate, ModifiedDate, DocDate, DocLineId)
+SELECT H.StockHeaderId, L.ProductId, NULL AS ProcessId, H.GodownId, L.LotNo, NULL AS CostCenterId, 
+L.Qty AS Qty_Iss, 0 AS Qty_Rec, NULL AS Rate, NULL AS ExpiryDate, NULL AS Specification, L.Dimension1Id, L.Dimension2Id,
+NULL AS OMSId, L.CreatedBy, L.ModifiedBy, L.CreatedDate, L.ModifiedDate, Convert(DATE,L.CreatedDate), L.JobReceiveLineId AS DocLineId
+FROM Web.JobReceiveBoms L With (NoLock)
+LEFT JOIN Web.JobReceiveHeaders H  With (NoLock) ON L.JobReceiveHeaderId = H.JobReceiveHeaderId
+WHERE H.DocTypeId = 448
+AND H.DocDate > '31/Oct/2013' AND H.DocDate <= '31/Mar/2014' 
+ORDER BY L.JobReceiveBomId
+
+
+
+INSERT INTO Web.StockProcesses (StockHeaderId, ProductId, ProcessId, GodownId, LotNo, CostCenterId, Qty_Iss, Qty_Rec, 
+Rate, ExpiryDate, Specification, Dimension1Id, Dimension2Id, OMSId, CreatedBy, ModifiedBy, CreatedDate, ModifiedDate, DocDate, DocLineId)
+SELECT H.StockHeaderId, L.ProductId, NULL AS ProcessId, H.GodownId, L.LotNo, NULL AS CostCenterId, 
+L.Qty AS Qty_Iss, 0 AS Qty_Rec, NULL AS Rate, NULL AS ExpiryDate, NULL AS Specification, L.Dimension1Id, L.Dimension2Id,
+NULL AS OMSId, L.CreatedBy, L.ModifiedBy, L.CreatedDate, L.ModifiedDate, Convert(DATE,L.CreatedDate), L.JobReceiveLineId AS DocLineId
+FROM Web.JobReceiveBoms L With (NoLock)
+LEFT JOIN Web.JobReceiveHeaders H  With (NoLock) ON L.JobReceiveHeaderId = H.JobReceiveHeaderId
+WHERE H.DocTypeId = 448
+AND H.DocDate > '31/Mar/2014'  AND H.DocDate <= '31/Oct/2014' 
+ORDER BY L.JobReceiveBomId
+
+
+INSERT INTO Web.StockProcesses (StockHeaderId, ProductId, ProcessId, GodownId, LotNo, CostCenterId, Qty_Iss, Qty_Rec, 
+Rate, ExpiryDate, Specification, Dimension1Id, Dimension2Id, OMSId, CreatedBy, ModifiedBy, CreatedDate, ModifiedDate, DocDate, DocLineId)
+SELECT H.StockHeaderId, L.ProductId, NULL AS ProcessId, H.GodownId, L.LotNo, NULL AS CostCenterId, 
+L.Qty AS Qty_Iss, 0 AS Qty_Rec, NULL AS Rate, NULL AS ExpiryDate, NULL AS Specification, L.Dimension1Id, L.Dimension2Id,
+NULL AS OMSId, L.CreatedBy, L.ModifiedBy, L.CreatedDate, L.ModifiedDate, Convert(DATE,L.CreatedDate), L.JobReceiveLineId AS DocLineId
+FROM Web.JobReceiveBoms L With (NoLock)
+LEFT JOIN Web.JobReceiveHeaders H  With (NoLock) ON L.JobReceiveHeaderId = H.JobReceiveHeaderId
+WHERE H.DocTypeId = 448
+AND H.DocDate > '31/Oct/2014'   AND H.DocDate <= '31/Mar/2015' 
+ORDER BY L.JobReceiveBomId
+
+
+
+
+INSERT INTO Web.StockProcesses (StockHeaderId, ProductId, ProcessId, GodownId, LotNo, CostCenterId, Qty_Iss, Qty_Rec, 
+Rate, ExpiryDate, Specification, Dimension1Id, Dimension2Id, OMSId, CreatedBy, ModifiedBy, CreatedDate, ModifiedDate, DocDate, DocLineId)
+SELECT H.StockHeaderId, L.ProductId, NULL AS ProcessId, H.GodownId, L.LotNo, NULL AS CostCenterId, 
+L.Qty AS Qty_Iss, 0 AS Qty_Rec, NULL AS Rate, NULL AS ExpiryDate, NULL AS Specification, L.Dimension1Id, L.Dimension2Id,
+NULL AS OMSId, L.CreatedBy, L.ModifiedBy, L.CreatedDate, L.ModifiedDate, Convert(DATE,L.CreatedDate), L.JobReceiveLineId AS DocLineId
+FROM Web.JobReceiveBoms L With (NoLock)
+LEFT JOIN Web.JobReceiveHeaders H  With (NoLock) ON L.JobReceiveHeaderId = H.JobReceiveHeaderId
+WHERE H.DocTypeId = 448
+AND H.DocDate > '31/Mar/2015' 
+ORDER BY L.JobReceiveBomId
+
+
+UPDATE Web.JobReceiveBoms
+SET Web.JobReceiveBoms.StockProcessId = V1.StockProcessId
+FROM (
+	SELECT L.JobReceiveBomId, S.StockProcessId
+	FROM Web.JobReceiveBoms L With (NoLock)
+	LEFT JOIN Web.JobReceiveHeaders H  With (NoLock) ON L.JobReceiveHeaderId = H.JobReceiveHeaderId
+	LEFT JOIN Web.StockProcesses S  With (NoLock) ON H.StockHeaderId  = S.StockHeaderId
+		AND L.JobReceiveBomId = S.DocLineId
+	WHERE H.DocTypeId = @DocTypeId
+) AS V1
+WHERE Web.JobReceiveBoms.JobReceiveBomId = V1.JobReceiveBomId
+
+
+
+
+
+INSERT INTO Web.JobInvoiceHeaderCharges (HeaderTableId, Sr, ChargeId, AddDeduct, AffectCost, ChargeTypeId, ProductChargeId, CalculateOnId, LedgerAccountDrId, LedgerAccountCrId, CostCenterId, RateType, IncludedInBase, ParentChargeId, Rate, Amount, IsVisible, OMSId, PersonId)
+
+SELECT H.JobInvoiceHeaderId AS HeaderTableId, Row_number() OVER (ORDER BY Jo.DocID) AS Sr,
+Cf.ChargeId, Cf.AddDeduct, Cf.AffectCost, Cf.ChargeTypeId, Cf.ProductChargeId,
+Cf.CalculateOnId, Chla.LedgerAccountDrId, Chla.LedgerAccountCrId, Cf.CostCenterId, 
+Cf.RateType, Cf.IncludedInBase, Cf.ParentChargeId, 
+CASE WHEN C.ChargeName = 'Penalty' THEN 0 ELSE Stf.Percentage END AS Rate,
+Stf.Amount,
+Cf.IsVisible, NULL AS OMSId,
+H.JobWorkerId AS PersonId
+FROM Web.JobInvoiceHeaders H 
+LEFT JOIN JobIssRec Jo With (NoLock) ON 'Job Receive-' + Convert(NVARCHAR,H.JobReceiveHeaderId) = Jo.OMSId
+LEFT JOIN Web.JobInvoiceSettings Jis ON H.DocTypeId = Jis.DocTypeId  
+	AND H.SiteId = Jis.SiteId AND H.DivisionId = Jis.DivisionId
+LEFT JOIN Web.CalculationFooters Cf ON Jis.CalculationId = Cf.CalculationId
+LEFT JOIN Web.CalculationHeaderLedgerAccounts Chla ON Cf.CalculationFooterLineId = Chla.CalculationFooterId
+	AND H.DocTypeId = Chla.DocTypeId AND H.DivisionId = Chla.DivisionId AND H.SiteId = Chla.SiteId
+LEFT JOIN Web.Charges C ON Cf.ChargeId = C.ChargeId
+LEFT JOIN Charges C1 ON 'Charge-' + Convert(NVARCHAR,C.ChargeId) = C1.OMSId
+LEFT JOIN StructureDetail Sd With (NoLock) ON Jo.Structure = Sd.Code AND C1.Code = Sd.Charges
+LEFT JOIN Structure_TransFooter Stf With (NoLock) ON Jo.DocID = Stf.DocID AND C1.Code = Stf.Charges
+--WHERE H.JobInvoiceHeaderId = 54251
+WHERE H.DocTypeId = 641
+AND C.ChargeId IS NOT NULL
+
+
+
+
+INSERT INTO Web.JobInvoiceLineCharges (LineTableId, Sr, ChargeId, AddDeduct, AffectCost, ChargeTypeId, CalculateOnId, LedgerAccountDrId, LedgerAccountCrId, CostCenterId, RateType, IncludedInBase, ParentChargeId, Rate, Amount, IsVisible, OMSId, HeaderTableId, PersonId, ContraLedgerAccountId, DealQty)
+
+
+SELECT H.JobInvoiceHeaderId AS HeaderTableId, Row_number() OVER (ORDER BY Jo.DocID) AS Sr,
+Cf.ChargeId, Cf.AddDeduct, Cf.AffectCost, Cf.ChargeTypeId, Cf.ProductChargeId,
+Cf.CalculateOnId, Chla.LedgerAccountDrId, Chla.LedgerAccountCrId, Cf.CostCenterId, 
+Cf.RateType, Cf.IncludedInBase, Cf.ParentChargeId, 
+CASE WHEN C.ChargeName = 'Penalty' THEN 0 ELSE Stf.Percentage END AS Rate,
+Stf.Amount,
+Cf.IsVisible, NULL AS OMSId,
+H.JobWorkerId AS PersonId
+FROM Web.JobInvoiceLines H 
+LEFT JOIN Web.JobInvoiceHeaders Jih ON H.JobInvoiceHeaderId = Jih.JobInvoiceHeaderId
+LEFT JOIN JobReceiveDetail Jo With (NoLock) ON 'Job Receive-' + Convert(NVARCHAR,H.JobReceiveLineId) = Jo.OMSId
+LEFT JOIN JobIssRec Jir ON Jo.DocId = Jir.DocID
+LEFT JOIN Web.JobInvoiceSettings Jis ON Jih.DocTypeId = Jis.DocTypeId  
+	AND Jih.SiteId = Jis.SiteId AND Jih.DivisionId = Jis.DivisionId
+LEFT JOIN Web.CalculationFooters Cf ON Jis.CalculationId = Cf.CalculationId
+LEFT JOIN Web.CalculationHeaderLedgerAccounts Chla ON Cf.CalculationFooterLineId = Chla.CalculationFooterId
+	AND Jih.DocTypeId = Chla.DocTypeId AND Jih.DivisionId = Chla.DivisionId AND Jih.SiteId = Chla.SiteId
+LEFT JOIN Web.Charges C ON Cf.ChargeId = C.ChargeId
+LEFT JOIN Charges C1 ON 'Charge-' + Convert(NVARCHAR,C.ChargeId) = C1.OMSId
+LEFT JOIN StructureDetail Sd With (NoLock) ON Jir.Structure = Sd.Code AND C1.Code = Sd.Charges
+LEFT JOIN Structure_TransFooter Stf With (NoLock) ON Jo.DocID = Stf.DocID AND C1.Code = Stf.Charges
+--WHERE H.JobInvoiceHeaderId = 54251
+WHERE Jih.DocTypeId = 641
+AND C.ChargeId IS NOT NULL
+
+
+
+
+
+
+INSERT INTO Web.LedgerHeaders (DocHeaderId, DocTypeId, DocDate, DocNo, DivisionId, SiteId, LedgerAccountId, CreditDays, Narration, Remark, Status, CreatedBy, CreatedDate, ModifiedBy, ModifiedDate, OMSId)
+SELECT H.JobInvoiceHeaderId AS DocHeaderId, H.DocTypeId, H.DocDate, H.DocNo, H.DivisionId, H.SiteId,
+6643 AS LedgerAccountId, 0 AS CreditDays, NULL AS Narration, H.Remark AS Remark, H.Status, 
+H.CreatedBy, H.CreatedDate, H.ModifiedBy, H.ModifiedDate, H.OMSId
+FROM Web.JobInvoiceHeaders H 
+WHERE H.DocTypeId = 641
+
+
+
+
+UPDATE Web.JobInvoiceHeaders
+SET Web.JobInvoiceHeaders.LedgerHeaderId = V1.LedgerHeaderId
+FROM (
+	SELECT H.JobInvoiceHeaderId, Lh.LedgerHeaderId
+	FROM Web.JobInvoiceHeaders H 
+	LEFT JOIN Web.LedgerHeaders Lh ON H.JobInvoiceHeaderId = Lh.DocHeaderId
+		AND H.DocTypeId = Lh.DocTypeId
+) AS v1
+WHERE Web.JobInvoiceHeaders.JobInvoiceHeaderId = V1.JobInvoiceHeaderId 
+
+
+UPDATE LedgerM
+SET LedgerM.OMSId = V1.OMSId
+FROM (
+	SELECT Hm.DocId, 'Job Receive-' + Convert(NVARCHAR,H.LedgerHeaderId) AS OMSId
+	FROM Web.LedgerHeaders H 
+	LEFT JOIN LedgerM Hm ON H.OMSId = 'Job Receive-' + Convert(NVARCHAR,Hm.DocId)
+) AS v1
+WHERE LedgerM.DocId = V1.DocId
+
+
+INSERT INTO Web.Ledgers (LedgerHeaderId, LedgerAccountId, ContraLedgerAccountId, CostCenterId, AmtDr, AmtCr, Narration, ContraText, OMSId, ChqNo, DueDate)
+SELECT Lh.LedgerHeaderId, IsNull(La.LedgerAccountId, La2.LedgerAccountId) AS LedgerAccountId, IsNull(La1.LedgerAccountId,La3.LedgerAccountId) AS ContraLedgerAccountId, Wc.CostCenterId,
+L.AmtDr, L.AmtCr, L.Narration, L.ContraText, 'Ledger-' + L.DocId + Convert(NVARCHAR,L.V_SNo) AS OMSId,
+L.Chq_No, L.Chq_Date AS DueDate
+FROM LedgerM H 
+LEFT JOIN Ledger L ON H.DocId = L.DocId
+LEFT JOIN SubGroup Sg ON L.SubCode = Sg.SubCode
+LEFT JOIN SubGroup Sg1 ON L.ContraSub = Sg1.SubCode
+LEFT JOIN CostCenterMast Cm ON L.CostCenter = Cm.Code
+LEFT JOIN Web.LedgerHeaders Lh ON H.OMSId = 'Job Receive-' + Convert(NVARCHAR,Lh.LedgerHeaderId)
+LEFT JOIN Web.People P ON Sg.OMSId = 'Person-' + Convert(NVARCHAR,P.PersonID)
+LEFT JOIN Web.People P1 ON Sg1.OMSId = 'Person-' + Convert(NVARCHAR,P1.PersonID)
+LEFT JOIN Web.LedgerAccounts La ON Sg.OMSId = 'Ledger Account-' + Convert(NVARCHAR,La.LedgerAccountId)
+LEFT JOIN Web.LedgerAccounts La1 ON Sg1.OMSId = 'Ledger Account-' + Convert(NVARCHAR,La1.LedgerAccountId)
+LEFT JOIN Web.LedgerAccounts La2 ON P.PersonID = La2.PersonId
+LEFT JOIN Web.LedgerAccounts La3 ON p1.PersonID = La3.PersonId
+LEFT JOIN Web.CostCenters Wc ON Cm.OMSId = 'Cost Center-' + Convert(NVARCHAR,Wc.CostCenterId)
+WHERE H.V_Type = 'WVREC'
+ORDER BY L.DocId, L.V_SNo
+
+
+
+
+
+
+
+UPDATE Ledger
+SET Ledger.OMSId = V1.OMSId
+FROM (
+	SELECT Ld.DocId, Ld.V_SNo, 'Ledger-' + Convert(NVARCHAR,L.LedgerId) AS OMSId
+	FROM Web.Ledgers L
+	LEFT JOIN Ledger Ld ON L.OMSid = 'Ledger-' + Ld.DocId + Convert(NVARCHAR,Ld.V_SNo)
+) AS V1
+WHERE Ledger.DocId = V1.DocId AND Ledger.V_SNo = V1.V_SNo

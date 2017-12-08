@@ -1,0 +1,67 @@
+﻿@model IEnumerable<Model.ViewModels.SaleEnquiryLineIndexViewModel>
+@using GridMvc.Html;
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<!-- modal placeholder-->
+<div id='myModal' class='modal fade in'>
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div id='myModalContent'></div>
+        </div>
+    </div>
+</div>
+
+<div class="panel panel-default">
+
+    <div class="panel-heading">
+
+        <h3>
+            <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-list black"></span> Sale Enquiry Product Mapping</span>
+        </h3>
+        <hr style="margin-top:0px;margin-bottom:0px" />
+
+        <div class="panel-info">
+            @*<h4 style="padding:5px 0 0 0;margin:0px">
+                @Html.ActionLink(" ", " ", " ", null, new { @class = "glyphicon glyphicon-refresh toolbar", @title = "Refresh Page", @data_toggle = "tooltip", @id = "RefreshPage" })
+                @Html.ActionLink(" ", "Index", "SaleEnquiryProductMapping", null, new { @class = "glyphicon glyphicon-list toolbar right", @title = "List", @data_toggle = "tooltip" })
+            </h4>*@
+            <div class="btn-group">
+                @Html.ActionLink(" ", " ", " ", null, new { @class = "cbtn btn-circle glyphicon glyphicon-refresh toolbar", @title = "Refresh Page", @data_toggle = "tooltip", @id = "RefreshPage" })
+            </div>
+        </div>
+
+    </div>
+    <div class="panel-info" style="padding-left:5px;padding-top:2px">
+
+        @Html.Grid(Model).Columns(columns =>
+           {
+               columns.Add(foo => foo.SaleEnquiryLineId, true);
+               columns.Add(foo => foo.SaleEnquiryHeaderDocNo).Sortable(true).Titled("Enquiry No").Filterable(true);
+               columns.Add(foo => foo.SaleEnquiryHeaderDocDate).Sortable(true).Titled("Enquiry Date").Format("{0:dd/MMM/yyyy}").Filterable(true);
+               columns.Add(foo => foo.SaleToBuyerName).Sortable(true).Titled("Buyer").Filterable(true);
+               if (Model.FirstOrDefault() != null)
+               {
+                   columns.Add(foo => foo.BuyerSpecification).Sortable(true).Titled(Model.FirstOrDefault().ProductBuyerSettings.BuyerSpecificationDisplayName ?? "Buyer Specification").Filterable(true);
+                   columns.Add(foo => foo.BuyerSpecification1).Sortable(true).Titled(Model.FirstOrDefault().ProductBuyerSettings.BuyerSpecification1DisplayName ?? "Buyer Specification-1").Filterable(true);
+                   columns.Add(foo => foo.BuyerSpecification2).Sortable(true).Titled(Model.FirstOrDefault().ProductBuyerSettings.BuyerSpecification2DisplayName ?? "Buyer Specification-2").Filterable(true);
+                   columns.Add(foo => foo.BuyerSpecification3).Sortable(true).Titled(Model.FirstOrDefault().ProductBuyerSettings.BuyerSpecification3DisplayName ?? "Buyer Specification-3").Filterable(true);
+               }
+           }).WithPaging(25).EmptyText("No records found.")
+    </div>
+</div>
+<script type="text/javascript">
+
+    $('table.grid-table td').dblclick(function () {
+        var $this = $(this);
+        var row = $this.closest("tr");
+        var editid = row.find('[data-name="SaleEnquiryLineId"]').text();
+        var url = '@Url.Action("Edit", "SaleEnquiryProductMapping")' + "/" + editid;
+        window.location.href = url;
+
+    });
+
+
+</script>

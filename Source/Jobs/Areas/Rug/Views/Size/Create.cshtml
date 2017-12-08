@@ -1,0 +1,416 @@
+﻿@model Model.Models.Size
+
+@{
+    ViewBag.Title = "Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@using (Html.BeginForm("Post", "Size", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(m => m.SizeId)
+    <div class="panel panel-default">
+        <div class="panel panel-heading">
+            <h3>
+                <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-file black"></span> Size</span>
+                @if ((ViewBag.Mode == "Add") || (ViewBag.Mode == "Edit"))
+                {
+                    <input type="submit" value="Save" class="btn btn-primary right" id="submit" style="width: 90px; background-color: #2980b9" />
+                }
+            </h3>
+            <hr style="margin-top:0px;margin-bottom:0px" />
+
+            <div class="panel-info">
+                <div class="btn-group">
+                   
+                    @Html.ActionLink(" ", "Create", "Size", null, new { @class = "cbtn btn-circle glyphicon glyphicon-plus toolbar", @title = "Add New", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "History", "Size", null, new { @class = "cbtn btn-circle glyphicon glyphicon-user toolbar", @title = "History", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "Print", "Size", null, new { @class = "cbtn btn-circle glyphicon glyphicon-print toolbar", @title = "Print", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "PrevPage", "Size", new { id = @Model.SizeId }, new { @class = "cbtn btn-circle glyphicon glyphicon-arrow-left toolbar", @title = "Prev Record", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "NextPage", "Size", new { id = @Model.SizeId }, new { @class = "cbtn btn-circle glyphicon glyphicon-arrow-right toolbar", @title = "Next Record", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "Index", "Size", null, new { @class = "cbtn btn-circle glyphicon glyphicon-list", @title = "List", @data_toggle = "tooltip" })
+                </div>
+
+            </div>
+        </div>
+        <div class="panel panel-info" style="padding-left:15px">
+            <div class="form-horizontal">
+
+                @Html.ValidationSummary(true)
+
+                <div>
+                    <h4 class="col-md-12 black" style="margin-top:15px">
+                        <span class="glyphicon glyphicon-align-justify"></span>
+                        1.Size Details
+                    </h4>
+                    <div>
+
+
+                        <div>
+                            <div class="col-md-6">
+                                <div class="form-group" style="margin-top:15px">
+                                    @Html.LabelFor(model => model.SizeName, "Size Name", new { @class = "control-label col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextBoxFor(m => m.SizeName, null, new { @class = "form-control col-xs-6 required" })
+                                        @Html.ValidationMessageFor(m => m.SizeName)
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group" style="margin-top:15px">
+                                    @Html.LabelFor(model => model.ProductShapeId, "Shape", new { @class = "control-label col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.DropDownListFor(model => model.ProductShapeId, new SelectList(ViewBag.ProductShapeList as System.Collections.IEnumerable, "ProductShapeId", "ProductShapeName"), new { @class = "form-control col-xs-6 height required" })
+                                        @Html.ValidationMessageFor(m => m.ProductShapeId)
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.UnitId, "Unit", new { @class = "control-label col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.DropDownListFor(model => model.UnitId, new SelectList(ViewBag.UnitList as System.Collections.IEnumerable, "UnitId", "UnitName"), string.Empty, new { @class = "form-control col-xs-6 height required" })
+                                        @Html.ValidationMessageFor(m => m.UnitId)
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.IsActive, "Is Active", new { @class = "control-label col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10" style=" padding-top:4px">
+                                        @Html.CheckBoxFor(m => m.IsActive, new { @class = "checkbox col-xs-1" })
+                                        @Html.ValidationMessageFor(model => model.IsActive)
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.DocTypeId, "Size Type", new { @class = "control-label col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.DropDownListFor(model => model.DocTypeId, new SelectList(ViewBag.DocTypeList as System.Collections.IEnumerable, "DocumentTypeId", "DocumentTypeName"),null, new { @class = "form-control col-xs-6 height required" })
+                                        @Html.ValidationMessageFor(m => m.DocTypeId)
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <hr />
+                <div>
+                    <h4 class="col-md-12 black" style="margin-top:15px">
+                        <span class="glyphicon glyphicon-align-justify"></span>
+                        2.Size Specification
+                    </h4>
+                    <div>
+                        <div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.Length, "Length", new { @class = "control-label col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextBoxFor(model => model.Length, null, new { @class = "form-control col-xs-6 " })
+                                        @Html.ValidationMessageFor(m => m.Length)
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.LengthFraction, "Length Fraction", new { @class = "control-label col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextBoxFor(model => model.LengthFraction, null, new { @class = "form-control col-xs-6 " })
+                                        @Html.ValidationMessageFor(m => m.LengthFraction)
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.Width, "Width", new { @class = "control-label col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextBoxFor(model => model.Width, null, new { @class = "form-control col-xs-6 " })
+                                        @Html.ValidationMessageFor(m => m.Width)
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.WidthFraction, "Width Fraction", new { @class = "control-label col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextBoxFor(model => model.WidthFraction, null, new { @class = "form-control col-xs-6 " })
+                                        @Html.ValidationMessageFor(m => m.WidthFraction)
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.Height, "Height", new { @class = "control-label col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextBoxFor(model => model.Height, null, new { @class = "form-control col-xs-6 " })
+                                        @Html.ValidationMessageFor(m => m.Height)
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.HeightFraction, "Height Fraction", new { @class = "control-label col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextBoxFor(model => model.HeightFraction, null, new { @class = "form-control col-xs-6" })
+                                        @Html.ValidationMessageFor(m => m.HeightFraction)
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.Area, "Area", new { @class = "control-label col-md-4 col-sm-2 strong", @style = "font-weight:bolder ! important;color:black ! important;font-size:1.3em! important" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextBoxFor(model => model.Area, null, new { @class = "form-control col-xs-6 strong", @style = "font-weight:bolder;color:black ! important;font-size:1.3em! important required" })
+                                        @Html.ValidationMessageFor(m => m.Area)
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.Perimeter, "Perimeter", new { @class = "control-label col-md-4 col-sm-2 strong", @style = "font-weight:bolder ! important;color:black ! important;font-size:1.3em! important" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextBoxFor(model => model.Perimeter, null, new { @class = "form-control col-xs-6 strong", @style = "font-weight:bolder;color:black ! important;font-size:1.3em! important required" })
+                                        @Html.ValidationMessageFor(m => m.Perimeter)
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="row"></div>
+            </div>
+        </div>
+    </div>
+}
+
+<script type="text/javascript">
+    $(function()
+    {
+        var TitleCase= '@Session["TitleCase"]';
+        //alert(TitleCase);
+        $('#SizeName').focusout(function() {
+            if (TitleCase=="UpperCase")
+            this.value = this.value.toUpperCase() ;
+    });
+    });
+</script>
+
+<script type="text/javascript">
+
+    var IsSaved=false;
+    var ValidationCount=0;
+    var FractionUnit=0;
+    var LengthA=0;
+    var WidthA=0;
+    $('form').submit(function(event){
+
+        if(!IsSaved)
+        {
+            if(!ValidateData())
+            {
+                return false;
+            }
+            IsSaved=true;
+            return IsSaved;
+        }
+        else
+        {
+            return false;
+        }
+
+
+    });
+
+    $(document).ready(function () {
+        GetFractionUnit();
+        $('#SizeName').focus();
+    })
+
+    var IsSizeNameChangedByUser = false;
+    $('#SizeName').keyup(function(){
+        if ($('#SizeName').val() != "")
+        {
+            IsSizeNameChangedByUser = true
+        }
+        else{
+            IsSizeNameChangedByUser = false
+        }
+    });
+
+    $('#Length,#LengthFraction,#Width,#WidthFraction,#Height,#HeightFraction,#UnitId').keyup(function(){
+        if (IsSizeNameChangedByUser == false)
+        {
+            //alert("Set Name");
+            //alert(IsSizeNameChangedByUser);
+            //alert($('#UnitId').val());
+            var SizeName = "";
+            if ($('#UnitId').val() == "MET")
+            {
+                if ($('#Length').val() != "" && $('#Length').val() != 0)
+                {
+                    SizeName = $('#Length').val().toString() + '';
+                }
+                if ($('#LengthFraction').val() != "" && $('#LengthFraction').val() != 0)
+                {
+                    SizeName = SizeName + $('#LengthFraction').val().toString() + '' ;
+                }
+                else
+                {
+                    SizeName = SizeName + '00' ;
+                }
+
+                SizeName = SizeName + "X";
+                if ($('#Width').val() != "" && $('#Width').val() != 0)
+                {
+                    SizeName = SizeName + $('#Width').val().toString() + '';
+                }
+                if ($('#WidthFraction').val() != "" && $('#WidthFraction').val() != 0)
+                {
+                    SizeName = SizeName + $('#WidthFraction').val().toString() + '' ;
+                }
+                else
+                {
+                    SizeName = SizeName + '00' ;
+                }
+            }
+            else
+            {
+                if ($('#Length').val() != "" && $('#Length').val() != 0)
+                {
+                    SizeName = $('#Length').val().toString() + '`';
+                }
+                if ($('#LengthFraction').val() != "" && $('#LengthFraction').val() != 0)
+                {
+                    SizeName = SizeName + $('#LengthFraction').val().toString() + '"' ;
+                }
+                SizeName = SizeName + "X";
+                if ($('#Width').val() != "" && $('#Width').val() != 0)
+                {
+                    SizeName = SizeName + $('#Width').val().toString() + '`';
+                }
+                if ($('#WidthFraction').val() != "" && $('#WidthFraction').val() != 0)
+                {
+                    SizeName = SizeName + $('#WidthFraction').val().toString() + '"' ;
+                }
+            }
+
+            $('#SizeName').val(SizeName);
+        }
+    });
+
+
+
+    function ValidateData() {
+        var DocId=@Model.SizeId;
+        var TempValue;
+        var ValidationMessage="";
+
+
+
+        //Checking for dulicate key value
+        if(DocId<=0)
+        {
+            TempValue= $('#SizeName').DuplicateCheckForCreate({ name: 'Size', value: $('#SizeName').val(), doctype: $('#ProductShapeId').val() });
+            if (TempValue){ ValidationMessage=$('#SizeName').val() + " already exist <br />";}
+        }
+        else
+        {
+            test = $('#SizeName').DuplicateCheckForEdit({ name: 'Size', value: $('#SizeName').val(), doctype: $('#ProductShapeId').val() ,headerId:DocId });
+            if (TempValue) {ValidationMessage+=$('#SizeName').val() + " already exist <br />";}
+        }
+        if(TempValue)
+        {
+            if($('#validationerrormsg').length==0){
+                $('.panel-info').filter(':eq(1)').before('<div class="alert alert-danger" role="alert" id="validationerrormsg">'+ValidationMessage+'</div>');}
+            else
+            {
+                $('#validationerrormsg').html(ValidationMessage);
+            }
+        }
+        return  (ValidationMessage=="");
+
+    }
+
+
+    $('#UnitId').change(function(){
+        GetFractionUnit();
+    })
+
+    function GetFractionUnit()
+    {
+        var unitid=$('#UnitId').val();
+
+        $.ajax({
+            cache: false,
+            type: "POST",
+            url: "@(Url.Action("GetUnitFraction"))",
+            data: { id: unitid },
+            success: function (data) {
+                FractionUnit=data;
+                calculateLenghtWidth();
+            },
+        })
+    }
+
+    $('#Length,#LengthFraction,#Width,#WidthFraction,#Height,#HeightFraction').keyup(calculateLenghtWidth);
+
+    function calculateLenghtWidth(){
+        var length=($('#Length').val()==null||$('#Length').val()=="")?0:(parseInt($('#Length').val()));
+        var lengthfraction=(FractionUnit==0)?0:($('#LengthFraction').val()==null||$('#LengthFraction').val()=="")?0:(parseInt($('#LengthFraction').val())/FractionUnit);
+        LengthA=length+lengthfraction;
+
+
+        var width=($('#Width').val()==null||$('#Width').val()=="")?0:(parseInt($('#Width').val()));
+        var widthfraction=(FractionUnit==0)?0:($('#WidthFraction').val()==null||$('#WidthFraction').val()=="")?0:(parseInt($('#WidthFraction').val())/FractionUnit);
+        WidthA=width+widthfraction;
+
+        calculateAreaPerimeter();
+    }
+
+    function calculateAreaPerimeter(){
+        if($('#ProductShapeId option:selected').text()=="Circle")
+        {
+            $("#Area").val(((3.141*(LengthA/2)*(LengthA/2)).toFixed(3)));
+            //$('#Perimeter').val(((2*3.141*(LengthA/2)).toFixed(0)));
+            $('#Perimeter').val(Math.floor((2*3.141*(LengthA/2))));
+        }
+        else if($('#ProductShapeId option:selected').text()=="Rectangle" || $('#ProductShapeId option:selected').text()=="Square")
+        {
+            $("#Area").val((LengthA*WidthA).toFixed(3));
+            //$('#Perimeter').val((2*(LengthA+WidthA)).toFixed(0));
+            $('#Perimeter').val(Math.floor((2*(LengthA+WidthA))));
+        }
+    }
+
+    $('#ProductShapeId').change(calculateLenghtWidth);
+
+</script>
+
+@if ((ViewBag.Mode != "Add") && (ViewBag.Mode != "Edit"))
+{
+    <script type="text/javascript">
+
+        RemoveFields();
+
+        function RemoveFields(){
+            //Disabling input fields
+            $(':input').attr('disabled','disabled');
+        }
+
+
+    </script>
+}

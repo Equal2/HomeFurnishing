@@ -1,0 +1,680 @@
+﻿@model Model.ViewModel.JobReceiveQALineViewModel
+@using Core.Common
+
+<style type="text/css">
+    .ui-autocomplete {
+        max-height: 250px;
+        overflow-y: auto;
+        /* prevent horizontal scrollbar */
+        overflow-x: hidden;
+    }
+</style>
+
+<div class="modal-content">
+    <div class="modal-header" style="border-bottom: 1px solid #8E8888">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"> <span class="glyphicon glyphicon-remove"></span></button>
+        <h3>
+            <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-file black"></span> @ViewBag.DocNo</span>
+        </h3>
+    </div>
+    <div>
+        @using (Html.BeginForm("_CreatePost", "JobReceiveQALine", FormMethod.Post, new { enctype = "multipart/form-data", id = "modform" }))
+        {
+
+            @Html.ValidationLog((string)TempData["CSEXCL"])
+            <div class="form-horizontal modal-body">
+
+                @Html.AntiForgeryToken()
+
+                @Html.HiddenFor(model => model.JobReceiveQALineId)
+                @Html.HiddenFor(m => m.JobReceiveQAHeaderId)
+                @Html.HiddenFor(m => m.JobReceiveLineId)
+                @Html.HiddenFor(m => m.JobWorkerId)
+                @Html.HiddenFor(m => m.BalanceQty)
+                @Html.HiddenFor(m => m.UnitDecimalPlaces)
+                @Html.HiddenFor(m => m.ProductUidId)
+                @Html.HiddenFor(m => m.DealUnitDecimalPlaces)
+                @Html.HiddenFor(m => m.JobReceiveQASettings.ProcessId)
+
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                <div class="row">
+                    <div class="col-md-6" style="display:@(Model.JobReceiveQASettings.isVisibleProductUID?"":"none")">
+                        @Html.HiddenFor(m => m.JobReceiveQASettings.isVisibleProductUID)
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.ProductUidId, (Model.DocumentTypeSettings.ProductUidCaption ?? "Product Uid"), new { @class = "control-label col-md-4 col-sm-2 " })
+                            @Html.HiddenFor(m => m.DocumentTypeSettings.ProductUidCaption)
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.ProductUidName, new { @class = "form-control required" })
+                                @Html.ValidationMessageFor(model => model.ProductUidId, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.JobReceiveLineId, "Job Receive", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @if (Model.JobReceiveQASettings.isVisibleProductUID)
+                                {
+                                    @Html.TextBoxFor(m => m.JobReceiveDocNo, "", new { @class = "form-control", @readonly = "true", tabindex="-1" })
+                                }
+                                else
+                                {
+                                    @Html.TextBoxFor(m => m.JobReceiveDocNo, "", new { @class = "form-control" })
+                                }
+
+                                @Html.ValidationMessageFor(model => model.JobReceiveLineId, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.ProductId, (Model.DocumentTypeSettings.ProductCaption ?? "Product"), new { @class = "control-label col-md-4 col-sm-2 " })
+                            @Html.HiddenFor(m => m.DocumentTypeSettings.ProductCaption)
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.ProductId, new { @class = "form-control required", @readonly = true })
+                                @Html.ValidationMessageFor(model => model.ProductId, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6" style="display:@(Model.JobReceiveQASettings.isVisibleDimension1?"":"none")">
+                        @Html.HiddenFor(m => m.JobReceiveQASettings.isVisibleDimension1)
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Dimension1Id, (Model.DocumentTypeSettings.Dimension1Caption ?? "Dimension1"), new { @class = "control-label col-md-4 col-sm-2 " })
+                            @Html.HiddenFor(m => m.DocumentTypeSettings.Dimension1Caption)
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.Dimension1Name, new { @class = "form-control required", @readonly = true })
+                                @Html.ValidationMessageFor(model => model.Dimension1Id, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="col-md-6" style="display:@(Model.JobReceiveQASettings.isVisibleDimension2?"":"none")">
+                        @Html.HiddenFor(m => m.JobReceiveQASettings.isVisibleDimension2)
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Dimension2Id, (Model.DocumentTypeSettings.Dimension2Caption ?? "Dimension2"), new { @class = "control-label col-md-4 col-sm-2 " })
+                            @Html.HiddenFor(m => m.DocumentTypeSettings.Dimension2Caption)
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.Dimension2Name, new { @class = "form-control required", @readonly = true })
+                                @Html.ValidationMessageFor(model => model.Dimension2Id, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="col-md-6" style="display:@(Model.JobReceiveQASettings.isVisibleDimension3?"":"none")">
+                        @Html.HiddenFor(m => m.JobReceiveQASettings.isVisibleDimension3)
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Dimension3Id, (Model.DocumentTypeSettings.Dimension3Caption ?? "Dimension3"), new { @class = "control-label col-md-4 col-sm-2 " })
+                            @Html.HiddenFor(m => m.DocumentTypeSettings.Dimension3Caption)
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.Dimension3Name, new { @class = "form-control required", @readonly = true })
+                                @Html.ValidationMessageFor(model => model.Dimension3Id, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="col-md-6" style="display:@(Model.JobReceiveQASettings.isVisibleDimension4?"":"none")">
+                        @Html.HiddenFor(m => m.JobReceiveQASettings.isVisibleDimension4)
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Dimension4Id, (Model.DocumentTypeSettings.Dimension4Caption ?? "Dimension4"), new { @class = "control-label col-md-4 col-sm-2 " })
+                            @Html.HiddenFor(m => m.DocumentTypeSettings.Dimension4Caption)
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.Dimension4Name, new { @class = "form-control required", @readonly = true })
+                                @Html.ValidationMessageFor(model => model.Dimension4Id, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="col-md-6" style="display:@(Model.JobReceiveQASettings.IsVisibleSpecification?"":"none")">
+                        @Html.HiddenFor(m => m.JobReceiveQASettings.IsVisibleSpecification)
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Specification, "Specification", new { @class = "control-label col-md-4 col-sm-2 " })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.Specification, new { @class = "form-control required", @readonly = true })
+                                @Html.ValidationMessageFor(model => model.Specification, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.QAQty, "QA-Qty", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10" style="padding:0px">
+                            <div class="col-xs-7" style="padding-right:0px;">
+                                @Html.TextBoxFor(model => model.QAQty, new { @class = "form-control required cusrightnormal", @name = "DocQty" })
+                                @Html.ValidationMessageFor(model => model.QAQty, "", new { @class = "text-danger" })
+                            </div>
+                            <div class="col-xs-5" style="padding-left:0px">
+                                @Html.TextBoxFor(m => m.UnitId, new { @class = "form-control col-xs-2 cusleftnormal", @readonly = "true" })
+                            </div>
+                                </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6" style="display:@(Model.JobReceiveQASettings.IsVisibleInspectedQty?"":"none")">
+                        @Html.HiddenFor(m => m.JobReceiveQASettings.IsVisibleInspectedQty)
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.InspectedQty, "Ins-Qty", new { @class = "control-label col-md-4 col-sm-2 " })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.InspectedQty, new { @class = "form-control required" })
+                                @Html.ValidationMessageFor(model => model.InspectedQty, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Qty, "Pass Qty", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.Qty, new { @class = "form-control required" })
+                                @Html.ValidationMessageFor(model => model.Qty, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    @*<div class="col-md-6" style="display:none">
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.FailQty, "Fail-Qty", new { @class = "control-label col-xs-4 " })
+                                <div class="col-xs-7">
+                                    @Html.TextBoxFor(model => model.FailQty, new { @class = "form-control col-xs-7 required" })
+                                    @Html.ValidationMessageFor(model => model.FailQty, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+                        </div>*@
+
+                    <div class="col-md-6" style="display:@(Model.JobReceiveQASettings.isVisibleDealUnit?"":"none")">
+                        @Html.HiddenFor(m => m.JobReceiveQASettings.isVisibleDealUnit)
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.DealUnitId, "Deal Unit& Multiplier", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10" style="padding:0px">
+                                <div class="col-xs-7" style="padding-right:0px">
+                                    @Html.DropDownListFor(model => model.DealUnitId, new SelectList(ViewBag.DeliveryUnitList as System.Collections.IEnumerable, "UnitId", "UnitName"), new { @class = "form-control height cusrightnormal required", @readonly = "true" })
+                                    @Html.ValidationMessageFor(model => model.DealUnitId, "", new { @class = "text-danger" })
+                                </div>
+                                <div class="col-xs-5" style="padding-left:0px">
+                                    @Html.TextBoxFor(model => model.UnitConversionMultiplier, new { @class = "form-control cusleftnormal required", @readonly = "true" })
+                                    @Html.ValidationMessageFor(model => model.UnitConversionMultiplier, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6" style="display:@(Model.JobReceiveQASettings.isVisibleDealUnit?"":"none")">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.DealQty, "Deal Qty", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.DealQty, new { @class = "form-control required" })
+                                @Html.ValidationMessageFor(model => model.DealQty, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6" style="display:@(Model.JobReceiveQASettings.isVisibleMarks?"":"none")">
+                        @Html.HiddenFor(m => m.JobReceiveQASettings.isVisibleMarks)
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Marks, "Marks", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.Marks, new { @class = "form-control required" })
+                                @Html.ValidationMessageFor(model => model.Marks, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6" style="display:@(Model.JobReceiveQASettings.IsVisibleWeight?"":"none")">
+                        @Html.HiddenFor(m => m.JobReceiveQASettings.IsVisibleWeight)
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Weight, "Weight", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.Weight, new { @class = "form-control required" })
+                                @Html.ValidationMessageFor(model => model.Weight, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6" style="display:@(Model.JobReceiveQASettings.IsVisiblePenalty?"":"none")">
+                        @Html.HiddenFor(m => m.JobReceiveQASettings.IsVisiblePenalty)
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.PenaltyRate, "Penalty Rate", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.PenaltyRate, new { @class = "form-control required" })
+                                @Html.ValidationMessageFor(model => model.PenaltyRate, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6" style="display:@(Model.JobReceiveQASettings.IsVisiblePenalty?"":"none")">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.PenaltyAmt, "Penalty Amt", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.PenaltyAmt, new { @class = "form-control required" })
+                                @Html.ValidationMessageFor(model => model.PenaltyAmt, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Remark, "Remark", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextAreaFor(model => model.Remark, new { @class = "form-control required" })
+                                @Html.ValidationMessageFor(model => model.Remark, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer " style="padding: 19px 20px 0 20px; border-top:1px solid #8E8888">
+                    @if (ViewBag.LineMode == "Edit" || ViewBag.LineMode == "Create")
+                    {
+                        <button class="btn custom left" name="Command:Edit" type="submit" id="submit"><h2 style="margin:0px"><span class="glyphicon glyphicon-floppy-disk black"></span> </h2></button>}
+                    @if (ViewBag.LineMode == "Delete")
+                    {
+                        <button class="btn custom" name="Command:Delete" id="delete" type="submit"><h2 style="margin:0px"><span class="glyphicon glyphicon-trash black"></span> </h2></button>}
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+
+<script type="text/javascript">
+
+
+    $(document).ready(function () {
+        CustomSelectFunction($("#ProductId"), '/ComboHelpList/GetProducts', '/ComboHelpList/SetSingleProducts', 'Enter Product', false, 3);
+
+        if($('#ProductUidId').val())
+        {
+            $('#DocQty').attr('readonly','true');
+            $('#LotNo').attr('readonly', 'true');
+        }
+
+        var id=@Model.JobReceiveQALineId;
+        if(id>0)
+        {
+            $('#JobReceiveDocNo').attr('disabled', 'disabled');
+            $('#ProductId').attr('readonly', 'true');
+            $('#ProductUidName').attr('readonly', 'true');
+            //if($('#ProductUidId').val())
+            //    $('#Qty').attr('readonly', 'true');
+
+        }
+        $('#delete','.modal-content').click(function (e) {
+            if(id>0)
+            {
+                var url = '/JobReceiveQALine/DeletePost';
+                $('form#modform').attr('action',url);
+                DeletingProductCharges();
+                return
+            }
+            else
+            {
+                return false;
+            }
+        })
+
+
+
+
+
+
+    });
+
+</script>
+
+@if (Model.JobReceiveQALineId <= 0)
+{
+    <script type="text/javascript">
+
+        $( "#JobReceiveDocNo" ).focusout( function( ) {
+
+            if (!$(this).val()) {
+                $("#JobReceiveDocNo").val("");
+                $('#JobReceiveLineId').val("");
+            }
+
+
+            if($("#JobReceiveDocNo").val()=="")
+            {
+                $('#JobReceiveLineId').val("");
+            }
+
+            if($('#JobReceiveLineId').val() && $('#JobReceiveLineId').val()!=0 )
+            {
+                //alert($('#JobReceiveLineId').val());
+                $.ajax({
+                    cache: false,
+                    type: "POST",
+                    url: "@(Url.Action("GetReceiveDetail"))",
+                    data: { RecId: $("#JobReceiveLineId").val(),ReceiveQAId:$('#JobReceiveQAHeaderId','.modal-body').val() },
+                    success: function (data) {
+                        $('#UnitDecimalPlaces').val(data.UnitDecimalPlaces);
+                        $('#DealUnitDecimalPlaces').val(data.DealUnitDecimalPlaces);
+                        $('#Qty').val(data.Qty.toFixed(data.UnitDecimalPlaces));
+                        $('#InspectedQty').val(data.Qty.toFixed(data.UnitDecimalPlaces));
+                        $('#QAQty').val(data.Qty.toFixed(data.UnitDecimalPlaces));
+                        $('#Specification').val(data.Specification);
+                        $("#UnitId").val(data.UnitId);
+                        $("#DealUnitId").val(data.DealUnitId);
+                        $('#UnitConversionMultiplier').val(data.UnitConversionMultiplier);
+                        $('#BalanceQty').val(data.Qty);
+                        $("#ProductId").select2('data', { id: data.ProductId, text: data.ProductName});
+                        $('#Qty').trigger('focusout');
+                        (data.Dimension1Name==null)?(1==1):($("#Dimension1Name").val(data.Dimension1Name));
+                        if(data.Dimension2Name!=null)
+                        {
+                            $("#Dimension2Name").val(data.Dimension2Name)
+                        }
+                        if(data.Dimension3Name!=null)
+                        {
+                            $("#Dimension3Name").val(data.Dimension3Name)
+                        }
+                        if(data.Dimension4Name!=null)
+                        {
+                            $("#Dimension4Name").val(data.Dimension4Name)
+                        }
+
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        alert('Failed to retrieve Order details.' + thrownError);
+                    }
+                });
+            }
+            else if($('#JobReceiveLineId').val()=="")
+            {
+                $('#Qty').val(0).trigger('keyup');
+                $('#InspectedQty').val(0).trigger('keyup');
+                $('#QAQty').val(0).trigger('keyup');
+                $("#ProductId").select2('val', "");
+                $('#UnitConversionMultiplier').val(0);
+                $('#Specification').val("");
+                $('#DealQty').val(0);
+                $('#UnitDecimalPlaces').val(0);
+                $('#DealUnitDecimalPlaces').val(0);
+                $("#Dimension1Name").val("");
+                $("#Dimension2Name").val("");
+                $("#Dimension3Name").val("");
+                $("#Dimension4Name").val("");
+            }
+        }
+        );
+
+        $(function() {
+            var CurrentPageCount=0;
+            var MaxPageSize=20;
+            var Req='';
+            var Res='';
+            var i=0;
+            $("#JobReceiveDocNo").autocomplete({
+                delay: 500,
+                minLength: 3,
+                source: function(request,response){
+                    Req=request.term;
+                    $.ajax({
+                        cache: false,
+                        type: "POST",
+                        url: "@(Url.Action("GetPendingReceive"))",
+                        data: { HeaderId:$("#JobReceiveQAHeaderId").val(),term:request.term,Limit:20 },
+                        success: function (data) {
+                            if(data.length>0){
+                                var cachearray = data.error ? [] : $.map(data, function(m) {
+
+                                    return {
+                                        value: m.DocNo,
+                                        key: m.JobReceiveLineId,
+                                        dim1: m.Dimension1Name,
+                                        dim2:m.Dimension2Name,
+                                        dim3: m.Dimension3Name,
+                                        dim4:m.Dimension4Name,
+                                        prod:m.ProductName,
+                                        balqty:m.BalanceQty,
+                                    };
+                                });
+                                response(cachearray);
+                            }
+                            else
+                            {
+                                var dimensions = { width: 10};
+                                var cachearray=$.map(dimensions,function(value,key){
+                                    return{
+                                        value:"No Record Found!",
+                                        key:null
+                                    }
+                                })
+                                response(cachearray);
+                            }
+                        },
+                        error: function (xhr, ajaxOptions, thrownError) {
+                            $('.ui-autocomplete-loading').removeClass("ui-autocomplete-loading");
+                            alert('Failed to retrieve Pending Receives.' + thrownError);
+                        }
+
+                    });
+
+                },
+                appendTo : $("#myModalContent"),
+                select: function(event, ui) {
+                    // prevent autocomplete from updating the textbox
+                    // navigate to the selected item's url
+                    if($("#JobReceiveDocNo").val()=="")
+                    {
+                        $('#JobReceiveLineId').val("");
+                    }
+                    else
+                        $("#JobReceiveLineId").val(ui.item.key);
+
+                },
+                focus: function( event, ui ) {
+                    //log( "focus: " + ui.item.label );
+                    //$('#modform').find('.modal-body').prepend("<span >"+ ui.item.idx+"</span>")
+                },
+            }).data("ui-autocomplete")._renderItem = function(ul, item) {
+                var $a = $("<a></a>");
+                $("<strong></strong>").text(item.value).appendTo($a);
+                (item.prod==null)?(""):($("<br /><span class='small' style='font-weight:bold'></span>").text(item.prod).appendTo($a));
+                (item.dim1==null)?(""):($("<br /><span class='small'></span>").text(item.dim1+",").appendTo($a));
+                (item.dim2==null)?(""):( item.dim1==null ? ($("<br /><span class='small'></span>").text(item.dim2).appendTo($a)) : ($("<span class='small'></span>").text(item.dim2).appendTo($a)) );
+                (item.balqty==null)?(""):($("<br /><span class='small'></span>").text("BalQty:"+item.balqty).appendTo($a));
+
+                return $("<li></li>").append($a).appendTo(ul);
+            }
+        });
+
+        //$("#JobReceiveDocNo").on("focus",function(){
+        //    $(this).keydown();
+        //})
+
+        $('#ProductUidName').on('change',function(e){
+
+
+
+            //var data=InitializePopoverForJobReceiveQA(this,$("#ProductUidName").val(),false,$('#JobReceiveQAHeaderId').val(),TransactionTypeConstantsEnum.Receive);
+
+            $('#ProductUidName').popover('destroy');
+
+            var DataArray;
+            var status;
+            var url = "/JobReceiveQALine/GetProductUidValidation"
+            $.ajax({
+                async: false,
+                url: url,
+                data: { ProductUID: $("#ProductUidName", '.modal-body').val(), HeaderID: $('#JobReceiveQAHeaderId', '.modal-body').val() },
+                success: function (data) {
+                    DataArray = data;
+                }
+            })
+
+            if (DataArray.ErrorType == "Error") {
+                $('#ProductUidName')
+                 .popover({
+                     trigger: 'manual',
+                     container: '.modal-body',
+                     'delay': { "hide": "1000" },
+                     html: true,
+                     content: "<ul class='list-group'>  <li class='list-group-item active'> Validation Detail </li>    <li class='list-group-item'>Message:" + DataArray.ErrorMessage + "</li>   </ul>"
+                 });
+                $('.modal-body').find('#ProductId').select2('val', '').removeAttr('readonly');
+                $('.modal-body').find('#Qty').val('').removeAttr('readonly');
+                $('.modal-body').find('#ProductUidId').val(0);
+            }
+            else if (DataArray.ErrorType == "Success") {
+                $('.modal-body').find('#ProductId').select2("data", { id: DataArray.ProductId, text: DataArray.ProductName }).attr('readonly', 'true');
+
+                $('.modal-body').find('#QAQty').val(1).attr('readonly','true');
+                $('.modal-body').find('#ProductUidId').val(DataArray.ProductUIDId);
+            }
+
+            $(this).popover('show');
+            setTimeout(function () { $('#ProductUidName').popover('destroy') }, 10000);
+
+            UpdateJobReceiveUidBased();
+
+        })
+
+
+        function UpdateJobReceiveUidBased() {
+            if ($("#ProductUidId").val() && $("#ProductUidId").val() > 0) {
+                $.ajax({
+                    cache: false,
+                    type: "POST",
+                    url: "@(Url.Action("GetReceiveLineForUid"))",
+                    data: { UId: $("#ProductUidId", '.modal-body').val(),HeaderId: $("#JobReceiveQAHeaderId", '.modal-body').val()},
+                    success: function (data) {
+                        if (data) {
+                            $('#JobReceiveLineId').val(data.JobReceiveLineId);
+                            $('#JobReceiveDocNo').val(data.JobReceiveDocNo).attr('readonly', 'true').trigger("focusout");
+                        }
+                        else if (!data) {
+                            $('#JobReceiveLineId').val(0);
+                            $('#JobReceiveDocNo').val("").removeAttr('readonly').trigger("focusout");
+                        }
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        alert('Failed to retrieve product details.' + thrownError);
+                    }
+                });
+            }
+            else {
+                $('#JobReceiveLineId').val(0);
+                $('#JobReceiveDocNo').val("").removeAttr('readonly');
+            }
+        }
+
+    </script>
+}
+
+<script type="text/javascript">
+    var decimalplaces=0;
+    var dealunitdecimalplaces=0;
+
+    $('#QAQty').focusout(function(){
+        $(this).val((parseFloat($(this).val())).toFixed($('#UnitDecimalPlaces').val()));
+        $('#InspectedQty').val($(this).val());
+        $('#Qty').val($(this).val()).trigger('focusout');
+        return;
+    });
+
+    $('#Qty').focusout(function(){
+        $(this).val((parseFloat($(this).val())).toFixed($('#UnitDecimalPlaces').val()));
+        $('#PassQty').val($(this).val());
+        Calculation();
+        ValidateData();
+        return;
+    });
+
+
+    $('#DealQty,#Qty,#PenaltyRate,#QAQty').keyup(function(){
+        Calculation();
+    });
+
+    $('#InspectedQty,#Qty,#QAQty').focusout(function(){
+        ValidateData();
+    });
+
+    function Calculation()
+    {
+        //$('#FailQty').val(parseFloat($('#QAQty').val()-$('#Qty').val()).toFixed($('#DealUnitDecimalPlaces').val()));
+
+        if ($('#UnitConversionMultiplier').val() != 0) {
+            $('#DealQty').val(parseFloat($('#Qty').val() * $('#UnitConversionMultiplier').val()).toFixed($('#DealUnitDecimalPlaces').val()));
+            //$('#FailDealQty').val(parseFloat($('#FailQty').val() * $('#UnitConversionMultiplier').val()).toFixed($('#DealUnitDecimalPlaces').val()));
+        }
+        if($('#PenaltyRate').val() && $('#PenaltyRate').val() >0)
+            $('#PenaltyAmt').val(($('#PenaltyRate').val() * parseFloat(($('#QAQty').val()-$('#Qty').val()) * $('#UnitConversionMultiplier').val())).toFixed(2))
+
+    }
+
+    function ValidateData()
+    {
+
+        var ValidationMessage = "";
+
+        //Check that Pass Qty can not exceed Job Qty.
+        if (parseFloat($('#BalanceQty').val() - $('#QAQty').val()) < 0) {
+            ValidationMessage="QAQty exceeding Balance Qty";
+        }
+
+        //Check that Pass Qty can not exceed Job Qty.
+        if (parseFloat($('#QAQty').val() - $('#InspectedQty').val()) < 0) {
+            ValidationMessage="InspectionQty exceeding QA Qty";
+        }
+
+        //Check that Job Qty can not exceed Order Balance Qty.
+        if (($('#QAQty').val() - $('#Qty').val()) < 0) {
+            ValidationMessage="Qty exceeding QAQty";
+        }
+
+        if(!ValidationMessage=="")
+        {
+            $('#submit', '.modal-body').attr('disabled', 'disabled');
+            if (!$('#modform').find('.modal-body #errormsg').length) {
+                $('#modform').find('.modal-body').prepend("<div class='alert alert-danger'><span id=errormsg >"+ValidationMessage+"</span></div>")
+            }
+            else
+                $('#modform').find('.modal-body #errormsg').text(ValidationMessage);
+        }
+        else
+        {
+            $('#submit', '.modal-body').removeAttr('disabled');
+            $('#modform').find('#errormsg').parent().remove();
+        }
+
+        return(ValidationMessage=="");
+
+
+    }
+
+    var IsSaved=false;
+    var ValidationCount=0;
+
+    $('#modform').bind('submit',function(event){
+
+        if(!IsSaved)
+        {
+            Calculation();
+            if(!ValidateData())
+            {
+                return false;
+            }
+            IsSaved=true;
+            $('button:submit').attr('disabled','disabled');
+            return IsSaved;
+        }
+        else
+        {
+            return false;
+        }
+
+    });
+</script>

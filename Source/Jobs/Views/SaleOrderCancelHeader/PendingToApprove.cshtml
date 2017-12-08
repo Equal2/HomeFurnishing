@@ -1,0 +1,89 @@
+﻿@model IQueryable<Model.ViewModels.SaleOrderCancelHeaderDetailsViewModel>
+@using Core.Common
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@helper RenderActionColumn(Model.ViewModels.SaleOrderCancelHeaderDetailsViewModel s)
+{
+    if (s.Status == (int)StatusConstants.Drafted || s.Status == (int)StatusConstants.Modified)
+    {
+        @Html.ActionLink(" ", "Submit", "SaleOrderCancelHeader", new { id = s.SaleOrderCancelHeaderId }, new { @class = "rowSubmitBlue", @title = "Submit", @data_toggle = "tooltip" })
+    }
+    if (s.Status == (int)StatusConstants.Submitted || s.Status == (int)StatusConstants.ModificationSubmitted)
+    {
+        @Html.ActionLink(" ", "Approve", "SaleOrderCancelHeader", new { id = s.SaleOrderCancelHeaderId, Redirect = ViewContext.RouteData.Values["action"] }, new { @class = "rowApproveBlue", @title = "Approve", @data_toggle = "tooltip" })
+    }
+}
+@helper RenderStatus(Model.ViewModels.SaleOrderCancelHeaderDetailsViewModel s)
+{
+    if (s.Status == (int)StatusConstants.Submitted)
+    {
+        @Html.Raw("Submitted");
+    }
+    else if (s.Status == (int)StatusConstants.Approved)
+    {
+        @Html.Raw("Approved")
+    }
+    else if (s.Status == (int)StatusConstants.Drafted)
+    {
+        @Html.Raw("Drafted")}
+    else if (s.Status == (int)StatusConstants.Modified)
+    {
+        @Html.Raw("Modified")
+    }
+    else if (s.Status == (int)StatusConstants.ModificationSubmitted)
+    {
+        @Html.Raw("Modification Submitted")
+    }
+}
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h4>
+            <span style="font-family: Calibri,sans-serif,Verdana">Sale Order Cancel List(To Approve).</span>
+        </h4>
+        <hr style="margin-top:0px;margin-bottom:0px" />
+        <div class="panel-info">
+            <span style="font-family: Calibri,sans-serif,Verdana;font-size:large;">
+                <u> @Html.ActionLink("Create", "Create", "SaleOrderCancelHeader", new { @class = "modal-link" })</u>
+            </span>
+            <span style="font-family: Calibri,sans-serif,Verdana; font-size: large; float: right; padding-top: 13px">
+                @Html.ActionLink(" ", "Index", "SaleOrderCancelExcelImport", null, new { @class = "ExcelImport" })
+            </span>
+            <br />
+            <span style="font-family: Calibri,sans-serif,Verdana;font-size:small">
+                <u> @Html.ActionLink("All", "Index", "SaleOrderCancelHeader", new { @class = "modal-link" })</u>|
+                <u>@Html.ActionLink("To Submit", "PendingToSubmit", "SaleOrderCancelHeader", new { @class = "modal-link" })</u>|
+                <u>@Html.ActionLink("To Approve", "PendingToApprove", "SaleOrderCancelHeader", new { @class = "modal-link" })</u>
+            </span>
+        </div>
+    </div>
+    <div class="panel-info" style="padding-left:5px;padding-top:2px">
+        @Html.Grid(Model).Columns(columns =>
+           {
+               columns.Add(foo => foo.SaleOrderCancelHeaderId, true);
+
+               columns.Add(foo => foo.DocDate).Sortable(true).Titled("Cancel Date").Format("{0:dd/MMM/yyyy}").Filterable(true);
+               columns.Add(foo => foo.DocNo).Titled("Cancel No").Sortable(true).Filterable(true);
+               columns.Add(m => m.Buyer).Titled("Buyer").Sortable(true).Filterable(true);
+               columns.Add(m => m.Reason).Titled("Reason").Sortable(true).Filterable(true);
+               columns.Add(m => m.Remark).Titled("Remark").Sortable(true).Filterable(true);
+               columns.Add().Titled("Status").RenderValueAs(m => RenderStatus(m));
+               columns.Add().Sanitized(false).Encoded(false).RenderValueAs(m => @Html.ActionLink(" ", "Index", "SaleOrderCancelLine", new { id = m.SaleOrderCancelHeaderId }, new { @class = "rowLineDetailBlue", @title = "Line Detail", @data_toggle = "tooltip" })).SetWidth(20);
+               columns.Add().Sanitized(false).Encoded(false).RenderValueAs(m => RenderActionColumn(m)).SetWidth(20);
+               columns.Add().Sanitized(false).Encoded(false).RenderValueAs(m => @Html.ActionLink(" ", "Detail", "SaleOrderCancelHeader", new { id = m.SaleOrderCancelHeaderId }, new { @class = "rowDetailBlue", @title = "Detail", @data_toggle = "tooltip" })).SetWidth(20);
+               columns.Add().Sanitized(false).Encoded(false).RenderValueAs(m => @Html.ActionLink(" ", "Print", "SaleOrderCancelHeader", new { id = m.SaleOrderCancelHeaderId }, new { @class = "rowPrintBlue", @data_toggle = "tooltip", @title = "Print" })).SetWidth(20);
+               columns.Add().Sanitized(false).Encoded(false).RenderValueAs(m => @Html.ActionLink(" ", " ", "", new { @class = "rowPrintBlue" })).SetWidth(20);
+               columns.Add().Sanitized(false).Encoded(false).RenderValueAs(m => @Html.ActionLink(" ", "Edit", "SaleOrderCancelHeader", new { id = m.SaleOrderCancelHeaderId, PrevAction = ViewContext.RouteData.Values["action"] }, new { @class = "rowEditBlue", @title = "Edit", @data_toggle = "tooltip" })).SetWidth(20);
+               columns.Add().Sanitized(false).Encoded(false).RenderValueAs(m => @Html.ActionLink(" ", "Delete", "SaleORderCancelHeader", new { id = m.SaleOrderCancelHeaderId, PrevAction = ViewContext.RouteData.Values["action"] }, new { @class = "rowDeleteBlue", @title = "Delete", @data_toggle = "tooltip" })).SetWidth(20);
+           }).WithPaging(25).EmptyText("No records found.")
+
+
+
+        <div id="dialog-ViewImage" style="display: none">
+        </div>
+
+    </div>
+</div>

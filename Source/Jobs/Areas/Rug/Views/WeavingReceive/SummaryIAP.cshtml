@@ -1,0 +1,449 @@
+﻿@model Model.ViewModel.JobReceiveIAPSummaryDetailViewModel
+@using Core.Common
+@{
+    ViewBag.Title = "Incentive & Penalty";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style type="text/css">
+    .row-selected {
+        background-color: #428bca;
+    }
+
+    .row-returned {
+        background-color: #ffcdd2;
+    }
+
+    .rContent .ui-selecting {
+        background: #b2cefa !important;
+    }
+    .select2-container-multi .select2-choices .select2-search-field input{
+        height:28px;
+    }
+   
+</style>
+
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" style="font-size:13px">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="exampleModalLabel"> Incentive & Penalty</h4>
+            </div>
+            @using (Html.BeginForm("", "", FormMethod.Get, new { enctype = "multipart/form-data", id = "iAPmodForm" }))
+            {
+                @Html.HiddenFor(m => m.DocTypeId)
+                <div class="modal-body form-horizontal" id="SelectedSummary">
+
+                    <div class="row">
+                        <div class="col-md-10">
+                            <div class="form-group">
+                                @Html.Label("Incentive", new { @class = "control-label col-xs-4" })
+                                <div class="col-xs-3" style="padding-right:0px">
+                                    @Html.TextBox(" ", "", new { @class = "form-control height cusrightnormal", @id = "IncentiveRate" })
+                                </div>
+                                <div class="col-xs-5" style="padding-left:0px">
+                                    @Html.TextBox(" ", "", new { @class = "form-control cusleftnormal", @id = "IncentiveAmt" })
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-10">
+                            <div class="form-group">
+                                @Html.Label("Penalty", new { @class = "control-label col-xs-4" })
+                                <div class="col-xs-3" style="padding-right:0px">
+                                    @Html.TextBox(" ", "", new { @class = "form-control height cusrightnormal", @id = "PenaltyRate" })
+                                </div>
+                                <div class="col-xs-5" style="padding-left:0px">
+                                    @Html.TextBox(" ", "", new { @class = "form-control cusleftnormal", @id = "PenaltyAmt" })
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-10">
+                            <div class="form-group">
+                                @Html.Label("Remark", new { @class = "control-label col-xs-4 " })
+                                <div class="col-xs-8">
+                                    @Html.TextArea(" ", "", 3, 60, new { @class = "form-control col-xs-7", @id = "mRemark" })
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer " style="padding: 19px 20px 0 20px; border-top:1px solid #8E8888">
+                        <button class="btn custom left" name="Command:Edit" type="submit" id="submit"><h2 style="margin:0px"><span class="glyphicon glyphicon-floppy-disk black"></span> </h2></button>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+
+<!-- modal placeholder-->
+@using (Html.BeginForm("PostIAPSummary", "WeavingReceive", FormMethod.Post, new { enctype = "multipart/form-data", id = "IAP" }))
+{
+    @Html.AntiForgeryToken()
+
+
+    <div class="panel panel-default">
+        <div class="panel-heading">
+
+            <h3 style="border-bottom:0px solid #e1dada;padding-bottom:0px;">
+                <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"> <span class="glyphicon glyphicon-file black"></span> @ViewBag.Name Penality Summary- @ViewBag.DocNo</span>
+                <input type="submit" value="Save" class="btn btn-primary right" id="submit" style="width: 90px; background-color: #2980b9" />
+            </h3>
+
+            <hr style="margin-top:10px;margin-bottom:0px" />
+
+            <div class="panel-info">
+                <h4 style="padding:5px 0 0 0;margin:0px">
+                    @Html.ActionLink(" ", " ", " ", null, new { @class = "glyphicon glyphicon-refresh toolbar", @title = "Refresh Page", @data_toggle = "tooltip", @id = "RefreshPage" })
+                    <a href="@ViewBag.Url" class="glyphicon glyphicon-list toolbar right"></a>
+                </h4>
+            </div>
+        </div>
+        <div class="panel-info" style="padding-left:15px">
+            <div class="form-horizontal">
+                @Html.ValidationSummary(true)
+                @Html.HiddenFor(m => Model.JobReceiveHeaderId)
+
+
+                <div class="row">
+
+                    <h4 class="col-md-12 black">
+                        <span class="glyphicon glyphicon-align-justify"></span>
+                        1.Receive Details
+                    </h4>
+                    <div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group" style="margin-top:15px">
+                                    @Html.LabelFor(model => model.DocData, "Receipt Date", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.DocData, "{0:dd/MMMM/yyyy}", new { @class = "datepickerWithNFD form-control required", @readonly = true })
+                                        @Html.ValidationMessageFor(model => model.DocData, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group" style="margin-top:15px">
+                                    @Html.LabelFor(model => model.JobWorkerId, "Job Worker", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.JobWorkerId, null, new { @class = "form-control required", @readonly = true })
+                                        @Html.ValidationMessageFor(m => m.JobWorkerId, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <hr />
+                <div class="row">
+                    <h4 class="col-md-12 black" style="margin-top:15px">
+                        <span class="glyphicon glyphicon-shopping-cart"></span>
+                        2.Summary
+                    </h4>
+                </div>
+                <div class="row Custom-Summary" style="padding-right:15px">
+
+                    <div class="panel panel-default" id="grid">
+
+                        <div class="panel-heading headrow" style="background-image: -webkit-linear-gradient(top, #428bca 0%, #428bca 100%);color:white">
+                            <div class="row grid-head">
+                                <div class="text-left block" style="width: 5%; ">
+                                    Srl.
+                                </div>
+                                <div class="block" style="width: 95%;">
+                                    <div class="row">
+                                        @*ProductInfo*@
+                                        <div class="block" style="width: 13%;">
+                                            Product
+                                        </div>
+                                        <div class="block" style="width: 13%; ">
+                                            BarCode
+                                        </div>
+                                        <div class="block text-right" style="width: 15%;">
+                                            DealQty-Unit
+                                        </div>
+                                        @*Qty*@
+                                        <div class="text-right block" style="width: 18%;">
+                                            Incentive
+                                        </div>
+                                        @*Rate*@
+                                        <div class="text-right block" style="width: 18%;">
+                                            Penality
+                                        </div>
+                                        <div class="block" style="width: 23%; ">
+                                            Remark
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+
+                        <div class="panel-info rContent">
+
+                            @{int count = 0;
+                            decimal PenCount = 0;
+                            decimal IncCount = 0;
+                            }
+                            @foreach (var item in Model.JobReceiveIAPSummaryViewModel.GroupBy(m => m.ProductName))
+                            {
+
+                                int j = 0;
+                                foreach (var item2 in item)
+                                {
+
+                                    int i = Model.JobReceiveIAPSummaryViewModel.IndexOf(item2);
+
+                                    count++;
+                                    <div class="row crow@(Model.JobReceiveIAPSummaryViewModel[i].IsReturned?" row-returned" : "")" style="margin: 0px; line-height: 30px">
+
+                                        @Html.HiddenFor(m => Model.JobReceiveIAPSummaryViewModel[i].ProductUidId)
+                                        @Html.HiddenFor(m => Model.JobReceiveIAPSummaryViewModel[i].ProductUidName)
+                                        @Html.HiddenFor(m => Model.JobReceiveIAPSummaryViewModel[i].ProductName)
+                                        @Html.HiddenFor(m => Model.JobReceiveIAPSummaryViewModel[i].DealUnitName)
+                                        @Html.HiddenFor(m => Model.JobReceiveIAPSummaryViewModel[i].DealQty)
+                                        @Html.HiddenFor(m => Model.JobReceiveIAPSummaryViewModel[i].MaxDecPlaces)
+                                        @Html.HiddenFor(m => Model.JobReceiveIAPSummaryViewModel[i].IsReturned)
+                                        @Html.Hidden(i.ToString(), i, new { @class = "uSr", @id = i })
+                                        <div class="block" style="width:5%">
+                                            @(j + 1)
+                                        </div>
+                                        <div class="block" style="width:95%">
+                                            <div class="row">
+                                                <div class="block" style="width:13%">
+                                                    <span> @(j == 0 ? Model.JobReceiveIAPSummaryViewModel[i].ProductName : "") </span>
+                                                </div>
+                                                <div class="block" style="width:13%">
+                                                    <span> @(Model.JobReceiveIAPSummaryViewModel[i].ProductUidName)</span>
+                                                </div>
+                                                <div class="block text-right" style="width:15%">
+                                                    <span class="DealQty">@string.Format("{" + "0:0.".PadRight(@Model.JobReceiveIAPSummaryViewModel[i].MaxDecPlaces + 4, '0') + "}", Model.JobReceiveIAPSummaryViewModel[i].DealQty)</span>
+                                                    @Model.JobReceiveIAPSummaryViewModel[i].DealUnitName
+                                                </div>
+                                                <div class="block text-right" style="width:18%">
+                                                    <div class="block text-right" style="width:35%;padding:0px">
+                                                        @Html.TextBoxFor(m => m.JobReceiveIAPSummaryViewModel[i].IncentiveRate, new { @class = "form-control IRate text-right Rate", Value = String.Format("{0:0.00}", Model.JobReceiveIAPSummaryViewModel[i].IncentiveRate) })
+                                                    </div>
+                                                    <div class="block text-right" style="width:65%;padding:0px">
+                                                        @Html.TextBoxFor(m => m.JobReceiveIAPSummaryViewModel[i].IncentiveAmt, new { @class = "form-control IAmt text-right Amount", Value = String.Format("{0:0.00}", Model.JobReceiveIAPSummaryViewModel[i].IncentiveAmt) })
+                                                    </div>
+                                                    @{IncCount += Model.JobReceiveIAPSummaryViewModel[i].IncentiveAmt;}
+                                                </div>
+                                                <div class="block text-right" style="width:18%">
+                                                    <div class="block text-right" style="width: 35%; padding: 0px">
+                                                        @Html.TextBoxFor(m => m.JobReceiveIAPSummaryViewModel[i].PenalityRate, new { @class = "form-control PRate Rate text-right", Value = String.Format("{0:0.00}", Model.JobReceiveIAPSummaryViewModel[i].PenalityRate) })
+                                                    </div>
+                                                    <div class="block text-right" style="width:65%;padding:0px">
+                                                        @Html.TextBoxFor(m => m.JobReceiveIAPSummaryViewModel[i].PenalityAmt, new { @class = "form-control text-right PAmt Amount", Value = String.Format("{0:0.00}", Model.JobReceiveIAPSummaryViewModel[i].PenalityAmt) })
+                                                    </div>
+                                                    @{PenCount += Model.JobReceiveIAPSummaryViewModel[i].PenalityAmt;}
+                                                </div>
+                                                <div class="block" style="width:23%">
+                                                    @Html.TextBoxFor(m => m.JobReceiveIAPSummaryViewModel[i].Remark, new { @class = "form-control Remark" })
+                                                </div>
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+                                    <hr style="margin:0px" />
+                                                    j++;
+                                }
+                            }
+                        </div>
+                    </div>
+                    <div class="row grid-head" style="margin:0px">
+                        <div class="text-left block" style="width: 5%; ">
+
+                        </div>
+                        <div class="block" style="width: 95%;">
+                            <div class="row">
+                                @*ProductInfo*@
+                                <div class="block" style="width: 13%; ">
+                                    <strong>Total</strong>
+                                </div>
+                                <div class="block" style="width: 13%;">
+
+                                </div>
+                                <div class="block text-right" style="width: 15%;">
+
+                                </div>
+                                @*Qty*@
+                                <div class="text-right block" style="width: 18%;">
+                                    <span id="Incentive">@string.Format("{" + "0:0.".PadRight(6, '0') + "}", IncCount)</span>
+                                </div>
+                                @*Rate*@
+                                <div class="text-right block" style="width: 18%;">
+                                    <span id="Penalty">@string.Format("{" + "0:0.".PadRight(6, '0') + "}", PenCount)</span>
+                                </div>
+                                <div class="block" style="width: 23%; ">
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<script type="text/javascript">
+    CustomSelectFunction($("#JobWorkerId"), '/ComboHelpList/GetJobWorkers', '/ComboHelpList/SetSingleJobWorker', ' ', false, 1);
+    //CustomSelectFunction($(".Remark"), '/WeavingReceive/GetReasons', '/WeavingReceive/SetReason', ' ', true, 1, $('#DocTypeId').val());
+    //CustomSelectFunction($("#mRemark"), '/WeavingReceive/GetReasons', '/WeavingReceive/SetReason', ' ', true, 1, $('#DocTypeId').val());
+
+    var Reasons = "@ViewBag.ReasonList";
+
+    $(".Remark").select2({ tags: Reasons.split(',') });
+    $("#mRemark").select2({ tags: Reasons.split(',') });
+
+    $('input.Rate,input.Amount').change(function () {
+        var Inc = false;
+        var Pen = false;
+        if ($(this).hasClass("IRate"))
+            Inc = true;
+        else if ($(this).hasClass("PRate"))
+            Pen = true;
+
+        if (Inc || Pen) {
+            var $Hdiv = $(this).closest("div.row.crow");
+            var DealQty = parseFloat($Hdiv.find('.DealQty').text());
+            if (Inc == true && $Hdiv.find('input.IAmt')) {
+                $Hdiv.find('input.IAmt').val(((DealQty * $(this).val()) + 0.49).toFixed(0));
+            }
+            else if (Pen == true && $Hdiv.find('input.PAmt')) {
+                $Hdiv.find('input.PAmt').val(((DealQty * $(this).val()) + 0.49).toFixed(0));
+            }
+        }
+        CalculateTotal();
+    })
+
+    function CalculateTotal() {
+        var Inc = 0;
+        var Pen = 0;
+        $('div.row.crow').each(function () {
+            Inc += parseFloat($(this).find('input.IAmt').val());
+            Pen += parseFloat($(this).find('input.PAmt').val());
+        })
+        $('#Incentive').text(Inc.toFixed(0));
+        $('#Penalty').text(Pen.toFixed(0));
+    }
+
+    var Lock = false;
+    $('input:submit').click(function () {
+        if (!Lock) {
+            Lock = true;
+            $.ajax({
+                url: $('form#IAP').attr('action'),
+                type: "POST",
+                data: $('form#IAP').serialize(),
+                success: function (result) {
+                    if (result.Success) {
+                        Lock = false;
+                        window.location.href = result.Url;
+                    } else {
+                        Lock = false;
+                        alert("Error in Updating Penality");
+                    }
+                },
+                error: function () {
+                    Lock = false;
+                }
+            });
+        }
+        return false;
+    })
+
+
+
+
+
+    $(document).ready(function () {
+
+        var sCount = 0;
+        var Srl = [];
+
+        $('.rContent', 'body').selectable({
+            filter: 'div.row.crow',
+            cancel: 'a,input,select',
+            start: function (event, ui) { sCount = 0; Srl = []; }
+        });
+
+        $(".rContent").on("selectableselected", function (event, ui) {
+            $.each(ui, function (i, val) {
+                Srl.push($(val).find('input:hidden.uSr').val());
+                $(val).addClass('row-selected');
+                sCount++;
+            });
+
+        });
+
+        $(".rContent").on("selectableunselected", function (event, ui) {
+            $.each(ui, function (i, val) {
+                $(val).removeClass('row-selected');
+            })
+        });
+
+        $(".rContent").on("selectablestop", function (event, ui) {
+
+            if (sCount > 1) {
+                $('#exampleModal').modal('toggle');
+            }
+        });
+
+        $('form#iAPmodForm', '#exampleModal').submit(function () {
+
+            var Remark = $('#mRemark', 'form#iAPmodForm').val();
+            $('#mRemark', 'form#iAPmodForm').select2("val", "");
+            var IncRate = parseFloat($('#IncentiveRate', 'form#iAPmodForm').val());
+            $('#IncentiveRate', 'form#iAPmodForm').val("");
+            var IncAmt = parseFloat($('#IncentiveAmt', 'form#iAPmodForm').val());
+            $('#IncentiveAmt', 'form#iAPmodForm').val("");
+            var PenRate = parseFloat($('#PenaltyRate', 'form#iAPmodForm').val());
+            $('#PenaltyRate', 'form#iAPmodForm').val("");
+            var PenAmt = parseFloat($('#PenaltyAmt', 'form#iAPmodForm').val());
+            $('#PenaltyAmt', 'form#iAPmodForm').val("");
+
+            $.each(Srl, function (index, val) {
+
+                var Filter = 'input.uSr#' + val;
+
+                var Row = $('.rContent').find(Filter).parents('.row.crow');
+
+                if (IncRate && IncRate > 0)
+                    $(Row).find('input.Rate.IRate').val(IncRate).trigger('change');
+                if (IncAmt && IncAmt > 0)
+                    $(Row).find('input.Amount.IAmt').val(IncAmt).trigger('change');
+                if (PenRate && PenRate > 0)
+                    $(Row).find('input.Rate.PRate').val(PenRate).trigger('change');
+                if (PenAmt && PenAmt > 0)
+                    $(Row).find('input.Amount.PAmt').val(PenAmt).trigger('change');
+                var Arr = Remark.split(',');
+
+                //var seleclist = [];
+                //$.each(Arr, function (i, v) {
+
+                //    seleclist.push({ id: v, text: v });
+
+                //})
+
+                $(Row).find('input.Remark').select2("val", Arr);
+
+            });
+
+            $('#exampleModal').modal('hide');
+            return false;
+
+        });
+
+
+    })
+</script>

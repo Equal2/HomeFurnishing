@@ -1,0 +1,636 @@
+﻿@model Model.ViewModel.SaleQuotationSettingsViewModel
+
+@{
+    ViewBag.Title = "Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!-- modal placeholder-->
+<div id='myModal' class='modal fade in'>
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div id='myModalContent'></div>
+        </div>
+    </div>
+</div>
+
+@using (Html.BeginForm("Post", "SaleQuotationSettings", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(model => model.SaleQuotationSettingsId)
+    @Html.HiddenFor(m => m.SiteId)
+    @Html.HiddenFor(m => m.DivisionId)
+    @Html.HiddenFor(m => m.DocTypeId)
+
+    <div class="panel panel-default">
+
+        <div class="panel-heading">
+
+            <h3>
+                <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-file black"></span> @Model.DocTypeName Settings</span>
+                <input type="submit" value="Save" class="btn btn-primary right" id="submit" style="width: 90px; background-color: #2980b9" />
+            </h3>
+            <hr style="margin-top:0px;margin-bottom:0px" />
+
+            <div class="panel-info">
+                <h4 style="padding:5px 0 0 0;margin:0px">
+                    @Html.ActionLink(" ", " ", " ", null, new { @class = "glyphicon glyphicon-refresh toolbar", @title = "Refresh Page", @data_toggle = "tooltip", @id = "RefreshPage" })
+                    @Html.ActionLink(" ", "GetHistory", "LogHistory", new { Ids = Model.SaleQuotationSettingsId, DocTypeId = Model.DocTypeId }, new { @class = "glyphicon glyphicon-user toolbar", @title = "History", @data_toggle = "tooltip", @id = "DocHistory", @data_modal = "" })
+                    @Html.ActionLink(" ", "Index", "SaleQuotationHeader", new { @id = @Model.DocTypeId }, new { @class = "glyphicon glyphicon-list toolbar right", @title = "List", @data_toggle = "tooltip" })
+                </h4>
+            </div>
+        </div>
+        <div class="panel-info" style="padding-left:15px">
+
+            <div class="form-horizontal">
+
+                @Html.ValidationSummary(true)
+
+                <div class="row">
+                    <h3 class="col-md-12 black">
+                        <span class="glyphicon glyphicon-align-justify"></span>
+                        1.Visibility Settings
+                    </h3>
+                    <div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.isVisibleCostCenter, "Cost Center", new { @class = "control-label col-xs-6" })
+                                    <div class="col-xs-4" style=" padding-top:4px">
+                                        @Html.CheckBoxFor(m => m.isVisibleCostCenter, new { @class = "checkbox col-xs-2" })
+                                        @Html.ValidationMessageFor(model => model.isVisibleCostCenter)
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.isVisibleFromSaleEnquiry, "Sale Enquiry", new { @class = "control-label col-xs-6" })
+                                    <div class="col-xs-4" style=" padding-top:4px">
+                                        @Html.CheckBoxFor(m => m.isVisibleFromSaleEnquiry, new { @class = "checkbox col-xs-2" })
+                                        @Html.ValidationMessageFor(model => model.isVisibleFromSaleEnquiry)
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.isVisibleDimension1, "Dimension 1", new { @class = "control-label col-xs-6" })
+                                    <div class="col-xs-4" style=" padding-top:4px">
+                                        @Html.CheckBoxFor(m => m.isVisibleDimension1, new { @class = "checkbox col-xs-2" })
+                                        @Html.ValidationMessageFor(model => model.isVisibleDimension1)
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.isVisibleDimension2, "Dimension 2", new { @class = "control-label col-xs-6" })
+                                    <div class="col-xs-4" style=" padding-top:4px">
+                                        @Html.CheckBoxFor(m => m.isVisibleDimension2, new { @class = "checkbox col-xs-2" })
+                                        @Html.ValidationMessageFor(model => model.isVisibleDimension2)
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.isVisibleDimension3, "Dimension 3", new { @class = "control-label col-xs-6" })
+                                    <div class="col-xs-4" style=" padding-top:4px">
+                                        @Html.CheckBoxFor(m => m.isVisibleDimension3, new { @class = "checkbox col-xs-2" })
+                                        @Html.ValidationMessageFor(model => model.isVisibleDimension3)
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.isVisibleDimension4, "Dimension 4", new { @class = "control-label col-xs-6" })
+                                    <div class="col-xs-4" style=" padding-top:4px">
+                                        @Html.CheckBoxFor(m => m.isVisibleDimension4, new { @class = "checkbox col-xs-2" })
+                                        @Html.ValidationMessageFor(model => model.isVisibleDimension4)
+                                    </div>
+                                </div>
+                            </div>
+                        </div> 
+
+
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.isVisibleDealUnit, "Deal Unit", new { @class = "control-label col-xs-6" })
+                                    <div class="col-xs-4" style=" padding-top:4px">
+                                        @Html.CheckBoxFor(m => m.isVisibleDealUnit, new { @class = "checkbox col-xs-2" })
+                                        @Html.ValidationMessageFor(model => model.isVisibleDealUnit)
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.isVisibleUnitConversionFor, "Unit Conversion For", new { @class = "control-label col-xs-6" })
+                                    <div class="col-xs-4" style=" padding-top:4px">
+                                        @Html.CheckBoxFor(m => m.isVisibleUnitConversionFor, new { @class = "checkbox col-xs-2" })
+                                        @Html.ValidationMessageFor(model => model.isVisibleUnitConversionFor)
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                           
+                           
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.isVisibleSpecification, "Specification", new { @class = "control-label col-xs-6" })
+                                    <div class="col-xs-4" style=" padding-top:4px">
+                                        @Html.CheckBoxFor(m => m.isVisibleSpecification, new { @class = "checkbox col-xs-2" })
+                                        @Html.ValidationMessageFor(model => model.isVisibleSpecification)
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.isVisibleCreditDays, "Credit Days", new { @class = "control-label col-xs-6" })
+                                    <div class="col-xs-4" style=" padding-top:4px">
+                                        @Html.CheckBoxFor(m => m.isVisibleCreditDays, new { @class = "checkbox col-xs-2" })
+                                        @Html.ValidationMessageFor(model => model.isVisibleCreditDays)
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.isVisibleDeliveryTerms, "Delivery Terms", new { @class = "control-label col-xs-6" })
+                                    <div class="col-xs-4" style=" padding-top:4px">
+                                        @Html.CheckBoxFor(m => m.isVisibleDeliveryTerms, new { @class = "checkbox col-xs-2" })
+                                        @Html.ValidationMessageFor(model => model.isVisibleDeliveryTerms)
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.isVisibleAgent, "Agent", new { @class = "control-label col-xs-6" })
+                                    <div class="col-xs-4" style=" padding-top:4px">
+                                        @Html.CheckBoxFor(m => m.isVisibleAgent, new { @class = "checkbox col-xs-2" })
+                                        @Html.ValidationMessageFor(model => model.isVisibleAgent)
+                                    </div>
+                                </div>
+                            </div>
+                            
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.isVisibleCurrency, "Currency", new { @class = "control-label col-xs-6" })
+                                    <div class="col-xs-4" style=" padding-top:4px">
+                                        @Html.CheckBoxFor(m => m.isVisibleCurrency, new { @class = "checkbox col-xs-2" })
+                                        @Html.ValidationMessageFor(model => model.isVisibleCurrency)
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.isVisibleSalesTaxGroupPerson, "Sales Tax Group Person", new { @class = "control-label col-xs-6" })
+                                    <div class="col-xs-4" style=" padding-top:4px">
+                                        @Html.CheckBoxFor(m => m.isVisibleSalesTaxGroupPerson, new { @class = "checkbox col-xs-2" })
+                                        @Html.ValidationMessageFor(model => model.isVisibleSalesTaxGroupPerson)
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.isVisibleSalesTaxGroupProduct, "Sales Tax Group Product", new { @class = "control-label col-xs-6" })
+                                    <div class="col-xs-4" style=" padding-top:4px">
+                                        @Html.CheckBoxFor(m => m.isVisibleSalesTaxGroupProduct, new { @class = "checkbox col-xs-2" })
+                                        @Html.ValidationMessageFor(model => model.isVisibleSalesTaxGroupProduct)
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="row">
+                            
+                        </div>
+
+                        <div class="row">
+
+
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.isVisiblePaymentTerms, "Payment Terms", new { @class = "control-label col-xs-6" })
+                                    <div class="col-xs-4" style=" padding-top:4px">
+                                        @Html.CheckBoxFor(m => m.isVisiblePaymentTerms, new { @class = "checkbox col-xs-2" })
+                                        @Html.ValidationMessageFor(model => model.isVisiblePaymentTerms)
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.isVisibleDoorDelivery, "Is Door Delivery", new { @class = "control-label col-xs-6" })
+                                    <div class="col-xs-4" style=" padding-top:4px">
+                                        @Html.CheckBoxFor(m => m.isVisibleDoorDelivery, new { @class = "checkbox col-xs-2" })
+                                        @Html.ValidationMessageFor(model => model.isVisibleDoorDelivery)
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.isVisibleFinancier, "Financier", new { @class = "control-label col-xs-6" })
+                                    <div class="col-xs-4" style=" padding-top:4px">
+                                        @Html.CheckBoxFor(m => m.isVisibleFinancier, new { @class = "checkbox col-xs-2" })
+                                        @Html.ValidationMessageFor(model => model.isVisibleFinancier)
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.isVisibleSalesExecutive, "Sales Executive", new { @class = "control-label col-xs-6" })
+                                    <div class="col-xs-4" style=" padding-top:4px">
+                                        @Html.CheckBoxFor(m => m.isVisibleSalesExecutive, new { @class = "checkbox col-xs-2" })
+                                        @Html.ValidationMessageFor(model => model.isVisibleSalesExecutive)
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.isVisibleDiscountPer, "Discount %", new { @class = "control-label col-xs-6" })
+                                    <div class="col-xs-4" style=" padding-top:4px">
+                                        @Html.CheckBoxFor(m => m.isVisibleDiscountPer, new { @class = "checkbox col-xs-2" })
+                                        @Html.ValidationMessageFor(model => model.isVisibleDiscountPer)
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                
+                <hr style="margin-bottom:0px" />
+                <div class="row">
+                    <h3 class="col-md-12 black">
+                        <span class="glyphicon glyphicon-align-justify"></span>
+                        2.Filters
+                    </h3>
+                    <div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group" style="margin-top:15px">
+                                    @Html.LabelFor(model => model.filterLedgerAccountGroups, "Ledger A/C Group", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.filterLedgerAccountGroups, new { @class = "form-control col-xs-6" })
+                                        @Html.ValidationMessageFor(m => m.filterLedgerAccountGroups, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group" style="margin-top:15px">
+                                    @Html.LabelFor(model => model.filterLedgerAccounts, "Ledger A/C", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.filterLedgerAccounts, new { @class = "form-control col-xs-6" })
+                                        @Html.ValidationMessageFor(m => m.filterLedgerAccounts, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.ProcessId, "Process", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.ProcessId, new { @class = "form-control col-xs-6 required" })
+                                        @Html.ValidationMessageFor(m => m.ProcessId, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.filterProductGroups, "Product Groups", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.filterProductGroups, new { @class = "form-control col-xs-6" })
+                                        @Html.ValidationMessageFor(m => m.filterProductGroups, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.filterProducts, "Products", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.filterProducts, new { @class = "form-control col-xs-6" })
+                                        @Html.ValidationMessageFor(m => m.filterProducts, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.filterProductTypes, "Product Types", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.filterProductTypes, new { @class = "form-control col-xs-6" })
+                                        @Html.ValidationMessageFor(m => m.filterProductTypes, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.filterProductCategories, "Product Categories", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.filterProductCategories, new { @class = "form-control col-xs-6" })
+                                        @Html.ValidationMessageFor(m => m.filterProductCategories, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.filterContraDocTypes, "Contra DocTypes", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.filterContraDocTypes, new { @class = "form-control col-xs-6" })
+                                        @Html.ValidationMessageFor(m => m.filterContraDocTypes, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.filterContraDivisions, "Contra Divisions", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.filterContraDivisions, new { @class = "form-control col-xs-6" })
+                                        @Html.ValidationMessageFor(m => m.filterContraDivisions, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.filterContraSites, "Contra Sites", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.filterContraSites, new { @class = "form-control col-xs-6" })
+                                        @Html.ValidationMessageFor(m => m.filterContraSites, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.filterPersonRoles, "Person Roles", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.filterPersonRoles, new { @class = "form-control col-xs-6" })
+                                        @Html.ValidationMessageFor(m => m.filterPersonRoles, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <hr style="margin-bottom:0px" />
+                <div class="row">
+                    <h3 class="col-md-12 black">
+                        <span class="glyphicon glyphicon-align-justify"></span>
+                        3.Other Settings
+                    </h3>
+                    <div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group" style="margin-top:15px">
+                                    @Html.LabelFor(model => model.UnitConversionForId, "Unit Conversion For", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.DropDownListFor(model => model.UnitConversionForId, new SelectList(ViewBag.UnitConversionForList as System.Collections.IEnumerable, "UnitconversionForId", "UnitconversionForName"), new { @class = "form-control col-xs-6 height required" })
+                                        @Html.ValidationMessageFor(m => m.UnitConversionForId, null, new { @class = "has-error" })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6" style="margin-top:15px">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.CalculationId, "Calculation", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.CalculationId, new { @class = "form-control col-xs-6" })
+                                        @Html.ValidationMessageFor(m => m.CalculationId, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.CurrencyId, "Currency", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.CurrencyId, new { @class = "form-control col-xs-6" })
+                                        @Html.ValidationMessageFor(m => m.CurrencyId, null, new { @class = "has-error" })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.DeliveryTermsId, "Delivery Terms", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.DeliveryTermsId, new { @class = "form-control col-xs-6" })
+                                        @Html.ValidationMessageFor(m => m.DeliveryTermsId, null, new { @class = "has-error" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.ShipMethodId, "Ship Method", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.ShipMethodId, new { @class = "form-control col-xs-6" })
+                                        @Html.ValidationMessageFor(m => m.ShipMethodId, null, new { @class = "has-error" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.SqlProcDocumentPrint, "SQL Proc DocumentPrint", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.SqlProcDocumentPrint, new { @class = "form-control col-xs-6" })
+                                        @Html.ValidationMessageFor(m => m.SqlProcDocumentPrint, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.WizardMenuId, "Wizard Menu", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.WizardMenuId, new { @class = "form-control col-xs-6" })
+                                        @Html.ValidationMessageFor(m => m.WizardMenuId, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.DealUnitId, "Deal Unit", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.DealUnitId, new { @class = "form-control col-xs-6" })
+                                        @*@Html.DropDownListFor(model => model.DealUnitId, new SelectList(ViewBag.DeliveryUnitList as System.Collections.IEnumerable, "UnitId", "UnitName"), new { @class = "form-control height cusrightnormal required" })*@
+                                        @Html.ValidationMessageFor(model => model.DealUnitId, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.DocumentPrint, "RS DocumentPrint", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.DocumentPrint, new { @class = "form-control col-xs-6" })
+                                        @Html.ValidationMessageFor(m => m.DocumentPrint, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.NoOfPrintCopies, "Print Copies", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.NoOfPrintCopies, new { @class = "form-control col-xs-6" })
+                                        @Html.ValidationMessageFor(m => m.NoOfPrintCopies, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.ImportMenuId, "Import Menu", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.ImportMenuId, new { @class = "form-control col-xs-6" })
+                                        @Html.ValidationMessageFor(m => m.ImportMenuId, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.isUniqueCostCenter, "Unique CostCenter", new { @class = "control-label col-xs-6" })
+                                    <div class="col-xs-4" style=" padding-top:4px">
+                                        @Html.CheckBoxFor(m => m.isUniqueCostCenter, new { @class = "checkbox col-xs-2" })
+                                        @Html.ValidationMessageFor(model => model.isUniqueCostCenter)
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.IsPersonWiseCostCenter, "Person Wise CostCenter", new { @class = "control-label col-xs-6" })
+                                    <div class="col-xs-4" style=" padding-top:4px">
+                                        @Html.CheckBoxFor(m => m.IsPersonWiseCostCenter, new { @class = "checkbox col-xs-2" })
+                                        @Html.ValidationMessageFor(model => model.IsPersonWiseCostCenter)
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.CalculateDiscountOnRate, "Calculate Discount on Rate", new { @class = "control-label col-xs-6" })
+                                    <div class="col-xs-4" style=" padding-top:4px">
+                                        @Html.CheckBoxFor(m => m.CalculateDiscountOnRate, new { @class = "checkbox col-xs-2" })
+                                        @Html.ValidationMessageFor(model => model.CalculateDiscountOnRate)
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+
+
+
+            </div>
+        </div>
+    </div>
+}
+<script type="text/javascript">
+
+    $(function () {
+        CustomSelectFunction($("#filterLedgerAccountGroups"), '/ComboHelpList/GetLedgerAccountGroups', '/ComboHelpList/SetLedgerAccountGroups', ' ', true, 1);
+        CustomSelectFunction($("#filterLedgerAccounts"), '/ComboHelpList/GetLedgerAccountGroups', '/ComboHelpList/SetLedgerAccountGroups', ' ', true, 1);
+        CustomSelectFunction($("#filterProcesses"), '/ComboHelpList/GetProcess', '/ComboHelpList/SetProcess', ' ', true, 1);
+        CustomSelectFunction($("#filterProductGroups"), '/ComboHelpList/GetProductGroup', '/ComboHelpList/SetProductGroup', ' ', true, 1);
+        CustomSelectFunction($("#filterProductCategories"), '/ComboHelpList/GetProductCategory', '/ComboHelpList/SetProductCategory', ' ', true, 1);
+        CustomSelectFunction($("#filterProducts"), '/ComboHelpList/GetProducts', '/ComboHelpList/SetProducts', ' ', true, 1);
+        CustomSelectFunction($("#filterProductTypes"), '/ComboHelpList/GetProductType', '/ComboHelpList/SetProductType', ' ', true, 1);
+        CustomSelectFunction($("#ProcessId"), '/ComboHelpList/GetProcess', '/ComboHelpList/SetSingleProcess', ' ', false, 1);
+        CustomSelectFunction($("#CalculationId"), '/ComboHelpList/GetCalculation', '/ComboHelpList/SetSingleCalculation', ' ', false, 1);
+        CustomSelectFunction($("#WizardMenuId"), '/ComboHelpList/GetMenu', '/ComboHelpList/SetSingleMenu', ' ', false, 1);
+        CustomSelectFunction($("#ImportMenuId"), '/ComboHelpList/GetMenu', '/ComboHelpList/SetSingleMenu', ' ', false, 1);
+        CustomSelectFunction($("#Perks"), '/ComboHelpList/GetPerk', '/ComboHelpList/SetPerk', ' ', true, 1);
+        CustomSelectFunction($("#filterContraDocTypes"), '/ComboHelpList/GetDocumentType', '/ComboHelpList/SetDocumentType', ' ', true, 1);
+        CustomSelectFunction($("#filterContraDivisions"), '/ComboHelpList/GetDivision', '/ComboHelpList/SetDivision', ' ', true, 1);
+        CustomSelectFunction($("#filterContraSites"), '/ComboHelpList/GetSite', '/ComboHelpList/SetSite', ' ', true, 1);
+        CustomSelectFunction($("#filterPersonRoles"), '/ComboHelpList/GetPersonRoles', '/ComboHelpList/SetPersonRole', ' ', true, 0);
+        CustomSelectFunction($("#DealUnitId"), '/ComboHelpList/GetUnits', '/ComboHelpList/SetSingleUnit', ' ', false, 0);
+        CustomSelectFunction($("#CurrencyId"), '/ComboHelpList/GetCurrencys', '/ComboHelpList/SetSingleCurrency', ' ', false, 0);
+        CustomSelectFunction($("#DeliveryTermsId"), '/ComboHelpList/GetDeliveryTerms', '/ComboHelpList/SetSingleDeliveryTerm', ' ', false, 0);
+        CustomSelectFunction($("#ShipMethodId"), '/ComboHelpList/GetShipMethods', '/ComboHelpList/SetSingleShipMethod', ' ', false, 0);
+    });
+
+
+    var IsSaved = false;
+    var ValidationCount = 0;
+
+    $('form').submit(function (event) {
+
+        if (!IsSaved) {
+            IsSaved = true;
+            return IsSaved;
+        }
+        else {
+            return false;
+        }
+    });
+
+</script>

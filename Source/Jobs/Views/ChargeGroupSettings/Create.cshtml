@@ -1,0 +1,124 @@
+﻿@model Model.Models.ChargeGroupSettings
+
+@{
+    ViewBag.Title = "Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@using (Html.BeginForm("Post", "ChargeGroupSettings", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(m => m.ChargeGroupSettingsId)
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3>
+                <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-file black"></span> Charge Group Settings</span>
+                <input type="submit" value="Save" class="btn btn-primary right" id="submit" style="width: 90px; background-color: #2980b9" />
+            </h3>
+            <div class="panel-info">
+                @*<h4 style="padding:5px 0 0 0;margin:0px">
+        @Html.ActionLink(" ", " ", " ", null, new { @class = "glyphicon glyphicon-refresh toolbar", @title = "Refresh Page", @data_toggle = "tooltip", @id = "RefreshPage" })
+        @Html.ActionLink(" ", "Create", "ChargeGroupSettings", null, new { @class = "glyphicon glyphicon-plus toolbar", @title = "Add New", @data_toggle = "tooltip" })
+        @Html.ActionLink(" ", "History", "ChargeGroupSettings", null, new { @class = "glyphicon glyphicon-user toolbar", @title = "History", @data_toggle = "tooltip" })
+        @Html.ActionLink(" ", "PrevPage", "ChargeGroupSettings", new { id = @Model.ChargeGroupSettingsId }, new { @class = "glyphicon glyphicon-arrow-left toolbar", @title = "Prev Record", @data_toggle = "tooltip" })
+        @Html.ActionLink(" ", "NextPage", "ChargeGroupSettings", new { id = @Model.ChargeGroupSettingsId }, new { @class = "glyphicon glyphicon-arrow-right toolbar", @title = "Next Record", @data_toggle = "tooltip" })
+        @Html.ActionLink(" ", "Index", "ChargeGroupSettings", null, new { @class = "glyphicon glyphicon-list toolbar right", @title = "List", @data_toggle = "tooltip" })
+    </h4>*@
+                <div class="btn-group">
+                    @Html.ActionLink(" ", "Create", "ChargeGroupSettings", null, new { @class = "cbtn btn-circle glyphicon glyphicon-plus toolbar", @title = "Add New", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "PrevPage", "ChargeGroupSettings", new { id = @Model.ChargeGroupSettingsId }, new { @class = "cbtn btn-circle glyphicon glyphicon-arrow-left toolbar", @title = "Prev Record", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "NextPage", "ChargeGroupSettings", new { id = @Model.ChargeGroupSettingsId }, new { @class = "cbtn btn-circle glyphicon glyphicon-arrow-right toolbar", @title = "Next Record", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "Index", "ChargeGroupSettings", null, new { @class = "cbtn btn-circle glyphicon glyphicon-list", @title = "List", @data_toggle = "tooltip" })
+                    
+                </div>
+            </div>
+        </div>
+        <div class="panel-info" style="padding-left:15px">
+            <div class="form-horizontal">                
+                @Html.ValidationSummary(true)
+                <div>
+                    <div class="col-md-6">
+                        <div class="form-group" style="margin-top:15px">
+                            @Html.LabelFor(model => model.ProcessId, "Process", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(m => m.ProcessId, new { @class = "form-control col-xs-6" })
+                                @Html.ValidationMessageFor(m => m.ProcessId, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group" style="margin-top:15px">
+                            @Html.LabelFor(model => model.ChargeTypeId, "Charge Type", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(m => m.ChargeTypeId, new { @class = "form-control col-xs-6" })
+                                @Html.ValidationMessageFor(m => m.ChargeTypeId, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.ChargeGroupPersonId, "Charge Group Person", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(m => m.ChargeGroupPersonId, new { @class = "form-control col-xs-6" })
+                                @Html.ValidationMessageFor(m => m.ChargeGroupPersonId, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.ChargeGroupProductId, "Charge Group Product", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(m => m.ChargeGroupProductId, new { @class = "form-control col-xs-6" })
+                                @Html.ValidationMessageFor(m => m.ChargeGroupProductId, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.ChargeLedgerAccountId, "Charge Ledger Account", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(m => m.ChargeLedgerAccountId, new { @class = "form-control col-xs-6" })
+                                @Html.ValidationMessageFor(m => m.ChargeLedgerAccountId, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+
+
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.ChargePer, "Charge %", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(m => m.ChargePer, new { @class = "form-control col-xs-6" })
+                                @Html.ValidationMessageFor(m => m.ChargePer, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="row"></div>
+            </div>
+        </div>
+    </div>
+}
+<script type="text/javascript">
+
+
+    $(document).ready(function () {
+        CustomSelectFunction($("#ProcessId"), '/ComboHelpList/GetProcess', '/ComboHelpList/SetSingleProcess', ' ', false, 0);
+        CustomSelectFunction($("#ChargeTypeId"), '/ComboHelpList/GetChargeTypeList', '/ComboHelpList/SetSingleChargeType', ' ', false, 0);
+        CustomSelectFunction($("#ChargeGroupPersonId"), '/ComboHelpList/GetSalesTaxGroupPerson', '/ComboHelpList/SetSingleSalesTaxGroupPerson', ' ', false, 0);
+        CustomSelectFunction($("#ChargeGroupProductId"), '/ComboHelpList/GetSalesTaxGroupProduct', '/ComboHelpList/SetSingleSalesTaxGroupProduct', ' ', false, 0);
+        CustomSelectFunction($("#ChargeLedgerAccountId"), '/ComboHelpList/GetAccount', '/ComboHelpList/SetSingleAccount', ' ', false, 0);
+    });
+
+
+</script>
+

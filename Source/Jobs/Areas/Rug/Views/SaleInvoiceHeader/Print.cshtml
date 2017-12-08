@@ -1,0 +1,191 @@
+﻿@using Core.Common
+
+
+
+<style type="text/css">
+    .Option {
+        color: black;
+        background: transparent;
+        border-radius: 10px !important;
+    }
+
+</style>
+
+
+<div class="modal-content">
+    <div class="modal-header" style="border-bottom: 1px solid #8E8888">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"> <span class="glyphicon glyphicon-remove"></span></button>
+        <h3>
+            <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-file black"></span>Export Documents</span>
+        </h3>
+    </div>
+
+    <div>
+        @using (Html.BeginForm("PrintDocument", "SaleInvoiceHeader", FormMethod.Post, new { @class = "modal-form", id = "modform" }))
+        {
+            @Html.AntiForgeryToken()
+
+            
+
+            <div class="form-horizontal modal-body Anchors">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group" style="margin-top:15px">
+                            @Html.Label("Report Format", new { @class = "control-label col-xs-3" })
+                            <div class="col-xs-8">
+                                @Html.DropDownList("ReportFormat", null, new { @class = "form-control col-xs-6 height" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <ul class="list-group" style="font-family:Verdana;font-weight:bold;font-size:15px;color:black">
+                    <li class="list-group-item">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                @Html.ActionLink("Exporter Declaration", "PrintDocument", "SaleInvoiceHeader", new { id = ViewBag.id, DocumentName = "Exporter Declaration", ReportFormat = "temprep" }, new { target = "_blank", @class = "Option" })
+                            </div>
+                        </div>
+                    </li>
+
+                    <li class="list-group-item">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                @Html.ActionLink("Cargo Declaration", "PrintDocument", "SaleInvoiceHeader", new { id = ViewBag.id, DocumentName = "Cargo Declaration", ReportFormat = "temprep" }, new { target = "_blank", @class = "Option" })
+                            </div>
+                        </div>
+                    </li>
+
+                    <li class="list-group-item">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                @Html.ActionLink("Order Sheet", "PrintDocument", "SaleInvoiceHeader", new { id = ViewBag.id, DocumentName = "Order Sheet", ReportFormat = "temprep" }, new { target = "_blank", @class = "Option" })
+                            </div>
+                        </div>
+                    </li>
+
+                    @*<li class="list-group-item">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                @Html.ActionLink("Invoice", "PrintDocument", "SaleInvoiceHeader", new { id = ViewBag.id, DocumentName = "Invoice", ReportFormat = "temprep" }, new { target = "_blank", @class = "Option" })
+                            </div>
+                        </div>
+                    </li>*@
+
+                    <li class="list-group-item">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                @Html.ActionLink("Single Country Declaration", "PrintDocument", "SaleInvoiceHeader", new { id = ViewBag.id, DocumentName = "Single Country Declaration", ReportFormat = "temprep" }, new { target = "_blank", @class = "Option" })
+                            </div>
+                        </div>
+                    </li>
+
+                    <li class="list-group-item">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                @Html.ActionLink("Post Shipment Covering Letter", "PrintDocument", "SaleInvoiceHeader", new { id = ViewBag.id, DocumentName = "Post Shipment Covering Letter", ReportFormat = "temprep" }, new { target = "_blank", @class = "Option" })
+                            </div>
+                        </div>
+                    </li>
+
+                    <li class="list-group-item">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                @Html.ActionLink("Document Of Exchange", "PrintDocument", "SaleInvoiceHeader", new { id = ViewBag.id, DocumentName = "Document Of Exchange", ReportFormat = "temprep" }, new { target = "_blank", @class = "Option" })
+                            </div>
+                        </div>
+                    </li>
+
+
+
+                    <li class="list-group-item">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                @Html.ActionLink("Shipping Agent Letter", "PrintDocument", "SaleInvoiceHeader", new { id = ViewBag.id, DocumentName = "Shipping Agent Letter", ReportFormat = "temprep" }, new { target = "_blank", @class = "Option" })
+                            </div>
+                        </div>
+                    </li>
+
+                    <li class="list-group-item">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                @Html.ActionLink("Export Value Declaration", "PrintDocument", "SaleInvoiceHeader", new { id = ViewBag.id, DocumentName = "Export Value Declaration", ReportFormat = "temprep" }, new { target = "_blank", @class = "Option" })
+                            </div>
+                        </div>
+                    </li>
+
+                    <li class="list-group-item">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                @Html.ActionLink("Measurement List", "PrintDocument", "SaleInvoiceHeader", new { id = ViewBag.id, DocumentName = "Measurement List", ReportFormat = "temprep" }, new { target = "_blank", @class = "Option" })
+                            </div>
+                        </div>
+                    </li>
+
+                    <li class="list-group-item">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                @Html.ActionLink("Packing List", "PrintDocument", "SaleInvoiceHeader", new { id = ViewBag.id, DocumentName = "Packing List", ReportFormat = "temprep" }, new { target = "_blank", @class = "Option" })
+                            </div>
+                        </div>
+                    </li>
+
+                    <li class="list-group-item">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                @Html.ActionLink("Master Key", "PrintDocument", "SaleInvoiceHeader", new { id = ViewBag.id, DocumentName = "Master Key", ReportFormat = "temprep" }, new { target = "_blank", @class = "Option" })
+                            </div>
+                        </div>
+                    </li>
+
+
+                    <li class="list-group-item">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                @Html.ActionLink("Special Custom Invoice", "PrintDocument", "SaleInvoiceHeader", new { id = ViewBag.id, DocumentName = "Special Custom Invoice", ReportFormat = "temprep" }, new { target = "_blank", @class = "Option" })
+                            </div>
+                        </div>
+                    </li>
+
+                    <li class="list-group-item">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                @Html.ActionLink("Invoice With Collection", "PrintDocument", "SaleInvoiceHeader", new { id = ViewBag.id, DocumentName = "Invoice With Collection", ReportFormat = "temprep" }, new { target = "_blank", @class = "Option" })
+                            </div>
+                        </div>
+                    </li>
+
+                    <li class="list-group-item">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                @Html.ActionLink("Packing List With Collection", "PrintDocument", "SaleInvoiceHeader", new { id = ViewBag.id, DocumentName = "Packing List With Collection", ReportFormat = "temprep" }, new { target = "_blank", @class = "Option" })
+                            </div>
+                        </div>
+                    </li>
+
+                </ul>
+            </div>
+        }
+    </div>
+</div>
+
+
+
+
+<script type="text/javascript">
+    $('a', '.Anchors').on('click', function () {
+        //alert($(this).attr('href'));
+        //alert($('#ReportFormat').val());
+        var url = $(this).attr('href')
+        
+        url = url.replace("PDF", $('#ReportFormat').val());
+        url = url.replace("Excel", $('#ReportFormat').val());
+        url = url.replace("Word", $('#ReportFormat').val());
+        url = url.replace("temprep", $('#ReportFormat').val());
+        $(this).attr('href',url)
+
+        //$(this).attr('href').replace("temprep", $('#ReportFormat').val());
+        //alert($(this).attr('href'));
+        return ;
+    });
+</script>

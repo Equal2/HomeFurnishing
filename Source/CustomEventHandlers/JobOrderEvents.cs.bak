@@ -1,0 +1,490 @@
+﻿using Core.Common;
+using CustomEventArgs;
+using Data.Models;
+using Model.Models;
+using System;
+using System.Collections.Generic;
+using System.Data.SqlClient;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using DocumentEvents;
+using JobOrderDocumentEvents;
+using System.Data;
+
+namespace Jobs.Controllers
+{
+
+
+    public class JobOrderEvents : JobOrderDocEvents
+    {
+        //For Subscribing Events
+        public JobOrderEvents()
+        {
+            Initialized = true;
+            _onHeaderSave += JobOrderEvents__onHeaderSave;
+            _onLineSave += JobOrderEvents__onLineSave;
+            _onLineSaveBulk += JobOrderEvents__onLineSaveBulk;
+            _onLineDelete += JobOrderEvents__onLineDelete;
+            _onHeaderDelete += JobOrderEvents__onHeaderDelete;
+            _onHeaderSubmit += JobOrderEvents__onHeaderSubmit;
+            _beforeLineSave += JobOrderEvents__beforeLineSaveDataValidation;
+            _beforeLineDelete += JobOrderEvents__beforeLineDeleteDataValidation;
+            _beforeLineSaveBulk += JobOrderEvents__beforeLineSaveBylkDataValidation;
+
+        }
+
+
+        void JobOrderEvents__onHeaderSubmit(object sender, JobEventArgs EventArgs, ref ApplicationDbContext db)
+        {
+
+            int Id = EventArgs.DocId;
+
+            string ConnectionString = (string)System.Web.HttpContext.Current.Session["DefaultConnectionString"];
+
+
+            try
+            {
+
+                using (SqlConnection sqlConnection = new SqlConnection(ConnectionString))
+                {
+                    sqlConnection.Open();
+
+
+                    using (SqlCommand cmd = new SqlCommand("Web.SpUpdate_CostCenterStatusExtendedFromOrder"))
+                    {
+                        cmd.CommandType = CommandType.StoredProcedure;
+                        cmd.Connection = sqlConnection;
+                        cmd.Parameters.AddWithValue("@JobOrderHeaderId", Id);
+                        cmd.CommandTimeout = 1000;
+                        //cmd.Connection.Open();
+                        cmd.ExecuteNonQuery();
+                        //cmd.Connection.Close();
+                    }
+
+                }
+            }
+
+            catch (Exception ex)
+            {
+                //Header.Status = (int)StatusConstants.Drafted;
+                //new JobReceiveHeaderService(_unitOfWork).Update(Header);
+                //_unitOfWork.Save();
+                throw ex;
+            }
+
+
+            try
+            {
+
+                using (SqlConnection sqlConnection = new SqlConnection(ConnectionString))
+                {
+                    sqlConnection.Open();
+
+
+                    using (SqlCommand cmd = new SqlCommand("Web.sp_CreateCostcenterForOverTuftMain"))
+                    {
+                        cmd.CommandType = CommandType.StoredProcedure;
+                        cmd.Connection = sqlConnection;
+                        cmd.Parameters.AddWithValue("@JobOrderHeaderId", Id);
+                        cmd.CommandTimeout = 1000;
+                        cmd.ExecuteNonQuery();
+                    }
+
+                }
+            }
+
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            try
+            {
+
+                using (SqlConnection sqlConnection = new SqlConnection(ConnectionString))
+                {
+                    sqlConnection.Open();
+
+
+                    using (SqlCommand cmd = new SqlCommand("Web.sp_CreateCostcenterForOverTuftMain"))
+                    {
+                        cmd.CommandType = CommandType.StoredProcedure;
+                        cmd.Connection = sqlConnection;
+                        cmd.Parameters.AddWithValue("@JobOrderHeaderId", Id);
+                        cmd.CommandTimeout = 1000;
+                        cmd.ExecuteNonQuery();
+                    }
+
+                }
+            }
+
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            // return Redirect(ReturnUrl);
+
+
+        }
+
+        bool JobOrderEvents__beforeLineSaveDataValidation(object sender, JobEventArgs EventArgs, ref ApplicationDbContext db)
+        {
+            if (EventArgs.Mode == "Add")
+            {
+                var JobOrder = (from H in db.JobOrderHeader
+                                join D in db.DocumentType on H.DocTypeId equals D.DocumentTypeId into DocumentTypeTable
+                                from DocumentTypeTab in DocumentTypeTable.DefaultIfEmpty()
+                                where H.JobOrderHeaderId == EventArgs.DocId
+                                select new { DocTypeName = DocumentTypeTab.DocumentTypeName, Status = H.Status }).FirstOrDefault();
+
+                if (JobOrder.DocTypeName == "Weaving Order" || JobOrder.DocTypeName == "Weaving Finished Order" && JobOrder.Status != 0)
+                {
+                    var Temp = (from L in db.JobOrderLine
+                                join Pol in db.ProdOrderLine on L.ProdOrderLineId equals Pol.ProdOrderLineId into ProdOrderLineTable
+                                from ProdOrderLineTab in ProdOrderLineTable.DefaultIfEmpty()
+                                join Poh in db.ProdOrderHeader on ProdOrderLineTab.ProdOrderHeaderId equals Poh.ProdOrderHeaderId into ProdOrderHeaderTable
+                                from ProdOrderHeaderTab in ProdOrderHeaderTable.DefaultIfEmpty()
+                                join H in db.JobOrderHeader on ProdOrderHeaderTab.ReferenceDocId equals H.JobOrderHeaderId into JobOrderHeaderTable
+                                from JobOrderHeaderTab in JobOrderHeaderTable.DefaultIfEmpty()
+                                where JobOrderHeaderTab.JobOrderHeaderId == EventArgs.DocId
+                                select new { JobOrderHeaderId = JobOrderHeaderTab.JobOrderHeaderId }).FirstOrDefault();
+
+
+
+                    if (Temp != null)
+                    {
+                        if (Temp.JobOrderHeaderId != null)
+                        {
+                            throw new Exception("Branch has already issued Weaving Order.You can't add new record.");
+                        }
+                    }
+                }
+            }
+
+            return true;
+        }
+
+        bool JobOrderEvents__beforeLineDeleteDataValidation(object sender, JobEventArgs EventArgs, ref ApplicationDbContext db)
+        {
+
+            var JobOrder = (from H in db.JobOrderHeader
+                            join D in db.DocumentType on H.DocTypeId equals D.DocumentTypeId into DocumentTypeTable
+                            from DocumentTypeTab in DocumentTypeTable.DefaultIfEmpty()
+                            where H.JobOrderHeaderId == EventArgs.DocId
+                            select new { DocTypeName = DocumentTypeTab.DocumentTypeName, Status = H.Status }).FirstOrDefault();
+
+            if (JobOrder.DocTypeName == "Weaving Order" || JobOrder.DocTypeName == "Weaving Finished Order" && JobOrder.Status != 0)
+            {
+                var Temp = (from L in db.JobOrderLine
+                            join Pol in db.ProdOrderLine on L.ProdOrderLineId equals Pol.ProdOrderLineId into ProdOrderLineTable
+                            from ProdOrderLineTab in ProdOrderLineTable.DefaultIfEmpty()
+                            join Poh in db.ProdOrderHeader on ProdOrderLineTab.ProdOrderHeaderId equals Poh.ProdOrderHeaderId into ProdOrderHeaderTable
+                            from ProdOrderHeaderTab in ProdOrderHeaderTable.DefaultIfEmpty()
+                            join H in db.JobOrderHeader on ProdOrderHeaderTab.ReferenceDocId equals H.JobOrderHeaderId into JobOrderHeaderTable
+                            from JobOrderHeaderTab in JobOrderHeaderTable.DefaultIfEmpty()
+                            where JobOrderHeaderTab.JobOrderHeaderId == EventArgs.DocId
+                            select new { JobOrderHeaderId = JobOrderHeaderTab.JobOrderHeaderId }).FirstOrDefault();
+
+                if (Temp != null)
+                {
+                    if (Temp.JobOrderHeaderId != null)
+                    {
+                        throw new Exception("Branch has already issued Weaving Order..You can't delete record.");
+                    }
+                }
+            }
+
+            return true;
+        }
+
+
+        bool JobOrderEvents__beforeLineSaveBylkDataValidation(object sender, JobEventArgs EventArgs, ref ApplicationDbContext db)
+        {
+
+            var JobOrder = (from H in db.JobOrderHeader
+                            join D in db.DocumentType on H.DocTypeId equals D.DocumentTypeId into DocumentTypeTable
+                            from DocumentTypeTab in DocumentTypeTable.DefaultIfEmpty()
+                            where H.JobOrderHeaderId == EventArgs.DocId
+                            select new { DocTypeName = DocumentTypeTab.DocumentTypeName, Status = H.Status }).FirstOrDefault();
+
+            if (JobOrder.DocTypeName == "Weaving Order" || JobOrder.DocTypeName == "Weaving Finished Order" && JobOrder.Status != 0)
+            {
+                var Temp = (from L in db.JobOrderLine
+                            join Pol in db.ProdOrderLine on L.ProdOrderLineId equals Pol.ProdOrderLineId into ProdOrderLineTable
+                            from ProdOrderLineTab in ProdOrderLineTable.DefaultIfEmpty()
+                            join Poh in db.ProdOrderHeader on ProdOrderLineTab.ProdOrderHeaderId equals Poh.ProdOrderHeaderId into ProdOrderHeaderTable
+                            from ProdOrderHeaderTab in ProdOrderHeaderTable.DefaultIfEmpty()
+                            join H in db.JobOrderHeader on ProdOrderHeaderTab.ReferenceDocId equals H.JobOrderHeaderId into JobOrderHeaderTable
+                            from JobOrderHeaderTab in JobOrderHeaderTable.DefaultIfEmpty()
+                            where JobOrderHeaderTab.JobOrderHeaderId == EventArgs.DocId
+                            select new { JobOrderHeaderId = JobOrderHeaderTab.JobOrderHeaderId }).FirstOrDefault();
+
+                if (Temp != null)
+                {
+                    if (Temp.JobOrderHeaderId != null)
+                    {
+                        throw new Exception("Branch has already issued Weaving Order.You can't add new record.");
+                    }
+                }
+            }
+
+            return true;
+        }
+
+
+        void JobOrderEvents__onHeaderDelete(object sender, JobEventArgs EventArgs, ref ApplicationDbContext db)
+        {
+            ApplicationDbContext DbContext = new ApplicationDbContext();
+
+            var Temp = DbContext.JobOrderLine.Where(m => m.JobOrderHeaderId == EventArgs.DocId).ToList();
+
+            var Boms = DbContext.JobOrderBom.Where(m => m.JobOrderHeaderId == EventArgs.DocId).ToList();
+
+            Decimal BomQty = 0;
+            if (Boms != null && Boms.Count > 0)
+                BomQty = Boms.Select(m => m.Qty).Sum();
+
+            var JobHeader = (from p in DbContext.JobOrderHeader
+                             where p.JobOrderHeaderId == EventArgs.DocId
+                             select p
+                               ).FirstOrDefault();
+
+            var CostCenRec = (from p in DbContext.CostCenter
+                              where p.CostCenterId == JobHeader.CostCenterId
+                              select p).FirstOrDefault();
+
+
+            DbContext.Dispose();
+
+            bool GenCosCenter = false;
+
+            if (CostCenRec != null)
+            {
+                GenCosCenter = (CostCenRec.ReferenceDocId == JobHeader.JobOrderHeaderId && CostCenRec.ReferenceDocTypeId == JobHeader.DocTypeId) ? true : false;
+            }
+
+            if (GenCosCenter)
+            {
+                var CostCentrerStatusRecord = (from p in db.CostCenterStatusExtended
+                                               where p.CostCenterId == CostCenRec.CostCenterId
+                                               select p).FirstOrDefault();
+
+                if (CostCentrerStatusRecord != null)
+                {
+                    CostCentrerStatusRecord.ObjectState = Model.ObjectState.Deleted;
+                    db.CostCenterStatusExtended.Remove(CostCentrerStatusRecord);
+                }
+
+            }
+            else
+            {
+
+
+                if (JobHeader.CostCenterId.HasValue && (JobHeader.JobOrderHeaderId != CostCenRec.ReferenceDocId || JobHeader.DocTypeId != CostCenRec.ReferenceDocTypeId))
+                {
+                    var DocType = (from p in db.DocumentType
+                                   where p.DocumentTypeName == TransactionDoctypeConstants.WeavingFinishOrder || p.DocumentTypeName == TransactionDoctypeConstants.WeavingOrder
+                                   select p.DocumentTypeId).ToList();
+
+                    if (DocType.Contains(JobHeader.DocTypeId))
+                    {
+                        var CostCenterIds = JobHeader.CostCenterId;
+                        var CostCenterRecords = (from p in db.CostCenterStatusExtended
+                                                 where p.CostCenterId == CostCenterIds
+                                                 select p).FirstOrDefault();
+
+                        if (CostCenterRecords != null)
+                        {
+                            CostCenterRecords.OrderQty = (CostCenterRecords.OrderQty ?? 0) - Temp.Select(m => m.Qty).Sum();
+                            CostCenterRecords.OrderDealQty = (CostCenterRecords.OrderDealQty ?? 0) - Temp.Select(m => m.Qty * m.UnitConversionMultiplier).Sum();
+                            CostCenterRecords.BOMQty = (CostCenterRecords.BOMQty ?? 0) - BomQty;
+                            CostCenterRecords.ObjectState = Model.ObjectState.Modified;
+                            db.CostCenterStatusExtended.Add(CostCenterRecords);
+                        }
+
+                    }
+
+
+                }
+            }
+
+
+        }
+
+        void JobOrderEvents__onLineDelete(object sender, JobEventArgs EventArgs, ref ApplicationDbContext db)
+        {
+            ApplicationDbContext DbContext = new ApplicationDbContext();
+
+            var Temp = DbContext.JobOrderLine.Where(m => m.JobOrderLineId == EventArgs.DocLineId).FirstOrDefault();
+
+            var Boms = DbContext.JobOrderBom.Where(m => m.JobOrderLineId == EventArgs.DocLineId).ToList();
+
+            Decimal BomQty = 0;
+            if (Boms != null && Boms.Count > 0)
+                BomQty = Boms.Select(m => m.Qty).Sum();
+
+
+            var JobHeader = (from p in DbContext.JobOrderHeader
+                             where p.JobOrderHeaderId == Temp.JobOrderHeaderId
+                             select p
+                            ).FirstOrDefault();
+
+            DbContext.Dispose();
+
+            var DocType = (from p in db.DocumentType
+                           where p.DocumentTypeName == TransactionDoctypeConstants.WeavingFinishOrder || p.DocumentTypeName == TransactionDoctypeConstants.WeavingOrder
+                           select p.DocumentTypeId).ToList();
+
+
+            if (DocType.Contains(JobHeader.DocTypeId) && Temp.Qty != 0)
+            {
+                if (JobHeader.CostCenterId.HasValue)
+                {
+                    var CostCenterStatus = db.CostCenterStatusExtended.Find(JobHeader.CostCenterId);
+
+
+                    if (CostCenterStatus != null)
+                    {
+                        CostCenterStatus.OrderQty = (CostCenterStatus.OrderQty ?? 0) - Temp.Qty;
+                        CostCenterStatus.OrderDealQty = (CostCenterStatus.OrderDealQty ?? 0) - Temp.Qty * Temp.UnitConversionMultiplier;
+                        CostCenterStatus.BOMQty = (CostCenterStatus.BOMQty ?? 0) - BomQty;
+                        CostCenterStatus.ObjectState = Model.ObjectState.Modified;
+                        db.CostCenterStatusExtended.Add(CostCenterStatus);
+                    }
+                }
+            }
+        }
+
+        void JobOrderEvents__onLineSaveBulk(object sender, JobEventArgs EventArgs, ref ApplicationDbContext db)
+        {
+            var Temp = db.JobOrderLine.Local.Where(m => m.JobOrderHeaderId == EventArgs.DocId).ToList();
+
+            var Boms = db.JobOrderBom.Local.Where(m => m.JobOrderHeaderId == EventArgs.DocId).ToList();
+
+            Decimal BomQty = 0;
+            if (Boms != null && Boms.Count > 0)
+                BomQty = Boms.Select(m => m.Qty).Sum();
+
+            ApplicationDbContext DbContext = new ApplicationDbContext();
+
+            var JobHeader = (from p in DbContext.JobOrderHeader
+                             where p.JobOrderHeaderId == EventArgs.DocId
+                             select p
+                               ).FirstOrDefault();
+
+            DbContext.Dispose();
+
+            var DocType = (from p in db.DocumentType
+                           where p.DocumentTypeName == TransactionDoctypeConstants.WeavingFinishOrder || p.DocumentTypeName == TransactionDoctypeConstants.WeavingOrder
+                           select p.DocumentTypeId).ToList();          
+
+            if (DocType.Contains(JobHeader.DocTypeId))
+            {
+                var CostCenterIds = JobHeader.CostCenterId;
+
+                var CostCenterRecords = db.CostCenterStatusExtended.Find(CostCenterIds);
+
+                if (JobHeader.CostCenterId.HasValue)
+                {
+
+                    if (CostCenterRecords != null)
+                    {
+                        CostCenterRecords.OrderQty = (CostCenterRecords.OrderQty ?? 0) + Temp.Select(m => m.Qty).Sum();
+                        CostCenterRecords.OrderDealQty = (CostCenterRecords.OrderDealQty ?? 0) + Temp.Select(m => m.Qty * m.UnitConversionMultiplier).Sum();
+                        CostCenterRecords.BOMQty = (CostCenterRecords.BOMQty ?? 0) + BomQty;
+                        CostCenterRecords.ProductId = Temp.Select(m => m.ProductId).Max();
+                        CostCenterRecords.Rate = (!CostCenterRecords.Rate.HasValue || CostCenterRecords.Rate == 0) ? Temp.Select(m => m.Rate).Min() : (CostCenterRecords.Rate > Temp.Select(m => m.Rate).Min() ? Temp.Select(m => m.Rate).Min() : CostCenterRecords.Rate);
+                        CostCenterRecords.ObjectState = Model.ObjectState.Modified;
+                        db.CostCenterStatusExtended.Add(CostCenterRecords);
+                    }
+                }
+            }
+
+        }
+
+        void JobOrderEvents__onLineSave(object sender, JobEventArgs EventArgs, ref ApplicationDbContext db)
+        {
+            var Temp = db.JobOrderLine.Local.Where(m => m.JobOrderLineId == EventArgs.DocLineId).FirstOrDefault();
+
+            var Boms = db.JobOrderBom.Local.Where(m => m.JobOrderLineId == EventArgs.DocLineId).ToList();
+
+            Decimal BomQty = 0;
+            if (Boms != null && Boms.Count > 0)
+                BomQty = Boms.Select(m => m.Qty).Sum();
+
+            ApplicationDbContext DbContext = new ApplicationDbContext();
+
+            var JobHeader = (from p in DbContext.JobOrderHeader
+                             where p.JobOrderHeaderId == Temp.JobOrderHeaderId
+                             select p
+                            ).FirstOrDefault();
+
+            DbContext.Dispose();
+
+            var DocType = (from p in db.DocumentType
+                           where p.DocumentTypeName == TransactionDoctypeConstants.WeavingFinishOrder || p.DocumentTypeName == TransactionDoctypeConstants.WeavingOrder
+                           select p.DocumentTypeId).ToList();
+
+            if (DocType.Contains(JobHeader.DocTypeId) && Temp.Qty != 0)
+            {
+                if (JobHeader.CostCenterId.HasValue)
+                {
+
+                    var CostCenterStatus = db.CostCenterStatusExtended.Find(JobHeader.CostCenterId);
+
+                    if (CostCenterStatus != null && EventArgs.DocLineId <= 0)
+                    {
+                        CostCenterStatus.OrderQty = (CostCenterStatus.OrderQty ?? 0) + Temp.Qty;
+                        CostCenterStatus.OrderDealQty = (CostCenterStatus.OrderDealQty ?? 0) + Temp.Qty * Temp.UnitConversionMultiplier;
+                        CostCenterStatus.BOMQty = (CostCenterStatus.BOMQty ?? 0) + BomQty;
+                        CostCenterStatus.ProductId = Temp.ProductId;
+                        CostCenterStatus.Rate = (CostCenterStatus.Rate == null || CostCenterStatus.Rate == 0) ? Temp.Rate : (CostCenterStatus.Rate > Temp.Rate ? Temp.Rate : CostCenterStatus.Rate);
+                        CostCenterStatus.ObjectState = Model.ObjectState.Modified;
+                        db.CostCenterStatusExtended.Add(CostCenterStatus);
+                    }
+                    else if (CostCenterStatus != null && EventArgs.DocLineId > 0)
+                    {
+
+                        var IssueLineCostCenterRecords = (from p in db.JobOrderHeader
+                                                          join t in db.JobOrderLine on p.JobOrderHeaderId equals t.JobOrderHeaderId
+                                                          where p.CostCenterId == JobHeader.CostCenterId
+                                                          && t.JobOrderLineId != EventArgs.DocLineId
+                                                          select t).ToList();
+
+                        var BomRecords = (from p in db.JobOrderHeader
+                                          join t in db.JobOrderLine on p.JobOrderHeaderId equals t.JobOrderHeaderId
+                                          join t2 in db.JobOrderBom on t.JobOrderLineId equals t2.JobOrderLineId
+                                          where p.CostCenterId == JobHeader.CostCenterId
+                                          && t.JobOrderLineId != EventArgs.DocLineId
+                                          select new { Qty = t2.Qty }).ToList();
+
+                        CostCenterStatus.OrderQty = IssueLineCostCenterRecords.Select(m => m.Qty).Sum() + Temp.Qty;
+                        CostCenterStatus.OrderDealQty = (IssueLineCostCenterRecords.Select(m => m.Qty * m.UnitConversionMultiplier).Sum()) + (Temp.Qty * Temp.UnitConversionMultiplier);
+                        CostCenterStatus.BOMQty = BomRecords.Sum(m => m.Qty) + Boms.Sum(m => m.Qty);
+                        CostCenterStatus.ProductId = Temp.ProductId;
+                        CostCenterStatus.ObjectState = Model.ObjectState.Modified;
+                        db.CostCenterStatusExtended.Add(CostCenterStatus);
+                    }
+                }
+            }
+        }
+
+
+        void JobOrderEvents__onHeaderSave(object sender, JobEventArgs EventArgs, ref ApplicationDbContext db)
+        {
+
+            var JobHeader = db.JobOrderHeader.Local.Where(m => m.JobOrderHeaderId == EventArgs.DocId).FirstOrDefault();
+            if (JobHeader != null && JobHeader.CostCenterId <= 0)
+            {
+                CostCenterStatusExtended CSStattus = new CostCenterStatusExtended();
+                CSStattus.CostCenterId = JobHeader.CostCenterId;
+                CSStattus.ObjectState = Model.ObjectState.Added;
+                db.CostCenterStatusExtended.Add(CSStattus);
+            }
+
+        }
+
+    }
+}

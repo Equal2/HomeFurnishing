@@ -1,0 +1,294 @@
+﻿@model Model.ViewModels.PackingMasterDetailModel
+
+@{
+    ViewBag.Title = "Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<style type="text/css">
+    .CurveBorder {
+        border-radius: 5px;
+        width: 8em;
+        height: 3em;
+    }
+</style>
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h4>
+            <span style="font-family: Calibri,sans-serif,Verdana">
+                @if (ViewBag.transactionType == "submit")
+                {<h2>Submit Packing</h2>}
+                else if (ViewBag.transactionType == "approve")
+                {<h2>Approve Packing</h2>}
+                else if (ViewBag.transactionType == "delete")
+                {<h2>Delete Packing</h2>}
+                else
+                {<h2>Packing Detail</h2>}
+            </span>
+        </h4>
+
+    </div>
+    <div class="panel-info" style="padding-left:15px">
+        @using (Html.BeginForm())
+        {
+            @Html.AntiForgeryToken()
+            <div class="row">
+                <div class="col-md-6">
+                    <hr />
+                    <dl class="dl-horizontal">
+                        @Html.HiddenFor(m => m.PackingHeaderId)
+                        @Html.HiddenFor(m => m.PackingHeaderViewModelWithLog.PackingHeaderId)
+                        @Html.HiddenFor(m => m.PackingHeaderViewModelWithLog.DocNo)
+                        <dt>
+                            @Html.DisplayNameFor(model => model.PackingHeaderViewModelWithLog.DocTypeName)    :
+                        </dt>
+
+                        <dd>
+                            @Html.DisplayFor(model => model.PackingHeaderViewModelWithLog.DocTypeName)
+                        </dd>
+
+                        <dt>
+                            @Html.DisplayNameFor(model => model.PackingHeaderViewModelWithLog.DocDate)    :
+                        </dt>
+
+                        <dd>
+                            @Html.DisplayFor(model => model.PackingHeaderViewModelWithLog.DocDate)
+                        </dd>
+
+                        <dt>
+                            @Html.DisplayNameFor(model => model.PackingHeaderViewModelWithLog.DocNo)    :
+                        </dt>
+
+                        <dd>
+                            @Html.DisplayFor(model => model.PackingHeaderViewModelWithLog.DocNo)
+                        </dd>
+
+                        <dt>
+                            @Html.DisplayNameFor(model => model.PackingHeaderViewModelWithLog.BuyerName)    :
+                        </dt>
+
+                        <dd>
+                            @Html.DisplayFor(model => model.PackingHeaderViewModelWithLog.BuyerName)
+                        </dd>
+
+
+                    </dl>
+                </div>
+
+                <div class="col-md-6">
+                    <hr />
+                    <dl class="dl-horizontal">
+                        <dt>
+                            @Html.DisplayNameFor(model => model.PackingHeaderViewModelWithLog.GodownName)    :
+                        </dt>
+
+                        <dd>
+                            @Html.DisplayFor(model => model.PackingHeaderViewModelWithLog.GodownName)
+                        </dd>
+
+                        <dt>
+                            @Html.DisplayNameFor(model => model.PackingHeaderViewModelWithLog.DealUnitName)    :
+                        </dt>
+
+                        <dd>
+                            @Html.DisplayFor(model => model.PackingHeaderViewModelWithLog.DealUnitName)
+                        </dd>
+
+                        <dt>
+                            @Html.DisplayNameFor(model => model.PackingHeaderViewModelWithLog.Remark)    :
+                        </dt>
+
+                        <dd>
+                            @Html.DisplayFor(model => model.PackingHeaderViewModelWithLog.Remark)
+                        </dd>
+
+                        @if (ViewBag.transactionType == "delete")
+                        {
+                            <dt>                                
+                                Delete Reason*
+                            </dt>
+
+                            <dd>
+                                @Html.EditorFor(model => model.PackingHeaderViewModelWithLog.LogReason)<span style="font-family:'Arial Rounded MT'">Min 20 Characters</span>
+                                @Html.ValidationMessageFor(m => m.PackingHeaderViewModelWithLog.LogReason)
+                            </dd>
+                        }
+                    </dl>
+                </div>
+            </div>
+
+            var objLine = Model.PackingLineViewModel.FirstOrDefault();
+            <table class="table">
+                <tr>
+                    <th>
+                        @Html.DisplayNameFor(model => objLine.ProductUidId)
+                    </th>
+
+                    <th>
+                        @Html.DisplayNameFor(model => objLine.ProductId)
+                    </th>
+
+                    <th>
+                        <div class="text-right">
+                            @Html.DisplayNameFor(model => objLine.Qty)
+                        </div>
+                    </th>
+
+                    <th>
+                        @Html.DisplayNameFor(model => objLine.SaleOrderLineId)
+                    </th>
+
+                    <th>
+                        <div class="text-right">
+                            @Html.DisplayNameFor(model => objLine.DealQty)
+                        </div>
+                    </th>
+
+                    <th>
+                        @Html.DisplayNameFor(model => objLine.BaleNo)
+                    </th>
+
+                    <th>
+                        <div class="text-right">
+                            @Html.DisplayNameFor(model => objLine.GrossWeight)
+                        </div>
+                    </th>
+
+                    <th>
+                        <div class="text-right">
+                            @Html.DisplayNameFor(model => objLine.NetWeight)
+                        </div>
+                    </th>
+
+                    <th>
+                        @Html.DisplayNameFor(model => objLine.Remark)
+                    </th>
+                </tr>
+
+
+                @{decimal TotalQty = 0;}
+                @{decimal TotalDealQty = 0;}
+                @{decimal TotalGrossWeight = 0;}
+                @{decimal TotalNetWeight = 0;}
+
+                @foreach (var item in Model.PackingLineViewModel)
+                {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.ProductUidName)
+                        </td>
+
+                        <td>
+                            @Html.DisplayFor(modelItem => item.ProductName)
+                        </td>
+
+                        <td>
+                            <div class="text-right">
+                                @Html.DisplayFor(modelItem => item.Qty)
+                            </div>
+                        </td>
+
+                        <td>
+                            @Html.DisplayFor(modelItem => item.SaleOrderNo)
+                        </td>
+
+                        <td>
+                            <div class="text-right">
+                                @Html.DisplayFor(modelItem => item.DealQty)
+                            </div>
+                        </td>
+
+                        <td>
+                            @Html.DisplayFor(modelItem => item.BaleNo)
+                        </td>
+
+                        <td>
+                            <div class="text-right">
+                                @Html.DisplayFor(modelItem => item.GrossWeight)
+                            </div>
+                        </td>
+
+                        <td>
+                            <div class="text-right">
+                                @Html.DisplayFor(modelItem => item.NetWeight)
+                            </div>
+                        </td>
+
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Remark)
+                        </td>
+                    </tr>
+
+                    TotalQty = TotalQty + System.Convert.ToDecimal(Html.DisplayFor(modelItem => item.Qty).ToString());
+                    TotalDealQty = TotalDealQty + System.Convert.ToDecimal(Html.DisplayFor(modelItem => item.DealQty).ToString());
+                    TotalGrossWeight = TotalGrossWeight + System.Convert.ToDecimal(Html.DisplayFor(modelItem => item.GrossWeight).ToString());
+                    TotalNetWeight = TotalNetWeight + System.Convert.ToDecimal(Html.DisplayFor(modelItem => item.NetWeight).ToString());
+                }
+
+                <tr>
+                    <td>
+                        <b>Totals :</b>
+                    </td>
+                    <td></td>
+                    <td class="text-right">
+                        <div class="text-right">
+                            <b>@TotalQty</b>
+                            </div>
+                        </td>
+                    <td></td>
+                    <td class="text-right">
+                        <div class="text-right">
+                            <b>@TotalDealQty</b>
+                        </div>
+                    </td>
+                    <td></td>
+                    <td class="text-right">
+                        <div class="text-right">
+                            <b>@TotalGrossWeight</b>
+                        </div>
+                    </td>
+                    <td class="text-right">
+                        <div class="text-right">
+                            <b>@TotalNetWeight</b>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+
+
+            <hr />
+            <div class="form-actions no-color">
+                @if (ViewBag.transactionType == "submit")
+                {
+                    <input type="submit" name="Command:Submit" value="Submit" class="btn btn-primary btn-sm CurveBorder" />
+                    <span style="font-family: Calibri,sans-serif,Verdana;font-size:large">
+
+                        @Html.ActionLink("Back", "Index", null, new { @class = "btn btn-primary btn-sm col-md-offset-1 CurveBorder ActionLinkPadding" })
+                    </span>
+                }
+
+                else if (ViewBag.transactionType == "approve")
+                {
+                    <input type="submit" name="Command:Approve" value="Approve" class="btn btn-primary btn-sm CurveBorder" />
+                    <span style="font-family: Calibri,sans-serif,Verdana;font-size:large">
+
+                        @Html.ActionLink("Back", "Index", null, new { @class = "btn btn-primary btn-sm col-md-offset-1 CurveBorder ActionLinkPadding" })
+                    </span>
+                }
+                else if (ViewBag.transactionType == "delete")
+                {
+                    <input type="submit" name="Command:Delete" value="Delete" class="btn btn-primary btn-sm CurveBorder" />
+                    <span style="font-family: Calibri,sans-serif,Verdana;font-size:large">
+
+                        @Html.ActionLink("Back", "Index", null, new { @class = "btn btn-primary btn-sm col-md-offset-1 CurveBorder ActionLinkPadding" })
+                    </span>
+                }
+                else
+                {
+                    <span style="font-family: Calibri,sans-serif,Verdana;font-size:large">
+                        @Html.ActionLink("Back", "Index", null, new { @class = "btn btn-primary btn-sm col-md-offset-0 CurveBorder ActionLinkPadding" })
+                    </span>
+                }
+            </div>
+        }
+    </div>
+</div>

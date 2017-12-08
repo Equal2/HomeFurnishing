@@ -1,0 +1,430 @@
+﻿@model Model.ViewModels.OverTimeApplicationHeaderViewModel
+@using Core.Common
+@{
+    ViewBag.Title = "Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+
+<style type="text/css">
+    .ui-autocomplete .m-name {
+        display: block;
+        margin-right: 1em;
+        font-size: small;
+    }
+
+    .ui-autocomplete .m-year {
+        display: block;
+        font-size: small;
+    }
+
+    .ui-autocomplete .rt-bar span {
+        display: block;
+        height: 1em;
+    }
+
+    /*.ui-autocomplete span {
+        background-color: #C91B22;
+    }*/
+    .ui-widget {
+        font-family: Tahoma;
+    }
+    /*.ui-autocomplete li {
+        background-color: #94B13C;
+    }*/
+</style>
+<!-- modal placeholder-->
+<div id='myModal' class='modal fade in'>
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div id='myModalContent'></div>
+        </div>
+    </div>
+</div>
+
+@using (Html.BeginForm("Post", "OverTimeApplicationHeader", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(m => m.SiteId)
+    @Html.HiddenFor(m => m.Status)
+    @Html.HiddenFor(m => m.OverTimeApplicationId)
+    @Html.HiddenFor(m => m.DocTypeId)
+    @Html.HiddenFor(m => m.CreatedDate)
+
+
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            @CustomHelpers.RenderResHeaderInfo(ViewBag.transactionType, (int?)ViewBag.PendingToSubmit, (int?)ViewBag.PendingToReview, ViewBag.Name)
+          
+              @*@if (ViewBag.transactionType == "submit" || ViewBag.transactionType == "submitContinue")
+            {<h3>
+                <button type="submit" name="Command:Submit" class="btn btn-primary right" id="SubmitContinue" style="margin-left:5px;">Submit & Next<span class='badge'>@(ViewBag.PendingToSubmit != 0 ? ViewBag.PendingToSubmit : "")</span></button>
+                <button type="submit" name="Command:Submit" class="btn btn-primary right">Submit</button>
+                <input type="hidden" id="IsContinue" name="IsContinue" value="" />
+                <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"> <span class="glyphicon glyphicon-file black"></span>Submit @ViewBag.Name</span>
+            </h3>}
+            else if (ViewBag.transactionType == "review" || ViewBag.transactionType == "ReviewContinue")
+            {<h3 style="border-bottom:0px solid #e1dada;padding-bottom:0px;">
+                <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"> <span class="glyphicon glyphicon-file black"></span> Review @ViewBag.Name</span>
+                <button type="submit" name="Command:Review" class="btn btn-primary right" style="margin-left:5px" id="ReviewContinue">Review & Next<span class='badge'>@(ViewBag.PendingToReview != 0 ? ViewBag.PendingToReview : "")</span></button>
+                <button type="submit" class="btn btn-primary right" name="Command:Review">Review</button>
+                <input type="hidden" id="IsContinue" name="IsContinue" value="" />
+            </h3>}
+
+            else if (ViewBag.transactionType == "detail")
+            {
+                <h3>
+                    <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"> <span class="glyphicon glyphicon-file black"></span>@ViewBag.Name</span>
+                </h3>
+            }
+            else
+            {
+                <h3>
+                    <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"> <span class="glyphicon glyphicon-file black"></span>@ViewBag.Name</span>
+                    <input type="submit" value="Save" class="btn btn-primary right" id="submit" style="width: 90px; background-color: #2980b9" />
+                </h3>
+              
+            }
+
+
+            <hr style="margin-top:0px;margin-bottom:0px" />*@
+            <hr style="margin-top: 5px; margin-bottom: 5px; border-top: 1px solid #d8d5d5" />
+            @{
+                string EditAction = "";
+                if (Model.Status == (int)StatusConstants.Drafted || Model.Status == (int)StatusConstants.Import)
+                {
+                    EditAction = "Modify";
+                }
+                else if ((Model.Status == (int)StatusConstants.Submitted || Model.Status == (int)StatusConstants.Modified))
+                {
+                    EditAction = "ModifyAfter_Submit";
+                }
+                else
+                {
+                    EditAction = "DetailInformation";
+                }
+            }
+            <div class="panel-info">
+                @*<h4 style="padding:5px 0 0 0;margin:0px">
+                    @Html.ActionLink(" ", " ", " ", null, new { @class = "glyphicon glyphicon-refresh toolbar", @title = "Refresh Page", @data_toggle = "tooltip", @id = "RefreshPage" })
+                    @Html.ActionLink(" ", "Create", "OverTimeApplicationHeader", new { @id = ViewBag.id }, new { @class = "glyphicon glyphicon-plus toolbar", @title = "Add New", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "History", "OverTimeApplicationHeader", new { id = @Model.OverTimeApplicationId }, new { @class = "glyphicon glyphicon-user toolbar", @title = "History", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "GeneratePrints", "OverTimeApplicationHeader", new { Ids = Model.OverTimeApplicationId, DocTypeId = Model.DocTypeId }, new { @class = "glyphicon glyphicon-print toolbar", @title = "Print", @data_toggle = "tooltip", @id = "PrintRecordC", target = "_blank" })
+
+
+                    @Html.ActionLink(" ", "Email", "OverTimeApplicationHeader", null, new { @class = "glyphicon glyphicon-envelope toolbar", @title = "Email", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "PrevPage", "OverTimeApplicationHeader", new { DocId = @Model.OverTimeApplicationId, DocTypeId = Model.DocTypeId }, new { @class = "glyphicon glyphicon-arrow-left toolbar ", @title = "Prev Record", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "NextPage", "OverTimeApplicationHeader", new { DocId = @Model.OverTimeApplicationId, DocTypeId = Model.DocTypeId }, new { @class = "glyphicon glyphicon-arrow-right toolbar animsition-link", @title = "Next Record", @data_toggle = "tooltip", @id = "NextId" })
+                    @Html.ActionLink(" ", "Index", "OverTimeApplicationHeader", new { @id = ViewBag.id, IndexType = ViewBag.IndexStatus }, new { @class = "glyphicon glyphicon-list toolbar right", @title = "List", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "Report", "OverTimeApplicationHeader", new { @id = ViewBag.id }, new { @class = "glyphicon glyphicon-th toolbar right", @title = "Report", @data_toggle = "tooltip" })
+                </h4>*@
+                <div class="btn-group">
+                    @Html.ActionLink(" ", "Create", "OverTimeApplicationHeader", new { @id = ViewBag.id }, new { @class = "cbtn btn-circle glyphicon glyphicon-plus toolbar", @title = "Add New", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", EditAction, "OverTimeApplicationHeader", new { @id = Model.OverTimeApplicationId, IndexType = ViewBag.IndexStatus }, new { @class = "cbtn btn-circle glyphicon glyphicon-edit", @title = "Edit", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "GeneratePrints", "OverTimeApplicationHeader", new { Ids = Model.OverTimeApplicationId, DocTypeId = Model.DocTypeId }, new { @class = "cbtn btn-circle glyphicon glyphicon-print toolbar", @title = "Print", @data_toggle = "tooltip", @id = "PrintRecordC", target = "_blank" })
+                    @Html.ActionLink(" ", "PrevPage", "OverTimeApplicationHeader", new { DocId = @Model.OverTimeApplicationId, DocTypeId = Model.DocTypeId }, new { @class = "cbtn btn-circle glyphicon glyphicon-arrow-left toolbar ", @title = "Prev Record", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "NextPage", "OverTimeApplicationHeader", new { DocId = @Model.OverTimeApplicationId, DocTypeId = Model.DocTypeId }, new { @class = "cbtn btn-circle glyphicon glyphicon-arrow-right toolbar animsition-link", @title = "Next Record", @data_toggle = "tooltip", @id = "NextId" })
+                    @Html.ActionLink(" ", "Index", "OverTimeApplicationHeader", new { @id = ViewBag.id, IndexType = ViewBag.IndexStatus }, new { @class = "cbtn btn-circle glyphicon glyphicon-list", @title = "List", @data_toggle = "tooltip" })
+                  </div>
+                <div class="btn-group">
+                    <a class="cbtn btn-circle glyphicon glyphicon-option-horizontal dropdown-toggle" aria-expanded="false" style="padding-top: 6px;padding-bottom: 6px;" href="#" data-toggle="dropdown" id="dropdownMenu1">
+                    </a>
+                    <ul class="dropdown-menu pull-right" aria-labelledby="dropdownMenu1">
+                        <li><a href="@Url.Action("Email", "OverTimeApplicationHeader")"><span class="glyphicon glyphicon-envelope"> </span> Email</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="@Url.Action("Report", "OverTimeApplicationHeader")"><span class="glyphicon glyphicon-th"> </span> Report</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="panel-info" style="padding-left:15px">
+            <div class="form-horizontal">
+                @Html.ValidationSummary(true)
+
+                <div>
+                    <h4 class="col-md-12 black">
+                        <span class="glyphicon glyphicon-align-justify"></span>
+                        1.Document Details
+                    </h4>
+                    <div>
+                        <div>
+                            <div class="col-md-6">
+                                <div class="form-group" style="margin-top:15px">
+                                    @Html.LabelFor(model => model.DocDate, "Application Date", new { @class = "control-label col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextBoxFor(m => m.DocDate, "{0:dd/MMM/yyyy}", new { @class = "datepickerWithNFD form-control required" })
+                                        @Html.ValidationMessageFor(model => model.DocDate, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6" style="margin-top:15px">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.DocNo, "Application No", new { @class = "control-label col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextBoxFor(m => m.DocNo, null, new { @class = "form-control required" })
+                                        @Html.ValidationMessageFor(m => m.DocNo, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.DepartmentId, "DepartMent", new { @class = "control-label col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextBoxFor(m => m.DepartmentId, null, new { @class = "form-control required" })
+                                        @Html.ValidationMessageFor(m => m.DepartmentId, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.PersonId1, "Employee Name", new { @class = "control-label col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextBoxFor(m => m.PersonId1, null, new { @class = "form-control required" })
+                                        @Html.ValidationMessageFor(m => m.PersonId1, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.PersonId, "Person", new { @class = "control-label col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextBoxFor(m => m.PersonId, null, new { @class = "form-control required" })
+                                        @Html.ValidationMessageFor(m => m.PersonId, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.Remark, "Remark", new { @class = "control-label col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextAreaFor(m => m.Remark, new { @class = "form-control" })
+                                        @Html.ValidationMessageFor(m => m.Remark, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.GodownId, "GodownName", new { @class = "control-label col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextBoxFor(m => m.GodownId, null, new { @class = "form-control" })
+                                        @Html.ValidationMessageFor(m => m.GodownId, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+
+                <hr />
+
+
+
+                <div style="padding-right: 15px;">
+                    <div class="panel-info tab" style="padding-left: 0px;">
+                        <div style="width: 100%;z-index:initial;">
+                            <div id="myGrid" style="width: 100%; height: 450px; font-size: 11px;"></div>
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+    @*<a tabindex="0" class="btn btn-lg btn-danger" role="button" data-toggle="popover" data-trigger="focus" title="Dismissible popover" data-content="And here's some amazing content. It's very engaging. Right?">Dismissible popover</a>*@
+}
+
+
+
+
+
+
+
+@if ((ViewBag.Mode == "Add") || (ViewBag.Mode == "Edit"))
+{
+
+    <script type="text/javascript">
+
+
+        $(function () {
+
+            $("#DocNo").on("change", function () {
+                $(this).DuplicateCheckForCreate({ name: 'OverTimeApplicationHeader', value: $(this).val(), doctype: $("#DocTypeId").val() });
+            });
+
+        });
+
+        var id=@Model.OverTimeApplicationId;
+        if(id==null||id==0)
+        {
+            $(document).find('a#btnCreate').removeAttr('href').removeAttr('data-modal');
+            $("#btnCreateF").attr('disabled','disabled');
+            $('#CurrencyId option:contains("INR")').prop('selected',true);
+        }
+
+    </script>
+
+}
+
+
+<script type="text/javascript">
+    $("#DepartmentId").change(function(){
+        CustomSelectFunction($("#PersonId1"), '/ComboHelpList/GetEmployeeWithDepartMent', '/ComboHelpList/SetEmployees',' ',true, 1,$('#DepartmentId').val());
+    });
+</script>
+
+
+
+
+<script type="text/javascript">
+
+
+
+    $(document).ready(function(){
+        CustomSelectFunction($("#PersonId1"), '/ComboHelpList/GetEmployeeWithDepartMent', '/ComboHelpList/SetEmployees',' ',true, 1,$('#DepartmentId').val());
+        CustomSelectFunction($("#DepartmentId"), '/ComboHelpList/GetDepartment', '/ComboHelpList/SetSingleDepartment', 'Select a Department', false,1);
+        CustomSelectFunction($("#PersonId"), '/ComboHelpList/GetEmployees', '/ComboHelpList/SetSingleEmployee', 'Select a Person', false,1);
+        CustomSelectFunction($("#GodownId"), '/ComboHelpList/GetGodown', '/ComboHelpList/SetSingleGodown', ' ', false, 1);
+    })
+    $('a#PrintRecord').click(function (e) {
+
+        var editiiid = $('#PurchaseOrderHeaderId').val();
+
+
+        var Status = $('#Status').val();
+        var url;
+        if (Status == StatusContstantsEnum.Drafted) {
+            url = '@Url.Action("Print", "PurchaseOrderHeader")' + "/" + editiiid;
+        }
+        else if (Status == StatusContstantsEnum.Submitted || Status == StatusContstantsEnum.Modified ) {
+            url = '@Url.Action("PrintAfter_Submit", "PurchaseOrderHeader")' + "/" + editiiid;
+        }
+        else if ( Status == StatusContstantsEnum.Closed ) {
+            url = '@Url.Action("PrintAfter_Approve", "PurchaseOrderHeader")' + "/" + editiiid;
+        }
+        $(this).attr('href', url);
+        return;
+    })
+
+    $(document).ready(function () {
+
+        //Adding Hidden Input Fields
+        AddFields();
+
+    });
+
+
+    function AddFields(){
+        $('form:last').append($("<input type='hidden' name='UserRemark'></input>"))
+    }
+
+</script>
+
+@if ((ViewBag.Mode != "Add") && (ViewBag.Mode != "Edit"))
+{
+    <script type="text/javascript">
+
+        RemoveFields();
+
+        function RemoveFields(){
+            //Disabling input fields
+            $(':input:not(:submit,#IsContinue)').attr('disabled','disabled');
+
+            //Removing the action link from the form so that the request will be redirected to the Submit function in the controller instead of the hardcoded path
+            $('form:last').prop('action','');
+        }
+
+
+    </script>
+}
+
+@if ((Model.Status == (int)ActivityTypeContants.Modified || Model.Status == (int)ActivityTypeContants.Submitted)
+                && (ViewBag.transactionType == "submit" || ViewBag.transactionType == "submitContinue" || ViewBag.transactionType == "review" || ViewBag.transactionType == "ReviewContinue"))
+{
+    <script type="text/javascript">
+
+        var href = '/ActivityLog/LogEditReason';
+
+        var $btnClicked;
+
+        $(':submit').bind('click', function () {
+            $btnClicked=$(this);
+            $('#myModalContent').load(href, function () {
+
+                $('#myModal').modal({
+                    backdrop: 'static',
+                    keyboard: true
+                }, 'show');
+
+                bindForm1(this);
+            });
+
+            return false;
+        })
+
+        function bindForm1(dialog) {
+
+            $('#modformr', dialog).submit(function () {
+
+                $.ajax({
+                    url: this.action,
+                    type: this.method,
+                    data: $(this).serialize(),
+                    success: function (result) {
+                        if (result.success) {
+                            $('#myModal').modal('hide');
+
+                            $(':submit').unbind();
+
+                            $('input[name="UserRemark"]').val(result.UserRemark);
+
+                            $btnClicked.trigger('click');
+
+                        } else {
+                            $('#myModalContent').html(result);
+                            bindForm1();
+                        }
+                    }
+                });
+                return false;
+            });
+
+        }
+
+    </script>
+}
+
+@if (ViewBag.transactionType != null && (ViewBag.transactionType == "submitContinue" || ViewBag.transactionType == "ReviewContinue"))
+{
+    <script type="text/javascript">
+        CreateTrasitionEffectForSubmit();
+
+        function CreateTrasitionEffectForSubmit() {
+
+            //$('body').find('.container.body-content > div.row ').wrap("<div class='animsition' data-animsition-in='fade-in-right-lg' data-animsition-out='fade-out-left-lg' style='animation-duration: 1.5s; -webkit-animation-duration: 1.5s; opacity: 0;'> </div>");
+
+            $('body').find('form').filter(":last").wrapInner("<div class='animsition' data-animsition-in='fade-in-right-lg' data-animsition-out='fade-out-left-lg' style='animation-duration: 1.5s; -webkit-animation-duration: 1.5s; opacity: 0;'> </div>");
+            var script = document.createElement('script');
+            script.setAttribute('type', 'text/javascript');
+            script.text = " $(document).ready(function () {$('.animsition').animsition().one('animsition.start', function () {}).one('animsition.end', function () {$(this).find('.animsition-child').addClass('zoom-in').css({'opacity': 1});})});";
+            $('body').append(script);
+
+        }
+    </script>
+}
+
+
+
+
+

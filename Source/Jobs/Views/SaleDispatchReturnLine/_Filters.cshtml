@@ -1,0 +1,142 @@
+﻿@model Model.ViewModel.SaleDispatchReturnLineFilterViewModel
+@using Core.Common
+
+<div class="modal-content">
+    <div class="modal-header" style="border-bottom: 1px solid #8E8888">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"> <span class="glyphicon glyphicon-remove"></span></button>
+        <h3>
+            <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-file black"></span> Filters</span>
+        </h3>
+    </div>
+    <div>
+        @using (Html.BeginForm("_FilterPost", "SaleDispatchReturnLine", FormMethod.Post, new { enctype = "multipart/form-data", id = "modform" }))
+        {
+          
+            <div class="form-horizontal modal-body">
+
+                @Html.AntiForgeryToken()
+                @Html.HiddenFor(m => m.BuyerId)
+                @Html.HiddenFor(model => model.SaleDispatchReturnHeaderId)
+
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.SaleDispatchHeaderId, "Dispatch", new { @class = "control-label col-xs-4" })
+                            <div class="col-xs-7">
+                                @Html.TextBoxFor(model => model.SaleDispatchHeaderId, new { @class = "form-control col-xs-7 required" })
+                                @Html.ValidationMessageFor(model => model.SaleDispatchHeaderId, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.ProductId, "Product ", new { @class = "control-label col-xs-4 " })
+                            <div class="col-xs-7">
+                                @Html.TextBoxFor(model => model.ProductId, new { @class = "form-control col-xs-7 required" })
+                                @Html.ValidationMessageFor(model => model.ProductId, "", new { @class = "text-danger" })
+                                <span id="status" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+               
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.ProductGroupId, "Product Group", new { @class = "control-label col-xs-4" })
+                            <div class="col-xs-7">
+                                @Html.TextBoxFor(model => model.ProductGroupId, new { @class = "form-control col-xs-7 required" })
+                                @Html.ValidationMessageFor(model => model.ProductGroupId, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer " style="padding: 19px 20px 0 20px; border-top:1px solid #8E8888">
+                    <button class="btn custom" name="Command:Edit" type="submit"><h2 style="margin:0px" id="submit" title="Proceed"><span class="glyphicon glyphicon-arrow-right black"></span> </h2></button>
+                </div>
+
+            </div>
+
+        }
+    </div>
+</div>
+
+
+<script type="text/javascript">
+
+
+    $(document).ready(function () {
+        $("#ProductId").select2("focus");
+
+        //CustomSelectFunction($("#ProductId"), '/ComboHelpList/GetProducts', '/ComboHelpList/SetProducts', 'Enter Product Name', true, 3);
+        //CustomSelectFunction($("#SaleDispatchHeaderId"), '/ComboHelpList/GetSaleDispatchs', '/ComboHelpList/SetSaleDispatchs', 'Enter Invoice No', true, 1);
+        CustomSelectFunction($("#ProductGroupId"), '/ComboHelpList/GetProductGroup', '/ComboHelpList/SetProductGroup', 'Enter Group Name', true, 1);
+    });
+
+    var DocID = $('#SaleDispatchReturnHeaderId', '.modal-body').val();
+    var URL = '/SaleDispatchReturnLine/GetSaleReceipts/' + DocID;
+    $("#SaleDispatchHeaderId").select2({
+        minimumInputLength: 0,
+        multiple: true,
+        ajax: {
+            url: URL,
+            dataType: 'json',
+            type: "GET",
+            quietMillis: 1000,
+            data: function (term) {
+                return {
+                    term: term,
+                };
+            },
+            results: function (data) {
+                return {
+                    results: $.map(data, function (item) {
+                        return {
+                            text: item.DocNo,
+                            id: item.SaleDispatchHeaderId
+                        }
+                    })
+
+                };
+            }
+        },
+
+
+    });
+
+
+    var URL = '/ComboHelpList/GetCustomProducts/';
+    $("#ProductId").select2({
+        minimumInputLength: 1,
+        multiple: true,
+        ajax: {
+            url: URL,
+            dataType: 'json',
+            type: "GET",
+            quietMillis: 1000,
+            data: function (term) {
+                return {
+                    term: term,
+                };
+            },
+            results: function (data) {
+                return {
+                    results: $.map(data, function (item) {
+                        return {
+                            text: item.PropFirst,
+                            id: item.Id
+                        }
+                    })
+
+                };
+            }
+        },
+
+
+    });
+
+</script>

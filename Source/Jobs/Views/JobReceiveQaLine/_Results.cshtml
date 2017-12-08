@@ -1,0 +1,427 @@
+﻿@model Model.ViewModel.JobReceiveQAMasterDetailModel
+@using Core.Common
+
+<style type="text/css">
+    #tbody {
+        height: 250px;
+        overflow-y: scroll;
+        width: 100%;
+    }
+
+    tbody td {
+        padding: 2px 2px 2px 2px;
+    }
+
+    .textRight {
+        text-align: right;
+    }
+    /*th div{
+        position:absolute;
+    }*/
+</style>
+
+<div class="modal-content Custom-modal">
+    <div class="modal-header" style="border-bottom: 1px solid #8E8888">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"> <span class="glyphicon glyphicon-remove"></span></button>
+        <h3>
+            <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-file black"></span> Orders & Quantities</span>
+        </h3>
+    </div>
+    <div>
+        @using (Html.BeginForm("_ResultsPost", "JobReceiveQALine", FormMethod.Post, new { enctype = "multipart/form-data", id = "modform" }))
+        {
+            @Html.AntiForgeryToken()
+            @Html.ValidationLog((string)TempData["CSEXCL"])
+
+            <div class="form-horizontal modal-body">
+
+                <div style="padding-right:15px">
+                    <div class="row">
+
+                        <div class="form-horizontal">
+                            @Html.ValidationSummary(true)
+
+
+                            <div class="panel panel-default" id="grid">
+                                <div class="panel-heading headrow" style="background-image: -webkit-linear-gradient(top, #428bca 0%, #428bca 100%);color:white">
+                                    <div class="row grid-head">
+                                        <div class="block text-left" style="width:5%">
+                                            Srl.
+                                        </div>
+                                        <div class="block" style="width:92%">
+                                            <div class="row">
+                                                @*ProductInfo*@
+                                                <div class="block" style="width:25%">
+                                                    Product
+
+                                                </div>
+                                                <div class="block text-center" style="width:15%">
+                                                    Order No
+                                                </div>
+                                                @*Qty*@
+                                                <div class="block text-right" style="width:15%">
+                                                    Bal Qty
+                                                </div>
+                                                <div class="block text-right" style="width:15%">
+                                                    Ins-Qty
+                                                </div>
+
+                                                <div class="block text-right" style="width:15%">
+                                                    <a href="#" id="ToCancel" style="color:white">Qty</a>
+                                                </div>
+                                                <div class="block text-right" style="width:15%">
+                                                    Marks
+                                                </div>
+
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+                                </div>
+                                <div class="panel-info" id="gbody" style="max-height:250px;overflow-y:scroll">
+
+                                    @{
+            decimal BalanceQty = 0;
+            decimal PassQty = 0;
+            int MaxUnitDecPlaces = 0;
+            int MaxDealUnitDecPlaces = 0;
+                                    }
+
+
+                                    @for (int i = 0; i < Model.JobReceiveQALineViewModel.Count(); i++)
+                                    {
+
+
+                                        if (MaxDealUnitDecPlaces < Model.JobReceiveQALineViewModel[i].DealUnitDecimalPlaces)
+                                        {
+                                            MaxDealUnitDecPlaces = Model.JobReceiveQALineViewModel[i].DealUnitDecimalPlaces;
+                                        }
+                                        if (MaxUnitDecPlaces < Model.JobReceiveQALineViewModel[i].UnitDecimalPlaces)
+                                        {
+                                            MaxUnitDecPlaces = Model.JobReceiveQALineViewModel[i].UnitDecimalPlaces;
+                                        }
+
+                                        <div class='row crow grid-body' style='margin-left:0px;margin-right:0px'>
+
+
+                                            @Html.HiddenFor(m => m.JobReceiveQALineViewModel[i].JobReceiveQAHeaderId)
+                                            @Html.HiddenFor(m => m.JobReceiveQALineViewModel[i].JobReceiveDocNo)
+                                            @*@Html.HiddenFor(m => m.JobReceiveQALineViewModel[i].JobWorkerName)*@
+                                            @Html.HiddenFor(m => m.JobReceiveQALineViewModel[i].JobReceiveLineId)
+                                            @Html.HiddenFor(m => m.JobReceiveQALineViewModel[i].ProductName)
+                                            @Html.HiddenFor(m => m.JobReceiveQALineViewModel[i].ProductId)
+                                            @Html.HiddenFor(m => m.JobReceiveQALineViewModel[i].BalanceQty)
+                                            @Html.HiddenFor(m => m.JobReceiveQALineViewModel[i].DealUnitDecimalPlaces, new { @class = "DelUDec" })
+                                            @Html.HiddenFor(m => m.JobReceiveQALineViewModel[i].UnitDecimalPlaces, new { @class = "UDec" })
+
+
+                                            <div class='block row-index' style='width:5%'>
+                                                @(i + 1)
+                                            </div>
+                                            <div class='block pull-middle' style='width:94%'>
+                                                <div class='row'>
+                                                    <div class='block' style='width:25%'>
+                                                        <strong>@Model.JobReceiveQALineViewModel[i].ProductName</strong>
+                                                        <br />
+                                                        @Model.JobReceiveQALineViewModel[i].Specification
+                                                        @{
+                                        var Dim1 = (string.IsNullOrEmpty(Model.JobReceiveQALineViewModel[i].Dimension1Name)) ? "" : Model.JobReceiveQALineViewModel[i].Dimension1Name + ",";
+                                        var Dim2 = (string.IsNullOrEmpty(Model.JobReceiveQALineViewModel[i].Dimension2Name)) ? "" : Model.JobReceiveQALineViewModel[i].Dimension2Name + ",";
+                                        var Dim3 = (string.IsNullOrEmpty(Model.JobReceiveQALineViewModel[i].Dimension3Name)) ? "" : Model.JobReceiveQALineViewModel[i].Dimension3Name + ",";
+                                        var Dim4 = (string.IsNullOrEmpty(Model.JobReceiveQALineViewModel[i].Dimension4Name)) ? "" : Model.JobReceiveQALineViewModel[i].Dimension4Name;
+                                                        }
+                                                        <div>
+                                                            @Dim1 @Dim2
+                                                        </div>
+                                                        <div>@Model.JobReceiveQALineViewModel[i].ProductUidName</div>
+                                                    </div>
+                                                    <div class='block text-center' style='width:15%'>
+
+                                                        @Model.JobReceiveQALineViewModel[i].JobReceiveDocNo                                                                                                         
+                                                    </div>
+                                                    <div class='block text-right' style='width:15%'>
+                                                        <a href="#" class="ToCancel" style="color:black">
+                                                            <span id="BalanceQty"> @string.Format("{" + "0:0.".PadRight(@Model.JobReceiveQALineViewModel[i].UnitDecimalPlaces + 4, '0') + "}", Model.JobReceiveQALineViewModel[i].BalanceQty)</span><br />
+                                                            <div>
+                                                                <small>@Model.JobReceiveQALineViewModel[i].UnitName</small>
+                                                            </div>
+                                                        </a>
+                                                        @{BalanceQty += Model.JobReceiveQALineViewModel[i].BalanceQty;}
+
+                                                    </div>
+                                                    <div class='block text-right' style='width:15%'>
+                                                        @Html.TextBoxFor(m => Model.JobReceiveQALineViewModel[i].InspectedQty, "{" + "0:0.".PadRight((Model.JobReceiveQALineViewModel[i].UnitDecimalPlaces + 4), '0') + "}", new { @class = "form-control text-right InspectionQty multiple-modal" })
+                                                        @Html.ValidationMessageFor(m => Model.JobReceiveQALineViewModel[i].InspectedQty, "", new { @class = "text-danger" })
+                                                    </div>
+                                                    <div class='block text-right' style='width:15%'>
+                                                        @Html.TextBoxFor(m => Model.JobReceiveQALineViewModel[i].Qty, "{" + "0:0.".PadRight((Model.JobReceiveQALineViewModel[i].UnitDecimalPlaces + 4), '0') + "}", new { @class = "form-control text-right PassQty multiple-modal" })
+                                                        @Html.ValidationMessageFor(m => Model.JobReceiveQALineViewModel[i].Qty, "", new { @class = "text-danger" })
+                                                    </div>
+                                                    @{PassQty += Model.JobReceiveQALineViewModel[i].Qty;}
+
+
+
+                                                    <div class='block' style='width:15%'>
+                                                        @Html.TextBoxFor(m => Model.JobReceiveQALineViewModel[i].Marks, new { @class = "form-control text-right  multiple-modal" })
+                                                        @Html.ValidationMessageFor(m => Model.JobReceiveQALineViewModel[i].Marks, "", new { @class = "text-danger" })
+                                                    </div>
+
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                        <hr style='margin-top:0px;margin-bottom:0px' />
+                                    }
+                                </div>
+                            </div>
+
+
+                            <div class="row grid-head" style="margin-left:0px;margin-right:0px">
+                                <div class="block text-left" style="width:5%">
+
+                                </div>
+                                <div class="block" style="width:92%">
+                                    <div class="row">
+                                        @*ProductInfo*@
+                                        <div class='block' style='width:25%'>
+                                            <strong>Total</strong>
+
+                                        </div>
+                                        <div class='block text-center' style='width:20%'>
+
+                                        </div>
+                                        @*Qty*@
+                                        <div class='block text-right' style='width:20%'>
+                                            @string.Format("{" + "0:0.".PadRight(MaxUnitDecPlaces + 4, '0') + "}", BalanceQty)
+                                        </div>
+                                        <div class='block text-right' style='width:20%'>
+                                            <strong><span id="PassQty">@string.Format("{" + "0:0.".PadRight(MaxUnitDecPlaces + 4, '0') + "}", PassQty)</span></strong>
+                                        </div>
+                                        <div class='block' style='width:15%'>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                            </div>
+
+
+
+
+
+
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer " style="padding: 19px 20px 0 20px; border-top:1px solid #8E8888">
+                    <button class="btn custom" name="Command:Edit" type="submit" id="submit"><h2 style="margin:0px" title="Proceed"><span class="glyphicon glyphicon-floppy-disk black black"></span> </h2></button>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<script type="text/javascript">
+
+    var reset = false;
+
+    $('input.PassQty').change(function () {
+
+        //var PassQty = $(this).val();
+        //var BalanceQty = parseFloat($(this).closest('div.row').find('span#BalanceQty').text());
+
+        //var bal = PassQty - BalanceQty;
+
+        //if (bal > 0) {
+        //    $('#submit', '.modal-body').attr("disabled", "disabled");
+        //    if (!$('#modform').find('.modal-body #errormsg').length) {
+        //        $('#modform').find('.modal-body').prepend("<div class='alert alert-danger'><span id=errormsg >Qty exceeding Balance Qty</span></div>")
+        //    }
+        //    else {
+        //        $('#modform').find('#errormsg').text("Qty exceeding Required Qty");
+        //    }
+        //}
+        //else {
+        //    $('#submit', '.modal-body').removeAttr("disabled");
+        //    if ($('#modform').find('.modal-body #errormsg').length) {
+        //        $('#modform').find('#errormsg').parent().remove();
+        //    }
+        //}
+        ValidateData(this);
+        CalculateTotal();
+    })
+
+    $('input.InspectionQty').change(function () {
+
+        //var InspectionQty = $(this).val();
+        //var PassQty = parseFloat($(this).closest('div.row').find('input.PassQty').val());
+
+        //var bal = InspectionQty - PassQty;
+
+        //if (bal > 0) {
+        //    $('#submit', '.modal-body').attr("disabled", "disabled");
+        //    if (!$('#modform').find('.modal-body #errormsg').length) {
+        //        $('#modform').find('.modal-body').prepend("<div class='alert alert-danger'><span id=errormsg >Qty exceeding Balance Qty</span></div>")
+        //    }
+        //    else {
+        //        $('#modform').find('#errormsg').text("Qty exceeding Required Qty");
+        //    }
+        //}
+        //else {
+        //    $('#submit', '.modal-body').removeAttr("disabled");
+        //    if ($('#modform').find('.modal-body #errormsg').length) {
+        //        $('#modform').find('#errormsg').parent().remove();
+        //    }
+        //}
+        ValidateData(this);
+    })
+
+    function CalculateTotal() {
+        var Request = 0;
+        var maxDeclaces = 0;
+        $('.row.crow.grid-body', '.modal-body').each(function () {
+
+            if ($(this).find('input.PassQty').val()) {
+                Request += parseFloat($(this).find('input.PassQty').val());
+
+                var unitDecPlaces = parseFloat($(this).find('.UDec').val()) || 0;
+                if (unitDecPlaces > maxDeclaces)
+                    maxDeclaces = unitDecPlaces;
+            }
+
+        })
+        $('#PassQty', '.modal-body').text(Request.toFixed(maxDeclaces));
+    }
+
+    function ValidateData(rowInput) {
+        var ValidationMsg = "";
+        if (rowInput) {
+            var InspectionQty = parseFloat($(rowInput).closest('div.row').find('input.InspectionQty').val());
+            var PassQty = parseFloat($(rowInput).closest('div.row').find('input.PassQty').val());
+            var BalanceQty = parseFloat($(rowInput).closest('div.row').find('span#BalanceQty').text());
+
+            if ((InspectionQty - BalanceQty) > 0) {
+                ValidationMsg += "Inspected Qty exceeding Balancnce Qty";
+            }
+
+            if ((PassQty - BalanceQty) > 0) {
+                ValidationMsg += "Pass Qty exceeding Balancnce Qty";
+            }
+        }
+        else {
+            $('.row.crow.grid-body', '.modal-body').each(function () {
+
+                var InspectionQty = parseFloat($(this).find('input.InspectionQty').val());
+                var PassQty = parseFloat($(this).find('input.PassQty').val());
+                var BalanceQty = parseFloat($(this).find('span#BalanceQty').text());
+
+                if ((InspectionQty - BalanceQty) > 0) {
+                    ValidationMsg += "Inspected Qty exceeding Balancnce Qty";
+                }
+
+                if ((PassQty - BalanceQty) > 0) {
+                    ValidationMsg += "Pass Qty exceeding Balancnce Qty";
+                }
+
+            })
+        }
+
+        if (ValidationMsg) {
+            $('#submit', '.modal-body').attr("disabled", "disabled");
+            if (!$('#modform').find('.modal-body #errormsg').length) {
+                $('#modform').find('.modal-body').prepend("<div class='alert alert-danger'><span id=errormsg >" + ValidationMsg + "</span></div>")
+            }
+            else {
+                $('#modform').find('#errormsg').text(ValidationMsg);
+            }
+        }
+        else {
+            $('#submit', '.modal-body').removeAttr("disabled");
+            if ($('#modform').find('.modal-body #errormsg').length) {
+                $('#modform').find('#errormsg').parent().remove();
+            }
+        }
+
+        return ValidationMsg == "";
+    }
+
+
+    $('.ToCancel').click(function () {
+
+        var $Hidiv = $(this).closest('div.row.crow');
+
+        var unitDecPlaces = parseFloat($Hidiv.find('.UDec').val()) || 0;
+
+        var $div = $(this).closest('div.row');
+
+        var OrderQty = parseFloat($div.find('#BalanceQty').text()) || 0;
+
+        if ($div.find('input.PassQty').val() && $div.find('input.PassQty').val() > 0) {
+            $div.find('input.PassQty').val(0);
+        }
+
+        else {
+            $div.find('input.PassQty').val(OrderQty.toFixed(unitDecPlaces));
+        }
+
+        CalculateTotal();
+
+    })
+
+    $('#ToCancel').click(function () {
+        if (reset) {
+            $('div.row.crow', "#gbody.panel-info").each(function (index) {
+
+
+                var $Hidiv = $(this);
+
+                var unitDecPlaces = parseFloat($Hidiv.find('.UDec').val()) || 0;
+
+                var OrderQty = parseFloat($Hidiv.find('#BalanceQty').text()) || 0;
+
+                $Hidiv.find('input.PassQty').val(OrderQty.toFixed(unitDecPlaces));
+
+
+            })
+            CalculateTotal();
+            reset = false;
+        }
+        else if (!reset) {
+            $('div.row.crow', "#gbody.panel-info").each(function (index) {
+
+                var $Hidiv = $(this);
+
+                $Hidiv.find('input.PassQty').val(0);
+
+            })
+            CalculateTotal();
+            reset = true;
+        }
+    })
+
+    $(document).ready(function () {
+        var IsSaved = false;
+        var ValidationCount = 0;
+
+        $('#modform').bind('submit', function (event) {
+
+            if (!IsSaved) {
+                if (!ValidateData()) {
+                    return false;
+                }
+                IsSaved = true;
+                $('button:submit').attr('disabled', 'disabled');
+                return IsSaved;
+            }
+            else {
+                return false;
+            }
+
+
+        });
+
+
+    });
+
+</script>

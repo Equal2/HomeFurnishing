@@ -1,0 +1,380 @@
+﻿@{
+    ViewBag.Title = "Sale Delivery Wizard";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<link href="~/Content/DataTables/css/jquery.dataTables.min.css" rel="stylesheet" />
+
+<script src="~/Scripts/DataTables/jquery.dataTables.min.js"></script>
+@*<script src="~/Scripts/DataTables/dataTables.scroller.js"></script>*@
+<script src="~/Scripts/DataTables/dataTables.scroller.min.js"></script>
+
+<style type="text/css">
+    .DTHidden {
+        display: none;
+    }
+
+    .TextRight {
+        text-align: right;
+    }
+
+    .dataTables_scroll {
+        font-size: 13px !important;
+        line-height: 1;
+    }
+
+    table.dataTable tbody td {
+        padding: 2px 10px;
+    }
+</style>
+
+
+
+@*<input type="button" id="button" />*@
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3>
+            <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-list black"></span> Pending Sale Invoice List</span>
+            @Html.ActionLink(" ", "ConfirmSaleInvoiceList", "SaleDeliveryWizard", null, new { @class = "glyphicon glyphicon-hand-right toolbar right", @title = "Proceed", @data_toggle = "tooltip", @id = "Proceed" })
+            @*<a href="#" class="glyphicon glyphicon-shopping-cart toolbar right" id="CartSum"></a>*@
+        </h3>
+        <span id="Validation" class="danger"></span>
+        <hr style="margin-top:0px;margin-bottom:0px" />
+    </div>
+
+
+
+    <div class="panel-info tab" style="padding-left:5px;padding-top:20px">
+        @*<input type="checkbox" id="TestCheck" name="checl" /> <span>Select</span>*@
+        <table id="example" class="display" cellspacing="0" width="100%">
+            <thead style="background: #428bca;color:white">
+                <tr>
+                    <th>Invoice No</th>
+                    <th>Invoice Date</th>
+                    <th>SaleToBuyerId</th>
+                    <th>Buyer Name</th>
+                    <th>Qty</th>
+                    <th>Amount</th>
+                    <th>SaleInvoiceLineId</th>
+                </tr>
+            </thead>
+            <tfoot>
+                <tr>
+                    <th></th>
+                    <th colspan="0" style="text-align:left"></th>
+                    <th colspan="1" style="text-align:right"></th>
+                    <th></th>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+</div>
+
+
+<script type="text/javascript">
+    $(document).ready(function () {
+
+        var PageLoadFirst = true;
+        var Url = "/SaleDeliveryWizard/PendingSaleInvoice/" + '@ViewBag.id';
+        $('#example').dataTable({
+            ajax: Url,
+            scrollY: "300px",
+            scrollCollapse: false,
+            scroller: true,
+            sort : false,
+            lengthChange : false,
+            bInfo: false,
+            columns: [
+                { "data": "DocNo", "width": "10%" },
+                { "data": "Date", "width": "10%" },
+                { "data": "SaleToBuyerId", "width": "10%" },
+                { "data": "SaleToBuyerName", "width": "10%" },
+                { "data": "Qty", "width": "5%", className: "TextRight", },
+                { "data": "Amount", "width": "5%", className: "TextRight", },
+                { "data": "SaleInvoiceLineId" },
+            ],
+            columnDefs: [
+    { "targets": 2, "searchable": false, className: "DTHidden", },
+    { "targets": 6, "searchable": false, className: "DTHidden", },
+            ],
+            dom: 'T<"clear">lfrti',
+            TableTools: {
+                "sRowSelect": "os",
+                "aButtons": [
+                "select_all", "select_none"
+                ]
+            },
+            tableTools: {
+                "sSwfPath": "../../Content/DataTables/swf/copy_csv_xls_pdf.swf"
+            }
+
+
+        });
+
+        $('#example tbody').on('click', 'tr', function (e) {
+            if (e.target.nodeName == "INPUT") {
+
+            }
+            else {
+                $(this).toggleClass('selected');
+
+                if (PageLoadFirst) {
+                    CaclTotal();
+                    PageLoadFirst = false;
+                }
+
+                if ($(this).hasClass('selected') && !$('#TestCheck').is(':checked')) {
+                    $('#TestCheck').prop("checked", true);
+                }
+
+                CalculateSelectedTotal();
+            }
+        });
+
+        var id = @ViewBag.id;
+        $('a#Proceed').click(function () {
+            var arr = [];
+
+            var table = $("#example").DataTable();
+            var test = table.rows('.selected').data();
+            var List = "";
+            var test34 = table.$('input, select').serialize();
+            $.each(test, function (index, value) {
+                arr.push({ SaleInvoiceLineId: value.SaleInvoiceLineId, Qty: value.Qty, Amount: value.Amount, SaleToBuyerId: value.SaleToBuyerId });
+            })
+
+
+            //alert($(this).attr('href'));
+            var ValidationMsg = "";
+
+            for (var i = 0; i < test.length; i++) {
+                if (i > 0)
+                {
+                    if (test[i].SaleToBuyerId != test[i-1].SaleToBuyerId)
+                    {
+                        ValidationMsg = "More then one Buyers can not be selected.";
+                    }
+                }
+            }
+
+            if (ValidationMsg != "")
+            {
+                $("#Validation").text(ValidationMsg);
+                return false;
+            }
+
+            
+            $.ajax({
+                url: $(this).attr('href'),
+                type: "POST",
+                data: { Selected: arr, id: id },
+                success: function (result) {
+                    if (result.Success == true) {
+                        UpdateDataTable(result);
+                    } else if (result.Success == "URL") {
+                        window.location.href = result.Data;
+                    }
+                    else if (!result.Success) {
+                        alert('Something went wrong');
+                    }
+                    else { }
+                },
+            });
+
+            return false;
+
+        });
+
+        function UpdateDataTable(data) {
+            var table = $('#example').DataTable();
+
+            table.clear().draw();
+
+            table.rows.add(data.Data).draw();
+
+            $('#example').dataTable().fnFilterClear();
+
+            $('tfoot > tr > th:first').html('');
+
+            UpdateActionLink();
+
+        }
+
+        function UpdateActionLink() {
+            $('a#Proceed').attr('href', '/SaleDeliveryWizard/ConfirmSaleInvoiceList');
+        }
+
+        $(document).on('change', 'td > input', function () {
+            var table = $('#example').dataTable();
+            var td = $(this).closest('td').get(0);
+            var pos = table.fnGetPosition(td); // Im not familiar with the plugin so the extra $() might be overkill
+
+            if ($(this).is('.Qty') && table.fnGetData(pos[0]).BalanceQty < $(this).val()) {
+                $(this).val(table.fnGetData(pos[0]).BalanceQty).select();
+            }
+            else {
+                table.fnUpdate(parseFloat($(this).val()), pos[0], pos[1], false);
+                $('#example').DataTable().draw(false);
+                CalculateSelectedTotal();
+            }
+        })
+
+
+        function CaclTotal() {
+            var table = $('#example').DataTable();
+
+            var intVal = function (i) {
+                return typeof i === 'string' ?
+                    i.replace(/[\$,]/g, '') * 1 :
+                    typeof i === 'number' ?
+                    i : 0;
+            };
+
+            // Total over all pages
+            total = table
+                .column(7)
+                .data()
+                .reduce(function (a, b) {
+                    return intVal(a) + intVal(b);
+                }, 0);
+
+            totalArea = table
+               .column(8)
+               .data()
+               .reduce(function (a, b) {
+                   return intVal(a) + intVal(b);
+               }, 0);
+
+            //$(table.column(5).footer()).html(
+            //           'Total: ' + total.toFixed(0) + ' Pcs, ' + totalArea.toFixed(3) + ' Sq.yard'
+            //     );
+
+
+        }
+
+    });
+
+
+    $('#TestCheck').change(function () {
+
+        var table = $('#example').dataTable();
+        var $LRow;
+
+
+        if ($(this).is(':checked')) {
+            var Rows = table.$('tr', { "filter": "applied" })
+            $.each(Rows, function (index, value) {
+
+                $(this).addClass('selected');
+                $LRow = this;
+            })
+            CalculateSelectedTotal();
+        }
+        else {
+            var Rows = table.$('tr.selected')
+            $.each(Rows, function (index, value) {
+
+                $(this).removeClass('selected');
+                $LRow = this;
+
+            })
+            CalculateSelectedTotal();
+        }
+
+    })
+
+
+    function CalculateSelectedTotal() {
+        var table = $('#example').DataTable();
+
+        function CheckTotal() {
+            var Qty = 0;
+            $.each(table.rows('.selected').data(), function (index, value) {
+                Qty += parseFloat(value.Qty);
+            })
+            return Qty.toFixed(0);
+        }
+        function CheckTotalArea() {
+            var Qty = 0;
+            $.each(table.rows('.selected').data(), function (index, value) {
+                Qty += parseFloat(value.Area);
+            })
+            return Qty.toFixed(3);
+        }
+
+        $(table.column(1).footer()).html(
+                'Selected:' + CheckTotal() + ' Pcs, ' + CheckTotalArea() + ' Sq.yards'
+           );
+
+
+
+    }
+
+
+
+    function ResetTotal() {
+        var table = $('#example').DataTable();
+        $(table.column(1).footer()).html(
+                    'Selected:' + 0 + ' Pcs '
+               );
+    }
+
+    $('#CartSum').click(function () {
+        GenerateSummaryString();
+        $('#exampleModal').modal('toggle');
+    })
+
+
+    function GenerateSummaryString() {
+        var Summary = "";
+        Summary += "<div class='row' style='margin:0px'>"
+
+        var table = $("#example").DataTable();
+        var test = table.rows('.selected').data();
+        var List = "";
+        var srno = 1;
+        var test34 = table.$('input, select').serialize();
+        var QtyTotal = 0;
+        var AmtTotal = 0;
+        $.each(test, function (index, value) {
+
+            Summary += " <div class='row crow grid-body' style='margin:0px;padding:0px'>"
+                + "      <div class='row-index block'  style='width:5%'>" + srno + "</div>"
+                + "          <div class='block'  style='width:95%'>"
+                + "                  <div class='block' style='width:30%'>" + (value.DesignName == null ? " " : "<strong>" + value.DesignName + "</strong>")
+                + "                  <div>" + value.Size + "</div>"
+                + "                  <div>" + value.Colour + "</div>"
+                + "                  </div>"
+                + "                  <div class='block' style='width:20%'>" + (value.Quality == null ? " " : "<strong>" + value.Quality + "</strong>")
+                + "                  </div>"
+                + "                  <div class='block'  style='width:20%'>" + (value.DocNo == null ? " " : "<span title='Dim1' class='' style='font-weight:bold'>" + value.DocNo) + "</span>"
+                + "                    <div> " + value.Date + " </div>"
+                + "                   </div>"
+                + "                  <div class='block text-right'  style='width:10%'>" + (value.Qty == null ? " " : value.Qty) + ""
+                + "                   </div>"
+                + "                  <div class='block text-right'  style='width:10%'>" + (value.Rate == null ? " " : value.Rate) + ""
+                + "                   </div>"
+                + "                  <div class='block text-right'  style='width:10%'>" + (value.Incentive == null ? " " : value.Incentive) + ""
+                + "                   </div>"
+                + "          </div>"
+                + "  </div>"
+                + "<hr style='margin-top:0px;margin-bottom:0px'/>";
+            srno++;
+            QtyTotal += parseFloat(value.Qty);
+            AmtTotal += parseFloat(value.Qty) * parseFloat(value.AreaPerPc) * (parseFloat(value.Rate) + parseFloat(value.Incentive));
+        });
+        Summary += "</div>"
+
+        $('#SummaryContent').html(Summary);
+        $('#QtyTotal').html(QtyTotal);
+        $('#AmtTotal').html(AmtTotal.toFixed(2));
+    }
+
+
+    $('#CartSum').on('hidden.bs.modal', function (e) {
+        $('#SummaryContent').html("");
+        $('#QtyTotal').html(0);
+        $('#AmtTotal').html(0);
+    })
+
+</script>

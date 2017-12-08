@@ -1,0 +1,202 @@
+﻿
+@model Model.ViewModel.CalculationHeaderLedgerAccountViewModel
+@using Core.Common
+
+<div class="modal-content">
+    <div class="modal-header" style="border-bottom: 1px solid #8E8888">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"> <span class="glyphicon glyphicon-remove"></span></button>
+        <h3>
+            <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-file black"></span> Footer</span>
+        </h3>
+    </div>
+    <div>
+        @using (Html.BeginForm("_CreatePost", "CalculationHeaderLedgerAccount", FormMethod.Post, new { enctype = "multipart/form-data", id = "modform" }))
+        {
+            @Html.AntiForgeryToken()
+
+
+
+            <div class="form-horizontal modal-body">
+                @Html.HiddenFor(model => model.CalculationId)
+                @Html.HiddenFor(m => m.DocTypeId)
+                @Html.HiddenFor(m=>m.CalculationHeaderLedgerAccountId)
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                <div class="row">
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.CalculationFooterId, "Calculation Header", new { @class = "control-label col-xs-4 " })
+                            <div class="col-xs-7">
+                                @Html.TextBoxFor(model => model.CalculationFooterId, new { @class = "form-control col-xs-7 required", @readonly=true })
+                                @Html.ValidationMessageFor(model => model.CalculationFooterId, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.LedgerAccountCrId, "Ledger Acc Cr", new { @class = "control-label col-xs-4" })
+                            <div class="col-xs-7">
+                                @Html.TextBoxFor(m=>m.LedgerAccountCrId, new { @class = "form-control"})
+                                @Html.ValidationMessageFor(model => model.LedgerAccountCrId, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>                  
+                </div>
+
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.LedgerAccountDrId, "Ledger Acc Dr", new { @class = "control-label col-xs-4 " })
+                            <div class="col-xs-7">
+                                @Html.TextBoxFor(model => model.LedgerAccountDrId, new { @class = "form-control col-xs-7 required height" })
+                                @Html.ValidationMessageFor(model => model.LedgerAccountDrId, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.ContraLedgerAccountId, "Contra Ledger A/C", new { @class = "control-label col-xs-4 " })
+                            <div class="col-xs-7">
+                                @Html.TextBoxFor(model => model.ContraLedgerAccountId, new { @class = "form-control col-xs-7 required height" })
+                                @Html.ValidationMessageFor(model => model.ContraLedgerAccountId, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.CostCenterId, "Cost Centre", new { @class = "control-label col-xs-4" })
+                            <div class="col-xs-7">
+                                @Html.TextBoxFor(model => model.CostCenterId, new { @class = "form-control col-xs-7 required" })
+                                @Html.ValidationMessageFor(model => model.CostCenterId, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                </div>         
+             
+
+                <div class="modal-footer " style="padding: 19px 20px 0 20px; border-top:1px solid #8E8888">
+                    <button class="btn custom left" name="Command:Edit" type="submit"><h2 style="margin:0px" id="submit"><span class="glyphicon glyphicon-floppy-disk black"></span> </h2></button>
+                    <button class="btn custom" name="Command:Delete" id="delete" type="submit"><h2 style="margin:0px"><span class="glyphicon glyphicon-trash black"></span> </h2></button>
+                </div>
+                
+            </div>
+        }
+    </div>
+</div>
+
+<script type="text/javascript">
+
+
+    $(document).ready(function(){
+
+        //CustomSelectFunction($("#CalculationFooterId"), '/ComboHelpList/GetCalculationFooter', '/ComboHelpList/SetSingleCalculationFooter', ' ', false, 1);
+        CustomSelectFunction($("#LedgerAccountCrId"), '/ComboHelpList/GetAccount', '/ComboHelpList/SetSingleAccount', ' ', false, 1);
+        CustomSelectFunction($("#LedgerAccountDrId"), '/ComboHelpList/GetAccount', '/ComboHelpList/SetSingleAccount', ' ', false, 1);
+        CustomSelectFunction($("#ContraLedgerAccountId"), '/ComboHelpList/GetAccount', '/ComboHelpList/SetSingleAccount', ' ', false, 1);
+        CustomSelectFunction($("#CostCenterId"), '/ComboHelpList/GetCostCenter', '/ComboHelpList/SetSingleCostCenter', ' ', false, 1);        
+
+
+        var DocID = $('#CalculationId', '.modal-body').val();
+        var URL = '/CalculationHeaderLedgerAccount/GetCalculationFooter/'+ DocID;
+        $("#CalculationFooterId").select2({
+            minimumInputLength: 0,
+            multiple: false,
+            ajax: {
+                url: URL,
+                dataType: 'json',
+                type: "GET",
+                quietMillis: 1000,
+                data: function (term) {
+                    return {
+                        term: term,
+                    };
+                },
+                results: function (data) {
+                    return {
+                        results: $.map(data, function (item) {
+                            return {
+                                text: item.PropFirst,
+                                id: item.Id
+                            }
+                        })
+
+                    };
+                }
+            },
+            initSelection: function (element, callback) {
+
+                var xval = element.val();
+                if (xval != 0) {
+                    $.ajax({
+                        cache: false,
+                        type: "POST",
+                        url: "/ComboHelpList/SetSingleCalculationFooter",
+                        data: { Ids: element.val() },
+                        success: function (data) {
+                            callback(data);
+                        },
+                        error: function (xhr, ajaxOptions, thrownError) {
+                            alert('Failed to Retrive Qty' + thrownError);
+                        }
+                    })
+                }
+                //callback([{ id: "1", text: "arpit" }, { id: "2", text: "akash" }]);
+            }
+        });
+
+
+        $('#CalculationFooterId').select2("focus");
+
+        var IsSaved=false;
+        var ValidationCount=0;
+
+        $('#modform').bind('submit',function(event){
+
+            if(!IsSaved)
+            {
+                if(!ValidateData())
+                {
+                    return false;
+                }
+                IsSaved=true;
+                $('button:submit').attr('disabled','disabled');
+                return IsSaved;
+            }
+            else
+            {
+                return false;
+            }
+
+
+        });
+
+        function ValidateData() {
+            var ValidationMessage = "";
+
+            //Client Side Validaion.....
+
+            return  (ValidationMessage=="");
+
+        }
+
+
+    })
+
+
+    var id=@Model.CalculationHeaderLedgerAccountId;
+
+    $('#delete','.modal-content').click(function (e) {
+        if(id>0)
+        {
+            var url = '/CalculationHeaderLedgerAccount/DeletePost';
+            $('form#modform').attr('action',url);
+            return;
+        }
+        else
+        {
+            return false;
+        }
+    });
+
+</script>

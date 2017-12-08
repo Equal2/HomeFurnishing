@@ -1,0 +1,684 @@
+﻿@model Model.ViewModel.ProdOrderHeaderViewModel
+@using Core.Common
+
+@{
+    ViewBag.Title = "Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style type="text/css">
+    .progress {
+        position: relative;
+    }
+
+        .progress span {
+            position: absolute;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            z-index: 2;
+            font-size: 0.8em;
+        }
+</style>
+
+<!-- modal placeholder-->
+<div id='myModal' class='modal fade in'>
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div id='myModalContent'></div>
+        </div>
+    </div>
+</div>
+
+@using (Html.BeginForm("HeaderPost", "ProdOrderHeader", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(m => m.SiteId)
+    @Html.HiddenFor(m => m.DivisionId)
+    @Html.HiddenFor(m => m.ProdOrderHeaderId)
+    @Html.HiddenFor(m => m.DocTypeId)
+    @Html.HiddenFor(m => m.CreatedDate)
+    <div class="panel panel-default">
+        <div class="panel-heading">
+           @CustomHelpers.RenderResHeaderInfo(ViewBag.transactionType, (int?)ViewBag.PendingToSubmit, (int?)ViewBag.PendingToReview, ViewBag.Name)
+          @*@if (ViewBag.transactionType == "submit")
+            {<h3>
+                <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"> <span class="glyphicon glyphicon-file black"></span>Submit @ViewBag.Name</span>
+                <input type="submit" value="Submit" name="Command:Submit" class="btn btn-primary right" style="width: 90px; background-color: #2980b9" />
+            </h3>
+            }
+            else if (ViewBag.transactionType == "review" || ViewBag.transactionType == "ReviewContinue")
+            {<h3 style="border-bottom:0px solid #e1dada;padding-bottom:0px;">
+                <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"> <span class="glyphicon glyphicon-file black"></span> Review @ViewBag.Name</span>
+                <button type="submit" name="Command:Review" class="btn btn-primary right" style="margin-left:5px" id="ReviewContinue">Review & Next<span class='badge'>@(ViewBag.PendingToReview != 0 ? ViewBag.PendingToReview : "")</span></button>
+                <button type="submit" class="btn btn-primary right" name="Command:Review">Review</button>
+                <input type="hidden" id="IsContinue" name="IsContinue" value="" />
+            </h3>}
+            else if (ViewBag.transactionType == "detail")
+            {
+                <h3>
+                    <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"> <span class="glyphicon glyphicon-file black"></span>@ViewBag.Name</span>
+                </h3>
+            }
+            else
+            {
+                <h3>
+                    <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"> <span class="glyphicon glyphicon-file black"></span>@ViewBag.Name</span>
+                    <input type="submit" value="Save" class="btn btn-primary right" id="submit" style="width: 90px; background-color: #2980b9" />
+                </h3>
+                @Html.ActionLink("For Material Plan", "_ForMaterialPlan", "ProdOrderLine", new { id = @Model.ProdOrderHeaderId }, new { data_modal = "", id = "btnCreateF", @class = "btn btn-primary borderradii", @title = "For MaterialPlan", @data_toggle = "tooltip" })
+            }
+            <hr style="margin-top:0px;margin-bottom:0px" />*@
+
+           <hr style="margin-top: 5px; margin-bottom: 5px; border-top: 1px solid #d8d5d5" />
+            @{
+                string EditAction = "";
+                if (Model.Status == (int)StatusConstants.Drafted || Model.Status == (int)StatusConstants.Import)
+                {
+                    EditAction = "Modify";
+                }
+                else if ((Model.Status == (int)StatusConstants.Submitted || Model.Status == (int)StatusConstants.Modified))
+                {
+                    EditAction = "ModifyAfter_Submit";
+                }
+                else
+                {
+                    EditAction = "DetailInformation";
+                }
+            }
+            <div class="panel-info">
+                @*<h4 style="padding:5px 0 0 0;margin:0px">
+                    @Html.ActionLink(" ", " ", " ", null, new { @class = "glyphicon glyphicon-refresh toolbar", @title = "Refresh Page", @data_toggle = "tooltip", @id = "RefreshPage" })
+                    @Html.ActionLink(" ", "Create", "ProdOrderHeader", new { @id = ViewBag.id }, new { @class = "glyphicon glyphicon-plus toolbar", @title = "Add New", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "GetHistory", "LogHistory", new { Ids = Model.ProdOrderHeaderId, DocTypeId = Model.DocTypeId }, new { @class = "glyphicon glyphicon-user toolbar", @title = "History", @data_toggle = "tooltip", @id = "DocHistory", @data_modal = "" })
+                    @Html.ActionLink(" ", "GeneratePrints", "ProdOrderHeader", new { Ids = Model.ProdOrderHeaderId, DocTypeId = Model.DocTypeId }, new { @class = "glyphicon glyphicon-print toolbar", @title = "Print", @data_toggle = "tooltip", @id = "PrintRecordC", target = "_blank" })
+                    @Html.ActionLink(" ", "Email", "ProdOrderHeader", null, new { @class = "glyphicon glyphicon-envelope toolbar", @title = "Email", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "PrevPage", "ProdOrderHeader", new { id = @Model.ProdOrderHeaderId }, new { @class = "glyphicon glyphicon-arrow-left toolbar", @title = "Prev Record", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "NextPage", "ProdOrderHeader", new { id = @Model.ProdOrderHeaderId }, new { @class = "glyphicon glyphicon-arrow-right toolbar", @title = "Next Record", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "Index", "ProdOrderHeader", new { @id = ViewBag.id, IndexType = ViewBag.IndexStatus }, new { @class = "glyphicon glyphicon-list toolbar right", @title = "List", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "Report", "ProdOrderHeader", new { @id = ViewBag.id }, new { @class = "glyphicon glyphicon-th toolbar right", @title = "Report", @data_toggle = "tooltip" })
+                </h4>*@
+                <div class="btn-group">
+                    @Html.ActionLink(" ", "Create", "ProdOrderHeader", new { @id = ViewBag.id }, new { @class = "cbtn btn-circle glyphicon glyphicon-plus toolbar", @title = "Add New", @data_toggle = "tooltip" })
+                    @if (Model.ProdOrderHeaderId > 0)
+                    {
+                    @Html.ActionLink(" ", EditAction, "ProdOrderHeader", new { @id = Model.ProdOrderHeaderId, IndexType = ViewBag.IndexStatus }, new { @class = "cbtn btn-circle glyphicon glyphicon-edit", @title = "Edit", @data_toggle = "tooltip" })
+                    }
+                    @if (Model.ProdOrderHeaderId > 0 && ViewBag.SqlProcDocumentPrint != null)
+                    {
+                    @Html.ActionLink(" ", "GeneratePrints", "ProdOrderHeader", new { Ids = Model.ProdOrderHeaderId, DocTypeId = Model.DocTypeId }, new { @class = "cbtn btn-circle glyphicon glyphicon-print toolbar", @title = "Print", @data_toggle = "tooltip", @id = "PrintRecordC", target = "_blank" })
+                    }
+                    @Html.ActionLink(" ", "PrevPage", "ProdOrderHeader", new { DocId = @Model.ProdOrderHeaderId, DocTypeId = Model.DocTypeId }, new { @class = "cbtn btn-circle glyphicon glyphicon-arrow-left", @title = "Prev Record", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "NextPage", "ProdOrderHeader", new { DocId = @Model.ProdOrderHeaderId, DocTypeId = Model.DocTypeId }, new { @class = "cbtn btn-circle glyphicon glyphicon-arrow-right", @title = "Next Record", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "Index", "ProdOrderHeader", new { @id = ViewBag.id, IndexType = ViewBag.IndexStatus }, new { @class = "cbtn btn-circle glyphicon glyphicon-list", @title = "List", @data_toggle = "tooltip" })
+                </div>
+                <div class="btn-group">
+                    <a class="cbtn btn-circle glyphicon glyphicon-option-horizontal dropdown-toggle" title="More Option" aria-expanded="false" style="padding-top: 6px;padding-bottom: 6px;" href="#" data-toggle="dropdown" id="dropdownMenu1">
+                    </a>
+                    <ul class="dropdown-menu pull-right" aria-labelledby="dropdownMenu1">
+                    <li><a id="DocHistory" data-modal="" href="@Url.Action("GetHistory", "LogHistory", new { Ids = Model.ProdOrderHeaderId, DocTypeId = Model.DocTypeId })"><span class="glyphicon glyphicon-user"> </span> History</a></li>
+                        @*<li><a href="@Url.Action("Email", "ProdOrderHeader")"><span class="glyphicon glyphicon-envelope"> </span> Email</a></li>*@
+                        <li role="separator" class="divider"></li>
+                        <li><a target="_blank" href="@Url.Action("Report", "ProdOrderHeader", new { @id = ViewBag.id })"><span class="glyphicon glyphicon-th"> </span> Report</a></li>
+                     </ul>
+             </div>
+            </div>
+        </div>
+        <div class="panel-info" style="padding-left:15px">
+            <div class="form-horizontal">
+                @Html.ValidationSummary(true)
+
+                <div>
+                    <h4 class="col-md-12 black">
+                        <span class="glyphicon glyphicon-align-justify"></span>
+                        1.Document Details
+                    </h4>
+                    <div>
+                        <div>
+
+                            <div class="col-md-6">
+                                <div class="form-group" style="margin-top:15px">
+                                    @Html.LabelFor(model => model.DocDate, "Plan Date", new { @class = "control-label col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextBoxFor(m => m.DocDate, "{0:dd/MMMM/yyyy}", new { @class = "datepickerWithNFD form-control col-xs-6 required" })
+                                        @Html.ValidationMessageFor(model => model.DocDate, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group" style="margin-top:15px">
+                                    @Html.LabelFor(model => model.DocNo, "Plan No.", new { @class = "control-label col-md-4 col-sm-2" })
+                                    <div  class="col-md-7 col-sm-10">
+                                        @Html.TextBoxFor(m => m.DocNo, null, new { @class = "form-control col-xs-6 required" })
+                                        @Html.ValidationMessageFor(m => m.DocNo, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.BuyerId, "Party", new { @class = "control-label col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextBoxFor(m => m.BuyerId, new { @class = "form-control col-xs-6" })
+                                        @Html.ValidationMessageFor(m => m.BuyerId, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.DueDate, "Due Date", new { @class = "control-label col-md-4 col-sm-2" })
+                                    <div  class="col-md-7 col-sm-10">
+                                        @Html.TextBoxFor(m => m.DueDate, "{0:dd/MMMM/yyyy}", new { @class = "datepicker form-control col-xs-6 required" })
+                                        @Html.ValidationMessageFor(m => m.DueDate, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.MaterialPlanDocNo, "Material Plan", new { @class = "control-label col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextBoxFor(m => m.MaterialPlanDocNo, new { @class = "form-control col-xs-6", @readonly = true })
+                                        @Html.ValidationMessageFor(m => m.MaterialPlanDocNo, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <h4 class="col-md-12 black" style="margin-top:15px">
+                        <span class="glyphicon glyphicon-shopping-cart"></span>
+                        2.Products
+                    </h4>
+                </div>
+
+              @*<div class="panel-info">
+                    <h5 style="padding:5px 0 3px 0;margin:0px;font-weight:bold">
+                        <span class="glyphicon glyphicon-plus-sign"></span>
+                        @{string Action = "";
+                        if (Model.Status == (int)StatusConstants.Drafted || Model.Status == (int)StatusConstants.Import)
+                        { Action = "CreateLine"; }
+                        else if (Model.Status == (int)StatusConstants.Submitted || Model.Status == (int)StatusConstants.Modified)
+                        { Action = "CreateLineAfter_Submit"; }
+                        }
+                        @Html.ActionLink("Add New Row ", Action, "ProdOrderLine", new { id = @Model.ProdOrderHeaderId }, new { data_modal = "", id = "btnCreate", @class = "toolbar", @title = "Add New", @data_toggle = "tooltip" })
+                    </h5>
+                </div>*@
+                <div id="Div1">
+                    <div class="panel-info" style="height:40px">
+                        <div class="btn-group" style="padding:5px 0 3px 0;margin:0px;font-weight:bold">
+                            <span class="glyphicon glyphicon-plus-sign"></span>
+                            @{string Action = "";
+                                if (Model.Status == (int)StatusConstants.Drafted || Model.Status == (int)StatusConstants.Import)
+                                { Action = "CreateLine"; }
+                                else if (Model.Status == (int)StatusConstants.Submitted || Model.Status == (int)StatusConstants.Modified)
+                                { Action = "CreateLineAfter_Submit"; }
+                            }
+                            @Html.ActionLink("Add New Row ", Action, "ProdOrderLine", new { id = @Model.ProdOrderHeaderId }, new { data_modal = "", id = "btnCreate", @class = "toolbar", @title = "Add New", @data_toggle = "tooltip" })
+                        </div>
+                        <div class="btn-group right" style="padding-right:15px">
+                            @Html.ActionLink(" ", "_ForMaterialPlan", "ProdOrderLine", new { id = @Model.ProdOrderHeaderId }, new { data_modal = "", id = "btnCreateF", @class = "cbtn btn-circle glyphicon glyphicon-link", @title = "For MaterialPlan", @data_toggle = "tooltip" })
+                        </div>
+                    </div>
+                </div>
+                    <div style="padding-right:15px">
+
+                        <div class="panel panel-default" id="grid">
+                            <div class="panel-heading headrow" style="background-image: -webkit-linear-gradient(top, #428bca 0%, #428bca 100%);color:white">
+                                <div class="row grid-head">
+                                    <div class="col-xs-1 text-left">
+                                        Srl.
+                                    </div>
+                                    <div class="col-xs-10">
+                                        <div class="row">
+                                            @*ProductInfo*@
+                                            <div class="col-sm-6">
+                                                Product Name
+                                            </div>
+                                            @*Qty*@
+                                            <div class="col-sm-2 text-right">
+                                                Quantity
+                                            </div>
+                                            @*Rate*@
+                                            @*Remark*@
+                                            <div class="col-sm-3">
+                                                Remark
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-1">
+
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="panel-info" id="gbody">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+        </div>
+    </div>
+}
+
+@if ((ViewBag.Mode == "Add") || (ViewBag.Mode == "Edit"))
+{
+    <script type="text/javascript">
+        $(function(){
+            $('#DocTypeId').focus();
+        })
+
+        CustomSelectFunction($("#BuyerId"), '/ProdOrderHeader/GetCustomPerson', '/ComboHelpList/SetSinglePerson', ' ', false, 1,$('#DocTypeId').val());
+
+        //CustomSelectFunction($("#SaleToBuyerId"), '/ComboHelpList/GetBuyers', '/ComboHelpList/SetSingleBuyer', ' ', false, 0);
+        //CustomSelectFunction($("#BillToBuyerId"), '/ComboHelpList/GetBuyers', '/ComboHelpList/SetSingleBuyer', ' ', false, 0);
+
+        //CustomSelectFunction($("#BillToBuyerId"), '/SaleEnquiryHeader/GetCustomPerson', '/ComboHelpList/SetSinglePerson', ' ', false, 1,$('#DocTypeId').val());
+        //CustomSelectFunction($("#SaleToBuyerId"), '/SaleEnquiryHeader/GetCustomPerson', '/ComboHelpList/SetSinglePerson', ' ', false, 1,$('#DocTypeId').val());
+
+
+        $("#DocNo").on("change", function () {
+            $(this).DuplicateCheckForCreate({ name: 'ProdOrderHeader', value: $(this).val(), doctype: $("#DocTypeId").val() });
+        });
+
+        var IsSaved=false;
+        var ValidationCount=0;
+
+        $('form').submit(function(event){
+
+            if(!IsSaved)
+            {
+                if(!ValidateData())
+                {
+                    return false;
+                }
+                IsSaved=true;
+                return IsSaved;
+            }
+            else
+            {
+                return false;
+            }
+
+
+        });
+
+
+        function ValidateData() {
+            var DocId=@Model.ProdOrderHeaderId;
+            var TempValue;
+            var ValidationMessage="";
+
+
+
+            //Checking for dulicate key value
+            if(DocId<=0)
+            {
+                TempValue= $('#DocNo').DuplicateCheckForCreate({ name: 'ProdOrderHeader', value: $('#DocNo').val(), doctype: $('#DocTypeId').val() });
+                if (TempValue){ ValidationMessage=$('#DocNo').val() + " already exist <br />";}
+            }
+            else
+            {
+                test = $('#DocNo').DuplicateCheckForEdit({ name: 'ProdOrderHeader', value: $('#DocNo').val(), doctype: $('#DocTypeId').val(),headerId:DocId });
+                if (TempValue) {ValidationMessage+=$('#DocNo').val() + " already exist <br />";}
+            }
+            if(TempValue)
+            {
+                if($('#validationerrormsg').length==0){
+                    $('.panel-info').filter(':eq(1)').before('<div class="alert alert-danger" role="alert" id="validationerrormsg">'+ValidationMessage+'</div>');}
+                else
+                {
+                    $('#validationerrormsg').html(ValidationMessage);
+                }
+            }
+            return  (ValidationMessage=="");
+
+        }
+        $('#SaleToBuyerId').change(function () {
+
+            var cid = $("#SaleToBuyerId").val();
+            var cdata = $('#SaleToBuyerId').select2('data').text;
+            $("#BillToBuyerId").select2('data', { id: cid, text: cdata });
+
+
+        });
+
+        //Reloading the table contents on modal hide
+        $('#myModal').on('hidden.bs.modal', function () {
+            LoadProducts();
+        });
+
+        $(document).ready(function(){
+            enableModalTransitions();
+        })
+
+        //To focus on the first element on modal load
+        $('#myModal').on('shown.bs.modal', function () {
+            $("#ProductId").select2("focus");
+        });
+
+        //For Populating Modal PopUp on DoubleClick Of Row
+        $('#gbody').on("dblclick",'.grid-body',function(){
+            var editurl=$(this).find('a[edit]').attr('href');
+            $('#myModalContent').load(editurl, function () {
+                //alert('2');
+                $('#myModal').modal({
+                    backdrop: 'static',
+                    keyboard: true
+                }, 'show');
+
+                bindForm1(this);
+            });
+        });
+
+
+        //For Handling Modal PopUp on Clicking Delete Icon
+        $('#gbody').on("click",'a[delete]', function (e) {
+            $('#myModalContent').load(this.href, function () {
+                //alert('2');
+                $('#myModal').modal({
+                    backdrop: 'static',
+                    keyboard: true
+                }, 'show');
+
+                bindForm1(this);
+            });
+            return false;
+        });
+
+        //For posting the data through ajax and render the contents sent back from the server
+        function bindForm1(dialog) {
+            //alert("binding");
+            $('form#modform', dialog).submit(function () {
+                //alert(this.action);
+                $.ajax({
+                    url: this.action,
+                    type: this.method,
+                    data: $(this).serialize(),
+                    success: function (result) {
+                        if (result.success) {
+                            $('#myModal').modal('hide');
+                            //Refresh
+                            //location.reload();
+                            //alert('Data Saved');
+                        }else if(!result.success)
+                        {
+                            $('#myModalContent').html(result);
+                            bindForm1();
+                        }
+                        else {
+                            $('#myModalContent').html(result);
+                            bindForm1();
+                        }
+                    }
+                });
+                return false;
+            });
+
+        }
+
+    </script>
+
+}
+
+
+<script type="text/javascript">
+    var form_clean;
+    $(document).ready(function () {
+
+        //Adding Hidden Input Fields
+        AddFields();
+
+        //Calling the function to load the table data/ Line information
+        LoadProducts();
+
+
+
+        //form_clean = $("form").serialize();
+
+
+        ////For maintaining the data change on the form
+        ////To enable of disable save button based on the data changed
+        //$("input,select").change(function () {
+        //    var form_dirty = $("form").serialize();
+        //    if (form_clean != form_dirty) {
+        //        $("#submit").removeAttr('disabled');
+        //    }
+        //    else
+        //    {
+        //        // alert('same form');
+        //        $("#submit").attr({ "disabled": "disabled" })
+        //    }
+        //});
+    });
+
+
+    var id=@Model.ProdOrderHeaderId;
+    if(id==null||id==0)
+    {
+        $(document).find('a#btnCreate').removeAttr('href').removeAttr('data-modal');
+        $(document).find('a#btnCreateF').removeAttr('href').removeAttr('data-modal');
+    }
+
+
+
+
+
+    function AddFields(){
+        $('form:last').append($("<input type='hidden' name='UserRemark'></input>"))
+    }
+
+
+    function LoadProducts() {
+        var groupId=@Model.ProdOrderHeaderId;
+        var status='@Model.Status';
+        var LineEditUrl;
+        var LineDeleteUrl;
+        if(status==StatusContstantsEnum.Drafted||status==StatusContstantsEnum.Import)
+        {
+            LineEditUrl="/ProdOrderLine/_ModifyLine/";
+            LineDeleteUrl="/ProdOrderLine/_DeleteLine/";
+        }
+        else if(status==StatusContstantsEnum.Submitted || status == StatusContstantsEnum.Modified )
+        {
+            LineEditUrl="/ProdOrderLine/_ModifyLineAfterSubmit/";
+            LineDeleteUrl="/ProdOrderLine/_DeleteLine_AfterSubmit/";
+        }
+        else
+        {
+            LineEditUrl="/ProdOrderLine/_Detail/";
+            LineDeleteUrl="/ProdOrderLine/_Detail/";
+        }
+        var link="/ProdOrderLine/Index/"+groupId;
+        var QtyCount=0;
+        var AmountCount=0;
+        var unit=true;
+        var prevunit;
+        var decimal=0;
+        $.ajax({
+            url: link,
+            type: "GET",
+            success: function (data) {
+                var row = ""
+                var srno=1;
+
+                if(data.length!=0)
+                {
+                    $.each(data, function (index, item) {
+                        row +="     <div class='row crow grid-body' style='margin-left:0px;margin-right:0px'>"
+                            +"              <div class='col-xs-1 row-index'>"+srno
+                            +"                  <input type='hidden' class='id' value='"+item.ProdOrderLineId+"' />"
+                            +"              </div>"
+                            +"              <div class='col-xs-10'>"
+                            +"                  <div class='row'>"
+                            +"                      <div class='col-sm-6'>"+(item.ProductName==null?" ":"<strong>"+item.ProductName+"</strong>")+"<br />"+(item.Specification==null?" ":item.Specification)
+                            +"                          <div>"+(item.Dimension1Name==null?" ":item.Dimension1Name+",")+(item.Dimension2Name==null?" ":item.Dimension2Name+",")+(item.Dimension3Name==null?" ":item.Dimension3Name+",")+(item.Dimension4Name==null?" ":item.Dimension4Name)+"</div>"
+                            +"                      </div>"
+                            +"                      <div class='col-sm-2 text-right'>"+(item.Qty==null?" ":item.Qty.toFixed(item.unitDecimalPlaces))+"<br />"
+                            +"                              <div>"
+                            +"                                  <small>"+(item.UnitId==null?" ":item.UnitId)+"</small>"
+                            +"                              </div> "
+                            +"                      </div>"
+                            +"                      <div class='col-sm-3'>"
+                            +                           (item.Remark==null?" ":item.Remark+"<br />")
+                            +"                      </div>"
+                            +"                  </div>"
+                            +"              </div>"
+                            +"              <div class='col-xs-1'>"
+                            +"                   <a class='glyphicon glyphicon-trash icon-Cus-Size' delete='' href='"+LineDeleteUrl+item.ProdOrderLineId+"'></a>"
+                            +"                   <a  edit='' href='"+LineEditUrl+item.ProdOrderLineId+"'></a>"
+                            +"               </div>"
+                            +"      </div>"
+                            +"      <hr style='margin-top:0px;margin-bottom:0px'/>"
+
+                        QtyCount+=item.Qty;
+                        AmountCount+=item.Amount;
+                        if(srno!=1)
+                        {
+                            if(item.UnitId==prevunit)
+                            {}
+                            else
+                            {unit=false;}
+                        }
+                        if(decimal<item.unitDecimalPlaces){decimal=item.unitDecimalPlaces;}
+                        srno++;
+                        prevunit=item.UnitId;
+                    });
+                    row+="<div class='row tfooter' style='padding-top:10px;'>"
+                        +"  <div class='col-xs-1'>"
+                        +"  </div>"
+                        +"  <div class='col-xs-10'>"
+                        +"      <div class='row'> "
+                        +"          <div class='col-sm-6'>"
+                        +"              <strong>Total</strong>"
+                        +"          </div>"
+                        +"          <div class='col-sm-2 text-right'>"
+                        +"              <strong>"+ ((unit==true)?QtyCount.toFixed(decimal)+"<br />":QtyCount.toFixed(decimal))+"</strong>"
+                        +"          </div>"
+                        +"          <div class='col-sm-3'>"
+                        +"          </div>"
+                        +"      </div>"
+                        +"  </div>"
+                        +"  <div class='col-xs-1'>"
+                        +"  </div>"
+                        +"</div>"
+
+
+
+                    $('#DocNo').attr('readonly','true');
+                }
+                else
+                {
+
+                }
+                $("#gbody").html(row);
+
+            },
+            error: function (result) {
+                alert("Error");
+            }
+        });
+    }
+</script>
+
+
+
+
+@if ((ViewBag.Mode != "Add") && (ViewBag.Mode != "Edit"))
+{
+    <script type="text/javascript">
+
+        RemoveFields();
+
+        function RemoveFields(){
+            //Disabling input fields
+            $(':input:not(:submit)').attr('disabled','disabled');
+
+            //Removing all the events from the newly created lines
+            $('#gbody').unbind();
+
+            //Removing Add New Row ActionLink
+            //$('a#btnCreate').parents('h5')[0].remove();
+            $('#Div1').remove();
+
+            //Preventing the click event on newly created elements
+            $(document).on('click','#gbody a',function(event){
+                event.preventDefault();
+            })
+            //Removing the action link from the form so that the request will be redirected to the Submit function in the controller instead of the hardcoded path
+            $('form:last').prop('action','');
+        }
+
+
+    </script>
+}
+
+@if ((Model.Status == (int)ActivityTypeContants.Modified || Model.Status == (int)ActivityTypeContants.Submitted)
+ && (ViewBag.transactionType == "submit" || ViewBag.transactionType == "submitContinue" || ViewBag.transactionType == "review" || ViewBag.transactionType == "ReviewContinue"))
+{
+    <script type="text/javascript">
+
+        var href = '/ActivityLog/LogEditReason';
+        var $btnClicked;
+
+        $(':submit').bind('click', function () {
+            $btnClicked=$(this);
+            $('#myModalContent').load(href, function () {
+
+                $('#myModal').modal({
+                    backdrop: 'static',
+                    keyboard: true
+                }, 'show');
+
+                bindForm1(this);
+            });
+
+            return false;
+        })
+
+        function bindForm1(dialog) {
+
+            $('#modformr', dialog).submit(function () {
+
+                $.ajax({
+                    url: this.action,
+                    type: this.method,
+                    data: $(this).serialize(),
+                    success: function (result) {
+                        if (result.success) {
+                            $('#myModal').modal('hide');
+
+                            $(':submit').unbind();
+
+                            $('input[name="UserRemark"]').val(result.UserRemark);
+
+                            $btnClicked.trigger('click');
+
+                        } else {
+                            $('#myModalContent').html(result);
+                            bindForm1();
+                        }
+                    }
+                });
+                return false;
+            });
+
+        }
+
+    </script>
+}
+
+
+
+
+
+
+
+
+
+

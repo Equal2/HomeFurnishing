@@ -1,0 +1,115 @@
+﻿@using GridMvc.Html;
+
+@model IQueryable<Models.Customize.ViewModels.JobOrderHeaderViewModel>
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    string ControllerName = (string)ViewContext.RouteData.Values["controller"];
+    string IndexStatus = (string)ViewBag.IndexStatus;
+}
+
+<style type="text/css">
+    .panel-info .dropdown-toggle:hover {
+        color: #1AAFD0;
+    }
+</style>
+
+<!-- modal placeholder-->
+<div id='myModal' class='modal fade in'>
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div id='myModalContent'></div>
+        </div>
+    </div>
+</div>
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3>
+            <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-list black"></span> @ViewBag.Name List </span>
+        </h3>
+        <hr style="margin-top:0px;margin-bottom:0px" />
+        <input type="hidden" class="DocType_Id" value="@ViewBag.id">
+        <div class="panel-info">
+            <h4 style="padding: 5px 0 0 0; margin: 0px; position: relative" class="dropdown">
+                @Html.ActionLink(" ", " ", " ", null, new { @class = "glyphicon glyphicon-refresh toolbar", @title = "Refresh Page", @data_toggle = "tooltip", @id = "RefreshPage" })
+                @Html.ActionLink(" ", "Create", "JobOrderHeader", new { @id = @ViewBag.id }, new { @class = "glyphicon glyphicon-plus toolbar", @title = "Add New", @data_toggle = "tooltip" })
+                @Html.ActionLink(" ", "GetHistory", "LogHistory", null, new { @class = "glyphicon glyphicon-user toolbar", @title = "History", @data_toggle = "tooltip", @id = "DocHistoryI" })
+                @Html.ActionLink(" ", "GeneratePrints", "JobOrderHeader", null, new { @class = "glyphicon glyphicon-print toolbar", @title = "Print", @data_toggle = "tooltip", @id = "PrintRecordI", target = "_blank" })
+                @Html.ActionLink(" ", "GenerateGatePass", "JobOrderHeader", null, new { @class = "glyphicon glyphicon glyphicon-log-out toolbar", @title = "GatePass", @data_toggle = "tooltip", @id = "GenGatePassI" })
+                @Html.ActionLink(" ", "Remove", "JobOrderHeader", null, new { @class = "glyphicon glyphicon-trash toolbar", @title = "Delete", @data_toggle = "tooltip", @id = "DeleteRecord", @data_modal = "", onclick = "" })
+                @Html.ActionLink(" ", "Report", "JobOrderHeader", new { @ViewBag.id }, new { @class = "glyphicon glyphicon-stats toolbar right", @title = "Report", @data_toggle = "tooltip", @id = "ReportRecord", target = "_blank" })
+                @Html.ActionLink(" ", "Wizard", "JobOrderHeader", new { @id = @ViewBag.id }, new { @class = "glyphicon glyphicon-import toolbar right", @title = "Wizard", @data_toggle = "tooltip" })
+                @Html.ActionLink(" ", "Import", "JobOrderHeader", new { @id = @ViewBag.id }, new { @class = "glyphicon glyphicon-import toolbar right", @title = "Import", @data_toggle = "tooltip" })
+                @Html.ActionLink(" ", "", "", null, new { @class = "glyphicon glyphicon-export toolbar right", @title = "Export", @data_toggle = "tooltip" })
+                @Html.ActionLink(" ", "Create", "JobOrderSettings", new { @id = @ViewBag.id }, new { @class = "glyphicon glyphicon-cog toolbar right", @title = "Default Settings", @data_toggle = "tooltip" })
+                @Html.ActionLink(" ", "Index", "JobOrderHeader", new { @id = @ViewBag.id }, new { @class = "glyphicon glyphicon-list toolbar right", @title = "Index", @data_toggle = "tooltip" })
+
+
+                @*<a href="#" class="dropdown-toggle toolbar right" data-toggle="dropdown" id="dropdownMenu1">
+                        <i class="glyphicon glyphicon-th"></i>
+                        <span class="label label-danger"></span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1">
+                        <li><a href="#"><span class="glyphicon glyphicon-cog"> </span> Action</a></li>
+                        <li><a href="#"><span class="glyphicon glyphicon-cog"> </span> Another action</a></li>
+                        <li><a href="#"><span class="glyphicon glyphicon-cog"> </span> Something else here</a></li>
+                        <li><a href="#"><span class="glyphicon glyphicon-cog"> </span> Action</a></li>
+                        <li><a href="#"><span class="glyphicon glyphicon-cog"> </span> Another action</a></li>
+                        <li><a href="#"><span class="glyphicon glyphicon-cog"> </span> Something else here asdas asd</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="#"><span class="glyphicon glyphicon-cog"> </span> Separated link</a></li>
+                    </ul>*@
+            </h4>
+
+        </div>
+        <hr style="margin-top: 5px; margin-bottom: 5px; border-top: 1px solid #706f6f; " />
+
+        @CustomHelpers.RenderStatusFilters(ViewBag.PendingToSubmit, ViewBag.PendingToReview, ControllerName, ViewBag.id, ViewBag.IndexStatus)
+
+    </div>
+    <div class="panel-info" style="padding-left:5px;padding-top:2px;font-size:12px">
+
+        @if (ViewBag.IsPostedInStock == true)
+        {
+            @Html.Grid(Model).Columns(columns =>
+           {
+               columns.Add(m => m.JobOrderHeaderId, true).Css("Header_Id");
+               columns.Add(m => m.Status, true);
+               columns.Add().Encoded(false).Sanitized(false).SetWidth("5%").RenderValueAs(m => CustomHelpers.RenderCheckBox("GpNo:" + m.GatePassDocNo + ",GpDate:" + m.GatePassDocDate, m.GatePassHeaderId, m.GatePassStatus));
+               columns.Add(foo => foo.DocDate).Sortable(true).Titled("Order Date").Format("{0:dd/MMM/yyyy}").Filterable(true);
+               columns.Add(m => m.DocNo).Sortable(true).Titled("Order No.").Filterable(true).Sortable(true);
+               columns.Add(foo => foo.DueDate).Sortable(true).Titled("Due Date").Format("{0:dd/MMM/yyyy}").Filterable(true);
+               columns.Add(m => m.CostCenterName).Sortable(true).Titled("CostCenter").Filterable(true).Sortable(true);
+               columns.Add(m => m.JobWorkerName).Sortable(true).Filterable(true).Titled("Job Worker");
+               columns.Add(m => m.GodownName).Sortable(true).Filterable(true).Titled("Godown");
+               columns.Add().RenderValueAs(m => CustomHelpers.RenderTotal(m.TotalQty, m.DecimalPlaces)).Sanitized(false).Encoded(false).Titled("TotalQty");
+               columns.Add().Sanitized(false).Encoded(false).RenderValueAs(m => CustomHelpers.RenderStatus(m.Status)).Titled("Status");
+               columns.Add().Titled("").Encoded(false).Sanitized(false).RenderValueAs(m => CustomHelpers.RenderUserImage(m.ModifiedBy)).Titled("User").SetWidth("5%").Css("UserImageIndex");
+               columns.Add().Encoded(false).Sanitized(false).RenderValueAs(m => CustomHelpers.RenderActionColumn(ControllerName, m.JobOrderHeaderId, m.Status, m.Reviewed, m.ReviewCount, (string)ViewBag.IndexStatus)).SetWidth(20).Css("icon-Cus-Size");
+               columns.Add(true).RenderValueAs(m => CustomHelpers.RenderHEDActionLink(ControllerName, m.JobOrderHeaderId, m.Status, IndexStatus));
+           }).WithPaging(25).EmptyText("No records found.")
+        }
+        else
+        {
+            @Html.Grid(Model).Columns(columns =>
+           {
+               columns.Add(m => m.JobOrderHeaderId, true).Css("Header_Id");
+               columns.Add(m => m.Status, true);
+               columns.Add().Encoded(false).Sanitized(false).SetWidth("5%").RenderValueAs(m => CustomHelpers.RenderCheckBox("GpNo:" + m.GatePassDocNo + ",GpDate:" + m.GatePassDocDate, m.GatePassHeaderId, m.GatePassStatus));
+               columns.Add(foo => foo.DocDate).Sortable(true).Titled("Order Date").Format("{0:dd/MMM/yyyy}").Filterable(true);
+               columns.Add(m => m.DocNo).Sortable(true).Titled("Order No.").Filterable(true).Sortable(true);
+               columns.Add(foo => foo.DueDate).Sortable(true).Titled("Due Date").Format("{0:dd/MMM/yyyy}").Filterable(true);
+               columns.Add(m => m.CostCenterName).Sortable(true).Titled("CostCenter").Filterable(true).Sortable(true);
+               columns.Add(m => m.JobWorkerName).Sortable(true).Filterable(true).Titled("Job Worker");
+               columns.Add(m => m.Remark).Sortable(true).Filterable(true).Titled("Remark");
+               columns.Add().RenderValueAs(m => CustomHelpers.RenderTotal(m.TotalQty, m.DecimalPlaces)).Sanitized(false).Encoded(false).Titled("TotalQty");
+               columns.Add().Sanitized(false).Encoded(false).RenderValueAs(m => CustomHelpers.RenderStatus(m.Status)).Titled("Status");
+               columns.Add().Titled("").Encoded(false).Sanitized(false).RenderValueAs(m => CustomHelpers.RenderUserImage(m.ModifiedBy)).Titled("User").SetWidth("5%").Css("UserImageIndex");
+               columns.Add().Encoded(false).Sanitized(false).RenderValueAs(m => CustomHelpers.RenderActionColumn(ControllerName, m.JobOrderHeaderId, m.Status, m.Reviewed, m.ReviewCount, (string)ViewBag.IndexStatus)).SetWidth(20).Css("icon-Cus-Size");
+               columns.Add(true).RenderValueAs(m => CustomHelpers.RenderHEDActionLink(ControllerName, m.JobOrderHeaderId, m.Status, IndexStatus));
+           }).WithPaging(25).EmptyText("No records found.")
+        }
+    </div>
+</div>

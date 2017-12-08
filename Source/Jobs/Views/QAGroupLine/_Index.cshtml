@@ -1,0 +1,156 @@
+﻿@model IEnumerable<Model.ViewModel.QAGroupLineViewModel>
+@using Core.Common
+
+
+<div style="min-width: 700px;">
+    <div class="panel-heading headrow">
+        <div class="row grid-head">
+            <div class="text-left block" style="width: 5%; ">
+                Srl.
+            </div>
+            <div class="block" style="width: 90%;">
+                <div class="row">
+                    @*ProductInfo*@
+                    <div class="block" style="width:15%; ">
+                      Name
+                    </div>
+                    <div class="block" style="width: 10%;">
+                        Is Mandatory
+                    </div>
+                    @*Qty*@
+                    <div class="block" style="width: 10%;">
+                        Data Type
+                    </div>
+                    <div class="block" style="width: 30%;">
+                        List Item
+                    </div>
+
+                    <div class="block" style="width: 15%;">
+                        Default Value
+                    </div>
+                    <div class="block" style="width: 10%;">
+                       Active
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="" style="width:5%">
+
+            </div>
+        </div>
+
+    </div>
+
+    @{
+        var SelectedRecord = ViewBag.DocLineId;
+        var DomainName = System.Configuration.ConfigurationManager.AppSettings["AdminSetupDomain"];
+        var groupId = ViewBag.QAGroupId;
+        int status = ViewBag.Status;
+        var LineEditUrl = "";
+        var LineDeleteUrl = "";
+        if (status == (int)StatusConstants.Drafted || status == (int)StatusConstants.Import)
+        {
+            LineEditUrl = "/QAGroupLine/_ModifyLine/";
+            LineDeleteUrl = "/QAGroupLine/_DeleteLine/";
+        }
+        else if (status == (int)StatusConstants.Submitted || status == (int)StatusConstants.Modified)
+        {
+            LineEditUrl = "/QAGroupLine/_ModifyLineAfterSubmit/";
+            LineDeleteUrl = "/QAGroupLine/_DeleteLine_AfterSubmit/";
+        }
+        else
+        {
+            LineEditUrl = "/QAGroupLine/DetailInformation/";
+            LineDeleteUrl = "/QAGroupLine/DetailInformation/";
+        }
+        var link = "/QAGroupLine/Index/" + groupId;
+
+        decimal QtyCount = 0;
+        decimal DealQtyCount = 0;
+        decimal AmountCount = 0;
+        var unit = true;
+        var dunit = true;
+        var prevunit = "";
+        var prevdunit = "";
+        var ddecimal = 0;
+        var DUdecimal = 0;
+    }
+
+
+    <div class="panel-info" id="gbody">
+
+        @{var srno = 1;}
+        @foreach (var item in Model)
+        {
+
+            
+
+            <div class='row crow grid-body' style='margin-left:0px;margin-right:0px' id='@item.QAGroupId'>
+                <div class='row-index block' style='width:5%'>@srno<input type='hidden' class='id' value='@item.QAGroupLineId' /></div>
+                <div class='block navbody' style='width:90%'>
+                    <div class='row'>
+                        <div class='block' style='width:15%'>
+                            @if (item.Name != null)
+                            {
+                                <strong> @item.Name </strong>
+                            }
+                        </div>
+                        <div class="block" style="width: 10%;">
+                            @if (item.IsMandatory != null)
+                            {
+                                <div>@item.IsMandatory</div>
+                            }
+                        </div>
+                        <div class="block" style="width: 10%;">
+                            @if (item.DataType != null)
+                            {
+                                <div>@item.DataType</div>
+                            }
+                        </div>
+                        <div class='block' style='width:30%'>
+                            @if (item.ListItem != null)
+                            {
+                               <strong>@item.ListItem</strong>
+                            }                            
+                        </div>
+                        <div class="block" style="width: 15%;">
+                            @if (item.DefaultValue != null)
+                            {
+                                <div>@item.DefaultValue</div>
+                            }
+                        </div>
+                        <div class="block" style="width: 10%;">
+                            @if (item.IsActive != null)
+                            {
+                                <div>@item.IsActive</div>
+                            }
+                        </div>
+                    </div>
+                </div>
+                <div class='block' style='width:5%'>
+                    <a class='glyphicon glyphicon-trash icon-Cus-Size hidden-xs' data-modal='' data-detaildisabled='true' delete='' href='@LineDeleteUrl@item.QAGroupLineId'></a>
+                    <a edit='' href='@LineEditUrl@item.QAGroupLineId'></a>
+                </div>
+            </div>
+            <hr style='margin-top:0px;margin-bottom:0px' />
+            srno++;
+
+
+
+        }
+
+
+        <div class='row tfooter' style='padding-top:10px;'>
+            <div class='block' style='width:5%'>
+            </div>
+            <div class='block' style='width:90%'>
+                
+            </div>
+            <div class='block' style='width:5%'>
+            </div>
+        </div>
+
+
+    </div>
+</div>

@@ -1,0 +1,346 @@
+﻿@model IEnumerable<Model.ViewModels.SaleDispatchLineViewModel>
+@using Core.Common
+
+
+@{
+    decimal? TDealQty;
+    decimal? TLossQty;  
+    TDealQty = Model.Sum(m => m.DealQty);
+    TLossQty = Model.Sum(m => m.LossQty);    
+    decimal? Uunit;
+    Uunit = Model.Sum(m => m.UnitId != m.DealUnitId ? 1 : 0);
+}
+<div style="min-width: 700px;">
+    <div class="panel-heading headrow">
+        <div class="row grid-head">
+            <div class="text-left block" style="width: 5%; ">
+                Srl.
+            </div>
+            <div class="block" style="width: 90%;">
+                <div class="row">
+                
+                    <div class="block" style="width: @(TDealQty > 0 && Uunit!=0 ?  25 :35)%; ">
+                        Product Name
+                    </div>
+                    <div class="block" style="width:15%;">
+                       Ref. No
+                    </div>
+                 
+                    @if (TDealQty > 0 && Uunit != 0)
+                    {
+                        <div class='text-right block' style='width:25%'>
+                            Qty
+                        </div>
+                    }
+                    else
+                    {
+                        <div class='text-right block' style='width:15%'>
+                           Qty
+                        </div>
+                    }
+
+                    @if (TDealQty > 0 && Uunit == 0)
+                    {
+                                        <div class='text-right block' style='width:10%'>
+                                            Unit
+                                        </div>
+                    }
+
+                   
+                    @if (TDealQty > 0 && Uunit != 0)
+                    {
+                        <div class='text-right block' style='width:10%'>
+                            Deal <Br>Qty
+                        </div>
+                    }
+
+                    @if (TLossQty>0)
+                    {
+                    <div  class='text-right block'  style='width:10%'>
+                       Loss <Br>Qty
+                    </div>
+                    }
+                    <div  class='text-left block'  style='width:@(TLossQty <= 0 ? 25 : 15)%'>
+                       Remark
+                    </div>
+                </div>
+            </div>
+            <div class="" style="width:5%">
+
+            </div>
+        </div>
+
+    </div>
+
+    @{
+        // var SelectedRecord = ViewBag.DocLineId;
+        // var DomainName = System.Configuration.ConfigurationManager.AppSettings["AdminSetupDomain"];
+        var groupId = ViewBag.SaleDispatchHeaderId;
+        int status = ViewBag.Status;
+        var LineEditUrl = "";
+        var LineDeleteUrl = "";
+        if (status == (int)StatusConstants.Drafted || status == (int)StatusConstants.Import)
+        {
+            LineEditUrl = "/SaleDispatchLine/_ModifyLine/";
+            LineDeleteUrl = "/SaleDispatchLine/_DeleteLine/";
+        }
+        else if (status == (int)StatusConstants.Submitted || status == (int)StatusConstants.Modified || status == (int)StatusConstants.ModificationSubmitted)
+        {
+            LineEditUrl = "/SaleDispatchLine/_ModifyLineAfterSubmit/";
+            LineDeleteUrl = "/SaleDispatchLine/_DeleteLine_AfterSubmit/";
+        }
+        else if (status == (int)StatusConstants.Approved)
+        {
+            LineEditUrl = "/SaleDispatchLine/_ModifyLineAfterApprove/";
+            LineDeleteUrl = "/SaleDispatchLine/_DeleteLine_AfterApprove/";
+        }
+        var link = "/SaleDispatchLine/Index/" + groupId;
+        //
+        decimal QtyCount = 0;
+        decimal DealQtyCount = 0;
+        decimal ? LossQtyCount = 0;
+        decimal AmountCount = 0;
+        var unit = true;
+        var prevunit="";
+        var dealunit = true;
+        var prevdealunit="";
+        var ddecimal= 0;
+        decimal dealdecimal = 0;      
+    }
+
+
+
+    <div class="panel-info" id="gbody">
+
+        @{var srno = 1;}
+        @foreach (var item in Model)
+        {
+
+            //var OrderUrl = DomainName + "/Redirect/RedirectToDocument?DocTypeId=" + item.OrderDocTypeId + "&DocId=" + item.OrderHeaderId + "&DocLineId=" + item.JobOrderLineId;
+            // var BarCodeUrl = DomainName + "/Redirect/BarCodeDetail?BarCode=" + item.ProductUidName;
+            
+
+
+             <div class='row crow grid-body' style='margin-left:0px;margin-right:0px' id='@item.SaleDispatchLineId '>
+                     <div class='row-index block'  style='width:5%'>@srno<input type='hidden' class='id' value='@item.SaleDispatchLineId' /></div>
+                                 <div class='block'  style='width:90%'>
+                                          <div class='row'>
+                                              <div class='block' style='width:@(TDealQty > 0 && Uunit!=0 ?  25 :35)%'>
+                                                  @if(item.ProductName!=null)
+                                                  {
+                                                       <strong> @item.ProductName </strong>
+                                                  }
+                                                  @if (item.Specification != null)
+                                                  {
+                                                    <div>@item.Specification </div>
+                                                  }
+                                                  <div>@(item.Dimension1Name == null ? " " : item.Dimension1Name + ",")@(item.Dimension2Name == null ? " " : item.Dimension2Name)</div>
+                                                  @if (item.ProductUidName != null)
+                                                  {
+                                                    <div> Product UID : <a href='#' target='_blank'>@item.ProductUidName </a></div>
+
+                                                  }
+                                                  </div>
+
+                                              <div class='block' style='width:15%'>
+                                                  @if (item.SaleOrderHeaderDocNo != null)
+                                                  {
+                                                    <a href='#'  class='nav' style='color:black'><span class='small' style='font-weight:bold'>Order No:@item.SaleOrderHeaderDocNo</span></a>
+                                                  }
+                                              </div>
+                                      
+
+                                              @if (item.Qty != null)
+                                              {
+                                                  if (TDealQty > 0 && Uunit != 0)
+                                                  {
+                                                      <div class='text-right block' style='width:25%'>
+                                                    @Math.Round(item.Qty, item.unitDecimalPlaces).ToString()<br />
+                                                    <div>
+                                                        <small>@(item.UnitId == null ? " " : item.UnitId)</small>
+                                                    </div>
+                                                   </div>
+                                                  }
+                                                  else
+                                                  {
+                                                    <div class='text-right block' style='width:15%'>
+                                                        @Math.Round(item.Qty, item.unitDecimalPlaces).ToString()
+                                                </div>
+                                                }
+                                                }
+                                                        @if (TDealQty > 0 && Uunit == 0)
+                                                        {
+                                                            <div class='text-right block' style='width:10%'>
+                                                                <small>@(item.UnitId == null ? " " : item.UnitId)</small>
+                                                            </div>
+                                                        }
+
+                                                        @if (TDealQty > 0 && Uunit != 0)
+                                                        {   <div class='text-right block' style='width:10%'>
+                                                            @(item.DealQty == null ? " " : Math.Round(item.DealQty, 3).ToString())<br />
+                                                            <div>
+                                                                <small>@(item.DealUnitId == null ? " " : item.DealUnitId)</small>
+                                                            </div>
+                                                        </div>
+                                                        }
+
+                                                        @if (TLossQty > 0)
+                                                        {
+                                                            <div class='text-right block' style='width:10%'>                                                                   
+                                                                @(item.LossQty == null ? ' ' : item.LossQty)                                            
+                                                            </div>
+                                                        }
+
+
+                                                     
+
+
+                                                        <div class='text-left block' style='width:@(TLossQty <= 0 ? 25 : 15)%'>
+                                                            @if (item.Remark != null)
+                                                            {
+                                                                <small>Remark : @item.Remark</small>
+                                                            }                                                          
+                                                            @if (((item.Qty + item.LossQty) - item.PassQty) > 0)
+                                                            {
+                                                                <div>Fail Qty : @((item.Qty + item.LossQty) - item.PassQty)<small>@(item.UnitName == null ? " " : item.UnitName)</small></div>
+                                                            }
+
+
+                                                        </div>
+                                                    </div>
+                      </div>
+
+                  
+                                                 <div class='block'  style='width:5%'>
+                                                               <a class='glyphicon glyphicon-trash icon-Cus-Size' data-modal data-detailDisabled='true' delete='' href='@LineDeleteUrl@item.SaleDispatchLineId'></a>
+                                                               <a  edit='' href='@LineEditUrl@item.SaleDispatchLineId'></a>
+                                                         </div>
+
+
+                     
+
+                                            </div>
+                                               <hr style='margin-top:0px;margin-bottom:0px'/>
+            QtyCount += item.Qty;
+            LossQtyCount += item.LossQty;
+            //AmountCount += item.Amount;
+            DealQtyCount += item.DealQty;
+            if (srno != 1)
+            {
+                if (item.UnitId == prevunit && unit != false)
+                { }
+                else
+                { unit = false; }
+            }
+
+            if (ddecimal - item.unitDecimalPlaces < 0) { ddecimal= item.unitDecimalPlaces; }
+            srno++;
+            prevunit = item.UnitId;
+            prevdealunit = item.DealUnitId;
+        }
+
+        <div class='row tfooter' style='padding-top:10px;margin-left:0px;margin-right:0px'>
+         
+           <div class='block' style='width:5%'>
+               
+            </div>
+           <div class='block' style='width:90%'>
+               
+
+               <div class="row">
+    @*ProductInfo*@
+    <div class="block" style='width:@(TDealQty > 0 && Uunit!=0 ?  25 :35)%'>
+        <strong>Total</strong>
+    </div>
+
+
+    <div class="block" style="width:15%;">
+       
+    </div>
+
+
+
+    @*Amount*@
+    @if (TDealQty > 0 && Uunit != 0)
+    {
+        <div class='text-right block' style='width:25%'>
+            <strong>
+
+                @if (unit)
+                {
+                    @Decimal.Round(QtyCount, ddecimal);
+                    <br />
+                                @prevunit;
+                }
+                else
+                {
+                    <small> @Decimal.Round(QtyCount, ddecimal).ToString() </small>
+                }
+            </strong>
+        </div>
+    }
+    else
+    {
+        <div class='text-right block' style='width:15%'>
+            <strong>
+                @Decimal.Round(QtyCount, ddecimal)
+            </strong>
+            </div>
+     }
+
+@if (TDealQty > 0 && Uunit == 0)
+{
+    <div class='text-right block' style='width:10%'>
+        <strong>
+                @((unit == true) ? prevunit : "")
+            </strong>
+    </div>
+}
+
+
+              
+                @if (TDealQty > 0 && Uunit != 0)
+                {
+                    <div class='text-right block' style='width:10%'>
+                        <strong>
+                            @if (dealunit)
+                            {
+                                @Decimal.Round(DealQtyCount, 3)
+                                <br />
+                                @prevdealunit;
+                            }
+                            else
+                            {
+                                <small> @Decimal.Round(DealQtyCount, 3) </small>
+                            }
+                        </strong>
+                    </div>
+                }
+
+                @if (TLossQty > 0)
+                {
+                    <div class='text-right block' style='width:10%'>
+                        <strong>
+                            @*@Decimal.Round(LossQtyCount, ddecimal)*@
+
+                            @LossQtyCount
+                        </strong>
+                    </div>
+                }
+                <div class='text-left block' style='width:@(TLossQty <= 0 ? 25 : 15)%'>
+                    <strong>
+                        @*@Decimal.Round(AmountCount, 2)*@
+                    </strong>
+                </div>
+        </div>
+
+        </div>
+            <div class='block' style='width:5%'>
+              
+               
+            </div>
+           
+        </div>
+
+    </div>
+</div>

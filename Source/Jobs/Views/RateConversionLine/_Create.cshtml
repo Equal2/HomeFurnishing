@@ -1,0 +1,353 @@
+﻿@model Model.ViewModel.StockLineViewModel
+@using Core.Common
+
+<style type="text/css">
+    .cusleftnormal {
+        border-bottom-left-radius: 0pc !important;
+        border-top-left-radius: 0px !important;
+    }
+
+    .cusrightnormal {
+        border-bottom-right-radius: 0px !important;
+        border-top-right-radius: 0px !important;
+    }
+</style>
+
+
+<div class="modal-content">
+    <div class="modal-header" style="border-bottom: 1px solid #8E8888">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"> <span class="glyphicon glyphicon-remove"></span></button>
+        <h3>
+            <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-file black"></span> @ViewBag.DocNo</span>
+        </h3>
+    </div>
+    <div>
+        @using (Html.BeginForm("_CreatePost", "RateConversionLine", FormMethod.Post, new { enctype = "multipart/form-data", id = "modform" }))
+        {
+            @Html.ValidationLog((string)TempData["CSEXCL"])
+            <div class="form-horizontal modal-body">
+
+                @Html.AntiForgeryToken()
+
+                @Html.HiddenFor(model => model.StockHeaderId)
+                @Html.HiddenFor(m => m.StockLineId)
+                @Html.HiddenFor(m => m.RequisitionLineId)
+                @Html.HiddenFor(m => m.GodownId)
+                @Html.HiddenFor(m => m.ProductUidId)
+                @Html.HiddenFor(m => m.ProductId)
+                @Html.HiddenFor(m => m.ProcessId)
+                @Html.HiddenFor(m => m.BalanceQty)
+                @Html.HiddenFor(m => m.StockHeaderSettings.ProcessId)
+                @Html.HiddenFor(m => m.StockHeaderSettings.isPostedInStockProcess)
+
+
+
+
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                <div class="row">
+                    <div class="col-md-6" style="display:@(Model.StockHeaderSettings.isVisibleProductUID?"":"none")">
+                        @Html.HiddenFor(m => m.StockHeaderSettings.isVisibleProductUID)
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.ProductUidId, "Product UID", new { @class = "control-label col-xs-4 " })
+                            <div class="col-xs-7">
+                                @Html.TextBoxFor(model => model.ProductUidIdName, new { @class = "form-control col-xs-7 required" })
+                                @Html.ValidationMessageFor(model => model.ProductUidId, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.ProductId, "Product", new { @class = "control-label col-xs-4 " })
+                            <div class="col-xs-7">
+                                @Html.TextBox("Product", "", new { @class = "form-control col-xs-7 required", @id = "ProductAC" })
+                                @Html.ValidationMessageFor(model => model.ProductId, "", new { @class = "text-danger" })
+                                @*<span id="status" class="text-danger"></span>*@
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Specification, "Specification", new { @class = "control-label col-xs-4" })
+                            <div class="col-xs-7">
+                                @Html.TextBoxFor(model => model.Specification, new { @class = "form-control col-xs-7 required" })
+                                @Html.ValidationMessageFor(model => model.Specification, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6" style="display:@(Model.StockHeaderSettings.isVisibleDimension1?"":"none")">
+                        @Html.HiddenFor(m => m.StockHeaderSettings.isVisibleDimension1)
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Dimension1Id, "Dimension1", new { @class = "control-label col-xs-4" })
+                            <div class="col-xs-7">
+                                @Html.TextBoxFor(model => model.Dimension1Id, new { @class = "form-control col-xs-7 required" })
+                                @Html.ValidationMessageFor(model => model.Dimension1Id, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6" style="display:@(Model.StockHeaderSettings.isVisibleDimension2?"":"none")">
+                        @Html.HiddenFor(m => m.StockHeaderSettings.isVisibleDimension2)
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Dimension2Id, "Dimension2", new { @class = "control-label col-xs-4" })
+                            <div class="col-xs-7">
+                                @Html.TextBoxFor(model => model.Dimension2Id, new { @class = "form-control col-xs-7 required" })
+                                @Html.ValidationMessageFor(model => model.Dimension2Id, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6" style="display:@(Model.StockHeaderSettings.isVisibleLotNo?"":"none")">
+                        @Html.HiddenFor(m => m.StockHeaderSettings.isVisibleLotNo)
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.LotNo, "LotNo", new { @class = "control-label col-xs-4" })
+                            <div class="col-xs-7">
+                                @Html.TextBoxFor(model => model.LotNo, new { @class = "form-control col-xs-7 required" })
+                                @Html.ValidationMessageFor(model => model.LotNo, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6" style="display:@(Model.StockHeaderSettings.isVisibleLineCostCenter?"":"none")">
+                        @Html.HiddenFor(m => m.StockHeaderSettings.isVisibleLineCostCenter)
+                        @Html.HiddenFor(m => m.StockHeaderSettings.isMandatoryLineCostCenter)
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.CostCenterId, "Cost Center", new { @class = "control-label col-xs-4" })
+                            <div class="col-xs-7">
+
+                                @Html.TextBoxFor(m => m.CostCenterId, new { @class = "form-control col-xs-7" })
+
+                                @Html.ValidationMessageFor(m => m.CostCenterId, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+
+
+                    <div class="col-md-6">
+                        @Html.HiddenFor(m => m.StockHeaderSettings.isMandatoryProcessLine)
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.FromProcessId, "From Process", new { @class = "control-label col-xs-4" })
+                            <div class="col-xs-7">
+                                @Html.TextBoxFor(model => model.FromProcessId, new { @class = "form-control col-xs-7 required" })
+                                @Html.ValidationMessageFor(model => model.FromProcessId, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Qty, "Qty", new { @class = "control-label col-xs-4" })
+                            <div class="col-xs-4" style="padding-right:0px;">
+                                @Html.TextBoxFor(model => model.Qty, new { @class = "form-control col-xs-3 required cusrightnormal" })
+                                @Html.ValidationMessageFor(model => model.Qty, "", new { @class = "text-danger" })
+                            </div>
+                            <div class="col-xs-3" style="padding-left:0px">
+                                @Html.TextBoxFor(m => m.UnitId, new { @class = "form-control col-xs-2 cusleftnormal", @readonly = "true" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Rate, "Rate", new { @class = "control-label col-xs-4" })
+                            <div class="col-xs-7">
+                                @if (Model.StockLineId > 0)
+                                {
+                                    @Html.TextBoxFor(model => model.Rate, new { @class = "form-control col-xs-7 required", @readonly = true })
+                                }
+                                else
+                                {
+                                    @Html.TextBoxFor(model => model.Rate, new { @class = "form-control col-xs-7 required" })
+                                }
+                                @Html.ValidationMessageFor(model => model.Rate, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Amount, "Amount", new { @class = "control-label col-xs-4 " })
+                            <div class="col-xs-7">
+                                @Html.TextBoxFor(model => model.Amount, new { @class = "form-control col-xs-7" })
+                                @Html.ValidationMessageFor(model => model.Amount, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Remark, "Remark", new { @class = "control-label col-xs-4" })
+                            <div class="col-xs-7">
+                                @Html.TextAreaFor(model => model.Remark, new { @class = "form-control col-xs-7 required" })
+                                @Html.ValidationMessageFor(model => model.Remark, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer " style="padding: 19px 20px 0 20px; border-top:1px solid #8E8888">
+                    @if (ViewBag.LineMode == "Edit" || ViewBag.LineMode == "Create")
+                    {
+                        <button class="btn custom left" name="Command:Edit" type="submit" id="submit"><h2 style="margin:0px"><span class="glyphicon glyphicon-floppy-disk black"></span> </h2></button>
+                    } @if (ViewBag.LineMode == "Delete")
+                    { <button class="btn custom" name="Command:Delete" id="delete" type="submit"><h2 style="margin:0px"><span class="glyphicon glyphicon-trash black"></span> </h2></button>
+                    }
+                </div>
+
+            </div>
+
+        }
+    </div>
+</div>
+
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        CustomSelectFunction($("#CostCenterId"), '/ComboHelpList/GetCostCenter', '/ComboHelpList/SetSingleCostCenter', 'Enter CostCenter', false, 1);
+        //CustomSelectFunction($("#ProductId"), '/ComboHelpList/GetProducts', '/ComboHelpList/SetSingleProducts', 'Enter Product Name', false, 3);
+        CustomSelectFunction($("#Dimension1Id"), '/ComboHelpList/GetDimension1', '/ComboHelpList/SetSingleDimension1', 'Enter Dimension2', false, 1);
+        CustomSelectFunction($("#Dimension2Id"), '/ComboHelpList/GetDimension2', '/ComboHelpList/SetSingleDimension2', 'Enter Dimension1 ', false, 1);
+        CustomSelectFunction($("#FromProcessId"), '/ComboHelpList/GetProcess', '/ComboHelpList/SetSingleProcess', 'Enter Process Name', false, 1);
+        $("#ProductId").select2("focus");
+
+
+        var IsSaved = false;
+        var ValidationCount = 0;
+
+        $('#modform').bind('submit', function (event) {
+
+            if (!IsSaved) {
+                if (!ValidateData()) {
+                    return false;
+                }
+                IsSaved = true;
+                $('button:submit').attr('disabled', 'disabled');
+                return IsSaved;
+            }
+            else {
+                return false;
+            }
+
+
+        });
+
+
+        function ValidateData() {
+            var ValidationMessage = "";
+
+            //Client Side Validaion.....
+
+            return (ValidationMessage == "");
+
+        }
+
+
+        $('#ProductUidIdName').on('change',function(e){
+
+            InitializePopover(this,$("#ProductUidIdName").val(),true,$('#GodownId').val());
+            $(this).popover('show');
+            setTimeout(function() {$('#ProductUidIdName').popover('destroy')},10000);
+
+        })
+
+
+        $('.datepicker').datepicker({
+            format: 'dd/MM/yyyy',
+            "setDate": new Date(),
+            "autoclose": true
+
+        })
+
+        var id=@Model.StockLineId;
+
+        if(id>0)
+        {
+            var tex='@Model.ProductName';
+            $("#ProductAC").val(tex).attr('readonly','true');
+            $('#Dimension1Id').attr('readonly','true');
+            $('#Dimension2Id').attr('readonly','true');
+            $('#LotNo').attr('readonly','true');
+            $('#FromProcessId').attr('readonly','true');
+            $('#Specification').attr('readonly','true');
+            $('#CostCenterId').attr('readonly','true');
+        }
+        $('#delete','.modal-content').click(function (e) {
+            if(id>0)
+            {
+                var url = '/RateConversionLine/DeletePost';
+                $('form#modform').attr('action',url);
+                return;
+            }
+            else
+            {
+                return false;
+            }
+        })
+    });
+
+</script>
+
+<script type="text/javascript">
+
+    var decimalplaces=0;
+
+    $(function(){
+
+        $("#Rate,#Amount,#Qty").keyup(Calculation);
+        $("#ProductId").change(GetProductDetail);
+
+
+        function GetProductDetail() {
+            var ProcessProgress = $("#Product detail loading progress");
+            ProcessProgress.show();
+            if ($("#ProductId").val() != 0 && $("#ProductId").val() != null) {
+                $.ajax({
+                    cache: false,
+                    type: "POST",
+                    url: "@(Url.Action("GetProductDetailJson"))",
+                    data: { ProductId: $("#ProductId").val(),StockId: $("#StockHeaderId").val() },
+                    success: function (data) {
+                        $("#Rate").val(data.StandardCost);
+                        $("#UnitId").val(data.UnitId);
+                        Calculation.call();
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        alert('Failed to retrieve product details.' + thrownError);
+                    }
+                });
+            }
+        }
+
+
+        function Calculation() {
+
+            $('#Amount').val(($('#Qty').val() * $('#Rate').val()).toFixed(2));
+        }
+
+    })
+
+
+</script>
+
+
+<script type="text/javascript">
+
+    $('#Qty').keyup(function () {
+        if (($('#BalanceQty').val() - $('#Qty').val()) < 0 ) {
+            $('#submit', '.modal-body').attr('disabled', 'disabled');
+            if ($(this).closest('div.col-xs-4').find('span#cerror').length == 0)
+            {
+                $(this).parents('.col-xs-4').append("<span class='text-danger' id='cerror'>Qty exceeding Production Order Qty</span>")
+            }
+        }
+        else
+        {
+            $('#submit', '.modal-body').removeAttr('disabled');
+            if ($(this).closest('div.col-xs-4').find('span#cerror').length > 0)
+            {
+                $(this).closest('.col-xs-4').find('span#cerror').remove();
+            }
+        }
+    })
+</script>

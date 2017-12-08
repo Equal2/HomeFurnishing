@@ -1,0 +1,857 @@
+﻿@model Model.ViewModels.LedgersViewModel
+@using Core.Common
+
+<style type="text/css">
+    .cusleftnormal {
+        border-bottom-left-radius: 0pc !important;
+        border-top-left-radius: 0px !important;
+    }
+
+    .cusrightnormal {
+        border-bottom-right-radius: 0px !important;
+        border-top-right-radius: 0px !important;
+    }
+
+    .ui-autocomplete {
+        max-height: 250px;
+        overflow-y: auto;
+        /* prevent horizontal scrollbar */
+        overflow-x: hidden;
+    }
+</style>
+
+<div class="modal-content">
+    <div class="modal-header" style="border-bottom: 1px solid #8E8888">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"> <span class="glyphicon glyphicon-remove"></span></button>
+        <h3>
+            <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-file black"></span> Line Detail @ViewBag.LedgerAccountName</span>
+        </h3>
+    </div>
+    <div>
+        @using (Html.BeginForm("_CreatePost", "LedgerLine", FormMethod.Post, new { enctype = "multipart/form-data", id = "modform" }))
+        { @Html.ValidationLog((string)TempData["CSEXCL"])
+            <div class="form-horizontal modal-body">
+
+                @Html.AntiForgeryToken()
+
+                @*@Html.HiddenFor(m => m.ContraLedgerAccountId)*@
+                @Html.HiddenFor(m => m.LedgerHeaderId)
+                @Html.HiddenFor(m => m.LedgerId)
+                @Html.HiddenFor(m => m.LedgerLineId)
+                @*@Html.HiddenFor(m => m.ReferenceId)*@
+                @Html.HiddenFor(m => m.ProductUidId)
+                @Html.HiddenFor(m => m.DocumentCategoryId)
+
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+
+                <div class="row">
+
+                    <div class="col-md-6" style="display:@(Model.LedgerSetting.isVisibleLineDrCr && Model.ContraLedgerAccountId == null ? "" : "none")">
+                        @Html.HiddenFor(m => m.LedgerSetting.isVisibleLineDrCr)
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.DrCr, "Dr./Cr.", new { @class = "control-label col-md-4 col-sm-2 " })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.DropDownListFor(m => m.DrCr, new SelectList(ViewBag.DrCrList as System.Collections.IEnumerable, "Value", "Text"), " ", new { @class = "form-control col-xs-6 height" })
+                                @Html.ValidationMessageFor(model => model.DrCr, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6" style="display:@(Model.LedgerSetting.isVisibleLineCostCenter?"":"none")">
+                        @Html.HiddenFor(m => m.LedgerSetting.isVisibleLineCostCenter)
+                        @Html.HiddenFor(m => m.LedgerSetting.isMandatoryLineCostCenter)
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.CostCenterId, (Model.DocumentTypeSettings.CostCenterCaption ?? "Cost Center"), new { @class = "control-label col-md-4 col-sm-2" })
+                            @Html.HiddenFor(m => m.DocumentTypeSettings.CostCenterCaption)
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(m => m.CostCenterId, new { @class = "form-control" })
+                                @Html.ValidationMessageFor(model => model.CostCenterId, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.LedgerAccountId, "Ledger Account", new { @class = "control-label col-md-4 col-sm-2 " })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.LedgerAccountId, new { @class = "form-control col-xs-7 required" })
+                                @Html.ValidationMessageFor(model => model.LedgerAccountId, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+
+
+
+
+
+                    <div class="col-md-6" style="display:@(!string.IsNullOrEmpty(Model.LedgerSetting.BaseValueText)?"":"none")">
+                        @Html.HiddenFor(m => m.LedgerSetting.BaseValueText)
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.BaseValue, Model.LedgerSetting.BaseValueText, new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(m => m.BaseValue, new { @class = "form-control" })
+                                @Html.ValidationMessageFor(model => model.BaseValue, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6" style="display:@(!string.IsNullOrEmpty(Model.LedgerSetting.BaseRateText)?"":"none")">
+                        @Html.HiddenFor(m => m.LedgerSetting.BaseRateText)
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.BaseRate, Model.LedgerSetting.BaseRateText, new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(m => m.BaseRate, new { @class = "form-control" })
+                                @Html.ValidationMessageFor(model => model.BaseRate, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6" style="display:@(Model.LedgerSetting.isVisibleRefNo?"":"none")">
+                        @Html.HiddenFor(m => m.LedgerSetting.isVisibleRefNo)
+                        @Html.HiddenFor(m => m.LedgerSetting.isMandatoryRefNo)
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.ReferenceId, "Reference No.", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @*@Html.TextBox(" ", "", new { @class = "form-control", @id = "autocompleteorder" })*@
+                                @Html.TextBoxFor(model => model.ReferenceId, new { @class = "form-control col-xs-7 " })
+                                @Html.ValidationMessageFor(model => model.ReferenceId, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @*@Html.LabelFor(model => model.Amount, (((string)ViewBag.Nature).ToUpper() == "CR" ? "Amount Dr" : "Amount Cr"), new { @class = "control-label col-md-4 col-sm-2" })*@
+                            @Html.LabelFor(model => model.Amount, (((string)ViewBag.Nature).ToUpper() == "CR" ? "Amount Dr" : (((string)ViewBag.Nature).ToUpper() == "DR" ? "Amount Cr" : "Amount" )), new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.Amount, new { @class = "form-control col-xs-7 required" })
+                                @Html.ValidationMessageFor(model => model.Amount, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+
+                    @if (ViewBag.LedgerAccountNature == LedgerAccountTypeConstants.Bank)
+                    {
+
+                        <div class="col-md-6" style="display:@(Model.LedgerSetting.isVisibleChqNo?"":"none")">
+                            @Html.HiddenFor(m => m.LedgerSetting.isVisibleChqNo)
+                            @Html.HiddenFor(m => m.LedgerSetting.isMandatoryChqNo)
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.ChqNo, "Chq/Ref No", new { @class = "control-label col-md-4 col-sm-2 " })
+                                <div class="col-md-7 col-sm-10">
+                                    @Html.TextBoxFor(model => model.ChqNo, new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(model => model.ChqNo, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.DueDate, "Chq/Ref Date", new { @class = "control-label col-md-4 col-sm-2" })
+                                <div class="col-md-7 col-sm-10">
+                                    @Html.TextBoxFor(model => model.DueDate, "{0:dd/MMMM/yyyy}", new { @class = "datepicker form-control col-xs-7" })
+                                    @Html.ValidationMessageFor(model => model.DueDate, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    
+                    <div class="col-md-6" style="display:@(Model.LedgerSetting.isVisibleProductUid?"":"none")">
+                        @Html.HiddenFor(m => m.LedgerSetting.isVisibleProductUid)
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.ProductUidId, "Product Uid", new { @class = "control-label col-md-4 col-sm-2 " })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.ProductUidName, new { @class = "form-control" })
+                                @Html.ValidationMessageFor(model => model.ProductUidId, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6" style="display:@(Model.LedgerSetting.isVisibleReferenceDocTypeId?"":"none")">
+                        @Html.HiddenFor(m => m.LedgerSetting.isVisibleReferenceDocTypeId)
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.ReferenceDocTypeId, (Model.DocumentTypeSettings.ReferenceDocTypeCaption ?? "Reference Doc Type"), new { @class = "control-label col-md-4 col-sm-2" })
+                            @Html.HiddenFor(m => m.DocumentTypeSettings.ReferenceDocTypeCaption)
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.ReferenceDocTypeId, new { @class = "form-control col-xs-7 " })
+                                @Html.ValidationMessageFor(model => model.ReferenceDocTypeId, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6" style="display:@(Model.LedgerSetting.isVisibleReferenceDocId?"":"none")">
+                        @Html.HiddenFor(m => m.LedgerSetting.isVisibleReferenceDocId)
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.ReferenceDocId, (Model.DocumentTypeSettings.ReferenceDocIdCaption ?? "Reference Doc No."), new { @class = "control-label col-md-4 col-sm-2" })
+                            @Html.HiddenFor(m => m.DocumentTypeSettings.ReferenceDocIdCaption)
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.ReferenceDocId, new { @class = "form-control col-xs-7 " })
+                                @Html.ValidationMessageFor(model => model.ReferenceDocId, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Remark, "Remark", new { @class = "control-label col-md-4 col-sm-2 " })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextAreaFor(model => model.Remark, new { @class = "form-control col-xs-7 required" })
+                                @Html.ValidationMessageFor(model => model.Remark, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+
+
+                <div class="modal-footer " style="padding: 19px 20px 0 20px; border-top:1px solid #8E8888">
+                    <a id="CopyLastTransaction" href="#">
+                        <small style="text-align:center;font-weight:bold">@ViewBag.LastTransaction</small>
+                    </a>
+                    @if (ViewBag.LineMode == "Edit" || ViewBag.LineMode == "Create")
+                    {
+                        <button class="btn custom left" name="Command:Edit" type="submit" id="submit"><h2 style="margin:0px"><span class="glyphicon glyphicon-floppy-disk black"></span> </h2></button>}
+                    @if (ViewBag.LineMode == "Delete")
+                    {
+                        <button class="btn custom" name="Command:Delete" id="delete" type="submit"><h2 style="margin:0px"><span class="glyphicon glyphicon-trash black"></span> </h2></button>}
+                </div>
+
+            </div>
+        }
+    </div>
+</div>
+
+<script type="text/javascript">
+
+    //var cachearray={};
+    var PTAID='@ViewBag.TAID';
+    var TChqNo=parseInt($('#ChqNo').val());
+
+    $(document).ready(function () {
+        var Nature  =  '@(((string)ViewBag.Nature).ToUpper() == "CR" ? "Dr" : "Cr")'
+
+
+        CustomSelectFunction($("#LedgerAccountId"), '/LedgerLine/GetLedgerAccount', '/ComboHelpList/SetSingleAccount', ' ', false, 0,$('#LedgerHeaderId','.modal-body').val());
+        CustomSelectFunction($("#CostCenterId"), '/LedgerLine/GetCostCenters', '/ComboHelpList/SetSingleCostCenter', ' ', false, 0,$('#LedgerHeaderId','.modal-body').val());
+        CustomSelectFunctionForLedgerId_Adjusted($("#ReferenceId"), '/LedgerLine/GetLedgerIds_Adusted', '/ComboHelpList/SetSingleLedger', ' ', false, 0, $('#LedgerAccountId','.modal-body').val(),Nature, $('#LedgerHeaderId', '.modal-body').val());
+        CustomSelectFunction($("#ReferenceDocTypeId"), '/ComboHelpList/GetDocumentType', '/ComboHelpList/SetDocumentType', ' ', false, 0);
+        CustomSelectFunctionForReference($("#ReferenceDocId"), '/LedgerLine/GetReferenceDocIds', '/LedgerLine/SetSingleReferenceDocIds', ' ', false, 0,$("#ReferenceDocTypeId").val());
+
+
+        $('.datepicker').datepicker({
+            format: 'dd/MM/yyyy',
+            "setDate": new Date(),
+            "autoclose": true
+        })
+
+
+        $('#LedgerAccountId').change(function()
+        {
+            CustomSelectFunctionForLedgerId_Adjusted($("#ReferenceId"), '/LedgerLine/GetLedgerIds_Adusted', '/ComboHelpList/SetSingleLedger', ' ', false, 0, $('#LedgerAccountId','.modal-body').val(),Nature, $('#LedgerHeaderId', '.modal-body').val());
+        })
+
+        $('#ReferenceDocTypeId').change(function()
+        {
+            CustomSelectFunctionForReference($("#ReferenceDocId"), '/LedgerLine/GetReferenceDocIds', '/LedgerLine/SetSingleReferenceDocIds', ' ', false, 0,$("#ReferenceDocTypeId").val());
+        })
+
+        function CustomSelectFunctionForLedgerId_Adjusted(ElementId, GetAction, SetAction, placehold, IsMultiple, MinLength, filterid, filter2id, filter3id) {
+            var geturl = GetAction;
+            //The url we will send our get request to
+            var attendeeUrl = GetAction;
+            var pageSize = 20;
+
+            ElementId.select2(
+            {
+
+                placeholder: placehold,
+                //Does the user have to enter any data before sending the ajax request
+                minimumInputLength: MinLength,
+                allowClear: true,
+                multiple: IsMultiple,
+                ajax: {
+                    //How long the user has to pause their typing before sending the next request
+                    quietMillis: 150,
+                    //The url of the json service
+                    url: attendeeUrl,
+                    dataType: 'jsonp',
+                    //Our search term and what page we are on
+                    data: function (term, page) {
+                        return {
+                            pageSize: pageSize,
+                            pageNum: page,
+                            searchTerm: term,
+                            filter: filterid,
+                            filter2: filter2id,
+                            filter3: filter3id,
+                        };
+                    },
+                    results: function (data, page) {
+                        //Used to determine whether or not there are more results available,
+                        //and if requests for more data should be sent in the infinite scrolling
+                        var more = (page * pageSize) < data.Total;
+                        return { results: data.Results, more: more };
+                    }
+                },
+                initSelection: function (element, callback) {
+
+                    var xval = element.val();
+                    if (xval != 0) {
+                        $.ajax({
+                            cache: false,
+                            type: "POST",
+                            url: SetAction,
+                            data: { Ids: element.val() },
+                            success: function (data) {
+                                callback(data);
+                            },
+                            error: function (xhr, ajaxOptions, thrownError) {
+                                alert('Failed to Retrive Qty' + thrownError);
+                            }
+                        })
+                    }
+                    //callback([{ id: "1", text: "arpit" }, { id: "2", text: "akash" }]);
+                }
+            });
+        }
+
+        function CustomSelectFunctionForReference(ElementId, GetAction, SetAction, placehold, IsMultiple,MinLength,filterid) 
+        {
+            var geturl = GetAction;
+            //The url we will send our get request to
+            var attendeeUrl = GetAction;
+            var pageSize = 20;
+    
+            ElementId.select2(
+            {
+        
+                placeholder: placehold,
+                //Does the user have to enter any data before sending the ajax request
+                minimumInputLength: MinLength,
+                allowClear: true,
+                multiple: IsMultiple,
+                ajax: {
+                    //How long the user has to pause their typing before sending the next request
+                    quietMillis: 150,
+                    //The url of the json service
+                    url: attendeeUrl,
+                    dataType: 'jsonp',
+                    //Our search term and what page we are on
+                    data: function (term, page) {
+                        return {
+                            pageSize: pageSize,
+                            pageNum: page,
+                            searchTerm: term,
+                            filter:filterid
+                        };
+                    },
+                    results: function (data, page) {
+                        //Used to determine whether or not there are more results available,
+                        //and if requests for more data should be sent in the infinite scrolling
+                        var more = (page * pageSize) < data.Total;
+                        return { results: data.Results, more: more };
+                    }
+                },
+                initSelection: function (element, callback) {
+
+                    var xval = element.val();
+                    if (xval != 0)
+                    {
+                        $.ajax({
+                            cache: false,
+                            type: "POST",
+                            url: SetAction,
+                            data: { Ids: element.val(), ReferenceDocTypeId : $("#ReferenceDocTypeId").val() },
+                            success: function (data) {
+                                callback(data);
+                            },
+                            error: function (xhr, ajaxOptions, thrownError) {
+                                alert('Failed to Retrive Qty' + thrownError);
+                            }
+                        })
+                    }
+                }
+            });
+        }
+
+
+        var id=@Model.LedgerLineId;
+        if(id>0)
+        {
+            $("#ReferenceId").attr('readonly','true');
+            if ($("#ReferenceId").val() != null && $("#ReferenceId").val() != 0)
+            {
+                $("#LedgerAccountId").attr('readonly','true');
+                $("#Amount").attr('readonly','true');
+            }
+        }
+
+
+
+
+        $("#ReferenceId").change(function () {
+            Validate_LedgerId_Adjusted();
+        });
+
+
+
+        function Validate_LedgerId_Adjusted()
+        {
+            if ($("#ReferenceId").val()) {
+                $.ajax({
+                    cache: false,
+                    type: "POST",
+                    url: "@(Url.Action("GetLedgerIds_AdustedDetailJson"))",
+                    data: { LedgerId: $("#ReferenceId").val() },
+                success: function (data) {
+                    if (data != null && data != "")
+                    {
+                        $("#Amount").val(data.BalanceAmount)
+                        $('#LedgerAccountId').select2("data",{id:data.LedgerAccountId,text:data.LedgerAccountName})
+                        $("#LedgerAccountId").attr('readonly','true');
+                    }
+                    else
+                    {
+                        $("#Amount").val(0);
+                        $('#LedgerAccountId').select2("data",{id:'',text:''})
+                        $("#LedgerAccountId").removeAttr('readonly');
+                    }
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    alert('Failed to retrieve product details.' + thrownError);
+                }
+            });
+        }
+    }
+
+        
+
+        @*if(id>0)
+        {
+            var tex='@Model.ReferenceDocNo';
+            $("#autocompleteorder").val(tex).attr('disabled', 'disabled');
+        }*@
+
+        $('#BaseRate,#BaseValue').change(function(){
+            if( parseFloat($('#BaseValue').val()) > 0 && parseFloat($('#BaseRate').val()) > 0 )
+            {
+                var Base=parseFloat($('#BaseValue').val());
+                var Rate=parseFloat($('#BaseRate').val());
+                $('#Amount').val((Base *( Rate/100)).toFixed(0))
+            }
+
+        })
+
+        $('#CostCenterId').change(function(){
+
+            $.ajax({
+                cache: false,
+                type: "POST",
+                url: "@(Url.Action("GetLedgerAcc"))",
+                data: { CostCenterId:$('#CostCenterId','.modal-body').val() },
+                success: function (data) {
+                    if(data.Success){
+                        $('#LedgerAccountId').select2("data",{id:data.Id,text:data.Name}).attr('readonly','true').trigger('change');
+                        if($('#BaseValue').is(':hidden'))
+                            $('#Amount').focus();
+                        else if($('#BaseValue').is(':visible'))
+                            $('#BaseValue').focus();
+
+                        IncrChqNo(data.Id);
+                    }
+                    else if(!data.Success){
+                        $('#LedgerAccountId').removeAttr('readonly');
+                    }
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    alert('Failed to retrieve Ledger Accounts.' + thrownError);
+                }
+
+            });
+
+        })
+
+        $("#LedgerAccountId").change(function(){
+            IncrChqNo($(this).val());
+            FetchRate($(this).val());
+
+        })
+
+        $('#ProductUidName').on('change',function(e){
+            if ($('#ProductUidName') != null && $('#ProductUidName') != "")
+            {
+                InitializePopover(this,$("#ProductUidName").val());
+                $(this).popover('show');
+                setTimeout(function() {$('#ProductUidName').popover('destroy')},10000);
+            }
+        })
+
+
+       
+
+
+        function FetchRate(Id)
+        {
+            if(Id)
+            {
+                $.ajax({
+                    cache: false,
+                    type: "POST",
+                    url: "@(Url.Action("FetchRate"))",
+                    data: { PersonId:Id },
+                    success: function (data) {
+                        if(data.Success){
+                            if(!$('#BaseRate').is(':hidden'))
+                                $('#BaseRate').val(data.Rate);
+                        }
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        alert('Failed to retrieve Ledger Accounts.' + thrownError);
+                    }
+
+                });
+            }
+        }
+
+
+        function IncrChqNo(id)
+        {
+            if(PTAID && !isNaN(PTAID) && TChqNo && !isNaN(TChqNo))
+            {
+                if(PTAID!=id)
+                {                     
+                    //var L=length(TChqNo)-length(parseInt(TChqNo))   
+                    //var str =''; 
+                    var TC = TChqNo + 1;                            
+                    //if(l>0)
+                    //{
+                    //    for (var i = 1; i < L; i++)
+                    //    {
+                    //        str+='0'
+                    //    }
+                        
+                    //}
+                    //str=str+TC;
+                    $('#ChqNo').val(TC);
+
+
+                }
+                else
+                {
+                    $('#ChqNo').val(TChqNo);
+                }
+            }
+        }
+
+        $('#delete','.modal-content').click(function (e) {
+            if(id>0)
+            {
+                var url = '/LedgerLine/DeletePost';
+                $('form#modform').attr('action',url);
+                return;
+            }
+            else
+            {
+                return false;
+            }
+        })
+
+        var IsSaved=false;
+        var ValidationCount=0;
+
+        $('#modform').bind('submit',function(event){
+
+            if(!IsSaved)
+            {
+                if(!ValidateData())
+                {
+                    return false;
+                }
+                IsSaved=true;
+                $('button:submit').attr('disabled','disabled');
+                return IsSaved;
+            }
+            else
+            {
+                return false;
+            }
+
+
+        });
+
+        function ValidateData() {
+            var ValidationMessage = "";
+
+            //Client Side Validaion.....
+
+            return  (ValidationMessage=="");
+
+        }
+
+
+    });
+
+
+    //$("#Narration").autocomplete({
+    //    source: function(request,response){
+    //        $.ajax({
+    //            cache: false,
+    //            type: "POST",
+    //            url: "/LedgerHeader/GetNarrationList",
+    //            success: function (data) {
+
+    //                var matcher = new RegExp( $.ui.autocomplete.escapeRegex( request.term ), "i" );
+    //                response( $.grep( data, function( value ) {
+
+    //                    value = value.label || value.value || value;
+    //                    return matcher.test( value );
+
+    //                }) );
+    //                //response(data);
+    //            },
+    //            error: function (xhr, ajaxOptions, thrownError) {
+    //                alert('Failed to retrieve Narrations.' + thrownError);
+    //            }
+    //        });
+    //    },
+    //    appendTo : $(".modal-content"),
+
+    //})
+
+
+    $('#submit').click(function(){
+        if($('#Amount').val()<=0)
+        {
+            if($(this).closest('.modal-body').find('#cerr').length==0){
+                $(this).closest('.modal-body').find('.row:first').before('<div id="cerr" class="alert alert-danger text-center"> <span>Amount is mandatory </span> </div>');}
+
+            return false;
+        }
+        else
+        {
+            return true;
+        }
+    })
+
+
+</script>
+
+@if (Model.LedgerSetting.isVisibleLineCostCenter)
+{
+    <script type="text/javascript">
+        $("#CostCenterId",".modal-body").select2("focus");
+    </script>
+}
+else
+{
+    <script type="text/javascript">
+        $("#LedgerAccountId",".modal-body").select2("focus");
+    </script>
+}
+
+<script type="text/javascript">
+    //alert( ($("#LedgerAccountId").attr('visibility'));
+
+    var referencetype = ""
+    if ( '@(((string)ViewBag.Nature).ToUpper())' == "CR" )
+    {
+        referencetype = "Credit"
+    }
+    else{
+        referencetype = "Debit"
+    }
+
+
+    @*$( "#autocompleteorder" ).focusout( function( ) {
+        if (!$(this).val()) {
+            $("#autocompleteorder").val("");
+            $('#ReferenceId').val("");
+        }
+
+        if($("#autocompleteorder").val()=="")
+        {
+            $('#ReferenceId').val("");
+        }
+    });
+
+    $(function() {
+        $("#autocompleteorder").autocomplete({
+            delay: 500,
+            minLength: 3,
+            source: function(request,response){
+
+                $.ajax({
+                    cache: false,
+                    type: "POST",
+                    url: "@(Url.Action("GetPersonPendingBills"))",
+                    data: { LedgerHeaderId:$('#LedgerHeaderId','.modal-body').val(), LedgerAccountId:$("#LedgerAccountId").val(),ReferenceType:referencetype,term:request.term,Limit:20 },
+                    success: function (data) {
+                        if(data.length>0){
+                            var cachearray = data.error ? [] : $.map(data, function(m) {
+
+                                return {
+                                    value: m.LedgerDocNo,
+                                    key: m.LedgerId,
+                                };
+                            });
+                            response(cachearray);
+                        }
+                        else
+                        {
+                            var dimensions = { width: 10};
+                            var cachearray=$.map(dimensions,function(value,key){
+                                return{
+                                    value:"No Record Found!",
+                                    key:null
+                                }
+                            })
+                            response(cachearray);
+                        }
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        $('.ui-autocomplete-loading').removeClass("ui-autocomplete-loading");
+                        alert('Failed to retrieve Pending Orders.' + thrownError);
+                    }
+
+                });
+            },
+            appendTo : $("#myModalContent"),
+            select: function(event, ui) {
+                // prevent autocomplete from updating the textbox
+                // navigate to the selected item's url
+                if($("#autocompleteorder").val()=="")
+                {
+                    $('#ReferenceId').val("");
+                }
+                else
+                {
+                    $("#ReferenceId").val(ui.item.key);
+                }
+
+
+            },
+
+        })
+    });
+
+    $("#autocompleteorder").on("focus",function(){
+        $(this).keydown();
+    });*@
+
+
+
+
+    function InitializePopover(element, ProdUid) {
+
+        $(element).popover('destroy');
+
+        var DataArray;
+        var status;
+        var url = "/LedgerLine/GetProductUidValidation";
+        $.ajax({
+            async: false,
+            url: url,
+            data: { ProductUID: ProdUid },
+            success: function (data) {
+                DataArray = data;
+            }
+        })
+
+        if (DataArray.ErrorType == "InvalidID") {
+            $(element)
+             .popover({
+                 trigger: 'manual',
+                 container: '.modal-body',
+                 'delay': { "hide": "1000" },
+                 html: true,
+                 content: "<ul class='list-group'>  <li class='list-group-item active'> Validation Detail </li>    <li class='list-group-item'>Message:" + DataArray.ErrorMessage + "</li>   </ul>"
+             });
+            ResetFields();
+            status = false;
+        }
+
+        else if (DataArray.ErrorType == "Success") {
+            var $page = $(element).closest('.modal-body').get(0);
+            $($page).find('#ProductUidId').val(DataArray.ProductUIDId);
+            status = true;
+        }
+
+
+
+
+
+        function ResetFields() {
+            var $page = $(element).closest('.modal-body').get(0);
+            $($page).find('#ProductUidId').val(0);
+        }
+
+
+        function Result() {
+            var self = this;
+            self.status = status;
+            self.data = DataArray;
+
+        }
+
+        var temp = new Result();   
+
+        return temp;
+
+
+    }
+
+
+    $("#CopyLastTransaction").click(function(){
+        var ProcessProgress = $("Last Transaction detail loading progress");
+        ProcessProgress.show();
+        $.ajax({
+            cache: false,
+            type: "POST",
+            url: "@(Url.Action("GetLastTransactionDetailJson"))",
+            data: { LedgerHeaderId: $("#LedgerHeaderId").val()},
+
+        success: function (data) {
+            if (data != null)
+            {
+                if (data.CostCenterId != 0 && data.CostCenterId != null)
+                {
+                    $("#CostCenterId").select2("data", { id: data.CostCenterId, text: data.CostCenterName });
+                }
+                $("#LedgerAccountId").select2("data", { id: data.LedgerAccountId, text: data.LedgerAccountName });
+                $("#Amount").focus()
+            }
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            alert('Failed to retrieve Last Transaction details.' + thrownError);
+            ProcessProgress.hide();
+        }
+    });
+    }); 
+
+
+    $("#DrCr").focusout(GetBalanceAmount);
+
+    function GetBalanceAmount() {
+        var ProcessProgress = $("#Product detail loading progress");
+        ProcessProgress.show();
+        if ($("#DrCr").val() != 0 && $("#DrCr").val() != null) {
+            $.ajax({
+                cache: false,
+                type: "POST",
+                url: "@(Url.Action("GetBalanceAmountJson"))",
+                data: { LedgerHeaderId: $("#LedgerHeaderId").val(), DrCr: $("#DrCr").val() },
+            success: function (data) {
+                $("#Amount").val(data);
+            },
+            error: function (xhr, ajaxOptions, thrownError) {
+                alert('Failed to retrieve product details.' + thrownError);
+            }
+        });
+    }
+    }
+
+</script>

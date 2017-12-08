@@ -1,0 +1,124 @@
+﻿@model IEnumerable<Model.ViewModel.SiteDivisionSummaryViewModel>
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <link href="~/Content/bootstrap.min.css" rel="stylesheet" />
+    <script src="~/Scripts/jquery-2.1.4.min.js"></script>
+    <script src="~/Scripts/bootstrap.min.js"></script>
+</head>
+<body>
+    <style>
+        legend {
+            margin-top: 5px;
+            margin-bottom: 30px;
+            padding-bottom: 25px;
+        }
+
+        .body {
+            padding-bottom: 30px;
+            border-bottom: 1px solid #eeeeee;
+        }
+
+        .footer {
+            margin-top: 20px;
+            padding-bottom: 20px;
+        }
+
+        .btn {
+            -webkit-box-shadow: none;
+            -moz-box-shadow: none;
+            box-shadow: none;
+            margin-left: 15px;
+            padding: 7px 25px;
+        }
+
+        .select2-container {
+            max-width: inherit !important;
+        }
+
+        .row {
+            padding: 10px;
+        }
+
+        div.container4 {
+            min-height: 45em;
+            position: relative;
+        }
+
+            div.container4 .cus {
+                -moz-border-radius: 15px;
+                -ms-border-radius: 15px;
+                -o-border-radius: 15px;
+                border-radius: 15px;
+                -webkit-box-shadow: 0 0 8px rgba(0, 0, 0, 0.4);
+                -moz-box-shadow: 0 0 8px rgba(0, 0, 0, 0.4);
+                box-shadow: 0 0 8px rgba(0, 0, 0, 0.4);
+                margin: 0;
+                background: white;
+                text-align: center;
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                margin-right: -50%;
+                transform: translate(-50%, -50%);
+                height: auto;
+            }
+
+        .Box {
+            float: left;
+            height: 150px;
+            width: 150px;
+            padding: 5px 5px 5px 5px;
+            margin: 5px 5px 5px 5px;
+            background-color: #5dbde1;
+            border-radius: 10px;
+            text-align: center;
+        }
+        .Box a{
+            color:white;
+        }
+    </style>
+
+
+
+    <div class=container4>
+        <div class="cus" style="max-width:800px">
+
+
+            <div class="body">
+                <legend>Site & Division wise permission</legend>
+                <div class="row">
+
+
+                    @foreach (var item in Model.OrderBy(m=>m.SiteId))
+                    {
+                        <div class="Box" style="@(!string.IsNullOrEmpty(item.SiteColour)?"background-color:"+item.SiteColour:"")">
+
+                            <a href="@Url.Action("SelectedSiteDivision", new { Id = item.RoleId, Siteid = item.SiteId, DivisionId = item.DivisionId })">
+                                <h3> @item.DivisionName</h3>
+                                <h4> @item.SiteName</h4>
+                            </a>
+                        </div>
+                    }
+                </div>
+
+            </div>
+
+
+        </div>
+    </div>
+
+    <script type="text/javascript">
+
+
+
+    </script>
+</body>
+</html>

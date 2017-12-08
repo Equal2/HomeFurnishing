@@ -1,0 +1,318 @@
+﻿@model Model.ViewModels.SaleDispatchListViewModel
+@using Core.Common
+
+<div class="modal-content">
+    <div class="modal-header" style="border-bottom: 1px solid #8E8888">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"> <span class="glyphicon glyphicon-remove"></span></button>
+        <h3>
+            <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-file black"></span> Indents & Quantities</span>
+        </h3>
+    </div>
+    <div>
+        @Html.ValidationLog((string)TempData["CSEXCL"])
+        @using (Html.BeginForm("_ResultsPost", "SaleDispatchLine", FormMethod.Post, new { enctype = "multipart/form-data", id = "modform" }))
+        {
+            @Html.AntiForgeryToken()
+            <div class="form-horizontal modal-body">
+
+                <div style="padding-right:15px">
+                    <div class="row">
+                        <div class="form-horizontal">
+                            @Html.ValidationSummary(true, null, new { @class = "alert alert-danger" })
+
+                            <div class="panel panel-default" id="grid">
+                                <div class="panel-heading headrow" style="background-image: -webkit-linear-gradient(top, #428bca 0%, #428bca 100%);color:white">
+                                    <div class="row grid-head">
+                                        <div class="col-xs-1 text-left">
+                                            Srl.
+                                        </div>
+                                        <div class="col-xs-11">
+                                            <div class="row">
+                                                @*ProductInfo*@
+                                                <div class="col-sm-4">
+                                                    Product
+                                                </div>
+                                                <div class="col-sm-2">
+                                                    Order & Qty
+                                                </div>
+                                                @*Qty*@
+                                                <div class="col-sm-2">
+                                                    Bale, LotNo
+                                                </div>
+                                                <div class="col-sm-2 text-right" style="padding-right:30px">
+                                                    <a href="#" id="ToDispatch" style="color:white">Dispatch Qty</a>
+                                                </div>
+                                                <div class="col-sm-2 text-right" style="padding-right:30px">
+                                                    Rate
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+                                </div>
+                                <div class="panel-info" id="gbody" style="max-height:250px;overflow-y:scroll">
+                                    @{
+            decimal DispatchQty = 0;
+            decimal OrderQty = 0;
+            int MaxUnitDecPlaces = 0;
+            int MaxDealUnitDecPlaces = 0;
+                                    }
+                                    @for (int i = 0; i < Model.SaleDispatchLineViewModel.Count(); i++)
+                                    {
+                                        @Html.HiddenFor(m => Model.SaleDispatchLineViewModel[i].ProductId)
+                                        @Html.HiddenFor(m => Model.SaleDispatchLineViewModel[i].DealUnitId)
+                                        @Html.HiddenFor(m => Model.SaleDispatchLineViewModel[i].ProductName)
+                                        @Html.HiddenFor(m => Model.SaleDispatchLineViewModel[i].Specification)
+                                        @Html.HiddenFor(m => Model.SaleDispatchLineViewModel[i].Dimension1Id)
+                                        @Html.HiddenFor(m => Model.SaleDispatchLineViewModel[i].Dimension1Name)
+                                        @Html.HiddenFor(m => Model.SaleDispatchLineViewModel[i].Dimension2Id)
+                                        @Html.HiddenFor(m => Model.SaleDispatchLineViewModel[i].Dimension2Name)
+                                        @Html.HiddenFor(m => Model.SaleDispatchLineViewModel[i].SaleOrderLineId)
+                                        @Html.HiddenFor(m => Model.SaleDispatchLineViewModel[i].SaleDispatchHeaderId)
+                                        @Html.HiddenFor(m => Model.SaleDispatchLineViewModel[i].SaleOrderHeaderDocNo)
+                                        @Html.HiddenFor(m => Model.SaleDispatchLineViewModel[i].BalanceQty)
+                                        @Html.HiddenFor(m => Model.SaleDispatchLineViewModel[i].UnitId)
+                                        @Html.HiddenFor(m => Model.SaleDispatchLineViewModel[i].DealUnitId)
+                                        @Html.HiddenFor(m => Model.SaleDispatchLineViewModel[i].UnitConversionMultiplier)
+                                        @Html.HiddenFor(m => Model.SaleDispatchLineViewModel[i].unitDecimalPlaces, new { @class = "UDec" })
+                                        @Html.HiddenFor(m => Model.SaleDispatchLineViewModel[i].DealUnitDecimalPlaces, new { @class = "DelUDec" })
+
+                                        if (MaxDealUnitDecPlaces < Model.SaleDispatchLineViewModel[i].DealUnitDecimalPlaces)
+                                        {
+                                            MaxDealUnitDecPlaces = Model.SaleDispatchLineViewModel[i].DealUnitDecimalPlaces ?? 0;
+                                        }
+                                        if (MaxUnitDecPlaces < Model.SaleDispatchLineViewModel[i].unitDecimalPlaces)
+                                        {
+                                            MaxUnitDecPlaces = Model.SaleDispatchLineViewModel[i].unitDecimalPlaces;
+                                        }
+
+                                        <div class='row crow grid-body' style='margin-left:0px;margin-right:0px'>
+                                            <div class='col-xs-1 row-index'>
+                                                @(i + 1)
+                                            </div>
+                                            <div class='col-xs-11'>
+                                                <div class='row'>
+                                                    <div class='col-sm-4'>
+                                                        <strong>@Model.SaleDispatchLineViewModel[i].ProductName</strong>
+                                                        <br />
+                                                        @Model.SaleDispatchLineViewModel[i].Specification
+                                                        @{
+                                        var Dim1 = (string.IsNullOrEmpty(Model.SaleDispatchLineViewModel[i].Dimension1Name)) ? "" : Model.SaleDispatchLineViewModel[i].Dimension1Name + ",";
+                                        var Dim2 = (string.IsNullOrEmpty(Model.SaleDispatchLineViewModel[i].Dimension2Name)) ? "" : Model.SaleDispatchLineViewModel[i].Dimension2Name;
+                                                        }
+
+                                                        @Dim1 @Dim2
+                                                        <div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-2 text-center">
+                                                        <a href="#" class="ToDispatch" style="color:black">
+                                                            @Model.SaleDispatchLineViewModel[i].SaleOrderHeaderDocNo
+                                                            <br />
+                                                            <span id="OrderQty" class="small">@string.Format("{" + "0:0.".PadRight(@Model.SaleDispatchLineViewModel[i].unitDecimalPlaces + 4, '0') + "}", Model.SaleDispatchLineViewModel[i].BalanceQty)</span>
+                                                            <small>@Model.SaleDispatchLineViewModel[i].UnitId</small>
+                                                        </a>
+                                                        @{OrderQty += Model.SaleDispatchLineViewModel[i].BalanceQty;}
+                                                    </div>
+                                                    <div class='col-sm-2'>
+                                                        @Html.TextBoxFor(m => Model.SaleDispatchLineViewModel[i].BaleNo, new { @class = "form-control", @placeholder = "BaleNo", @style="display:inline;margin-bottom:3px" })
+                                                        @Html.ValidationMessageFor(m => Model.SaleDispatchLineViewModel[i].BaleNo, "", new { @class = "text-danger" })
+                                                        <br />
+                                                        @Html.TextBoxFor(m => Model.SaleDispatchLineViewModel[i].LotNo, new { @class = "form-control", @placeholder = "LotNo", @style = "display:inline" })
+                                                        @Html.ValidationMessageFor(m => Model.SaleDispatchLineViewModel[i].LotNo, "", new { @class = "text-danger" })
+                                                        
+                                                    </div>
+                                                    <div class="col-sm-2 text-right">
+                                                        @Html.TextBoxFor(m => Model.SaleDispatchLineViewModel[i].Qty, new { @class = "form-control text-right DispatchQty", @style = "display:inline" })
+                                                        @Html.ValidationMessageFor(m => Model.SaleDispatchLineViewModel[i].Qty, "", new { @class = "text-danger" })
+                                                        @{DispatchQty += Model.SaleDispatchLineViewModel[i].Qty;}
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                        <hr style='margin-top:0px;margin-bottom:0px' />
+                                    }
+                                </div>
+                            </div>
+
+
+                            <div class="row grid-head" style='margin-left:0px;margin-right:0px'>
+                                <div class="col-xs-1 text-left">
+                                </div>
+                                <div class="col-xs-11">
+                                    <div class="row">
+                                        @*ProductInfo*@
+                                        <div class="col-sm-4">
+                                            <strong>Total</strong>
+                                        </div>
+                                        <div class="col-sm-2">
+
+                                        </div>
+                                        @*Qty*@
+                                        <div class="col-sm-2 text-right">
+                                            @string.Format("{" + "0:0.".PadRight(MaxUnitDecPlaces + 4, '0') + "}", OrderQty)
+                                        </div>
+                                        <div class="col-sm-2 text-right" style="padding-right:30px">
+                                            <strong><span id="DispatchQty">@string.Format("{" + "0:0.".PadRight(MaxUnitDecPlaces + 4, '0') + "}", DispatchQty)</span></strong>
+                                        </div>
+                                        <div class="col-sm-2 text-right" style="padding-right:30px">
+
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer " style="padding: 19px 20px 0 20px; border-top:1px solid #8E8888">
+                    <button class="btn custom" name="Command:Edit" type="submit" id="submit"><h2 style="margin:0px" title="Proceed"><span class="glyphicon glyphicon-floppy-disk black black"></span> </h2></button>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+
+
+
+<script type="text/javascript">
+
+    var reset = false;
+    var IsSaved = false;
+    var ValidationCount = 0;
+
+    $('#modform').bind('submit', function (event) {
+
+        if (!IsSaved) {
+            if (!ValidateData()) {
+                return false;
+            }
+            IsSaved = true;
+            $('button:submit').attr('disabled', 'disabled');
+            return IsSaved;
+        }
+        else {
+            return false;
+        }
+
+
+    });
+
+
+    function ValidateData() {
+        var ValidationMessage = "";
+
+        //Client Side Validaion.....
+
+        return (ValidationMessage == "");
+
+    }
+
+
+    $('input.DispatchQty').change(function () {
+
+        var $div = $(this).closest('div.row');
+        var OrderQty = parseFloat($div.find('#OrderQty').text()) || 0;
+
+        var DispatchQty = parseFloat($div.find('input.DispatchQty').val()) || 0;
+
+        var bal = (DispatchQty) - (OrderQty);
+
+        if (bal > 0) {
+            if (!$('#modform').find('.modal-body #errormsg').length) {
+                $('#modform').find('#submit').attr('disabled', 'disabled');
+                $('#modform').find('.modal-body').prepend("<div class='alert alert-danger'><span id=errormsg >Qty exceeding Balance Qty</span></div>")
+            }
+            else {
+                $('#modform').find('#errormsg').text("Qty exceeding Required Qty");
+            }
+        }
+        else {
+            $('#modform').find('#submit:disabled').removeAttr('disabled');
+            if ($('#modform').find('.modal-body #errormsg').length) {
+                $('#modform').find('#errormsg').parent().remove();
+            }
+        }
+        CalculateTotal();
+
+    })
+
+    function CalculateTotal() {
+        var Order = 0;
+        var maxDeclaces = 0;
+        $('.row.crow.grid-body', '.modal-body').each(function () {
+
+            if ($(this).find('input.DispatchQty').val()) {
+                Order += parseFloat($(this).find('input.DispatchQty').val());
+                var $Hidiv = $(this).closest('div.row.crow');
+                var unitDecPlaces = parseFloat($Hidiv.find('.DelUDec').val()) || 0;
+                if (unitDecPlaces > maxDeclaces)
+                    maxDeclaces = unitDecPlaces;
+            }
+
+        })
+        $('#DispatchQty', '.modal-body').text(Order.toFixed(maxDeclaces));
+    }
+
+
+    $('.ToDispatch').click(function () {
+
+        var $Hidiv = $(this).closest('div.row.crow');
+
+        var unitDecPlaces = parseFloat($Hidiv.find('.UDec').val()) || 0;
+
+        var $div = $(this).closest('div.row');
+
+        var DispatchQty = parseFloat($div.find('#OrderQty').text()) || 0;
+
+        if ($div.find('input.DispatchQty').val() && $div.find('input.DispatchQty').val() > 0) {
+            $div.find('input.DispatchQty').val(0);
+        }
+
+        else {
+            $div.find('input.DispatchQty').val(DispatchQty.toFixed(unitDecPlaces));
+        }
+
+
+
+
+        CalculateTotal();
+
+    })
+
+    $('#ToDispatch').click(function () {
+        if (reset) {
+            $('div.row.crow', "#gbody.panel-info").each(function (index) {
+
+
+                var $Hidiv = $(this);
+
+                var unitDecPlaces = parseFloat($Hidiv.find('.UDec').val()) || 0;
+
+                var DispatchQty = parseFloat($Hidiv.find('#OrderQty').text()) || 0;
+
+                $Hidiv.find('input.DispatchQty').val(DispatchQty.toFixed(unitDecPlaces));
+
+
+            })
+            CalculateTotal();
+            reset = false;
+        }
+        else if (!reset) {
+            $('div.row.crow', "#gbody.panel-info").each(function (index) {
+
+                var $Hidiv = $(this);
+
+                $Hidiv.find('input.DispatchQty').val(0);
+
+            })
+            CalculateTotal();
+            reset = true;
+        }
+    })
+
+</script>

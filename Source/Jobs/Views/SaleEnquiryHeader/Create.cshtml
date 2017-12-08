@@ -1,0 +1,941 @@
+﻿@model Model.ViewModels.SaleEnquiryHeaderIndexViewModel
+@using Core.Common
+
+@{
+    ViewBag.Title = "Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style type="text/css">
+    .progress {
+        position: relative;
+    }
+
+        .progress span {
+            position: absolute;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            z-index: 2;
+            font-size: 0.8em;
+        }
+</style>
+
+<!-- modal placeholder-->
+<div id='myModal' class='modal fade in'>
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div id='myModalContent'></div>
+        </div>
+    </div>
+</div>
+
+<!-- modal placeholder For Print -->
+<div id='myModal1' class='modal fade in'>
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div id='myModalContent1'></div>
+        </div>
+    </div>
+</div>
+
+@using (Html.BeginForm("HeaderPost", "SaleEnquiryHeader", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(m => m.SiteId)
+    @Html.HiddenFor(m => m.DivisionId)
+    @Html.HiddenFor(m => m.SaleEnquiryHeaderId)
+    @Html.HiddenFor(m => m.DocTypeId)
+    @Html.HiddenFor(m => m.CreatedDate)
+    @Html.HiddenFor(m => m.ProcessId)
+    <div class="panel panel-default">
+        <div class="panel-heading">
+
+            @CustomHelpers.RenderHeaderInfo(ViewBag.transactionType, (int?)ViewBag.PendingToSubmit, (int?)ViewBag.PendingToReview, ViewBag.Name)
+
+            @*@if (ViewBag.transactionType == "submit")
+            {<h3>
+                <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"> <span class="glyphicon glyphicon-file black"></span>Submit @ViewBag.Name</span>
+                <input type="submit" value="Submit" name="Command:Submit" class="btn btn-primary right" style="width: 90px; background-color: #2980b9" />
+            </h3>
+            }
+            else if (ViewBag.transactionType == "review" || ViewBag.transactionType == "ReviewContinue")
+            {<h3 style="border-bottom:0px solid #e1dada;padding-bottom:0px;">
+                <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"> <span class="glyphicon glyphicon-file black"></span> Review @ViewBag.Name</span>
+                <button type="submit" name="Command:Review" class="btn btn-primary right" style="margin-left:5px" id="ReviewContinue">Review & Next<span class='badge'>@(ViewBag.PendingToReview != 0 ? ViewBag.PendingToReview : "")</span></button>
+                <button type="submit" class="btn btn-primary right" name="Command:Review">Review</button>
+                <input type="hidden" id="IsContinue" name="IsContinue" value="" />
+            </h3>
+            }
+            else if (ViewBag.transactionType == "detail")
+            {
+                <h3 style="border-bottom:1px solid #e1dada;padding-bottom:10px;">
+                    <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"> <span class="glyphicon glyphicon-file black"></span> @ViewBag.Name</span>
+                </h3>
+            }
+            else
+            {
+                <h3>
+                    <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"> <span class="glyphicon glyphicon-file black"></span>@ViewBag.Name</span>
+                    <input type="submit" value="Save" class="btn btn-primary right" id="submit" style="width: 90px; background-color: #2980b9" />
+                </h3>
+            }
+            <hr style="margin-top:0px;margin-bottom:0px" />*@
+
+            @{
+            string EditAction = "";
+            if (Model.Status == (int)StatusConstants.Drafted || Model.Status == (int)StatusConstants.Import)
+            {
+                EditAction = "Modify";
+            }
+            else if ((Model.Status == (int)StatusConstants.Submitted || Model.Status == (int)StatusConstants.Modified))
+            {
+                EditAction = "ModifyAfter_Submit";
+            }
+            else
+            {
+                EditAction = "DetailInformation";
+            }
+            }
+
+            <hr style="margin-top: 5px; margin-bottom: 5px; border-top: 1px solid #d8d5d5" />
+
+            <div class="panel-info">
+                @*<h4 style="padding:5px 0 0 0;margin:0px">
+                    @Html.ActionLink(" ", " ", " ", null, new { @class = "glyphicon glyphicon-refresh toolbar", @title = "Refresh Page", @data_toggle = "tooltip", @id = "RefreshPage" })
+                    @Html.ActionLink(" ", "Create", "SaleEnquiryHeader", new { @id = ViewBag.id }, new { @class = "glyphicon glyphicon-plus toolbar", @title = "Add New", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "GetHistory", "LogHistory", new { Ids = Model.SaleEnquiryHeaderId, DocTypeId = Model.DocTypeId }, new { @class = "glyphicon glyphicon-user toolbar", @title = "History", @data_toggle = "tooltip", @id = "DocHistory", @data_modal = "" })
+                    @Html.ActionLink(" ", "GeneratePrints", "SaleEnquiryHeader", new { Ids = Model.SaleEnquiryHeaderId, DocTypeId = Model.DocTypeId }, new { @class = "glyphicon glyphicon-print toolbar", @title = "Print", @data_toggle = "tooltip", @id = "PrintRecordC", target = "_blank" })
+                    @Html.ActionLink(" ", "Email", "SaleEnquiryHeader", null, new { @class = "glyphicon glyphicon-envelope toolbar", @title = "Email", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "PrevPage", "SaleEnquiryHeader", new { DocId = @Model.SaleEnquiryHeaderId, DocTypeId = Model.DocTypeId }, new { @class = "glyphicon glyphicon-arrow-left toolbar", @title = "Prev Record", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "NextPage", "SaleEnquiryHeader", new { DocId = @Model.SaleEnquiryHeaderId, DocTypeId = Model.DocTypeId }, new { @class = "glyphicon glyphicon-arrow-right toolbar", @title = "Next Record", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", " ", " ", null, new { @class = "glyphicon glyphicon-trash toolbar", @title = "Delete", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "Index", "SaleEnquiryHeader", new { @id = ViewBag.id, IndexType = ViewBag.IndexStatus }, new { @class = "glyphicon glyphicon-list toolbar right", @title = "List", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "Report", "SaleEnquiryHeader", new { @id = ViewBag.id }, new { @class = "glyphicon glyphicon-th toolbar right", @title = "Report", @data_toggle = "tooltip" })
+                </h4>*@
+                <div class="btn-group">
+                    @Html.ActionLink(" ", "Create", "SaleEnquiryHeader", new { @id = ViewBag.id }, new { @class = "cbtn btn-circle glyphicon glyphicon-plus toolbar", @title = "Add New", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", EditAction, "SaleEnquiryHeader", new { @id = Model.SaleEnquiryHeaderId, IndexType = ViewBag.IndexStatus }, new { @class = "cbtn btn-circle glyphicon glyphicon-edit", @title = "Edit", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "GeneratePrints", "SaleEnquiryHeader", new { Ids = Model.SaleEnquiryHeaderId, DocTypeId = Model.DocTypeId }, new { @class = "cbtn btn-circle glyphicon glyphicon-print toolbar", @title = "Print", @data_toggle = "tooltip", @id = "PrintRecordC", target = "_blank" })
+                    @Html.ActionLink(" ", "PrevPage", "SaleEnquiryHeader", new { DocId = @Model.SaleEnquiryHeaderId, DocTypeId = Model.DocTypeId }, new { @class = "cbtn btn-circle glyphicon glyphicon-arrow-left toolbar", @title = "Prev Record", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "NextPage", "SaleEnquiryHeader", new { DocId = @Model.SaleEnquiryHeaderId, DocTypeId = Model.DocTypeId }, new { @class = "cbtn btn-circle glyphicon glyphicon-arrow-right toolbar", @title = "Next Record", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "Index", "SaleEnquiryHeader", new { @id = ViewBag.id, IndexType = ViewBag.IndexStatus }, new { @class = "cbtn btn-circle glyphicon glyphicon-list toolbar", @title = "List", @data_toggle = "tooltip" })
+                </div>
+                <div class="btn-group">
+                    <a class="cbtn btn-circle glyphicon glyphicon-option-horizontal dropdown-toggle"   title="More Option"  aria-expanded="false" style="padding-top: 6px;padding-bottom: 6px;" href="#" data-toggle="dropdown" id="dropdownMenu1">
+                    </a>
+                    <ul class="dropdown-menu pull-right" aria-labelledby="dropdownMenu1">
+                        <li><a id="DocHistory" data-modal="" href="@Url.Action("GetHistory", "LogHistory", new { Ids = Model.SaleEnquiryHeaderId, DocTypeId = Model.DocTypeId })"><span class="glyphicon glyphicon-user"> </span> History</a></li>
+                        <li><a href="@Url.Action("Email", "SaleEnquiryHeader")"><span class="glyphicon glyphicon-envelope"> </span> Email</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="@Url.Action("Report", "SaleEnquiryHeader")"><span class="glyphicon glyphicon-th"> </span> Report</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="panel-info" style="padding-left:15px">
+            <div class="form-horizontal">
+                @Html.ValidationSummary(true)
+
+                <div class="row">
+                    <h4 class="col-md-12 black">
+                        <span class="glyphicon glyphicon-align-justify"></span>
+                        1.Document Details
+                    </h4>
+                    <div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group" style="margin-top:15px">
+                                    @Html.LabelFor(model => model.DocDate, "Enquiry Date", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @*@Html.TextBoxFor(m => m.DocDate, "{0:dd/MMMM/yyyy}", new { @class = "datepickerWithNFD form-control col-xs-6 required" })*@
+                                        @Html.TextBoxFor(m => m.DocDate, "{0:dd/MMMM/yyyy}", new
+                                   {
+                                       @class = "datepickerWithNFD form-control col-xs-6 required updateDocNo",
+                                       data_tabl = "SaleEnquiryHeaders",
+                                       data_doctype = Model.DocTypeId,
+                                       data_divId = Model.DivisionId,
+                                       data_sitId = Model.SiteId,
+                                   })
+                                        @Html.ValidationMessageFor(model => model.DocDate, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group" style="margin-top:15px">
+                                    @Html.LabelFor(model => model.DocNo, "Enquiry No", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.DocNo, null, new { @class = "form-control col-xs-6 required" })
+                                        @Html.ValidationMessageFor(m => m.DocNo, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.DueDate, "Due Date", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.DueDate, "{0:dd/MMMM/yyyy}", new { @class = "datepicker form-control col-xs-6 required" })
+                                        @Html.ValidationMessageFor(m => m.DueDate, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <hr style="margin-bottom:0px" />
+                <div class="row">
+                    <h4 class="col-md-12 black">
+                        <span class="glyphicon glyphicon-shopping-cart"></span>
+                        2.Buyer Details
+                    </h4>
+                    <div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.BuyerEnquiryNo, "Buyer Enquiry No", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(model => model.BuyerEnquiryNo, null, new { @class = "form-control col-xs-6 " })
+                                        @Html.ValidationMessageFor(m => m.BuyerEnquiryNo, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6" style="display:@(Model.SaleEnquirySettings.isVisibleBillToParty ? "" : "none")">
+                                @Html.HiddenFor(m => m.SaleEnquirySettings.isVisibleBillToParty)
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.BillToBuyerId, "Bill To Buyer", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.BillToBuyerId, new { @class = "form-control col-xs-6 height" })
+                                        @Html.ValidationMessageFor(m => m.BillToBuyerId, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.SaleToBuyerId, "Sale To Buyer", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        <div class="input-group">
+                                            @Html.TextBoxFor(m => m.SaleToBuyerId, new { @class = "form-control col-xs-6" })
+                                            @Html.ValidationMessageFor(m => m.SaleToBuyerId, "", new { @class = "text-danger" })
+                                            <span class="input-group-btn">
+                                                @Html.ActionLink("...", "_Create", "PersonCreation", new { id = "id" }, new { data_modalCustom2 = "", id = "CustomerDetail", @class = "btn btn-default ", @title = "For Enquiry", @data_toggle = "tooltip" })
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6" style="display:@(Model.SaleEnquirySettings.isVisibleCurrency ? "" : "none")">
+                                @Html.HiddenFor(m => m.SaleEnquirySettings.isVisibleCurrency)
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.CurrencyId, "Currency", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.DropDownListFor(m => m.CurrencyId, new SelectList(ViewBag.CurrencyList as System.Collections.IEnumerable, "ID", "Name"), new { @class = "form-control col-xs-6 height" })
+                                        @Html.ValidationMessageFor(m => m.CurrencyId, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.ShipAddress, "Ship Address", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextAreaFor(m => m.ShipAddress, new { @class = "form-control col-xs-6" })
+                                        @Html.ValidationMessageFor(m => m.ShipAddress, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <hr style="margin-bottom: 0px" />
+
+                <div class="row">
+                    <h4 class="col-md-12 black">
+                        <span class="glyphicon glyphicon-certificate"></span>
+                        3.Other Details
+                    </h4>
+                    <div>
+                        <div class="row">
+                            <div class="col-md-6" style="display:@(Model.SaleEnquirySettings.isVisibleAdvance ? "" : "none")">
+                                @Html.HiddenFor(m => m.SaleEnquirySettings.isVisibleAdvance)
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.Advance, "Advance", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.Advance, new { @class = "form-control col-xs-6" })
+                                        @Html.ValidationMessageFor(m => m.Advance, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6" style="display:@(Model.SaleEnquirySettings.isVisibleUnitConversionFor ? "" : "none")">
+                                @Html.HiddenFor(m => m.SaleEnquirySettings.isVisibleUnitConversionFor)
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.UnitConversionForId, "Unit Conversion For", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.DropDownListFor(m => m.UnitConversionForId, new SelectList(ViewBag.UnitConvForList as System.Collections.IEnumerable, "UnitconversionForId", "UnitconversionForName"), new { @class = "form-control col-xs-6 height" })
+                                        @Html.ValidationMessageFor(m => m.UnitConversionForId, null, new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6" style="display:@(Model.SaleEnquirySettings.isVisibleShipMethod ? "" : "none")">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.ShipMethodId, "Ship Method", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.DropDownListFor(model => model.ShipMethodId, new SelectList(ViewBag.ShipMethodList as System.Collections.IEnumerable, "ShipMethodId", "ShipMethodName"), new { @class = "form-control col-xs-6 height required" })
+                                        @Html.ValidationMessageFor(m => m.ShipMethodId, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6" style="display:@(Model.SaleEnquirySettings.isVisibleDeliveryTerms ? "" : "none")">
+                                @Html.HiddenFor(m => m.SaleEnquirySettings.isVisibleDeliveryTerms)
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.DeliveryTermsId, "Delivery Terms", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.DropDownListFor(model => model.DeliveryTermsId, new SelectList(ViewBag.DeliveryTermsList as System.Collections.IEnumerable, "DeliveryTermsId", "DeliveryTermsName"), new { @class = "form-control col-xs-6 height required" })
+                                        @Html.ValidationMessageFor(m => m.DeliveryTermsId, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6" style="display:@(Model.SaleEnquirySettings.isVisiblePriority ? "" : "none")">
+                                @Html.HiddenFor(m => m.SaleEnquirySettings.isVisiblePriority)
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.Priority, "Priority", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.DropDownList("Priority", null, new { @class = "form-control col-xs-6 height" })
+                                        @Html.ValidationMessageFor(m => m.Priority, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6" style="display:@(Model.SaleEnquirySettings.isVisibleCreditDays ? "" : "none")">
+                                @Html.HiddenFor(m => m.SaleEnquirySettings.isVisibleCreditDays)
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.CreditDays, "Credit Days", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.CreditDays, new { @class = "form-control col-xs-6" })
+                                        @Html.ValidationMessageFor(m => m.CreditDays, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.TermsAndConditions, "Terms", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextAreaFor(m => m.TermsAndConditions, new { @class = "form-control col-xs-6" })
+                                        @Html.ValidationMessageFor(m => m.TermsAndConditions, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.Remark, "Remark", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextAreaFor(m => m.Remark, new { @class = "form-control col-xs-6" })
+                                        @Html.ValidationMessageFor(m => m.Remark, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <hr />
+                <div class="row">
+                    <h4 class="col-md-12 black" style="margin-top:15px">
+                        <span class="glyphicon glyphicon-shopping-cart"></span>
+                        4.Products
+                    </h4>
+                </div>
+
+                <div class="panel-info">
+                    <h5 style="padding:5px 0 3px 0;margin:0px;font-weight:bold">
+                        <span class="glyphicon glyphicon-plus-sign"></span>
+                        @{string Action = "";
+                        if (Model.Status == (int)StatusConstants.Drafted || Model.Status == (int)StatusConstants.Import)
+                        { Action = "CreateLine"; }
+                        else if (Model.Status == (int)StatusConstants.Submitted || Model.Status == (int)StatusConstants.Modified)
+                        { Action = "CreateLineAfter_Submit"; }
+                        }
+                        @Html.ActionLink("Add New Row ", Action, "SaleEnquiryLine", new { id = @Model.SaleEnquiryHeaderId }, new { data_modal = "", id = "btnCreate", @class = "toolbar", @title = "Add New", @data_toggle = "tooltip" })
+                    </h5>
+                </div>
+                <div style="padding-right:15px">
+
+                    <div class="panel panel-default" id="grid">
+                        <div class="panel-heading headrow" style="background-image: -webkit-linear-gradient(top, #428bca 0%, #428bca 100%);color:white">
+                            <div class="row grid-head">
+                                <div class="col-xs-1 text-left">
+                                    Srl.
+                                </div>
+                                <div class="col-xs-10">
+                                    <div class="row">
+                                        @*ProductInfo*@
+                                        <div class="col-sm-4">
+                                            Product Name
+                                        </div>
+                                        @*Qty*@
+                                        <div class="col-sm-2 text-right">
+                                            Qty
+                                        </div>
+                                        @*Rate*@
+                                        <div class="col-sm-2 text-right">
+                                            Rate
+                                        </div>
+                                        @*Amount*@
+                                        <div class="col-sm-2 text-right">
+                                            Amount
+                                        </div>
+                                        @*Remark*@
+                                        <div class="col-sm-2">
+                                            Remark
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-xs-1">
+
+                                </div>
+                                <div class="col-xs-1">
+
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="panel-info" id="gbody">
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@if ((ViewBag.Mode == "Add") || (ViewBag.Mode == "Edit"))
+{
+    <script type="text/javascript">
+
+        $('#SaleToBuyerId').change(function () {
+
+            var cid = $("#SaleToBuyerId").val();
+            var cdata = $('#SaleToBuyerId').select2('data').text;
+            $("#BillToBuyerId").select2('data', { id: cid, text: cdata });
+        });
+
+
+        $(function(){
+            $('#DocTypeId').focus();
+        })
+
+        $("#DocNo").on("change", function () {
+            $(this).DuplicateCheckForCreate({ name: 'SaleEnquiryHeader', value: $(this).val(), doctype: $("#DocTypeId").val() });
+        });
+
+        var IsSaved=false;
+        var ValidationCount=0;
+
+        $('form').submit(function(event){
+
+            if(!IsSaved)
+            {
+                if(!ValidateData())
+                {
+                    return false;
+                }
+                IsSaved=true;
+                return IsSaved;
+            }
+            else
+            {
+                return false;
+            }
+
+
+        });
+
+
+        function ValidateData() {
+            var DocId=@Model.SaleEnquiryHeaderId;
+            var TempValue;
+            var ValidationMessage="";
+
+
+
+            //Checking for dulicate key value
+            if(DocId<=0)
+            {
+                TempValue= $('#DocNo').DuplicateCheckForCreate({ name: 'SaleEnquiryHeader', value: $('#DocNo').val(), doctype: $('#DocTypeId').val() });
+                if (TempValue){ ValidationMessage=$('#DocNo').val() + " already exist <br />";}
+            }
+            else
+            {
+                test = $('#DocNo').DuplicateCheckForEdit({ name: 'SaleEnquiryHeader', value: $('#DocNo').val(), doctype: $('#DocTypeId').val(),headerId:DocId });
+                if (TempValue) {ValidationMessage+=$('#DocNo').val() + " already exist <br />";}
+            }
+            if(TempValue)
+            {
+                if($('#validationerrormsg').length==0){
+                    $('.panel-info').filter(':eq(1)').before('<div class="alert alert-danger" role="alert" id="validationerrormsg">'+ValidationMessage+'</div>');}
+                else
+                {
+                    $('#validationerrormsg').html(ValidationMessage);
+                }
+            }
+            return  (ValidationMessage=="");
+
+        }
+        $('#BillToBuyerId').change(function () {
+            var cid = $("#BillToBuyerId").val();
+            var cdata = $('#BillToBuyerId').select2('data').text;
+
+            if (cdata != 'Cash A/c' && cdata != 'Bank A/c')
+            {
+                $("#SaleToBuyerId").select2('data', { id: cid, text: cdata });
+            }
+
+            if ($("#SaleToBuyerId").val() != 0 && $("#SaleToBuyerId").val() != null)
+            {
+                GetPersonLedgerBalance();
+                GetPersonDetail();
+            }
+        });
+
+
+        //Reloading the table contents on modal hide
+        $('#myModal').on('hidden.bs.modal', function () {
+            LoadProducts();
+        });
+
+        $(document).ready(function(){
+            enableModalTransitions();
+        })
+
+
+        //To focus on the first element on modal load
+        $('#myModal').on('shown.bs.modal', function () {
+            $("#ProductId").select2("focus");
+        });
+
+        //For Populating Modal PopUp on DoubleClick Of Row
+        $('#gbody').on("dblclick",'.grid-body',function(){
+            var editurl=$(this).find('a[edit]').attr('href');
+            $('#myModalContent').load(editurl, function () {
+                //alert('2');
+                $('#myModal').modal({
+                    backdrop: 'static',
+                    keyboard: true
+                }, 'show');
+
+                bindForm1(this);
+            });
+        });
+
+
+        //For Handling Modal PopUp on Clicking Delete Icon
+        $('#gbody').on("click",'a[delete]', function (e) {
+            $('#myModalContent').load(this.href, function () {
+                //alert('2');
+                $('#myModal').modal({
+                    backdrop: 'static',
+                    keyboard: true
+                }, 'show');
+
+                bindForm1(this);
+            });
+            return false;
+        });
+
+        //For Handling Modal PopUp on Clicking PersonProductUid Icon
+        $('#gbody').on("click",'a[PersonProductUid]', function (e) {
+            $('#myModalContent').load(this.href, function () {
+                //alert('2');
+                $('#myModal').modal({
+                    backdrop: 'static',
+                    keyboard: true
+                }, 'show');
+
+                bindForm1(this);
+            });
+            return false;
+        });
+
+        //For posting the data through ajax and render the contents sent back from the server
+        function bindForm1(dialog) {
+            //alert("binding");
+            $('form#modform', dialog).submit(function () {
+                //alert(this.action);
+                $.ajax({
+                    url: this.action,
+                    type: this.method,
+                    data: $(this).serialize(),
+                    success: function (result) {
+                        if (result.success) {
+                            $('#myModal').modal('hide');
+                            //Refresh
+                            //location.reload();
+                            //alert('Data Saved');
+                        }else if(!result.success)
+                        {
+                            $('#myModalContent').html(result);
+                            bindForm1();
+                        }
+                        else {
+                            $('#myModalContent').html(result);
+                            bindForm1();
+                        }
+                    }
+                });
+                return false;
+            });
+
+        }
+
+    </script>
+
+}
+
+<script type="text/javascript">
+    $(function()
+    {
+        var TitleCase= '@Session["TitleCase"]';
+        $('#BuyerEnquiryNo, #DocNo').focusout(function () {
+            if (TitleCase=="UpperCase")
+                this.value = this.value.toUpperCase() ;
+        });
+    });
+</script>
+
+<script type="text/javascript">
+    var form_clean;
+    $(document).ready(function () {
+
+        //CustomSelectFunction($("#BillToBuyerId"), '/ComboHelpList/GetPersonWithProcess', '/ComboHelpList/SetSinglePerson', ' ', false, 0,$('#ProcessId').val());
+        //CustomSelectFunction($("#SaleToBuyerId"), '/ComboHelpList/GetPersonWithProcess', '/ComboHelpList/SetSinglePerson', ' ', false, 0,$('#ProcessId').val());
+
+        CustomSelectFunction($("#BillToBuyerId"), '/SaleEnquiryHeader/GetCustomPerson', '/ComboHelpList/SetSinglePerson', ' ', false, 0,$('#DocTypeId').val());
+        CustomSelectFunction($("#SaleToBuyerId"), '/SaleEnquiryHeader/GetCustomPerson', '/ComboHelpList/SetSinglePerson', ' ', false, 0,$('#DocTypeId').val());
+
+
+        //CustomSelectFunction($("#SaleToBuyerId"), '/ComboHelpList/GetPerson', '/ComboHelpList/SetSinglePerson', ' ', false, 0);
+        //CustomSelectFunction($("#BillToBuyerId"), '/ComboHelpList/GetBuyers', '/ComboHelpList/SetSingleBuyer', ' ', false, 0);
+
+        //Adding Hidden Input Fields
+        AddFields();
+
+        //Calling the function to load the table data/ Line information
+        LoadProducts();
+
+
+
+        //form_clean = $("form").serialize();
+
+
+        ////For maintaining the data change on the form
+        ////To enable of disable save button based on the data changed
+        //$("input,select").change(function () {
+        //    var form_dirty = $("form").serialize();
+        //    if (form_clean != form_dirty) {
+        //        $("#submit").removeAttr('disabled');
+        //    }
+        //    else
+        //    {
+        //        // alert('same form');
+        //        $("#submit").attr({ "disabled": "disabled" })
+        //    }
+        //});
+    });
+
+
+    var id=@Model.SaleEnquiryHeaderId;
+    if(id==null||id==0)
+    {
+        $(document).find('a#btnCreate').removeAttr('href').removeAttr('data-modal');
+    }
+
+
+
+
+
+    function AddFields(){
+        $('form:last').append($("<input type='hidden' name='UserRemark'></input>"))
+    }
+
+
+    function LoadProducts() {
+        var groupId=@Model.SaleEnquiryHeaderId;
+        var status='@Model.Status';
+        var LineEditUrl;
+        var LineDeleteUrl;
+        var LinePersonProductUidUrl;
+        if(status==StatusContstantsEnum.Drafted||status==StatusContstantsEnum.Import)
+        {
+            LineEditUrl="/SaleEnquiryLine/_ModifyLine/";
+            LineDeleteUrl="/SaleEnquiryLine/_DeleteLine/";
+            LinePersonProductUidUrl="/SaleEnquiryLine/_PersonProductUidLine/";
+        }
+        else if(status==StatusContstantsEnum.Submitted || status == StatusContstantsEnum.Modified )
+        {
+            LineEditUrl="/SaleEnquiryLine/_ModifyLineAfterSubmit/";
+            LineDeleteUrl="/SaleEnquiryLine/_DeleteLine_AfterSubmit/";
+            LinePersonProductUidUrl="/SaleEnquiryLine/_PersonProductUidLine/";
+        }
+        else
+        {
+            LineEditUrl="/SaleEnquiryLine/_Detail/";
+            LineDeleteUrl="/SaleEnquiryLine/_Detail/";
+        }
+
+        var link="/SaleEnquiryLine/Index/"+groupId;
+        var QtyCount=0;
+        var AmountCount=0;
+        var unit=true;
+        var prevunit;
+        var decimal=0;
+        $.ajax({
+            url: link,
+            type: "GET",
+            success: function (data) {
+                var row = ""
+                var srno=1;
+
+                if(data.length!=0)
+                {
+                    $.each(data, function (index, item) {
+                        row +="     <div class='row crow grid-body' style='margin-left:0px;margin-right:0px'>"
+                            +"              <div class='col-xs-1 row-index'>"+srno
+                            +"                  <input type='hidden' class='id' value='"+item.SaleEnquiryLineId+"' />"
+                            +"              </div>"
+                            +"              <div class='col-xs-10'>"
+                            +"                  <div class='row'>"
+                            +"                      <div class='col-sm-4'>"+(item.ProductName==null?" ":"<strong>"+item.ProductName+"</strong><br/>")+(item.BuyerSpecification==null?" ":item.BuyerSpecification)+(item.BuyerSpecification1==null?" ":"<br />"+item.BuyerSpecification1)
+                            +"                          <div>"+(item.BuyerSpecification3==null?" ":item.BuyerSpecification3)+(item.BuyerSpecification2==null?" ":", "+item.BuyerSpecification2)+"</div>"
+                            +"                          <div>"+((item.DueDate==null)?" ":"<span title='DueDate' class='label label-danger' style='font-weight:bold'>"+formatDate('d/m/Y',new Date(parseInt(item.DueDate.substr(6))))+"</span>")
+                            +"                          </div>"
+                            +"                        </div>"
+                            +"                        <div class='col-sm-2 text-right'>"+(item.Qty==null?" ":item.Qty)+"<br />"
+                            +"                              <div>"
+                            +"                                  <small>"+(item.UnitId==null?" ":item.UnitId)+"</small>"
+                            +"                              </div> "
+                            +"                         </div>"
+                            +"                          <div class='col-sm-2 text-right'>"
+                            +                              (item.Rate==null?" ":item.Rate.toFixed(2))
+                            +"                          </div>"
+                            +"                          <div class='col-sm-2 text-right'>"
+                            +                            (item.Amount==null?" ":item.Amount.toFixed(2))
+                            +"                          </div>"
+                            +"                          <div class='col-sm-2'>"
+                            +                               (item.Remark==null?" ":item.Remark+"<br />")
+                            +"                          </div>"
+                            +"                      </div>"
+                            +"              </div>"
+                            +"              <div class='col-xs-1'>"
+                            +"                   <a class='glyphicon glyphicon-user icon-Cus-Size' PersonProductUid='' href='"+LinePersonProductUidUrl+item.SaleEnquiryLineId+"'></a>"
+                            +"                   <a  edit='' href='"+LineEditUrl+item.SaleEnquiryLineId+"'></a>"
+                            +"                   <a class='glyphicon glyphicon-trash icon-Cus-Size' delete='' href='"+LineDeleteUrl+item.SaleEnquiryLineId+"'></a>"
+                            +"                   <a  edit='' href='"+LineEditUrl+item.SaleEnquiryLineId+"'></a>"
+                            +"               </div>"
+                            +"      </div>"
+                            +"      <hr style='margin-top:0px;margin-bottom:0px'/>"
+
+                        QtyCount+=item.Qty;
+                        AmountCount+=item.Amount;
+                        if(srno!=1)
+                        {
+                            if(item.UnitId==prevunit)
+                            {}
+                            else
+                            {unit=false;}
+                        }
+                        if(decimal<item.unitDecimalPlaces){decimal=item.unitDecimalPlaces;}
+                        srno++;
+                        prevunit=item.UnitId;
+                    });
+                    row+="<div class='row tfooter' style='padding-top:10px;'>"
+                        +"  <div class='col-xs-1'>"
+                        +"  </div>"
+                        +"  <div class='col-xs-10'>"
+                        +"      <div class='row'> "
+                        +"          <div class='col-sm-4'>"
+                        +"              <strong>Total</strong>"
+                        +"          </div>"
+                        +"          <div class='col-sm-2 text-right'>"
+                        +"              <strong>"+ ((unit==true)?QtyCount.toFixed(decimal)+"<br /><small>"+prevunit+"</small>":QtyCount.toFixed(decimal))+"</strong>"
+                        +"          </div>"
+                        +"          <div class='col-sm-2 text-right'>"
+                        +"          </div>"
+                        +"          <div class='col-sm-2 text-right'>"
+                        +"              <strong>"+AmountCount.toFixed(2)+"</strong>"
+                        +"          </div>"
+                        +"          <div class='col-sm-2'>"
+                        +"          </div>"
+                        +"      </div>"
+                        +"  </div>"
+                        +"  <div class='col-xs-1'>"
+                        +"  </div>"
+                        +"</div>"
+                }
+                else
+                {
+
+                }
+                $("#gbody").html(row);
+
+            },
+            error: function (result) {
+                alert("Error");
+            }
+        });
+    }
+
+    $(function () {
+
+        $("a[data-modalCustom2]").on("click", function (e) {
+            if (this.href == "") {
+                return false;
+            }
+
+            var SaleToBuyerId =  $("#SaleToBuyerId").val()
+            var NewUrl = this.href.replace("id",SaleToBuyerId);
+
+            $.ajax({
+                url: NewUrl,
+                type: "POST",               
+                success: function (result) {
+                    $('#myModalContent').html(result);
+                    $('#myModal').modal({
+                        backdrop: 'static',
+                        keyboard: true
+                    }, 'show');
+
+                    bindForm2('#myModalContent');
+                },
+            });
+            return false;
+        });
+
+
+        function bindForm2(dialog) {
+            $('#modformr2', dialog).submit(function () {
+                $.ajax({
+                    url: this.action,
+                    type: this.method,
+                    data: $(this).serialize(),
+                    success: function (result) {
+                        if (result.success) {
+                            $('#myModal').modal('hide');
+                            CustomSelectFunction($("#SaleToBuyerId"), '/ComboHelpList/GetPerson', '/ComboHelpList/SetSinglePerson', ' ', false, 0);
+                            //$('#SaleToBuyerId').keydown();
+                            $("#SaleToBuyerId").select2('data', { id: result.PersonId, text: result.Name });
+                        } else {
+                            $('#myModalContent').html(result);
+                            bindForm();
+                        }
+                    }
+                });
+                return false;
+            });
+        }
+
+    });
+</script>
+
+
+
+
+@if ((ViewBag.Mode != "Add") && (ViewBag.Mode != "Edit"))
+{
+    <script type="text/javascript">
+
+        RemoveFields();
+
+        function RemoveFields(){
+            //Disabling input fields
+            $(':input:not(:submit)').attr('disabled','disabled');
+
+            //Removing all the events from the newly created lines
+            $('#gbody').unbind();
+
+            //Removing Add New Row ActionLink
+            $('a#btnCreate').parents('h5')[0].remove();
+
+
+            //Preventing the click event on newly created elements
+            $(document).on('click','#gbody a',function(event){
+                event.preventDefault();
+            })
+            //Removing the action link from the form so that the request will be redirected to the Submit function in the controller instead of the hardcoded path
+            $('form:last').prop('action','');
+        }
+
+
+    </script>
+}
+
+@if ((Model.Status == (int)ActivityTypeContants.Modified || Model.Status == (int)ActivityTypeContants.Submitted)
+    && (ViewBag.transactionType == "submit" || ViewBag.transactionType == "submitContinue" || ViewBag.transactionType == "review" || ViewBag.transactionType == "ReviewContinue"))
+{
+    <script type="text/javascript">
+
+        var href = '/ActivityLog/LogEditReason';
+        var $btnClicked;
+
+        $(':submit').bind('click', function () {
+            $btnClicked=$(this);
+            $('#myModalContent').load(href, function () {
+
+                $('#myModal').modal({
+                    backdrop: 'static',
+                    keyboard: true
+                }, 'show');
+
+                bindForm1(this);
+            });
+
+            return false;
+        })
+
+        function bindForm1(dialog) {
+
+            $('#modformr', dialog).submit(function () {
+
+                $.ajax({
+                    url: this.action,
+                    type: this.method,
+                    data: $(this).serialize(),
+                    success: function (result) {
+                        if (result.success) {
+                            $('#myModal').modal('hide');
+
+                            $(':submit').unbind();
+
+                            $('input[name="UserRemark"]').val(result.UserRemark);
+
+                            $btnClicked.trigger('click');
+
+                        } else {
+                            $('#myModalContent').html(result);
+                            bindForm1();
+                        }
+                    }
+                });
+                return false;
+            });
+
+        }
+
+    </script>
+}
+
+
+
+
+
+
+
+
+
+

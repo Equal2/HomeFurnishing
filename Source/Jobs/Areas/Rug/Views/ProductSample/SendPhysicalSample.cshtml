@@ -1,0 +1,58 @@
+﻿@model Model.Models.ProductSampleShipment
+
+@{
+    ViewBag.Title = "Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@using (Html.BeginForm()) 
+{
+    @Html.AntiForgeryToken()
+     @Html.ValidationSummary(true)
+     @Html.HiddenFor(m=>m.ProductSamplePhotoApprovalId)
+        @Html.HiddenFor(m => m.ProductSamplePhotoApproval)
+    
+    
+     
+<div class="panel panel-default" style="padding:5px">
+
+    <div class="panel panel-heading">
+
+        <h4>
+            <span style="font-family: Calibri,sans-serif,Verdana">Send Physical Sample</span>
+        </h4>
+
+    </div>
+
+        <div class="panel panel-info" style="padding:15px">
+
+            <div class="form-horizontal">
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.ShipDate, new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.ShipDate)
+                        @Html.ValidationMessageFor(model => model.ShipDate)
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.Specification, new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.TextAreaFor(model => model.Specification, new { @class = "control-label col-md-2", @style="width:200px;height:100px" })
+                        @Html.ValidationMessageFor(model => model.Specification)
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-10">
+                        <input type="submit" value="Send" class="btn btn-primary" />
+                        @Html.ActionLink("Back to List", "CheckApprovedRejectedSampleStatus", "ProductSample", null, new { @class = "btn btn-primary" })
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+}
+

@@ -1,0 +1,326 @@
+﻿@model Model.ViewModel.SaleDeliveryOrderLineViewModel
+@using Core.Common
+
+<style type="text/css">
+    .ui-autocomplete {
+        max-height: 250px;
+        overflow-y: auto;
+        /* prevent horizontal scrollbar */
+        overflow-x: hidden;
+    }
+</style>
+
+<div class="modal-content">
+    <div class="modal-header" style="border-bottom: 1px solid #8E8888">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"> <span class="glyphicon glyphicon-remove"></span></button>
+        <h3>
+            <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-file black"></span> Products</span>
+        </h3>
+    </div>
+    <div>
+        @using (Html.BeginForm("_CreatePost", "SaleDeliveryOrderLine", FormMethod.Post, new { enctype = "multipart/form-data", id = "modform" }))
+        {
+            @Html.ValidationLog((string)TempData["CSEXCL"])
+            <div class="form-horizontal modal-body">
+
+                @Html.AntiForgeryToken()
+
+                @Html.HiddenFor(model => model.SaleDeliveryOrderHeaderId)
+                @Html.HiddenFor(m => m.SaleDeliveryOrderLineId)
+                @Html.HiddenFor(m => m.ProductId)
+                @Html.HiddenFor(m => m.SaleOrderLineId)
+                @Html.HiddenFor(m => m.BalanceQty)
+
+
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.ProductId, "Product", new { @class = "control-label col-md-4 col-sm-2 " })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBox(" ", "", new { @class = "form-control", @id = "acProducts" })
+                                @Html.ValidationMessageFor(model => model.ProductId, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.SaleOrderLineId, "Sale Order", new { @class = "control-label col-md-4 col-sm-2 " })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBox(" ", " ", new { @class = "form-control col-xs-7", @id = "acsaleorders" })
+                                @Html.ValidationMessageFor(model => model.SaleOrderLineId, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Qty, "Qty", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.Qty, new { @class = "form-control col-xs-7 required" })
+                                @Html.ValidationMessageFor(model => model.Qty, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.DueDate, "DueDate", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.DueDate, "{0:dd/MMMM/yyyy}", new { @class = "datepicker form-control col-xs-7" })
+                                @Html.ValidationMessageFor(model => model.DueDate, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Remark, "Remark", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextAreaFor(model => model.Remark, new { @class = "form-control col-xs-7 required" })
+                                @Html.ValidationMessageFor(model => model.Remark, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer " style="padding: 19px 20px 0 20px; border-top:1px solid #8E8888">
+                    @if (ViewBag.LineMode == "Edit" || ViewBag.LineMode == "Create")
+                    {  <button class="btn custom left" name="Command:Edit" type="submit" id="submit"><h2 style="margin:0px"><span class="glyphicon glyphicon-floppy-disk black"></span> </h2></button>
+                    }
+                    @if (ViewBag.LineMode == "Delete")
+                    {
+                        <button class="btn custom" name="Command:Delete" id="delete" type="submit"><h2 style="margin:0px"><span class="glyphicon glyphicon-trash black"></span> </h2></button>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+
+<script type="text/javascript">
+
+
+    $('#acProducts').focus();
+    var IsSaved=false;
+    var ValidationCount=0;
+
+    $('#modform').bind('submit',function(event){
+
+        if(!IsSaved)
+        {
+            if(!ValidateData())
+            {
+                return false;
+            }
+            IsSaved=true;
+            $('button:submit').attr('disabled','disabled');
+            return IsSaved;
+        }
+        else
+        {
+            return false;
+        }
+
+
+    });
+
+
+    function ValidateData() {
+        var ValidationMessage = "";
+
+        //Client Side Validaion.....
+
+        return  (ValidationMessage=="");
+
+    }
+
+    $('.datepicker').datepicker({
+        format: 'dd/MM/yyyy',
+        "setDate": new Date(),
+        "autoclose": true
+
+    })
+
+    $(document).ready(function () {
+        var id=@Model.SaleDeliveryOrderLineId;
+        $("#ProductId").select2("focus");
+
+        if(id>0)
+        {
+            var tex='@Model.SaleOrderDocNo';
+            var prod='@Model.ProductName';
+            $("#acProducts").val(prod);
+            $('#acsaleorders').val(tex);
+            $('#acProducts').attr('readonly','true');
+            $('#acsaleorders').attr('disabled','disabled');
+        }
+
+
+        $('#delete','.modal-content').click(function (e) {
+            if(id>0)
+            {
+                var url = '/SaleDeliveryOrderLine/DeletePost';
+                $('form#modform').attr('action',url);
+                return;
+            }
+            else
+            {
+                return false;
+            }
+        })
+    });
+
+    $('#Qty').keyup(function(){
+
+        if((parseFloat($(this).val())-parseFloat($('#BalanceQty').val())) > 0 ){
+            $('#submit', '.modal-body').attr('disabled', 'disabled');
+            if (!$('#modform').find('.modal-body #errormsg').length) {
+                $('#modform').find('.modal-body').prepend("<div class='alert alert-danger'><span id=errormsg >Qty exceeding Balance Qty</span></div>")
+            }
+        }
+        else
+        {
+            $('#submit', '.modal-body').removeAttr('disabled');
+            $('#modform').find('#errormsg').parent().remove();
+        }
+
+    })
+
+
+
+</script>
+
+
+
+@if (Model.SaleDeliveryOrderLineId <= 0)
+{
+    <script type="text/javascript">
+
+        $( "#acProducts" ).focusout( function( ) {
+
+            if (!$(this).val()) {
+                $("#acProducts").val("");
+                $('#ProductId').val("");
+                $('#SaleOrderLineId').val("");
+            }
+
+
+            if($("#acProducts").val()=="")
+            {
+                $('#ProductId').val("");
+                $('#SaleOrderLineId').val("");
+            }
+
+            if($('#SaleOrderLineId').val()!="")
+            {
+                $.ajax({
+                    cache: false,
+                    type: "POST",
+                    url: "@(Url.Action("GetSaleOrderDetail"))",
+                    data: { LineId: $("#SaleOrderLineId").val() },
+                    success: function (data) {
+                        $('#acsaleorders').val(data.SaleOrderDocNo).attr('readonly','true');
+                        $('#Qty').val(data.Qty);
+                        $('#BalanceQty').val(data.Qty);
+                        $('#Specification').val(data.Specification).attr('readonly','true');
+
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        alert('Failed to retrieve product details.' + thrownError);
+                    }
+                });
+            }
+            else if($('#SaleOrderLineId').val()=="")
+            {
+                $('#acsaleorders').val("").removeAttr('readonly');
+                $('#Qty').val(0);
+                $('#BalanceQty').val(0);
+                $('#Specification').val("").removeAttr('readonly');
+            }
+        }
+        );
+
+
+
+
+
+        $(function() {
+            $("#acProducts").autocomplete({
+                delay: 500,
+                minLength: 3,
+                source: function(request,response){
+
+                    var DocID = $('#SaleDeliveryOrderHeaderId', '.modal-body').val();
+                    $.ajax({
+                        cache: false,
+                        type: "POST",
+                        url: "@(Url.Action("GetCustomProducts"))",
+                        data: { id:DocID, term:request.term,Limit:30 },
+                        success: function (data) {
+                            if(data.length>0){
+                                var cachearray = data.error ? [] : $.map(data, function(m) {
+
+                                    return {
+                                        value: m.ProductName,
+                                        key: m.ProductId,
+                                        spec:m.Specification,
+                                        SO:m.SaleOrderDocNo,
+                                        balqty:m.Qty,
+                                        linekey:m.SaleOrderLineId,
+                                    };
+                                });
+                                response(cachearray);
+                            }
+                            else
+                            {
+                                var dimensions = { width: 10};
+                                var cachearray=$.map(dimensions,function(value,key){
+                                    return{
+                                        value:"No Record Found!",
+                                        key:null
+                                    }
+                                })
+                                response(cachearray);
+                            }
+                        },
+                        error: function (xhr, ajaxOptions, thrownError) {
+                            $('.ui-autocomplete-loading').removeClass("ui-autocomplete-loading");
+                            alert('Failed to retrieve Pending Orders.' + thrownError);
+                        }
+
+                    });
+
+                },
+                appendTo : $("#myModalContent"),
+                select: function(event, ui) {
+                    // prevent autocomplete from updating the textbox
+                    // navigate to the selected item's url
+                    if($("#acProducts").val()=="")
+                    {
+                        $('#ProductId').val("");
+                        $('#SaleOrderLineId').val("");
+                    }
+                    else{
+                        $("#ProductId").val(ui.item.key);
+                        $("#SaleOrderLineId").val(ui.item.linekey);
+                    }
+                },
+
+            }).data("ui-autocomplete")._renderItem = function(ul, item) {
+                var $a = $("<a></a>");
+                $("<strong></strong>").text(item.value).appendTo($a);
+                (item.balqty==null)?(""):($("<small></small>").text(" (Qty:"+item.balqty+")").appendTo($a));
+                (item.spec==null)?(""):($("<br /><span class='small' style='font-weight:bold'></span>").text(item.spec).appendTo($a));
+                (item.SO==null)?(""):($("<br /><span class='small'></span>").text("Order:"+item.SO+",").appendTo($a));
+
+
+
+                return $("<li></li>").append($a).appendTo(ul);
+            }
+        });
+
+
+    </script>
+}

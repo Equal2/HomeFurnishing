@@ -1,0 +1,210 @@
+﻿@{
+    ViewBag.Title = "Product Purchase History";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<style type="text/css">
+    .DTHidden {
+        display: none;
+    }
+
+    .TextRight {
+        text-align: right;
+    }
+
+    .dataTable {
+        font-size: 13px !important;
+        line-height: 1.5;
+    }
+    table.dataTable tbody td {
+        padding: 2px 10px;
+    }
+</style>
+
+<link href="~/Content/DataTables/css/dataTables.bootstrap.css" rel="stylesheet" />
+<link href="~/Content/DataTables/css/scroller.bootstrap.min.css" rel="stylesheet" />
+
+<script src="~/Scripts/DataTables/jquery.dataTables.min.js"></script>
+<script src="~/Scripts/DataTables/dataTables.scroller.js"></script>
+
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3>
+            <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"> <span class="glyphicon glyphicon-file black"></span> Product Purchase History</span>
+        </h3>
+    </div>
+
+    <div class="panel-info" style="padding-left:15px">
+        <div class="form-horizontal">
+
+           
+            <div class="row">
+                <h3 class="col-md-12 black">
+                    <span class="glyphicon glyphicon-align-justify"></span>
+                    1.Product
+                </h3>
+                <div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group" style="margin-top:15px">
+                                <label class="control-label col-xs-3" for="Product">Product</label>
+                                <div class="col-xs-8">
+                                    <input class="form-control col-xs-6" id="ProductId" name="ProductId" type="text">
+                                    <span class="field-validation-valid text-danger" data-valmsg-for="Product" data-valmsg-replace="true"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <hr style="margin-top:0px;margin-bottom:0px" />
+            <h4 class="col-md-12 black">
+                <span class="glyphicon glyphicon-align-justify"></span>
+                2. Invoice History
+            </h4>
+
+            <div style="margin:20px;">
+                <table id="Iexample" class="table table-striped" cellspacing="0" width="100%">
+                    <thead style="background: #428bca;color:white">
+                        <tr>
+                            <th>DocType</th>
+                            <th>DocNo</th>
+                            <th>DocDate</th>
+                            <th>Supplier</th>
+                            <th>Rate</th>
+                            <th>Discount%</th>
+                            <th>Remark</th>
+                            <th>PurchaseInvoiceHeaderId</th>
+                        </tr>
+                    </thead>
+                    <tfoot>
+                        <tr>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+
+            <h4 class="col-md-12 black">
+                <span class="glyphicon glyphicon-align-justify"></span>
+                3. Order History
+            </h4>
+            <div style="margin:20px;">
+                <table id="example" class="table table-striped" cellspacing="0" width="100%">
+                    <thead style="background: #428bca;color:white">
+                        <tr>
+                            <th>DocType</th>
+                            <th>DocNo</th>
+                            <th>DocDate</th>
+                            <th>Supplier</th>
+                            <th>Rate</th>
+                            <th>Discount%</th>
+                            <th>Remark</th>
+                            <th>PurchaseOrderHeaderId</th>
+                        </tr>
+                    </thead>
+                    <tfoot>
+                        <tr>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+
+        </div>
+
+
+    </div>
+</div>
+<script type="text/javascript">
+
+    CustomSelectFunction($("#ProductId"), '/ProductPurchaseHistory/GetProducts', '/ComboHelpList/SetSingleProducts', 'Enter Product', false, 3);
+
+
+    $(document).ready(function () {
+        var tab = $('#example').DataTable({
+            ordering: false,
+            searching: false,
+            searchDelay: 1000,
+            ajax: {
+                "url": "/ProductPurchaseHistory/AjaxGetJsonData/?ProductId=" + ($('#ProductId').val()||0),
+                "type": "POST"
+            },
+            columns: [
+              { "data": "DocTypeName", "width": "15%", "sortable": false },
+                 { "data": "DocNo", "width": "10%", "sortable": false },
+                 { "data": "sDocDate", "width": "10%", "sortable": false },
+                 { "data": "SupplierName", "width": "15%", "sortable": false },
+                 { "data": "Rate", "width": "6%", "sortable": false },
+                 { "data": "DiscountPer", "width": "6%", "sortable": false },
+                 { "data": "Remark", "width": "24%", "sortable": false },
+                 { "data": "PurchaseOrderHeaderId" },
+            ],
+            columnDefs: [
+   { "targets": 7, "searchable": false, className: "DTHidden Id", },
+            ],
+            scrollY: "600px",
+            dom: 'tir',         
+            language: {
+                "loadingRecords": "Please wait - loading..."
+            },
+            scrollCollapse: true,
+        });
+
+        var Itab = $('#Iexample').DataTable({
+            ordering: false,
+            searching: false,
+            searchDelay: 1000,
+            ajax: {
+                "url": "/ProductPurchaseHistory/AjaxGetInvoiceJsonData/?ProductId=" + ($('#ProductId').val() || 0),
+                "type": "POST"
+            },
+            columns: [
+              { "data": "DocTypeName", "width": "15%", "sortable": false },
+                 { "data": "DocNo", "width": "10%", "sortable": false },
+                 { "data": "sDocDate", "width": "10%", "sortable": false },
+                 { "data": "SupplierName", "width": "15%", "sortable": false },
+                 { "data": "Rate", "width": "6%", "sortable": false },
+                 { "data": "DiscountPer", "width": "6%", "sortable": false },
+                 { "data": "Remark", "width": "24%", "sortable": false },
+                 { "data": "PurchaseInvoiceHeaderId" },
+            ],
+            columnDefs: [
+   { "targets": 7, "searchable": false, className: "DTHidden Id", },
+            ],
+            scrollY: "600px",
+            dom: 'tir',
+            language: {
+                "loadingRecords": "Please wait - loading..."
+            },
+            scrollCollapse: true,
+        });
+
+        $('#ProductId').on('change', function () {
+            var table = $('#example').DataTable();
+            table.ajax.url("/ProductPurchaseHistory/AjaxGetJsonData/?ProductId=" + $(this).val()).load();
+            var iTable = $('#Iexample').DataTable();
+            iTable.ajax.url("/ProductPurchaseHistory/AjaxGetInvoiceJsonData/?ProductId=" + $(this).val()).load();
+        })
+ 
+        $('#example tbody').on('dblclick', 'tr', function () {
+            var id = parseInt($(this).find("td.Id:first").html());
+            window.location.href = '/ProductPurchaseHistory/RecordMenu/' + id;
+        });
+
+    });
+</script>

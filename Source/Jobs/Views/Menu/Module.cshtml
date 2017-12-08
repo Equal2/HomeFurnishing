@@ -1,0 +1,41 @@
+﻿@model Model.ViewModel.MenuModuleViewModelList
+@{
+    ViewBag.Title = "Modules";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@Styles.Render("~/Content/icongridcss")
+
+@if (Model.RoleModification.HasValue && Model.RoleModification == true)
+{
+    <style type="text/css">
+
+        .cbp-ig-grid li > a {
+            color: @(!string.IsNullOrEmpty((string)System.Web.HttpContext.Current.Session["UserPermissionSiteColour"]) ?  (string)System.Web.HttpContext.Current.Session["UserPermissionSiteColour"] : "#0ed3a9");
+        }
+        .cbp-ig-grid .cbp-ig-title:before ,.cbp-ig-grid li > a:hover{
+            background: @(!string.IsNullOrEmpty((string)System.Web.HttpContext.Current.Session["UserPermissionSiteColour"]) ?  (string)System.Web.HttpContext.Current.Session["UserPermissionSiteColour"] : "#0ed3a9");
+        }
+
+    </style>
+}
+
+
+<div class="container">
+    <div class="main">
+        <ul class="cbp-ig-grid" style="margin-top:50px">
+
+            @foreach (var item in Model.MenuModule)
+            {
+                <li>
+                    <a href="/Menu/SubModule/@item.ModuleId@(Model.RoleModification.HasValue&&Model.RoleModification==true?"?RolePerm=true":"")" style="text-decoration:none">
+                        <span class="@item.IconName" style="font-size:5em;padding:10px 0 0 0"></span>
+                        <h3 class="cbp-ig-title">@item.ModuleName</h3>
+                        <span class="cbp-ig-category">Module</span>
+                    </a>
+                </li>
+            }
+
+        </ul>
+    </div>
+</div>

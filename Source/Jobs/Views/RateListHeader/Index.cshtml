@@ -1,0 +1,147 @@
+﻿@using Core.Common;
+@using Model.ViewModel;
+@using GridMvc.Html;
+
+@model IQueryable<Model.ViewModel.RateListHeaderViewModel>
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+@helper RenderActionColumn(RateListHeaderViewModel s)
+{
+    if (s.Status == (int)StatusConstants.Submitted || s.Status == (int)StatusConstants.ModificationSubmitted)
+    {
+        @Html.ActionLink(" ", "Approve", "RateListHeader", new { id = s.RateListHeaderId }, new { @class = "glyphicon glyphicon-lock", @title = " Approve", @data_toggle = "tooltip" });
+    }
+    if (s.Status == (int)StatusConstants.Drafted || s.Status == (int)StatusConstants.Modified)
+    {
+        @Html.ActionLink(" ", "Submit", "RateListHeader", new { id = s.RateListHeaderId }, new { @class = "glyphicon glyphicon-floppy-open", @title = " Submit", @data_toggle = "tooltip" });
+
+    }
+}
+@helper RenderStatus(Model.ViewModel.RateListHeaderViewModel s)
+{
+    if (s.Status == (int)StatusConstants.Submitted)
+    {
+        @Html.Raw("Submitted");
+    }
+    else if (s.Status == (int)StatusConstants.Approved)
+    {
+        @Html.Raw("Approved")
+    }
+    else if (s.Status == (int)StatusConstants.Drafted)
+    {
+        @Html.Raw("Drafted")}
+    else if (s.Status == (int)StatusConstants.Modified)
+    {
+        @Html.Raw("Modified")
+    }
+    else if (s.Status == (int)StatusConstants.ModificationSubmitted)
+    {
+        @Html.Raw("Modification Submitted")
+    }
+}
+
+@helper RenderUserImage(string Name)
+{
+    string Defaultdomain = (System.Configuration.ConfigurationManager.AppSettings["ProfilePic"]);
+    string ImgSrc = Defaultdomain + Name + ".jpg";
+    <div>
+        <img src="@ImgSrc" class="img-circle UserIndexImage" title="@Name" />
+    </div>
+}
+
+<!-- modal placeholder-->
+<div id='myModal' class='modal fade in'>
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div id='myModalContent'></div>
+        </div>
+    </div>
+</div>
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3>
+            <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-list black"></span> Rate List </span>
+        </h3>
+        <hr style="margin-top:0px;margin-bottom:0px" />
+
+        <div class="panel-info">
+            <h4 style="padding:5px 0 0 0;margin:0px">
+                @Html.ActionLink(" ", " ", " ", null, new { @class = "glyphicon glyphicon-refresh toolbar", @title = "Refresh Page", @data_toggle = "tooltip", @id = "RefreshPage" })
+                @Html.ActionLink(" ", "Create", "RateListHeader", null, new { @class = "glyphicon glyphicon-plus toolbar", @title = "Add New", @data_toggle = "tooltip" })
+                @Html.ActionLink(" ", "Print", "RateListHeader", null, new { @class = "glyphicon glyphicon-print toolbar", @title = "Print", @data_toggle = "tooltip", @id = "PrintRecord", target = "_blank" })
+                @Html.ActionLink(" ", "Remove", "RateListHeader", null, new { @class = "glyphicon glyphicon-trash toolbar", @title = "Delete", @data_toggle = "tooltip", @id = "DeleteRecord", @data_modal = "" })                                
+                @Html.ActionLink(" ", "Report", "RateListHeader", null, new { @class = "glyphicon glyphicon-stats toolbar right", @title = "Report", @data_toggle = "tooltip", target = "_blank" })
+                @Html.ActionLink(" ", "", "", null, new { @class = "glyphicon glyphicon-export toolbar right", @title = "Export", @data_toggle = "tooltip" })
+                @Html.ActionLink(" ", "CreateForRateConversion", "StockHeaderSettings", new { @id = @ViewBag.id }, new { @class = "glyphicon glyphicon-cog toolbar right", @title = "Default Settings", @data_toggle = "tooltip" })
+                @Html.ActionLink(" ", "Index", "RateListHeader", null, new { @class = "glyphicon glyphicon-list toolbar right", @title = "Index", @data_toggle = "tooltip" })
+            </h4>
+        </div>
+
+    </div>
+    <div class="panel-info" style="padding-left:5px;padding-top:2px">
+
+        @Html.Grid(Model).Columns(columns =>
+           {
+               columns.Add(m => m.RateListHeaderId, true);
+               columns.Add(foo => foo.EffectiveDate).Sortable(true).Titled("Effective Date").Format("{0:dd/MMM/yyyy}").Filterable(true);
+               columns.Add(m => m.RateListName).Sortable(true).Titled("Name.").Filterable(true).Sortable(true);
+               columns.Add(m => m.ProcessName).Sortable(true).Filterable(true).Titled("Process");
+               columns.Add(m => m.CalculateWeightageOn).Sortable(true).Filterable(true).Titled("Weightage");
+               columns.Add(m => m.WeightageGreaterOrEqual).Sortable(true).Filterable(true).Titled("Weightage");
+               columns.Add(m => m.DealUnitName).Sortable(true).Filterable(true).Titled("Deal Unit");
+               columns.Add().Sanitized(false).Encoded(false).RenderValueAs(m => RenderStatus(m)).Titled("Status");
+               columns.Add().Titled("").Encoded(false).Sanitized(false).RenderValueAs(m => RenderUserImage(m.ModifiedBy)).Titled("User").SetWidth("5%").Css("UserImageIndex");
+               columns.Add().Encoded(false).Sanitized(false).RenderValueAs(m => RenderActionColumn(m)).SetWidth(20).Css("icon-Cus-Size");               
+           }).WithPaging(25).EmptyText("No records found.")
+    </div>
+</div>
+
+<script type="text/javascript">
+
+    $('table.grid-table td').dblclick(function () {
+        var $this = $(this);
+        var row = $this.closest("tr");
+        var editid = row.find('[data-name="RateListHeaderId"]').text();
+        var url = '@Url.Action("Edit", "RateListHeader")' + "/" + editid;
+        window.location.href = url;
+    });
+
+    //To focus on the first element on modal load
+    $('#myModal').on('shown.bs.modal', function () {
+        $("#Reason").focus();
+    });
+
+    $('a#DeleteRecord').click(function (e) {
+
+        var tes = DeleteValidation();
+        if (!tes) {
+            e.stopImmediatePropagation();
+            return false;
+        }
+        var editiiid = $('table.grid-table .grid-row.grid-row-selected').find('[data-name="RateListHeaderId"]').text();
+
+
+        var url = '/RateListHeader/Delete/' + editiiid;
+        $(this).attr('href', url);
+        return;
+    })
+
+
+    $('a#PrintRecord').click(function (e) {
+        var $row = $('table.grid-table .grid-row.grid-row-selected');
+        var editiiid = $row.find('[data-name="RateListHeaderId"]').text();
+        if (!$('table.grid-table .grid-row.grid-row-selected').get(0)) {
+            e.stopImmediatePropagation();
+            return false;
+        }
+        var url = '/RateListHeader/Print/' + editiiid;
+        $(this).attr('href', url);
+        return;
+    })
+</script>

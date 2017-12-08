@@ -1,0 +1,134 @@
+﻿@model IQueryable<Model.Tasks.ViewModel.TasksViewModel>
+@using GridMvc.Html
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@helper RenderActionColumn(Model.Tasks.ViewModel.TasksViewModel s)
+{
+    if (ViewBag.Outbox != "Outbox")
+    {
+        @Html.ActionLink(" ", "Create", "DAR", new { id = s.TaskId }, new { @class = "glyphicon glyphicon-calendar", @title = "Add DAR", @data_toggle = "tooltip" });
+    }
+}
+
+<!-- modal placeholder-->
+<div id='myModal' class='modal fade in'>
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div id='myModalContent'></div>
+        </div>
+    </div>
+</div>
+
+<div class="panel panel-default">
+
+    <div class="panel-heading">
+
+        <h3>
+            <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-list black"></span> Tasks List</span>
+        </h3>
+        <hr style="margin-top:0px;margin-bottom:0px" />
+
+        <div class="panel-info">
+            <h4 style="padding:5px 0 0 0;margin:0px">
+                @Html.ActionLink(" ", " ", " ", null, new { @class = "glyphicon glyphicon-refresh toolbar", @title = "Refresh Page", @data_toggle = "tooltip", @id = "RefreshPage" })
+                @Html.ActionLink(" ", "Create", "Tasks", null, new { @class = "glyphicon glyphicon-plus toolbar", @title = "Add New", @data_toggle = "tooltip" })
+                @Html.ActionLink(" ", "History", "Tasks", null, new { @class = "glyphicon glyphicon-user toolbar", @title = "History", @data_toggle = "tooltip" })
+                @Html.ActionLink(" ", "Delete", "Tasks", null, new { @class = "glyphicon glyphicon-trash toolbar", @title = "Delete", @data_toggle = "tooltip", @id = "DeleteRecord", @data_modal = "" })
+                @Html.ActionLink(" ", "Index", "Tasks", null, new { @class = "glyphicon glyphicon-list toolbar right", @title = "List", @data_toggle = "tooltip" })
+                @Html.ActionLink(" ", "", "", null, new { @class = "glyphicon glyphicon-export toolbar right", @title = "Export", @data_toggle = "tooltip" })
+            </h4>
+        </div>
+    </div>
+    <ul class="nav nav-pills">
+        <li role="presentation" class='@(ViewBag.Outbox != "Outbox"? "active" : "")'><a href="/Tasks/Index?Outbox=&Status=@ViewBag.Status">Inbox</a></li>
+        <li role="presentation" class="@(ViewBag.Outbox == "Outbox"? "active" : "")"><a href="/Tasks/Index?Outbox=Outbox&Status=@ViewBag.Status">Outbox</a></li>
+        <li role="presentation" class="dropdown right">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Showing @(ViewBag.Status == "Complete" ? "Completed" : "Pending") Tasks</a>
+            <ul class="dropdown-menu">
+                <li><a href="/Tasks/Index?Outbox=@ViewBag.Outbox&Status=Complete">Show Completed Tasks</a></li>
+                <li><a href="/Tasks/Index?Outbox=@ViewBag.Outbox&Status=Pending">Show Pending Tasks</a></li>
+            </ul>
+        </li>
+        <li role="presentation" class="dropdown right">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown">@(ViewBag.User) Tasks</a>
+            <ul class="dropdown-menu">
+                @foreach (var item in (List<string>)ViewBag.UserTeamList)
+                {
+                    <li><a href="#" class="UserTeamList" data-user="@item">@item</a></li>
+                }
+            </ul>
+        </li>
+    </ul>
+    @*<ul class="dropdown-menu">
+            <li role="presentation">
+                <ul class="nav navbar-nav toolbar right">
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle toolbar glyphicon glyphicon-th" data-toggle="dropdown" style="padding:10px"></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="/Tasks/Index?Outbox=@ViewBag.Outbox&Status=Complete">Completed</a></li>
+                            <li><a href="/Tasks/Index?Outbox=@ViewBag.Outbox&Status=Pending">Pending</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </li>
+        </ul>*@
+
+    <div class="panel-info" style="padding-left:5px;padding-top:2px">
+       
+        @Html.Grid(Model).Columns(columns =>
+           {
+               columns.Add(foo => foo.TaskId, true);
+               columns.Add(foo => foo.TaskTitle).Sortable(true).Titled("Name").Filterable(true);
+               columns.Add(foo => foo.DueDate).Format("{0:dd/MMM/yyyy}").Sortable(true).Titled("Due Date").Filterable(true).SetWidth("12%");
+               columns.Add(foo => foo.ForUser).Sortable(true).Titled("User").Filterable(true).SetWidth("12%");
+               columns.Add(foo => foo.ProjectName).Sortable(true).Titled("Project").Filterable(true).SetWidth("12%");
+               columns.Add(foo => foo.CreatedDate).Format("{0:dd/MMM/yyyy}").Sortable(true).Titled("Created Date").Filterable(true).SetWidth("12%");
+               columns.Add(m => m.Status).Sortable(true).Titled("Status").Filterable(true);
+               columns.Add().Encoded(false).Sanitized(false).RenderValueAs(m => RenderActionColumn(m)).Css("icon-Cus-Size");
+           }).WithPaging(25).EmptyText("No records found.")
+    </div>
+</div>
+
+<script type="text/javascript">
+
+    $('table.grid-table td').dblclick(function () {
+        var $this = $(this);
+        var row = $this.closest("tr");
+        var editid = row.find('[data-name="TaskId"]').text();
+        var url = '@Url.Action("Edit", "Tasks")' + "/" + editid;
+        window.location.href = url;
+
+    });
+
+    $('a#DeleteRecord').click(function (e) {
+
+
+        var tes = DeleteValidation();
+        if (!tes) {
+            e.stopImmediatePropagation();
+            return false;
+        }
+        var editiiid = $('table.grid-table .grid-row.grid-row-selected').find('[data-name="TaskId"]').text();
+
+        var url = '/Tasks/Delete/' + editiiid;
+        $(this).attr('href', url);
+        return;
+    })
+    $('#myModal').on('shown.bs.modal', function () {
+        $("#Reason").focus();
+    });
+
+    $('a.UserTeamList').click(function (e) {
+        $.post('/Tasks/SetTaskUser', { UserName: $(this).data('user') }, function (data, stat, xhr) {
+
+            if (data.Success)
+                location.reload();
+
+        })
+    })
+
+</script>

@@ -1,0 +1,46 @@
+﻿
+@{
+    ViewBag.Title = "Sale Order Excel Import";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Purchase Invoice Excel Import</h2>
+<html>
+<head>
+    
+</head>
+
+
+<body>
+    <p style="font:bold"><b>Check These Fields</b> </p>
+    @{
+        
+    <ul>
+        @if (ViewBag.SaleOrderCancelNo != null)
+        {
+             <li>
+                 <p style="font:bold"><b>Doc Numbers Already Exist:</b>@ViewBag.SaleOrderCancelNo</p> 
+        </li>
+        }
+       
+        
+        @if (ViewBag.SaleOrder != null)
+        {
+            <li>
+                <p style="font:bold"><b>Sale Order Doesn't Exist:</b>@ViewBag.SaleOrder</p>
+            </li>
+        }
+        
+        @if (ViewBag.OtherValidation != null)
+        {
+            <li>
+                <p style="font:bold">@ViewBag.OtherValidation</p>
+            </li>
+        }
+    </ul>
+}
+
+    @Html.ActionLink("Go Back", "Index", "SaleOrderCancelExcelImport", new { @class = "btn btn-primary btn-sm col-md-offset-0 CurveBorder ActionLinkPadding" })
+
+</body>
+</html>

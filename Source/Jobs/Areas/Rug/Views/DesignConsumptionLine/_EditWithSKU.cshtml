@@ -1,0 +1,199 @@
+﻿@model Model.ViewModels.DesignConsumptionLineViewModel
+@using Core.Common
+
+<div class="modal-content">
+    <div class="modal-header" style="border-bottom: 1px solid #8E8888">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"> <span class="glyphicon glyphicon-remove"></span></button>
+        <h3>
+            <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-file black"></span> Design : @Model.DesignName /  Quality : @Model.QualityName </span>
+        </h3>
+    </div>
+    <div>
+        @using (Html.BeginForm("_EditWithSKU", "DesignConsumptionLine", FormMethod.Post, new { enctype = "multipart/form-data", id = "modform" }))
+        {
+            <div class="form-horizontal modal-body">
+
+                @Html.AntiForgeryToken()
+
+                @Html.HiddenFor(model => model.BaseProductId)
+                @Html.HiddenFor(m => m.BomDetailId)
+                @Html.HiddenFor(m => m.DesignName)
+                @Html.HiddenFor(m => m.QualityName)
+                @Html.HiddenFor(m => m.Weight)
+
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.ProductId, "Product", new { @class = "control-label col-xs-4 " })
+                            <div class="col-xs-7">
+                                @Html.TextBoxFor(model => model.ProductId, new { @class = "form-control col-xs-7 required" })
+                                @Html.ValidationMessageFor(model => model.ProductId, "", new { @class = "text-danger" })
+                                <span id="status" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Dimension1Id, "Shade", new { @class = "control-label col-xs-4 " })
+                            <div class="col-xs-7">
+                                @Html.TextBoxFor(model => model.Dimension1Id, new { @class = "form-control col-xs-7 " })
+                                @Html.ValidationMessageFor(model => model.Dimension1Id, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <hr style="margin-bottom:0px" />
+                <div class="row" style="max-height:200px;overflow:scroll">
+                    <h4 class="col-md-12">
+                        Affected SKUs List<span style="float:right"> Total: @Model.SKUs.Count()</span>
+                    </h4>
+                    
+                        <div class="row col-md-12" style="background: #428bca;color:white">
+                            <div class="col-md-1">
+                                <strong>Srl.</strong>
+                            </div>
+                            <div class="col-md-3">
+                                <strong>Base Product</strong>
+                            </div>
+                            <div class="col-md-3">
+                                <strong>Product</strong>
+                            </div>
+                            <div class="col-md-3">
+                                <strong>Shade</strong>
+                            </div>
+                            <div class="col-md-2">
+                                <strong>Qty</strong>
+                            </div>
+                        </div>
+                   
+                   
+                        @{int i = 1;}
+                        @foreach (var item in Model.SKUs)
+                        {
+                            <div class="row col-md-12" style="@(((i%2)==0)?"background:#E0E0E0":"")" >
+                                <div class="col-md-1">
+                                    @(i++)
+                                </div>
+                                <div class="col-md-3">
+                                    @item.BaseProductName
+                                </div>
+                                <div class="col-md-3">
+                                    @item.ProductName
+                                </div>
+                                <div class="col-md-3">
+                                    @item.Shade
+                                </div>
+                                <div class="col-md-2">
+                                    @item.Qty
+                                </div>
+                            </div>
+                            
+                        }
+
+                   
+                </div>
+
+                <div class="modal-footer " style="padding: 19px 20px 0 20px; border-top:1px solid #8E8888">
+                    <button class="btn custom left" name="Command:Edit" type="submit"><h2 style="margin:0px" id="submit"><span class="glyphicon glyphicon-floppy-disk black"></span> </h2></button>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+
+<script type="text/javascript">
+    CustomSelectFunction($("#ProductId"), '/ComboHelpList/GetBomMaterial', '/ComboHelpList/SetSingleProducts', ' ', false, 3);
+    CustomSelectFunction($("#Dimension1Id"), '/ComboHelpList/GetDimension1', '/ComboHelpList/SetSingleDimension1', ' ', false, 0);
+</script>
+
+
+<script type="text/javascript">
+    $(document).ready(function () {
+
+
+        $("#ProductId").select2('focus');
+      
+    });
+
+    $(":submit").on("click", function () {
+
+        var check;
+        if ($('#BomDetailId', '.modal-body').val() != 0)
+            check=  CheckForValidationInEdit.call();
+        else
+            check=  CheckForValidation.call();
+
+        return check;
+    });
+
+
+   
+
+
+    function CheckForValidation() {
+        if ($("#ProductId", '.modal-body').val() != 0 && $("#ProductId", '.modal-body').val() != null) {
+            var bol;
+            $.ajax({
+                async:false,
+                cache: false,
+                type: "POST",
+                url: "@(Url.Action("CheckForValidation"))",
+                data: { ProductId: $("#ProductId", '.modal-body').val(), Dimension1Id: $("#Dimension1Id", '.modal-body').val(), BaseProductId: $("#BaseProductId", '.modal-body').val() },
+                success: function (data) {
+                    var status = data;
+                    if (data.returnvalue) {
+                        $("#status").text("Product And Shade combination already exists");
+                        bol=false;
+                    }
+                    else{
+                        $("#status").text(" ");
+                        bol=true;
+                    }
+
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    alert('Failed to Check Validation.' + thrownError);
+                }
+            });
+            return bol;
+        }
+
+    }
+
+
+    function CheckForValidationInEdit() {
+        if ($("#ProductId", '.modal-body').val() != 0 && $("#ProductId", '.modal-body').val() != null) {
+            var bol;
+            $.ajax({
+                async:false,
+                cache: false,
+                type: "POST",
+                url: "@(Url.Action("CheckForValidationinEdit"))",
+                data: { ProductId: $("#ProductId", '.modal-body').val(), Dimension1Id: $("#Dimension1Id", '.modal-body').val(), BaseProductId: $("#BaseProductId", '.modal-body').val(), BomDetailId: $("#BomDetailId", '.modal-body').val() },
+                success: function (data) {
+                    var status = data;
+                    if (data.returnvalue){
+                        $("#status").text("Product And Shade combination already exists");
+                        bol=false;
+                    }
+                    else{
+                        $("#status").text(" ");
+                        bol=true;
+                    }
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    alert('Failed to Check Validation.' + thrownError);
+                }
+            });
+            return bol;
+        }
+
+    }
+
+
+</script>
+

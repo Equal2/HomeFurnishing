@@ -1,0 +1,124 @@
+﻿@model Model.ViewModels.SaleInvoiceMasterDetailModel
+@using Core.Common
+
+<div class="modal-content">
+    <div class="modal-header" style="border-bottom: 1px solid #8E8888">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"> <span class="glyphicon glyphicon-remove"></span></button>
+        <h3>
+            <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-file black"></span> Indents & Quantities</span>
+        </h3>
+    </div>
+    <div>
+        @using (Html.BeginForm("_ResultsPost", "SaleInvoiceLine", FormMethod.Post, new { enctype = "multipart/form-data", id = "modform" }))
+        {
+            @Html.AntiForgeryToken()
+
+            <div class="form-horizontal modal-body">
+
+                <div style="padding-right:15px">
+                    <div class="row">
+                        <div class="form-horizontal">
+                            @Html.ValidationSummary(true)
+
+                            <div class="panel panel-default" id="grid">
+                                <div class="panel-heading headrow" style="background-image: -webkit-linear-gradient(top, #428bca 0%, #428bca 100%);color:white">
+                                    <div class="row grid-head">
+                                        <div class="col-xs-1 text-left">
+                                            Srl.
+                                        </div>
+                                        <div class="col-xs-11">
+                                            <div class="row">
+                                                @*ProductInfo*@
+                                                <div class="col-sm-4">
+                                                    Product
+
+                                                </div>
+                                                <div class="col-sm-2">
+                                                    Indent No
+                                                </div>
+                                                @*Qty*@
+                                                <div class="col-sm-2 text-right">
+                                                    Indent Qty
+                                                </div>
+                                                <div class="col-sm-2 text-right" style="padding-right:30px">
+                                                    Qty
+                                                </div>                                                
+                                                <div class="col-sm-2 text-right" style="padding-right:30px">
+                                                    Rate
+                                                </div>
+                                            </div>
+                                        </div>
+                                      
+                                    </div>
+
+                                </div>
+                                <div class="panel-info" id="gbody" style="max-height:250px;overflow-y:scroll">
+                                    @{
+            decimal ReturnQty = 0;
+            decimal InvoiceQty = 0;
+                                    }
+                                    @for (int i = 0; i < Model.SaleInvoiceLineViewModel.Count(); i++)
+                                    {
+                                        @Html.HiddenFor(m => Model.SaleInvoiceLineViewModel[i].ProductId)
+                                        @Html.HiddenFor(m => Model.SaleInvoiceLineViewModel[i].DealUnitId)
+                                        @Html.HiddenFor(m => Model.SaleInvoiceLineViewModel[i].ProductName)
+                                        @Html.HiddenFor(m => Model.SaleInvoiceLineViewModel[i].Specification)
+                                        //@Html.HiddenFor(m => Model.SaleInvoiceLineViewModel[i].Dimension1Name)
+                                        //@Html.HiddenFor(m => Model.SaleInvoiceLineViewModel[i].Dimension2Name)
+                                        @Html.HiddenFor(m => Model.SaleInvoiceLineViewModel[i].SaleDispatchLineId)
+                                        @Html.HiddenFor(m => Model.SaleInvoiceLineViewModel[i].SaleInvoiceHeaderId)
+                                        //@Html.HiddenFor(m => Model.SaleInvoiceLineViewModel[i].SaleDispatchHeaderDocNo)
+                                        //@Html.HiddenFor(m => Model.SaleInvoiceLineViewModel[i].ReceiptBalQty)
+                                        @Html.HiddenFor(m => Model.SaleInvoiceLineViewModel[i].UnitId)
+                                        <div class='row crow grid-body' style='margin-left:0px;margin-right:0px'>
+                                            <div class='col-xs-1 row-index'>
+                                                @(i + 1)
+                                                <input type='hidden' class='id' value="@Model.SaleInvoiceLineViewModel[i].SaleInvoiceHeaderId" />
+                                            </div>
+                                            <div class='col-xs-11'>
+                                                <div class='row'>
+                                                    <div class='col-sm-4'>
+                                                        <strong>@Model.SaleInvoiceLineViewModel[i].ProductName</strong>
+                                                        <br />
+                                                        @Model.SaleInvoiceLineViewModel[i].Specification
+                                                        @*<p>@Model.SaleInvoiceLineViewModel[i].Dimension1Name,@Model.SaleInvoiceLineViewModel[i].Dimension2Name</p>*@
+                                                        <div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-2 text-center">
+                                                        @*@Model.SaleInvoiceLineViewModel[i].SaleDispatchHeaderDocNo*@
+                                                    </div>
+                                                    <div class='col-sm-2 text-right'>
+                                                        <span id="InvoiceQty">                                                           
+                                                            @*@Model.SaleInvoiceLineViewModel[i].ReceiptBalQty*@
+                                                        </span><br />                                                        
+                                                        <div>
+                                                            <small>@Model.SaleInvoiceLineViewModel[i].UnitId</small>
+                                                        </div>                                                        
+                                                    </div>
+                                                    <div class="col-md-2 text-right">
+                                                        @Html.TextBoxFor(m => Model.SaleInvoiceLineViewModel[i].Qty, new { @class = "form-control text-right" })
+                                                        @Html.ValidationMessageFor(m => Model.SaleInvoiceLineViewModel[i].Qty, "", new { @class = "text-danger" })
+                                                    </div>
+                                                    <div class='col-sm-2 text-right'>
+                                                        @Html.TextBoxFor(m => Model.SaleInvoiceLineViewModel[i].Rate, new { @class = "form-control text-right" })
+                                                        @Html.ValidationMessageFor(m => Model.SaleInvoiceLineViewModel[i].Rate, "", new { @class = "text-danger" })
+                                                    </div>                                                                                                       
+                                                </div>
+                                            </div>
+                                           
+                                        </div>
+                                        <hr style='margin-top:0px;margin-bottom:0px' />
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer " style="padding: 19px 20px 0 20px; border-top:1px solid #8E8888">
+                    <button class="btn custom" name="Command:Edit" type="submit"><h2 style="margin:0px" id="submit" title="Proceed"><span class="glyphicon glyphicon-floppy-disk black black"></span> </h2></button>
+                </div>
+            </div>
+        }
+    </div>
+</div>

@@ -1,0 +1,312 @@
+﻿@model Model.ViewModel.JobInvoiceMasterDetailModel
+@using Core.Common
+
+<div class="modal-content">
+    <div class="modal-header" style="border-bottom: 1px solid #8E8888">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"> <span class="glyphicon glyphicon-remove"></span></button>
+        <h3>
+            <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-file black"></span> Receipts & Quantities</span>
+        </h3>
+    </div>
+    <div>
+        @using (Html.BeginForm("_ResultsPost", "JobInvoiceReceiveLine", FormMethod.Post, new { enctype = "multipart/form-data", id = "modform" }))
+        {
+           @Html.ValidationLog((string)TempData["CSEXCL"])
+            @Html.AntiForgeryToken()
+
+            <div class="form-horizontal modal-body">
+
+                <div style="padding-right:15px">
+                    <div class="row">
+                        <div class="form-horizontal">
+                            @Html.HiddenFor(m => m.JobInvoiceSettings.CalculationId)
+                            @Html.ValidationSummary(true)
+
+                            <div class="panel panel-default" id="grid">
+                                <div class="panel-heading headrow" style="background-image: -webkit-linear-gradient(top, #428bca 0%, #428bca 100%);color:white">
+                                    <div class="row grid-head">
+                                        <div class="block text-left" style="width:5%">
+                                            Srl.
+                                        </div>
+                                        <div class="block" style="width:92%">
+                                            <div class="row">
+                                                @*ProductInfo*@
+                                                <div class="block" style="width:25%">
+                                                    Product
+
+                                                </div>
+                                                <div class="block" style="width:15%">
+                                                    Receipt No
+                                                </div>
+                                                @*Qty*@
+                                                <div class="block text-right" style="width:20%">
+                                                    Qty
+                                                </div>
+                                                <div class="block text-right" style="width:20%">
+                                                    Deal Qty
+                                                </div>
+                                                <div class="block text-right" style="width:20%">
+                                                    Rate
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+                                </div>
+                                <div class="panel-info" id="gbody" style="max-height:250px;overflow-y:scroll">
+
+                                    @{
+            decimal ReceiptQty = 0;
+            decimal DealQty = 0;
+            int MaxUnitDecPlaces = 0;
+            int MaxDealUnitDecPlaces = 0;
+            decimal Amount = 0;
+                                    }
+
+                                    @for (int i = 0; i < Model.JobInvoiceLineViewModel.Count(); i++)
+                                    {
+
+
+                                        if (MaxDealUnitDecPlaces < Model.JobInvoiceLineViewModel[i].DealUnitDecimalPlaces)
+                                        {
+                                            MaxDealUnitDecPlaces = Model.JobInvoiceLineViewModel[i].DealUnitDecimalPlaces;
+                                        }
+                                        if (MaxUnitDecPlaces < Model.JobInvoiceLineViewModel[i].UnitDecimalPlaces)
+                                        {
+                                            MaxUnitDecPlaces = Model.JobInvoiceLineViewModel[i].UnitDecimalPlaces;
+                                        }
+
+
+
+                                        @* @Html.HiddenFor(m => Model.JobInvoiceLineViewModel[i].UnitId)*@
+                                        <div class='row crow grid-body' style='margin-left:0px;margin-right:0px'>
+                                            @Html.HiddenFor(m => Model.JobInvoiceLineViewModel[i].ProductId)
+                                            @Html.HiddenFor(m => Model.JobInvoiceLineViewModel[i].DealUnitId)
+                                            @Html.HiddenFor(m => Model.JobInvoiceLineViewModel[i].ProductName)
+                                            @Html.HiddenFor(m => Model.JobInvoiceLineViewModel[i].Specification)
+                                            @Html.HiddenFor(m => Model.JobInvoiceLineViewModel[i].Dimension1Name)
+                                            @Html.HiddenFor(m => Model.JobInvoiceLineViewModel[i].Dimension2Name)
+                                            @Html.HiddenFor(m => Model.JobInvoiceLineViewModel[i].Dimension3Name)
+                                            @Html.HiddenFor(m => Model.JobInvoiceLineViewModel[i].Dimension4Name)
+                                            @Html.HiddenFor(m => Model.JobInvoiceLineViewModel[i].JobReceiveLineId)
+                                            @Html.HiddenFor(m => Model.JobInvoiceLineViewModel[i].JobInvoiceHeaderId)
+                                            @Html.HiddenFor(m => Model.JobInvoiceLineViewModel[i].JobReceiveDocNo)
+                                            @Html.HiddenFor(m => Model.JobInvoiceLineViewModel[i].ReceiptBalQty)
+                                            @Html.HiddenFor(m => Model.JobInvoiceLineViewModel[i].DealUnitId)
+                                            @Html.HiddenFor(m => m.JobInvoiceLineViewModel[i].JobWorkerId)
+                                            @Html.HiddenFor(m => Model.JobInvoiceLineViewModel[i].SalesTaxGroupProductId)
+                                            @Html.HiddenFor(m => Model.JobInvoiceLineViewModel[i].SalesTaxGroupPersonId)
+                                            @*@Html.HiddenFor(m => Model.JobInvoiceLineViewModel[i].DealQty)*@
+                                            @Html.HiddenFor(m => Model.JobInvoiceLineViewModel[i].UnitConversionMultiplier, new { @class = "UConv" })
+                                            @Html.HiddenFor(m => Model.JobInvoiceLineViewModel[i].UnitDecimalPlaces, new { @class = "UDec" })
+                                            @Html.HiddenFor(m => Model.JobInvoiceLineViewModel[i].DealUnitDecimalPlaces, new { @class = "DUDec" })
+
+                                            <div class='block row-index' style='width:5%'>
+                                                @(i + 1)
+                                                <input type='hidden' class='id' value="@Model.JobInvoiceLineViewModel[i].JobInvoiceHeaderId" />
+                                            </div>
+                                            <div class='block pull-middle' style='width:94%'>
+                                                <div class='row'>
+                                                    <div class='block' style='width:25%'>
+                                                        <strong>@Model.JobInvoiceLineViewModel[i].ProductName</strong>
+                                                        <br />
+                                                        @{
+                                        var Dim1 = string.IsNullOrEmpty(Model.JobInvoiceLineViewModel[i].Dimension1Name) ? "" : Model.JobInvoiceLineViewModel[i].Dimension1Name + ",";
+                                        var Dim2 = string.IsNullOrEmpty(Model.JobInvoiceLineViewModel[i].Dimension2Name) ? "" : Model.JobInvoiceLineViewModel[i].Dimension2Name + ",";
+                                        var Dim3 = string.IsNullOrEmpty(Model.JobInvoiceLineViewModel[i].Dimension3Name) ? "" : Model.JobInvoiceLineViewModel[i].Dimension3Name + ",";
+                                        var Dim4 = string.IsNullOrEmpty(Model.JobInvoiceLineViewModel[i].Dimension4Name) ? "" : Model.JobInvoiceLineViewModel[i].Dimension4Name;
+                                                        }
+
+                                                        @Dim1 @Dim2
+
+                                                        <p>@Model.JobInvoiceLineViewModel[i].Specification</p>
+                                                        <div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="block text-center" style='width:15%'>
+                                                        @Model.JobInvoiceLineViewModel[i].JobReceiveDocNo
+                                                    </div>
+                                                    <div class='block text-right' style='width:20%'>
+                                                        @*@string.Format("{" + "0:0.".PadRight(@Model.JobInvoiceLineViewModel[i].UnitDecimalPlaces + 4, '0') + "}", Model.JobInvoiceLineViewModel[i].ReceiptBalQty)<br />*@
+                                                        @Html.TextBoxFor(m => Model.JobInvoiceLineViewModel[i].PassQty, new { @class = "form-control text-right Qty" })
+                                                        @Html.ValidationMessageFor(m => Model.JobInvoiceLineViewModel[i].PassQty, "", new { @class = "text-danger" })
+
+                                                        <div>
+                                                            <small>@Model.JobInvoiceLineViewModel[i].UnitName</small>
+                                                        </div>
+                                                        @*<div>
+                                                            <small>@Model.JobInvoiceLineViewModel[i].OrderDocDate</small>
+                                                        </div>*@
+
+                                                        @{ReceiptQty += Model.JobInvoiceLineViewModel[i].PassQty;}
+                                                    </div>
+                                                    <div class='block text-right' style='width:20%'>
+                                                        @*<span class="DealQty"> @string.Format("{" + "0:0.".PadRight(@Model.JobInvoiceLineViewModel[i].DealUnitDecimalPlaces + 4, '0') + "}", Model.JobInvoiceLineViewModel[i].DealQty)</span><br />*@
+                                                        @Html.TextBoxFor(m => Model.JobInvoiceLineViewModel[i].DealQty, "{" + "0:0.".PadRight(@Model.JobInvoiceLineViewModel[i].DealUnitDecimalPlaces + 4, '0') + "}", new { @class = "form-control text-right Quantity DealQty multiple-modal", @style = "display:inline", @readonly = "true" })
+                                                        <div>
+                                                            <small>@Model.JobInvoiceLineViewModel[i].DealUnitName</small>
+                                                        </div>
+                                                        @{DealQty += Model.JobInvoiceLineViewModel[i].DealQty;}
+                                                    </div>
+                                                    <div class='block text-right' style='width:20%'>
+                                                        @Html.TextBoxFor(m => Model.JobInvoiceLineViewModel[i].Rate, new { @class = "form-control text-right Rate" })
+                                                        @Html.ValidationMessageFor(m => Model.JobInvoiceLineViewModel[i].Rate, "", new { @class = "text-danger" })
+                                                    </div>
+                                                    @{Amount += Model.JobInvoiceLineViewModel[i].Rate * Model.JobInvoiceLineViewModel[i].DealQty;}
+                                                </div>
+                                            </div>
+
+
+                                        </div>
+                                        <hr style='margin-top:0px;margin-bottom:0px' />
+                                    }
+                                </div>
+                            </div>
+
+                            <div class="row grid-head" style="margin-left:0px;margin-right:0px">
+                                <div class="block text-left" style="width:5%">
+
+                                </div>
+                                <div class="block" style="width:92%">
+                                    <div class="row">
+                                        @*ProductInfo*@
+                                        <div class='block' style='width:25%'>
+                                            <strong>Total</strong>
+
+                                        </div>
+                                        <div class='block text-center' style='width:15%'>
+
+                                        </div>
+                                        @*Qty*@
+                                        <div class='block text-right' style='width:20%'>
+                                            @string.Format("{" + "0:0.".PadRight(MaxUnitDecPlaces + 4, '0') + "}", ReceiptQty)
+                                            @*<strong><span id="Qty">@string.Format("{" + "0:0.".PadRight(MaxUnitDecPlaces + 4, '0') + "}", ReceiptQty)</span></strong>*@
+                                        </div>
+                                        <div class='block text-right' style='width:20%'>
+                                            <strong><span id="DealQty">@string.Format("{" + "0:0.".PadRight(MaxDealUnitDecPlaces + 4, '0') + "}", DealQty)</span></strong>
+                                        </div>
+                                        <div class='block text-right' style='width:20%'>
+                                            <strong><span id="Amount">@string.Format("{" + "0:0.".PadRight(2 + 4, '0') + "}", Amount)</span></strong>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+
+
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer " style="padding: 19px 20px 0 20px; border-top:1px solid #8E8888">
+                    <button class="btn custom" name="Command:Edit" type="submit"><h2 style="margin:0px" id="submit" title="Proceed"><span class="glyphicon glyphicon-floppy-disk black black"></span> </h2></button>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+
+
+
+
+<script type="text/javascript">
+
+
+    var reset = false;
+    var IsSaved = false;
+    var ValidationCount = 0;
+
+    $('#modform').bind('submit', function (event) {
+
+        if (!IsSaved) {
+            if (!ValidateData()) {
+                return false;
+            }
+            IsSaved = true;
+            $('button:submit').attr('disabled', 'disabled');
+            return IsSaved;
+        }
+        else {
+            return false;
+        }
+
+
+    });
+
+
+    function ValidateData() {
+        var ValidationMessage = "";
+
+        //Client Side Validaion.....
+
+        return (ValidationMessage == "");
+
+    }
+
+    //$('input').change(CalculateTotal);
+
+    //function CalculateTotal() {
+    //    var Amount = 0;
+    //    $('.row.crow.grid-body', '.modal-body').each(function () {
+
+    //        if ($(this).find('input.Rate').val()) {
+    //            Amount += (parseFloat($(this).find('input.Rate').val()) * parseFloat($(this).find('span.DealQty').html()));
+    //        }
+
+    //    })
+    //    $('#Amount', '.modal-body').text(Amount.toFixed(2));
+    //}
+
+
+    function Calculation(obj) {
+        var $Block = $(obj).closest('div.row');
+        var $HBlock = $(obj).closest('div.row.crow');
+        var DecPlaces = $HBlock.find('input.UDec:first').val();
+        var DDecPlaces = $HBlock.find('input.DUDec:first').val();
+        var UConveMul = $HBlock.find('input.UConv:first').val();
+
+
+        if (UConveMul != 0) {
+            //alert($Block.find('.Qty').val());
+            //alert(UConveMul);
+            //alert(DDecPlaces);
+            //alert(DecPlaces);
+            //alert(parseFloat($Block.find('.Qty').val() * UConveMul).toFixed(DDecPlaces));
+            $Block.find('.DealQty').val(parseFloat($Block.find('.Qty').val() * UConveMul).toFixed(DDecPlaces));
+        }
+        CalculateTotalAmount();
+
+    }
+
+    $('.Qty').keyup(function () {
+        Calculation(this);
+    });
+
+    function CalculateTotalAmount() {
+        var Amount = 0;
+        var Qty = 0;
+        var DealQty = 0;
+        var UnitDecPlaces = 0;
+        var DealUnitDecPlaces = 0;
+        $('.row.crow.grid-body', '.modal-body').each(function () {
+
+            if ($(this).find('input.Rate').val()) {
+                Amount += (parseFloat($(this).find('input.Rate').val()) * parseFloat($(this).find('input.DealQty').val()));
+            }
+            Qty += (parseFloat($(this).find('input.JobQuantity').val()));
+            DealQty += (parseFloat($(this).find('input.DealQty').val()));
+
+            if (parseFloat($('input.UDec').val()) > UnitDecPlaces)
+                UnitDecPlaces = parseFloat($('input.UDec').val());
+            if (parseFloat($('input.DUDec').val()) > DealUnitDecPlaces)
+                DealUnitDecPlaces = parseFloat($('input.DUDec').val());
+
+        })
+        $('span#Qty', '.modal-body').text(Qty.toFixed(UnitDecPlaces));
+        $('span#DealQty', '.modal-body').text(DealQty.toFixed(DealUnitDecPlaces));
+        $('span#Amount', '.modal-body').text(Amount.toFixed(2));
+    }
+
+
+</script>

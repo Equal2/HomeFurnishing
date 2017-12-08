@@ -1,0 +1,586 @@
+﻿@model Model.ViewModels.SaleEnquiryLineViewModel
+@using Core.Common
+
+<div class="modal-content">
+    <div class="modal-header" style="border-bottom: 1px solid #8E8888">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"> <span class="glyphicon glyphicon-remove"></span></button>
+        <h3>
+            <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-file black"></span> Products-(@ViewBag.DocNo)</span>
+        </h3>
+    </div>
+    <div>
+        @using (Html.BeginForm("_CreatePost", "SaleEnquiryLine", FormMethod.Post, new { enctype = "multipart/form-data", id = "modform" }))
+        {
+            @Html.ValidationLog((string)TempData["CSEXCL"])
+            
+
+            @Html.HiddenFor(model => model.SaleEnquiryHeaderId)
+            @Html.HiddenFor(m => m.SaleEnquiryLineId)
+            @Html.HiddenFor(m => m.LockReason)
+
+            @Html.AntiForgeryToken()
+            <div class="form-horizontal modal-body">
+                
+
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.ProductId, "Product", new { @class = "control-label col-xs-4 " })
+                            <div class="col-xs-7">
+                                @Html.TextBoxFor(model => model.ProductId, new { @class = "form-control col-xs-7 required" })
+                                @Html.ValidationMessageFor(model => model.ProductId, "", new { @class = "text-danger" })
+                                <span id="status" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.BuyerSpecification, (Model.ProductBuyerSettings.BuyerSpecificationDisplayName != null ? Model.ProductBuyerSettings.BuyerSpecificationDisplayName : "Specification"), new { @class = "control-label col-xs-4 " })
+                            @Html.HiddenFor(m => m.ProductBuyerSettings.BuyerSpecificationDisplayName)
+                            <div class="col-xs-7">
+                                @Html.TextBoxFor(model => model.BuyerSpecification, new { @class = "form-control col-xs-7 required" })
+                                @Html.ValidationMessageFor(model => model.BuyerSpecification, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.BuyerSpecification1, (Model.ProductBuyerSettings.BuyerSpecification1DisplayName != null ? Model.ProductBuyerSettings.BuyerSpecification1DisplayName : "Specification-1"), new { @class = "control-label col-xs-4 " })
+                            @Html.HiddenFor(m => m.ProductBuyerSettings.BuyerSpecification1DisplayName)
+                            <div class="col-xs-7">
+                                @Html.TextBoxFor(model => model.BuyerSpecification1, new { @class = "form-control col-xs-7 required" })
+                                @Html.ValidationMessageFor(model => model.BuyerSpecification1, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.BuyerSpecification2, (Model.ProductBuyerSettings.BuyerSpecification2DisplayName != null ? Model.ProductBuyerSettings.BuyerSpecification2DisplayName : "Specification-2"), new { @class = "control-label col-xs-4 " })
+                            @Html.HiddenFor(m => m.ProductBuyerSettings.BuyerSpecification2DisplayName)
+                            <div class="col-xs-7">
+                                @Html.TextBoxFor(model => model.BuyerSpecification2, new { @class = "form-control col-xs-7 required" })
+                                @Html.ValidationMessageFor(model => model.BuyerSpecification2, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.BuyerSpecification3, (Model.ProductBuyerSettings.BuyerSpecification3DisplayName != null ? Model.ProductBuyerSettings.BuyerSpecification3DisplayName : "Specification-3"), new { @class = "control-label col-xs-4 " })
+                            @Html.HiddenFor(m => m.ProductBuyerSettings.BuyerSpecification3DisplayName)
+                            <div class="col-xs-7">
+                                @Html.TextBoxFor(model => model.BuyerSpecification3, new { @class = "form-control col-xs-7 required" })
+                                @Html.ValidationMessageFor(model => model.BuyerSpecification3, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.BuyerSku, "Buyer SKU", new { @class = "control-label col-xs-4 " })
+                            <div class="col-xs-7">
+                                @Html.TextBoxFor(model => model.BuyerSku, new { @class = "form-control col-xs-7 required" })
+                                @Html.ValidationMessageFor(model => model.BuyerSku, "", new { @class = "text-danger" })
+                                <span id="status" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.BuyerUpcCode, "Buyer UPC Code", new { @class = "control-label col-xs-4 " })
+                            <div class="col-xs-7">
+                                @Html.TextBoxFor(model => model.BuyerUpcCode, new { @class = "form-control col-xs-7 required" })
+                                @Html.ValidationMessageFor(model => model.BuyerUpcCode, "", new { @class = "text-danger" })
+                                <span id="status" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6" style="display:@(Model.SaleEnquirySettings.isVisibleDimension1 ? "" : "none")">
+                        @Html.HiddenFor(m => m.SaleEnquirySettings.isVisibleDimension1)
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Dimension1Id, "Dimension1", new { @class = "control-label col-xs-4" })
+                            <div class="col-xs-7">
+                                @Html.TextBoxFor(model => model.Dimension1Id, new { @class = "form-control col-xs-7" })
+                                @Html.ValidationMessageFor(model => model.Dimension1Id, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6" style="display:@(Model.SaleEnquirySettings.isVisibleDimension2 ? "" : "none")">
+                        @Html.HiddenFor(m => m.SaleEnquirySettings.isVisibleDimension2)
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Dimension2Id, "Dimension2", new { @class = "control-label col-xs-4" })
+                            <div class="col-xs-7">
+                                @Html.TextBoxFor(model => model.Dimension2Id, new { @class = "form-control col-xs-7 required" })
+                                @Html.ValidationMessageFor(model => model.Dimension2Id, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6" style="display:@(Model.SaleEnquirySettings.isVisibleDimension3 ? "" : "none")">
+                        @Html.HiddenFor(m => m.SaleEnquirySettings.isVisibleDimension3)
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Dimension3Id, "Dimension3", new { @class = "control-label col-xs-4" })
+                            <div class="col-xs-7">
+                                @Html.TextBoxFor(model => model.Dimension3Id, new { @class = "form-control col-xs-7" })
+                                @Html.ValidationMessageFor(model => model.Dimension3Id, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6" style="display:@(Model.SaleEnquirySettings.isVisibleDimension4 ? "" : "none")">
+                        @Html.HiddenFor(m => m.SaleEnquirySettings.isVisibleDimension4)
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Dimension4Id, "Dimension4", new { @class = "control-label col-xs-4" })
+                            <div class="col-xs-7">
+                                @Html.TextBoxFor(model => model.Dimension4Id, new { @class = "form-control col-xs-7 required" })
+                                @Html.ValidationMessageFor(model => model.Dimension4Id, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6" style="display:@(Model.SaleEnquirySettings.isVisibleSpecification ? "" : "none")">
+                        @Html.HiddenFor(m => m.SaleEnquirySettings.isVisibleSpecification)
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Specification, "Specification", new { @class = "control-label col-xs-4 " })
+                            <div class="col-xs-7">
+                                @Html.TextBoxFor(model => model.Specification, new { @class = "form-control col-xs-7 required" })
+                                @Html.ValidationMessageFor(model => model.Specification, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Qty, "Qty", new { @class = "control-label col-xs-4" })
+                            <div class="col-xs-4" style="padding-right:0px;">
+                                @Html.TextBoxFor(model => model.Qty, new { @class = "form-control required cusrightnormal" })
+                                @Html.ValidationMessageFor(model => model.Qty, "", new { @class = "text-danger" })
+                            </div>
+                            <div class="col-xs-3" style="padding-left:0px">
+                                @Html.TextBoxFor(m => m.UnitId, new { @class = "form-control col-xs-2 cusleftnormal", @readonly = "true" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6" style="display:@(Model.SaleEnquirySettings.isVisibleDealUnit ? "" : "none")">
+                        @Html.HiddenFor(m => m.SaleEnquirySettings.isVisibleDealUnit)
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.DealUnitId, "Deal Unit& Multiplier", new { @class = "control-label col-xs-4" })
+                            <div class="col-xs-4" style="padding-right:0px">
+                                @Html.DropDownListFor(model => model.DealUnitId, new SelectList(ViewBag.DeliveryUnitList as System.Collections.IEnumerable, "UnitId", "UnitName"), new { @class = "form-control height cusrightnormal required" })
+                                @Html.ValidationMessageFor(model => model.DealUnitId, "", new { @class = "text-danger" })
+                            </div>
+                            <div class="col-xs-3" style="padding-left:0px">
+                                @Html.TextBoxFor(model => model.UnitConversionMultiplier, new { @class = "form-control cusleftnormal required" })
+                                @Html.ValidationMessageFor(model => model.UnitConversionMultiplier, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6" style="display:@(Model.SaleEnquirySettings.isVisibleDealUnit ? "" : "none")">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.DealQty, "Deal Qty", new { @class = "control-label col-xs-4" })
+                            <div class="col-xs-7">
+                                @Html.TextBoxFor(model => model.DealQty, new { @class = "form-control col-xs-7 required" })
+                                @Html.ValidationMessageFor(model => model.DealQty, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.DueDate, "Due Date", new { @class = "control-label col-xs-4" })
+                            <div class="col-xs-7">
+                                @Html.TextBoxFor(model => model.DueDate, "{0:dd/MMMM/yyyy}", new { @class = "datepicker form-control col-xs-7 required" })
+                                @Html.ValidationMessageFor(model => model.DueDate, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6" style="display:@(Model.SaleEnquirySettings.isVisibleRate?"":"none")">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Rate, "Rate", new { @class = "control-label col-xs-4" })
+                            <div class="col-xs-7">
+                                @Html.TextBoxFor(model => model.Rate, new { @class = "form-control col-xs-7 " })
+                                @Html.ValidationMessageFor(model => model.Rate, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6" style="display:@(Model.SaleEnquirySettings.isVisibleRate?"":"none")">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Amount, "Amount", new { @class = "control-label col-xs-4" })
+                            <div class="col-xs-7">
+                                @Html.TextBoxFor(model => model.Amount, new { @class = "form-control col-xs-7 " })
+                                @Html.ValidationMessageFor(model => model.Amount, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Remark, "Remark", new { @class = "control-label col-xs-4" })
+                            <div class="col-xs-7">
+                                @Html.TextAreaFor(model => model.Remark, new { @class = "form-control col-xs-7 required" })
+                                @Html.ValidationMessageFor(model => model.Remark, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer " style="padding: 19px 20px 0 20px; border-top:1px solid #8E8888">
+                    <a id="CopyLastTransaction" href="#">
+                        <small style="text-align:center;font-weight:bold">@ViewBag.LastTransaction</small>
+                    </a>
+                    @if (ViewBag.LineMode == "Edit" || ViewBag.LineMode == "Create")
+                    { <button class="btn custom left" name="Command:Edit" type="submit" id="submit"><h2 style="margin:0px"><span class="glyphicon glyphicon-floppy-disk black"></span> </h2></button>
+                    }
+                    @if (ViewBag.LineMode == "Delete")
+                    {
+                        <button class="btn custom" name="Command:Delete" id="delete" type="submit"><h2 style="margin:0px"><span class="glyphicon glyphicon-trash black"></span> </h2></button>
+                    }
+
+                </div>
+
+            </div>
+
+        }
+    </div>
+</div>
+
+
+<script type="text/javascript">
+    $(function()
+    {
+        var TitleCase= '@Session["TitleCase"]';
+        $('#BuyerSpecification, #BuyerSpecification1,#BuyerSpecification2,#BuyerSpecification3').focusout(function () {
+            if (TitleCase=="UpperCase")
+                this.value = this.value.toUpperCase() ;
+        });
+    });
+</script>
+
+
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        var DocID = $('#SaleEnquiryHeaderId').val();
+        var SaleToBuyerId = $('#SaleToBuyerId').val();
+
+        CustomSelectFunction($("#ProductId"), '/SaleEnquiryLine/GetCustomProducts', '/SaleEnquiryLine/SetSingleBuyerProduct', ' ', false, 0,DocID);
+        CustomSelectFunction($("#Dimension1Id"), '/ComboHelpList/GetDimension1', '/ComboHelpList/SetSingleDimension1', ' ', false, 0);
+        CustomSelectFunction($("#Dimension2Id"), '/ComboHelpList/GetDimension2', '/ComboHelpList/SetSingleDimension2', ' ', false, 0);
+        CustomSelectFunction($("#Dimension3Id"), '/ComboHelpList/GetDimension3', '/ComboHelpList/SetSingleDimension3', ' ', false, 0);
+        CustomSelectFunction($("#Dimension4Id"), '/ComboHelpList/GetDimension4', '/ComboHelpList/SetSingleDimension4', ' ', false, 0);
+
+        CustomTagFunction($("#BuyerSpecification"), '/SaleEnquiryLine/GetBuyerSpecification', '/SaleEnquiryLine/SetSingleBuyerSpecification',' ', 0, SaleToBuyerId, 1);
+        CustomTagFunction($("#BuyerSpecification1"), '/SaleEnquiryLine/GetBuyerSpecification1', '/SaleEnquiryLine/SetSingleBuyerSpecification1',' ', 0, SaleToBuyerId, 1);
+        CustomTagFunction($("#BuyerSpecification2"), '/SaleEnquiryLine/GetBuyerSpecification2', '/SaleEnquiryLine/SetSingleBuyerSpecification2',' ', 0, SaleToBuyerId, 1);
+        CustomTagFunction($("#BuyerSpecification3"), '/SaleEnquiryLine/GetBuyerSpecification3', '/SaleEnquiryLine/SetSingleBuyerSpecification3',' ', 0, SaleToBuyerId, 1);
+
+
+
+
+        $("#ProductId").select2("focus");
+
+        $('.datepicker').datepicker({
+            format: 'dd/MM/yyyy',
+            "setDate": new Date(),
+            "autoclose": true
+
+        })
+
+
+
+
+
+
+        var id=@Model.SaleEnquiryLineId;
+        $('#delete','.modal-content').click(function (e) {
+            if(id>0)
+            {
+                var url = '/SaleEnquiryLine/DeletePost';
+                $('form#modform').attr('action',url);
+                return;
+            }
+            else
+            {
+                return false;
+            }
+        })
+
+        if ($("#LockReason").val() != "" && $("#LockReason").val() != null)
+        {
+            //$("#ProductId").prop('readonly', true);
+            $('button:submit').attr('disabled','disabled');
+        }
+
+
+
+        var IsSaved=false;
+        var ValidationCount=0;
+
+        $('#modform').bind('submit',function(){
+            if(!IsSaved)
+            {
+                IsSaved=true;
+                $('button:submit').attr('disabled','disabled');
+            }
+            else
+            {
+                return false;
+            }
+        });
+    });
+
+</script>
+
+<script type="text/javascript">
+    $(function () {
+
+        $("#DealQty,#Rate,#Amount,#Qty").keyup(Calculation);
+        $("#DealUnitId").change(GetUnitConversionMultiplier);
+        $("#ProductId").change(GetProductDetail);
+        $("#ProductId").change(function(){
+            GetProductCustomDetail();
+            ManageCustomFields();
+            GetBuyerSku();
+
+            if($('#SaleEnquiryLineId').val()!=0)
+                CheckForValidationInEdit.call();
+            else
+                CheckForValidation.call();
+        });
+        if($("#SaleEnquiryLineId").val()>0)
+        {
+            GetUnitConversionMultiplier();
+        }
+
+
+        function GetBuyerSku() {
+
+            if ($("#ProductId").val() != 0 && $("#ProductId").val() != null) {
+                $.ajax({
+                    cache: false,
+                    url: "@(Url.Action("GetBuyerSKU"))",
+                    data: { ProductId: $("#ProductId").val(), SaleEnquiryHeaderId: $("#SaleEnquiryHeaderId").val() },
+                    success: function (data) {
+                        $("#BuyerSku").val(data);
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        alert('Failed to retrieve product details.' + thrownError);
+                    }
+                });
+            }
+
+        }
+
+
+        function GetProductDetail() {
+            var ProcessProgress = $("#Product detail loading progress");
+            ProcessProgress.show();
+            if ($("#ProductId").val() != 0 && $("#ProductId").val() != null) {
+                $.ajax({
+                    cache: false,
+                    type: "POST",
+                    url: "@(Url.Action("GetProductDetailJson"))",
+                    data: { ProductId: $("#ProductId").val() },
+                    success: function (data) {
+                        $("#Rate").val(data[0].StandardCost);
+                        $("#UnitId").val(data[0].UnitId);
+                        //$("#DealUnitId").val(data[0].UnitId);
+                        $("#Specification").val(data[0].ProductSpecification);
+
+                        GetUnitConversionMultiplier.call();
+                        Calculation.call();
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        alert('Failed to retrieve product details.' + thrownError);
+                        ProcessProgress.hide();
+                    }
+                });
+            }
+
+        }
+
+
+        function GetProductCustomDetail() {
+            var ProcessProgress = $("#Product Custom detail loading progress");
+            ProcessProgress.show();
+            if ($("#ProductId").val() != 0 && $("#ProductId").val() != null) {
+                $.ajax({
+                    cache: false,
+                    type: "POST",
+                    url: "@(Url.Action("GetProductCustomDetailJson"))",
+                    data: { ProductId: $("#ProductId").val(), SaleEnquiryHeaderId: $("#SaleEnquiryHeaderId").val() },
+                    success: function (data) {
+                        if (data.length > 0)
+                        {
+                        //    $("#BuyerSpecification").val(data[0].BuyerSpecification);
+                        //    $("#BuyerSpecification1").val(data[0].BuyerSpecification1);
+                        //    $("#BuyerSpecification2").val(data[0].BuyerSpecification2);
+                        //    $("#BuyerSpecification3").val(data[0].BuyerSpecification3);
+                            if (data[0].BuyerSpecification != null)
+                            {
+                                $("#BuyerSpecification").select2("data", { id: data[0].BuyerSpecification, text: data[0].BuyerSpecification });
+                            }
+                            if (data[0].BuyerSpecification1 != null)
+                            {
+                                $("#BuyerSpecification1").select2("data", { id: data[0].BuyerSpecification1, text: data[0].BuyerSpecification1 });
+                            }
+                            if (data[0].BuyerSpecification2 != null)
+                            {
+                                $("#BuyerSpecification2").select2("data", { id: data[0].BuyerSpecification2, text: data[0].BuyerSpecification2 });
+                            }
+                            if (data[0].BuyerSpecification3 != null)
+                            {
+                                $("#BuyerSpecification3").select2("data", { id: data[0].BuyerSpecification3, text: data[0].BuyerSpecification3 });
+                            }
+                        }
+                        else{
+                            $("#BuyerSpecification").val("");
+                            $("#BuyerSpecification1").val("");
+                            $("#BuyerSpecification2").val("");
+                            $("#BuyerSpecification3").val("");
+
+                        }
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        alert('Failed to retrieve product details.' + thrownError);
+                        ProcessProgress.hide();
+                    }
+            });
+        }}
+
+        function ManageCustomFields()
+        {
+            if ($("#ProductId").val() != 0 && $("#ProductId").val() != null)
+            {
+                $("#BuyerSpecification").prop('readonly', true);
+                $("#BuyerSpecification1").prop('readonly', true);
+                $("#BuyerSpecification2").prop('readonly', true);
+                $("#BuyerSpecification3").prop('readonly', true);
+            }
+            else{
+                $("#BuyerSpecification").prop('readonly', false);
+                $("#BuyerSpecification1").prop('readonly', false);
+                $("#BuyerSpecification2").prop('readonly', false);
+                $("#BuyerSpecification3").prop('readonly', false);
+            }
+        }
+
+
+
+        function CheckForValidation() {
+            if ($("#ProductId").val() != 0 && $("#ProductId").val() != null) {
+                $.ajax({
+                    cache: false,
+                    type: "POST",
+                    url: "@(Url.Action("CheckForValidation"))",
+                    data: { ProductId: $("#ProductId").val(), SaleEnquiryHeaderId: $("#SaleEnquiryHeaderId").val() },
+                    success: function (data) {
+                        var status = data;
+                        if (data.returnvalue)
+                            $("#status").text("Product already exists");
+                        else
+                            $("#status").text(" ");
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        alert('Failed to Check Validation.' + thrownError);
+                    }
+                });
+            }
+
+        }
+
+
+        function CheckForValidationInEdit() {
+            if ($("#ProductId").val() != 0 && $("#ProductId").val() != null) {
+                $.ajax({
+                    cache: false,
+                    type: "POST",
+                    url: "@(Url.Action("CheckForValidationinEdit"))",
+                    data: { ProductId: $("#ProductId").val(), SaleEnquiryHeaderId: $("#SaleEnquiryHeaderId").val(), SaleEnquiryLineId: $("#SaleEnquiryLineId").val() },
+                    success: function (data) {
+                        var status = data;
+                        if (data.returnvalue)
+                            $("#status").text("Product already exists");
+                        else
+                            $("#status").text(" ");
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        alert('Failed to Check Validation.' + thrownError);
+                    }
+                });
+            }
+        }
+
+        function GetUnitConversionMultiplier() {
+            if ($("#ProductId").val() != 0 && $("#ProductId").val() != null)
+            {
+                if ($("#UnitId").val() == $("#DealUnitId").val()) {
+                    $("#UnitConversionMultiplier").val(1);
+                    Calculation.call();
+                }
+                else {
+                    var ProcessProgress = $("#Unit conversion detail loading progress");
+                    ProcessProgress.show();
+                    $.ajax({
+                        cache: false,
+                        type: "POST",
+                        url: "@(Url.Action("GetUnitConversionDetailJson"))",
+                        data: { ProductId: $("#ProductId").val(), UnitId: $("#UnitId").val(), DeliveryUnitId: $("#DealUnitId").val(),HeaderId: $("#SaleEnquiryHeaderId").val()},
+
+                        success: function (data) {
+                            $("#UnitConversionMultiplier").val(data[0].Value);
+                            Calculation.call();
+                        },
+                        error: function (xhr, ajaxOptions, thrownError) {
+                            alert('Failed to retrieve Unit conversion details.' + thrownError);
+                            ProcessProgress.hide();
+                        }
+                    });
+                }
+            }
+        }
+
+        function Calculation() {
+            if ($('#UnitConversionMultiplier').val() != 0) {
+                $('#DealQty').val($('#Qty').val() * $('#UnitConversionMultiplier').val())
+            }
+            $('#Amount').val(($('#DealQty').val() * $('#Rate').val()).toFixed(2));
+        }
+
+        $("#CopyLastTransaction").click(function(){
+                var ProcessProgress = $("Last Transaction detail loading progress");
+                ProcessProgress.show();
+                $.ajax({
+                    cache: false,
+                    type: "POST",
+                    url: "@(Url.Action("GetLastTransactionDetailJson"))",
+                    data: { SaleEnquiryHeaderId: $("#SaleEnquiryHeaderId").val()},
+
+                success: function (data) {
+                    if (data != null)
+                    {
+                        $("#BuyerSpecification").select2("data", { id: data.BuyerSpecification, text: data.BuyerSpecification });
+                        $("#BuyerSpecification1").select2("data", { id: data.BuyerSpecification1, text: data.BuyerSpecification1 });
+                        $("#BuyerSpecification2").select2("data", { id: data.BuyerSpecification2, text: data.BuyerSpecification2 });
+                        $("#BuyerSpecification3").select2("data", { id: data.BuyerSpecification3, text: data.BuyerSpecification3 });
+                    }
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    alert('Failed to retrieve Last Transaction details.' + thrownError);
+                    ProcessProgress.hide();
+                }
+            });
+        }); 
+    });
+</script>

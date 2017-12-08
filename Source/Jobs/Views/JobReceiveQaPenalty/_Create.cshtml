@@ -1,0 +1,158 @@
+﻿@model Model.ViewModel.JobReceiveQAPenaltyViewModel
+@using Core.Common
+
+<style type="text/css">
+    .ui-autocomplete {
+        max-height: 250px;
+        overflow-y: auto;
+        /* prevent horizontal scrollbar */
+        overflow-x: hidden;
+    }
+</style>
+
+<div class="modal-content">
+    <div class="modal-header" style="border-bottom: 1px solid #8E8888">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"> <span class="glyphicon glyphicon-remove"></span></button>
+        <h3>
+            <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-file black"></span> @ViewBag.DocNo</span>
+        </h3>
+    </div>
+    <div>
+        @using (Html.BeginForm("_CreatePost", "JobReceiveQAPenalty", FormMethod.Post, new { enctype = "multipart/form-data", id = "modform" }))
+        {
+
+            @Html.ValidationLog((string)TempData["CSEXCL"])
+            <div class="form-horizontal modal-body">
+
+                @Html.AntiForgeryToken()
+
+                @Html.HiddenFor(model => model.JobReceiveQALineId)
+                @Html.HiddenFor(model => model.JobReceiveQAPenaltyId)
+                @Html.HiddenFor(m => m.JobReceiveQAHeaderId)
+                @Html.HiddenFor(m => m.DocTypeId)
+
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.ReasonId, "Reason", new { @class = "control-label col-md-4 col-sm-2 " })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.ReasonId, new { @class = "form-control required" })
+                                @Html.ValidationMessageFor(model => model.ReasonId, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Amount, "Amount", new { @class = "control-label col-md-4 col-sm-2 " })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.Amount, new { @class = "form-control required" })
+                                @Html.ValidationMessageFor(model => model.Amount, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Remark, "Remark", new { @class = "control-label col-md-4 col-sm-2 " })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.Remark, new { @class = "form-control required" })
+                                @Html.ValidationMessageFor(model => model.Remark, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer " style="padding: 19px 20px 0 20px; border-top:1px solid #8E8888">
+                    @if (ViewBag.LineMode == "Edit" || ViewBag.LineMode == "Create")
+                    {
+                        <button class="btn custom left" name="Command:Edit" type="submit" id="submit"><h2 style="margin:0px"><span class="glyphicon glyphicon-floppy-disk black"></span> </h2></button>}
+                    @if (ViewBag.LineMode == "Delete")
+                    {
+                        <button class="btn custom" name="Command:Delete" id="delete" type="submit"><h2 style="margin:0px"><span class="glyphicon glyphicon-trash black"></span> </h2></button>}
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        CustomSelectFunction($("#ReasonId"), '/ComboHelpList/GetReason', '/ComboHelpList/SetSingleReason', 'Enter Reason', false, 0, $('#DocTypeId').val());
+    });
+
+    $('#delete', '.modal-content').click(function (e) {
+        if (id > 0) {
+            var url = '/JobReceiveQAPenalty/DeletePost';
+            $('form#modform').attr('action', url);
+            DeletingProductCharges();
+            return
+        }
+        else {
+            return false;
+        }
+    })
+</script>
+
+
+
+<script type="text/javascript">
+    var decimalplaces=0;
+    var dealunitdecimalplaces=0;
+
+
+    function ValidateData()
+    {
+
+        var ValidationMessage = "";
+
+        //Check that Pass Qty can not exceed Job Qty.
+        //if (parseFloat($('#BalanceQty').val() - $('#QAQty').val()) < 0) {
+        //    ValidationMessage="QAQty exceeding Balance Qty";
+        //}
+
+
+
+        if(!ValidationMessage=="")
+        {
+            $('#submit', '.modal-body').attr('disabled', 'disabled');
+            if (!$('#modform').find('.modal-body #errormsg').length) {
+                $('#modform').find('.modal-body').prepend("<div class='alert alert-danger'><span id=errormsg >"+ValidationMessage+"</span></div>")
+            }
+            else
+                $('#modform').find('.modal-body #errormsg').text(ValidationMessage);
+        }
+        else
+        {
+            $('#submit', '.modal-body').removeAttr('disabled');
+            $('#modform').find('#errormsg').parent().remove();
+        }
+
+        return(ValidationMessage=="");
+    }
+
+    var IsSaved=false;
+    var ValidationCount=0;
+
+    $('#modform').bind('submit',function(event){
+
+        if(!IsSaved)
+        {
+            //Calculation();
+            if(!ValidateData())
+            {
+                return false;
+            }
+            IsSaved=true;
+            $('button:submit').attr('disabled','disabled');
+            return IsSaved;
+        }
+        else
+        {
+            return false;
+        }
+
+    });
+</script>

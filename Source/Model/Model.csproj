@@ -1,0 +1,862 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{4D4923F5-548C-4D13-859D-7F5E9699FACD}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Model</RootNamespace>
+    <AssemblyName>Model</AssemblyName>
+    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
+    <RestorePackages>true</RestorePackages>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <UseVSHostingProcess>true</UseVSHostingProcess>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.AspNet.Identity.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Microsoft.AspNet.Identity.Core.2.2.1\lib\net45\Microsoft.AspNet.Identity.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AspNet.Identity.EntityFramework, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.Identity.EntityFramework.2.2.1\lib\net45\Microsoft.AspNet.Identity.EntityFramework.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.AspNet.Identity.Owin">
+      <HintPath>..\packages\Microsoft.AspNet.Identity.Owin.2.2.1\lib\net45\Microsoft.AspNet.Identity.Owin.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Owin, Version=3.0.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Microsoft.Owin.3.0.1\lib\net45\Microsoft.Owin.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Owin.Security, Version=3.0.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Microsoft.Owin.Security.3.0.1\lib\net45\Microsoft.Owin.Security.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Owin.Security.Cookies, Version=3.0.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Microsoft.Owin.Security.Cookies.3.0.1\lib\net45\Microsoft.Owin.Security.Cookies.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Owin.Security.OAuth, Version=3.0.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Microsoft.Owin.Security.OAuth.3.0.1\lib\net45\Microsoft.Owin.Security.OAuth.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Newtonsoft.Json.6.0.8\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="Owin">
+      <HintPath>..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Security" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Mvc, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="DatabaseViews\MaterialPlanViewModel.cs" />
+    <Compile Include="DatabaseViews\SaleDeliveryOrderViewModels.cs" />
+    <Compile Include="DatabaseViews\SaleEnquiryViewModels.cs" />
+    <Compile Include="DatabaseViews\ViewDesignColourConsumption.cs" />
+    <Compile Include="DatabaseViews\ViewLedgerBalance.cs" />
+    <Compile Include="DatabaseViews\ViewProductBuyer.cs" />
+    <Compile Include="DatabaseViews\ViewPackingBalance.cs" />
+    <Compile Include="DatabaseViews\ViewStockProcessBalance.cs" />
+    <Compile Include="DatabaseViews\ViewStockInBalance.cs" />
+    <Compile Include="DatabaseViews\_Users.cs" />
+    <Compile Include="DatabaseViews\ViewMaterialRequestViewModels.cs" />
+    <Compile Include="DatabaseViews\SaleInvoiceViewModel.cs" />
+    <Compile Include="DatabaseViews\ProdOrderViewModel.cs" />
+    <Compile Include="DatabaseViews\PurchaseGoodsReceiptViewModel.cs" />
+    <Compile Include="DatabaseViews\SaleInvoiceViewModels.cs" />
+    <Compile Include="DatabaseViews\StockVirtual.cs" />
+    <Compile Include="Models\ActivityLog.cs" />
+    <Compile Include="Models\BinLocation.cs" />
+    <Compile Include="Models\ChargeGroupPersonCalculation.cs" />
+    <Compile Include="Models\DAR.cs" />
+    <Compile Include="Models\DocumentNature.cs" />
+    <Compile Include="Models\DocumentLineAttributes.cs" />
+    <Compile Include="Models\DocumentHeaderAttributes.cs" />
+    <Compile Include="Models\ChargeGroupSettings.cs" />
+    <Compile Include="Models\JobInvoiceHeaderAttributes.cs" />
+    <Compile Include="Models\JobOrderBomMaterialIssue.cs" />
+    <Compile Include="Models\Notification.cs" />
+    <Compile Include="Models\NotificationSubject.cs" />
+    <Compile Include="Models\NotificationUser.cs" />
+    <Compile Include="Models\PersonProductUid.cs" />
+    <Compile Include="Models\ProductCategorySettings.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Models\ProductGroupSettings.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Models\Project.cs" />
+    <Compile Include="Models\RolesDocTypeProcess.cs" />
+    <Compile Include="Models\RolesDocType.cs" />
+    <Compile Include="Models\SaleQuotationHeaderAttributes.cs" />
+    <Compile Include="Models\DivisionSettings.cs" />
+    <Compile Include="Models\StockHeaderAttributes.cs" />
+    <Compile Include="Models\SaleInvoiceHeaderAttributes.cs" />
+    <Compile Include="Models\JobOrderHeaderAttributes.cs" />
+    <Compile Include="Models\SiteDivisionSettings.cs" />
+    <Compile Include="Models\SalesTaxProductCode.cs" />
+    <Compile Include="Models\ImportMessage.cs" />
+    <Compile Include="Models\CompanySettings.cs" />
+    <Compile Include="Models\Dimension4Type.cs" />
+    <Compile Include="Models\Dimension3Type.cs" />
+    <Compile Include="Models\Dimension4.cs" />
+    <Compile Include="Models\Dimension3.cs" />
+    <Compile Include="Models\DocumentTypeHeaderAttribute.cs" />
+    <Compile Include="Models\DocumentTypeSettings.cs" />
+    <Compile Include="Models\FeetConversionToCms.cs" />
+    <Compile Include="Models\SaleDeliveryHeader.cs" />
+    <Compile Include="Models\SaleDeliveryLine.cs" />
+    <Compile Include="Models\SaleDeliverySetting.cs" />
+    <Compile Include="Models\PersonRole.cs" />
+    <Compile Include="Models\ProductTypeSettings.cs" />
+    <Compile Include="Models\PersonSettings.cs" />
+    <Compile Include="Models\PackingLineExtended.cs" />
+    <Compile Include="Models\JobReceiveQaLineExtended.cs" />
+    <Compile Include="Models\JobReceiveQaAttribute.cs" />
+    <Compile Include="Models\JobReceiveQaPenalty.cs" />
+    <Compile Include="Models\ProductGroupProcessSettings.cs" />
+    <Compile Include="Models\ProductCategoryProcessSettings.cs" />
+    <Compile Include="Models\ProductBuyerSettings.cs" />
+    <Compile Include="Models\QAGroup.cs" />
+    <Compile Include="Models\QAGroupLine.cs" />
+    <Compile Include="Models\DocumentShipMethod.cs" />
+    <Compile Include="Models\ImportHeader.cs" />
+    <Compile Include="Models\ImportLine.cs" />
+    <Compile Include="Models\SaleQuotationHeader.cs" />
+    <Compile Include="Models\SaleQuotationHeaderCharge.cs" />
+    <Compile Include="Models\SaleInvoiceLineDetail.cs" />
+    <Compile Include="Models\SaleQuotationHeaderDetail.cs" />
+    <Compile Include="Models\SaleQuotationLine.cs" />
+    <Compile Include="Models\SaleQuotationLineCharge.cs" />
+    <Compile Include="Models\SaleQuotationSettings.cs" />
+    <Compile Include="Models\Agent.cs" />
+    <Compile Include="Models\ApplicationUser.cs" />
+    <Compile Include="Models\ActivityType.cs" />
+    <Compile Include="Models\AttendanceHeader.cs" />
+    <Compile Include="Models\AttendanceLine.cs" />
+    <Compile Include="Models\BusinessSession.cs" />
+    <Compile Include="Models\OverTimeApplicationLine.cs" />
+    <Compile Include="Models\OverTimeApplicationHeader.cs" />
+    <Compile Include="Models\SaleEnquiryLineExtended.cs" />
+    <Compile Include="Models\JobOrderHeaderExtended.cs" />
+    <Compile Include="Models\MaterialPlanCancelHeader.cs" />
+    <Compile Include="Models\MaterialPlanCancelLine.cs" />
+    <Compile Include="Models\MaterialPlanCancelForSaleOrder.cs" />
+    <Compile Include="Models\MaterialPlanCancelForProdOrder.cs" />
+    <Compile Include="Models\MaterialPlanCancelForProdOrderLine.cs" />
+    <Compile Include="Models\PromoCode.cs" />
+    <Compile Include="Models\CurrencyConversions.cs" />
+    <Compile Include="Models\DocumentAttachment.cs" />
+    <Compile Include="Models\Area.cs" />
+    <Compile Include="Models\AspNetRole.cs" />
+    <Compile Include="Models\JobInvoiceAmendmentHeaderCharge.cs" />
+    <Compile Include="Models\JobInvoiceRateAmendmentLineCharge.cs" />
+    <Compile Include="Models\ProductAlias.cs" />
+    <Compile Include="Models\JobInvoiceLineStatus.cs" />
+    <Compile Include="Models\PurchaseQuotationLineCharge.cs" />
+    <Compile Include="Models\PurchaseQuotationHeaderCharge.cs" />
+    <Compile Include="Models\PurchaseOrderInspectionHeader.cs" />
+    <Compile Include="Models\PurchaseOrderInspectionLine.cs" />
+    <Compile Include="Models\PurchaseOrderInspectionRequestCancelHeader.cs" />
+    <Compile Include="Models\PurchaseOrderInspectionRequestCancelLine.cs" />
+    <Compile Include="Models\PurchaseOrderInspectionRequestHeader.cs" />
+    <Compile Include="Models\PurchaseOrderInspectionRequestLine.cs" />
+    <Compile Include="Models\PurchaseOrderInspectionRequestSettings.cs" />
+    <Compile Include="Models\PurchaseOrderInspectionSettings.cs" />
+    <Compile Include="Models\JobReceiveQaSettings.cs" />
+    <Compile Include="Models\JobReceiveQaHeader.cs" />
+    <Compile Include="Models\JobReceiveQaLine.cs" />
+    <Compile Include="Models\JobInvoiceReturnHeader.cs" />
+    <Compile Include="Models\JobInvoiceReturnHeaderCharge.cs" />
+    <Compile Include="Models\JobInvoiceReturnLine.cs" />
+    <Compile Include="Models\JobInvoiceReturnLineCharge.cs" />
+    <Compile Include="Models\PurchaseOrderAmendmentHeaderCharge.cs" />
+    <Compile Include="Models\PurchaseOrderRateAmendmentLineCharge.cs" />
+    <Compile Include="Models\PurchaseQuotationSetting.cs" />
+    <Compile Include="Models\ReportColumn.cs" />
+    <Compile Include="Models\ReportUIDValues.cs" />
+    <Compile Include="Models\DocumentTypeTimeExtension.cs" />
+    <Compile Include="Models\DocumentTypeTimePlan.cs" />
+    <Compile Include="Models\JobOrderInspectionRequestCancelHeader.cs" />
+    <Compile Include="Models\JobOrderInspectionRequestHeader.cs" />
+    <Compile Include="Models\JobOrderInspectionRequestCancelLine.cs" />
+    <Compile Include="Models\JobOrderInspectionRequestLine.cs" />
+    <Compile Include="Models\JobOrderInspectionHeader.cs" />
+    <Compile Include="Models\JobOrderInspectionLine.cs" />
+    <Compile Include="Models\JobOrderInspectionSettings.cs" />
+    <Compile Include="Models\SaleDeliveryOrderCancelHeader.cs" />
+    <Compile Include="Models\SaleDeliveryOrderCancelLine.cs" />
+    <Compile Include="Models\ProcessSettings.cs" />
+    <Compile Include="Models\JobOrderInspectionRequestSettings.cs" />
+    <Compile Include="Models\ExcessMaterialHeader.cs" />
+    <Compile Include="Models\ExcessMaterialLine.cs" />
+    <Compile Include="Models\ExcessMaterialSetting.cs" />
+    <Compile Include="Models\SaleDispatchSetting.cs" />
+    <Compile Include="Models\SaleEnquiryHeader.cs" />
+    <Compile Include="Models\SaleEnquiryLine.cs" />
+    <Compile Include="Models\SaleEnquirySettings.cs" />
+    <Compile Include="Models\CarpetSkuSettings.cs" />
+    <Compile Include="Models\Shift.cs" />
+    <Compile Include="Models\SubReport.cs" />
+    <Compile Include="Models\Task.cs" />
+    <Compile Include="Models\UserTeam.cs" />
+    <Compile Include="ViewModels\BankReconciliationViewModel.cs" />
+    <Compile Include="ViewModels\ChargeGroupPersonCalculationViewModel.cs" />
+    <Compile Include="ViewModels\CompanySettingsViewModel.cs" />
+    <Compile Include="ViewModels\ControllerActionViewModel.cs" />
+    <Compile Include="ViewModels\DARViewModel.cs" />
+    <Compile Include="ViewModels\Dimension1.cs" />
+    <Compile Include="ViewModels\DocumentCancelViewModel.cs" />
+    <Compile Include="ViewModels\DocumentTypeViewModel.cs" />
+    <Compile Include="ViewModels\JobRatePenaltyUpdateViewModel.cs" />
+    <Compile Include="ViewModels\LedgerAccountViewModel.cs" />
+    <Compile Include="ViewModels\MvcControllerViewModel.cs" />
+    <Compile Include="ViewModels\NotificationContentViewModel.cs" />
+    <Compile Include="ViewModels\NotificationViewModel.cs" />
+    <Compile Include="ViewModels\PersonProductUidViewModel.cs" />
+    <Compile Include="ViewModels\ProjectViewModel.cs" />
+    <Compile Include="ViewModels\PurchaseOrderLineDetailViewModel.cs" />
+    <Compile Include="ViewModels\PurchaseOrderLineIndexViewModel.cs" />
+    <Compile Include="ViewModels\ReportLineViewModel.cs" />
+    <Compile Include="ViewModels\FinancialDisplayViewModel.cs" />
+    <Compile Include="ViewModels\RolesControllerActionViewModel.cs" />
+    <Compile Include="ViewModels\SiteViewModel.cs" />
+    <Compile Include="ViewModels\SmsViewModel.cs" />
+    <Compile Include="ViewModels\DocumentTypeAttributeViewModel.cs" />
+    <Compile Include="ViewModels\ImportHeaderViewModel.cs" />
+    <Compile Include="ViewModels\ImportLineViewModel.cs" />
+    <Compile Include="ViewModels\ImportMessageViewModel.cs" />
+    <Compile Include="ViewModels\LedgerAccountOpeningViewModel.cs" />
+    <Compile Include="ViewModels\PersonOpeningViewModel.cs" />
+    <Compile Include="ViewModels\PersonAddressViewModel.cs" />
+    <Compile Include="ViewModels\PersonRoleViewModel.cs" />
+    <Compile Include="ViewModels\ImportMasterViewModel.cs" />
+    <Compile Include="ViewModels\SaleDeliverySettingsViewModel.cs" />
+    <Compile Include="ViewModels\SaleDeliveryViewModel.cs" />
+    <Compile Include="ViewModels\SaleQuotationHeaderViewModel.cs" />
+    <Compile Include="ViewModels\SaleQuotationLineViewModel.cs" />
+    <Compile Include="ViewModels\SaleQuotationSettingsViewModel.cs" />
+    <Compile Include="ViewModels\TasksViewModel.cs" />
+    <Compile Include="ViewModels\UserBookMarkViewModel.cs" />
+    <Compile Include="ViewModels\UserTeamViewModel.cs" />
+    <Compile Include="ViewModels\WeavingReceiveQACombinedViewModel.cs" />
+    <Compile Include="ViewModels\CopyProductViewModel.cs" />
+    <Compile Include="ViewModels\ChargeGroupSettingsViewModel.cs" />
+    <Compile Include="ViewModels\Dimension2.cs" />
+    <Compile Include="ViewModels\Dimension3.cs" />
+    <Compile Include="ViewModels\Dimension4.cs" />
+    <Compile Include="ViewModels\DocumentTypeSettingsViewModel.cs" />
+    <Compile Include="ViewModels\GatePassHeaderViewModel.cs" />
+    <Compile Include="ViewModels\ProductTypeSettingsViewModel.cs" />
+    <Compile Include="ViewModels\PersonSettingsViewModel.cs" />
+    <Compile Include="ViewModels\ProductGroupProcessSettingsViewModel.cs" />
+    <Compile Include="ViewModels\ProductCategoryProcessSettingsViewModel.cs" />
+    <Compile Include="ViewModels\ProductCategorySettingsViewModel.cs" />
+    <Compile Include="ViewModels\ProductGroupSettingsViewModel.cs" />
+    <Compile Include="ViewModels\ProductBuyerSettingsViewModel.cs" />
+    <Compile Include="ViewModels\DesignColourConsumptionViewModel.cs" />
+    <Compile Include="ViewModels\QAGroupViewModel.cs" />
+    <Compile Include="ViewModels\QAGroupLineViewModel.cs" />
+    <Compile Include="ViewModels\WeavingReceiveWizardViewModel.cs" />
+    <Compile Include="ViewModels\OverTimeApplicationHeaderViewModel.cs" />
+    <Compile Include="ViewModels\AttendanceHeaderViewModel.cs" />
+    <Compile Include="ViewModels\AttendanceLinesViewModel.cs" />
+    <Compile Include="ViewModels\MaterialPlanCancelHeaderViewModel.cs" />
+    <Compile Include="ViewModels\MaterialPlanCancelLineViewModel.cs" />
+    <Compile Include="ViewModels\MaterialPlanCancelForSaleOrderViewModel.cs" />
+    <Compile Include="ViewModels\ReportColumnViewModel.cs" />
+    <Compile Include="ViewModels\SaleDispatchViewModel.cs" />
+    <Compile Include="ViewModels\DocNoViewModel.cs" />
+    <Compile Include="ViewModels\PurchaseQuotationLineViewModel.cs" />
+    <Compile Include="ViewModels\PurchaseQuotationHeaderViewModel.cs" />
+    <Compile Include="ViewModels\PurchaseQuotationSettingsViewModel.cs" />
+    <Compile Include="ViewModels\SaleDispatchLineViewModel.cs" />
+    <Compile Include="ViewModels\SaleDispatchSettingsViewModel.cs" />
+    <Compile Include="ViewModels\CarpetSkuSettingsViewModel.cs" />
+    <Compile Include="ViewModels\SaleEventArgs.cs" />
+    <Compile Include="ViewModels\SaleEnquiryHeaderViewModels.cs" />
+    <Compile Include="ViewModels\SaleEnquiryLineViewModel.cs" />
+    <Compile Include="ViewModels\SaleEnquirySettingsViewModel.cs" />
+    <Compile Include="ViewModels\SaleEnquiryPrintViewModel.cs" />
+    <Compile Include="ViewModels\SaleOrderSettingsViewModel.cs" />
+    <Compile Include="Models\StockInOut.cs" />
+    <Compile Include="Models\UserPerson.cs" />
+    <Compile Include="ViewModels\DocumentAttachmentViewModel.cs" />
+    <Compile Include="ViewModels\ProductSupplierViewModel.cs" />
+    <Compile Include="ViewModels\JobReceiveQaSettingsViewModel.cs" />
+    <Compile Include="ViewModels\JobReceiveQaViewModel.cs" />
+    <Compile Include="ViewModels\MenuModuleViewModel.cs" />
+    <Compile Include="ViewModels\JobOrderInspectionRequestCancelViewModel.cs" />
+    <Compile Include="ViewModels\JobOrderInspectionSettingsViewModel.cs" />
+    <Compile Include="ViewModels\JobOrderInspectionViewModel.cs" />
+    <Compile Include="ViewModels\JobOrderInspectionRequestViewModel.cs" />
+    <Compile Include="ViewModels\DocumentTypeTimeExtensionViewModel.cs" />
+    <Compile Include="ViewModels\ImportErrors.cs" />
+    <Compile Include="Models\UrgentList.cs" />
+    <Compile Include="Models\JobInvoiceAmendmentHeader.cs" />
+    <Compile Include="Models\JobInvoiceRateAmendmentLine.cs" />
+    <Compile Include="Models\ProdOrderSettings.cs" />
+    <Compile Include="Models\SaleDeliveryOrderExcel.cs" />
+    <Compile Include="Models\SaleDeliveryOrderSettings.cs" />
+    <Compile Include="Models\UserRole.cs" />
+    <Compile Include="Models\AspNetUserRole.cs" />
+    <Compile Include="Models\BomDetail.cs" />
+    <Compile Include="Models\BusinessEntity.cs" />
+    <Compile Include="Models\Buyer.cs" />
+    <Compile Include="Models\Calculation.cs" />
+    <Compile Include="Models\CalculationFooter.cs" />
+    <Compile Include="Models\CalculationHeaderCharge.cs" />
+    <Compile Include="Models\CalculationHeaderLedgerAccount.cs" />
+    <Compile Include="Models\CalculationLineCharge.cs" />
+    <Compile Include="Models\CalculationLineLedgerAccount.cs" />
+    <Compile Include="Models\CalculationProduct.cs" />
+    <Compile Include="Models\Charge.cs" />
+    <Compile Include="Models\ChargeGroupPerson.cs" />
+    <Compile Include="Models\ChargeGroupProduct.cs" />
+    <Compile Include="Models\ChargeType.cs" />
+    <Compile Include="Models\City.cs" />
+    <Compile Include="Models\Colour.cs" />
+    <Compile Include="Models\Company.cs" />
+    <Compile Include="Models\ControllerAction.cs" />
+    <Compile Include="Models\CostCenter.cs" />
+    <Compile Include="Models\CostCenterStatus.cs" />
+    <Compile Include="Models\Counter.cs" />
+    <Compile Include="Models\Country.cs" />
+    <Compile Include="Models\Courier.cs" />
+    <Compile Include="Models\Currency.cs" />
+    <Compile Include="Models\CustomDetail.cs" />
+    <Compile Include="Models\DeliveryTerms.cs" />
+    <Compile Include="Models\Department.cs" />
+    <Compile Include="Models\DescriptionOfGoods.cs" />
+    <Compile Include="Models\Designation.cs" />
+    <Compile Include="Models\Dimension1.cs" />
+    <Compile Include="Models\Dimension1Type.cs" />
+    <Compile Include="Models\Dimension2.cs" />
+    <Compile Include="Models\Dimension2Type.cs" />
+    <Compile Include="Models\DispatchWaybillHeader.cs" />
+    <Compile Include="Models\DispatchWaybillLine.cs" />
+    <Compile Include="Models\Division.cs" />
+    <Compile Include="Models\DocEmailContent.cs" />
+    <Compile Include="Models\DocNotificationContent.cs" />
+    <Compile Include="Models\DocSmsContent.cs" />
+    <Compile Include="Models\DocumentCategory.cs" />
+    <Compile Include="Models\DocumentStatus.cs" />
+    <Compile Include="Models\DocumentType.cs" />
+    <Compile Include="Models\DocumentTypeDivision.cs" />
+    <Compile Include="Models\DocumentTypeSite.cs" />
+    <Compile Include="Models\DrawBackTarrifHead.cs" />
+    <Compile Include="Models\Employee.cs" />
+    <Compile Include="Models\FinishedProduct.cs" />
+    <Compile Include="Models\Gate.cs" />
+    <Compile Include="Models\GateIn.cs" />
+    <Compile Include="Models\GatePassHeader.cs" />
+    <Compile Include="Models\GatePassLine.cs" />
+    <Compile Include="Models\Godown.cs" />
+    <Compile Include="Models\InspectionQaAttributes.cs" />
+    <Compile Include="Models\JobConsumptionSetting.cs" />
+    <Compile Include="Models\JobInstruction.cs" />
+    <Compile Include="Models\JobInvoiceHeader.cs" />
+    <Compile Include="Models\JobInvoiceHeaderCharge.cs" />
+    <Compile Include="Models\JobInvoiceLine.cs" />
+    <Compile Include="Models\JobInvoiceLineCharge.cs" />
+    <Compile Include="Models\JobInvoiceSetting.cs" />
+    <Compile Include="Models\JobOrderAmendmentHeader.cs" />
+    <Compile Include="Models\JobOrderBom.cs" />
+    <Compile Include="Models\JobOrderByProduct.cs" />
+    <Compile Include="Models\JobOrderCancelBom.cs" />
+    <Compile Include="Models\JobOrderCancelHeader.cs" />
+    <Compile Include="Models\JobOrderCancelLine.cs" />
+    <Compile Include="Models\JobOrderHeader.cs" />
+    <Compile Include="Models\JobOrderHeaderCharge.cs" />
+    <Compile Include="Models\JobOrderHeaderStatus.cs" />
+    <Compile Include="Models\JobOrderJobOrder.cs" />
+    <Compile Include="Models\JobOrderLine.cs" />
+    <Compile Include="Models\JobOrderLineCharge.cs" />
+    <Compile Include="Models\JobOrderLineRefData.cs" />
+    <Compile Include="Models\JobOrderLineStatus.cs" />
+    <Compile Include="Models\JobReceiveLineStatus.cs" />
+    <Compile Include="Models\JobOrderPerk.cs" />
+    <Compile Include="Models\JobOrderQtyAmendmentLine.cs" />
+    <Compile Include="Models\JobOrderRateAmendmentLine.cs" />
+    <Compile Include="Models\JobOrderSettings.cs" />
+    <Compile Include="Models\JobReceiveBom.cs" />
+    <Compile Include="Models\JobReceiveByProduct.cs" />
+    <Compile Include="Models\JobReceiveHeader.cs" />
+    <Compile Include="Models\JobReceiveLine.cs" />
+    <Compile Include="Models\JobReceiveSetting.cs" />
+    <Compile Include="Models\JobReturnBom.cs" />
+    <Compile Include="Models\JobReturnHeader.cs" />
+    <Compile Include="Models\JobReturnLine.cs" />
+    <Compile Include="Models\JobWorker.cs" />
+    <Compile Include="Models\LeaveGroup.cs" />
+    <Compile Include="Models\LeaveGroupLine.cs" />
+    <Compile Include="Models\LeaveType.cs" />
+    <Compile Include="Models\Ledger.cs" />
+    <Compile Include="Models\LedgerAccount.cs" />
+    <Compile Include="Models\LedgerAccountGroup.cs" />
+    <Compile Include="Models\LedgerAdj.cs" />
+    <Compile Include="Models\LedgerHeader.cs" />
+    <Compile Include="Models\LedgerLine.cs" />
+    <Compile Include="Models\LedgerLineRefValue.cs" />
+    <Compile Include="Models\LedgerSetting.cs" />
+    <Compile Include="Models\Location.cs" />
+    <Compile Include="Models\Manufacturer.cs" />
+    <Compile Include="Models\MaterialPlanForJobOrder.cs" />
+    <Compile Include="Models\MaterialPlanForJobOrderLine.cs" />
+    <Compile Include="Models\MaterialPlanForProdOrder.cs" />
+    <Compile Include="Models\MaterialPlanForProdOrderLine.cs" />
+    <Compile Include="Models\MaterialPlanForSaleOrder.cs" />
+    <Compile Include="Models\MaterialPlanForSaleOrderLine.cs" />
+    <Compile Include="Models\MaterialPlanHeader.cs" />
+    <Compile Include="Models\MaterialPlanLine.cs" />
+    <Compile Include="Models\MaterialPlanSettings.cs" />
+    <Compile Include="Models\MaterialReceiveSetting.cs" />
+    <Compile Include="Models\MaterialRequestSetting.cs" />
+    <Compile Include="Models\Menu.cs" />
+    <Compile Include="Models\MenuDivision.cs" />
+    <Compile Include="Models\MenuRelativeHeader.cs" />
+    <Compile Include="Models\MenuRelativeIndex.cs" />
+    <Compile Include="Models\MenuRelativeIndexHeader.cs" />
+    <Compile Include="Models\MenuRelativeLine.cs" />
+    <Compile Include="Models\MenuRelativeLineHeader.cs" />
+    <Compile Include="Models\MenuSite.cs" />
+    <Compile Include="Models\Module.cs" />
+    <Compile Include="Models\MvcController.cs" />
+    <Compile Include="Models\Narration.cs" />
+    <Compile Include="Models\PackingHeader.cs" />
+    <Compile Include="Models\PackingLine.cs" />
+    <Compile Include="Models\PackingSettings.cs" />
+    <Compile Include="Models\Perk.cs" />
+    <Compile Include="Models\PerkDocumentType.cs" />
+    <Compile Include="Models\Person.cs" />
+    <Compile Include="Models\PersonAddress.cs" />
+    <Compile Include="Models\PersonBankAccount.cs" />
+    <Compile Include="Models\PersonContact.cs" />
+    <Compile Include="Models\PersonContactType.cs" />
+    <Compile Include="Models\PersonCustomGroupHeader.cs" />
+    <Compile Include="Models\PersonCustomGroupLine.cs" />
+    <Compile Include="Models\PersonDocument.cs" />
+    <Compile Include="Models\PersonProcess.cs" />
+    <Compile Include="Models\PersonRateGroup.cs" />
+    <Compile Include="Models\PersonRegistration.cs" />
+    <Compile Include="Models\Process.cs" />
+    <Compile Include="Models\ProcessSequenceHeader.cs" />
+    <Compile Include="Models\ProcessSequenceLine.cs" />
+    <Compile Include="Models\ProdOrderCancelHeader.cs" />
+    <Compile Include="Models\ProdOrderCancelLine.cs" />
+    <Compile Include="Models\ProdOrderHeader.cs" />
+    <Compile Include="Models\ProdOrderHeaderStatus.cs" />
+    <Compile Include="Models\ProdOrderLine.cs" />
+    <Compile Include="Models\ProdOrderLineStatus.cs" />
+    <Compile Include="Models\Product.cs" />
+    <Compile Include="Models\ProductAttributes.cs" />
+    <Compile Include="Models\ProductBuyer.cs" />
+    <Compile Include="Models\ProductBuyerExcel.cs" />
+    <Compile Include="Models\ProductCategory.cs" />
+    <Compile Include="Models\ProductCollection.cs" />
+    <Compile Include="Models\ProductContentHeader.cs" />
+    <Compile Include="Models\ProductContentLine.cs" />
+    <Compile Include="Models\ProductCustomGroupHeader.cs" />
+    <Compile Include="Models\ProductCustomGroupLine.cs" />
+    <Compile Include="Models\ProductDesign.cs" />
+    <Compile Include="Models\ProductDesignPattern.cs" />
+    <Compile Include="Models\ProductGroup.cs" />
+    <Compile Include="Models\ProductIncludedAccessories.cs" />
+    <Compile Include="Models\ProductInvoiceGroup.cs" />
+    <Compile Include="Models\ProductionOrderSetting.cs" />
+    <Compile Include="Models\ProductManufacturer.cs" />
+    <Compile Include="Models\ProductMap.cs" />
+    <Compile Include="Models\ProductNature.cs" />
+    <Compile Include="Models\ProductPhoto.cs" />
+    <Compile Include="Models\ProductProcess.cs" />
+    <Compile Include="Models\ProductQuality.cs" />
+    <Compile Include="Models\ProductRateGroup.cs" />
+    <Compile Include="Models\ProductRelatedAccessories.cs" />
+    <Compile Include="Models\ProductSample.cs" />
+    <Compile Include="Models\ProductSampleApproval.cs" />
+    <Compile Include="Models\ProductSampleAttributes.cs" />
+    <Compile Include="Models\ProductSamplePhoto.cs" />
+    <Compile Include="Models\ProductSamplePhotoApproval.cs" />
+    <Compile Include="Models\ProductSampleShipment.cs" />
+    <Compile Include="Models\ProductShape.cs" />
+    <Compile Include="Models\ProductSiteDetail.cs" />
+    <Compile Include="Models\ProductSize.cs" />
+    <Compile Include="Models\ProductSizeType.cs" />
+    <Compile Include="Models\ProductStyle.cs" />
+    <Compile Include="Models\ProductSupplier.cs" />
+    <Compile Include="Models\ProductTag.cs" />
+    <Compile Include="Models\ProductType.cs" />
+    <Compile Include="Models\ProductTypeAttributes.cs" />
+    <Compile Include="Models\ProductTypeQaAttributes.cs" />
+    <Compile Include="Models\ProductUid.cs" />
+    <Compile Include="Models\ProductUidHeader.cs" />
+    <Compile Include="Models\ProductUidSiteDetail.cs" />
+    <Compile Include="Models\ProfilePic.cs" />
+    <Compile Include="Models\PurchaseGoodsReceiptHeader.cs" />
+    <Compile Include="Models\PurchaseGoodsReceiptLine.cs" />
+    <Compile Include="Models\PurchaseGoodsReceiptLineStatus.cs" />
+    <Compile Include="Models\PurchaseGoodsReceiptSetting.cs" />
+    <Compile Include="Models\PurchaseGoodsReceiptText.cs" />
+    <Compile Include="Models\PurchaseGoodsReturnHeader.cs" />
+    <Compile Include="Models\PurchaseGoodsReturnLine.cs" />
+    <Compile Include="Models\PurchaseIndentCancelHeader.cs" />
+    <Compile Include="Models\PurchaseIndentCancelLine.cs" />
+    <Compile Include="Models\PurchaseIndentHeader.cs" />
+    <Compile Include="Models\PurchaseIndentLine.cs" />
+    <Compile Include="Models\PurchaseIndentLineStatus.cs" />
+    <Compile Include="Models\PurchaseIndentSetting.cs" />
+    <Compile Include="Models\PurchaseInvoiceAmendmentHeader.cs" />
+    <Compile Include="Models\PurchaseInvoiceExcel.cs" />
+    <Compile Include="Models\PurchaseInvoiceHeader.cs" />
+    <Compile Include="Models\PurchaseInvoiceHeaderCharge.cs" />
+    <Compile Include="Models\PurchaseInvoiceLine.cs" />
+    <Compile Include="Models\PurchaseInvoiceLineCharge.cs" />
+    <Compile Include="Models\PurchaseInvoiceRateAmendmentLine.cs" />
+    <Compile Include="Models\PurchaseInvoiceReturnHeader.cs" />
+    <Compile Include="Models\PurchaseInvoiceReturnHeaderCharge.cs" />
+    <Compile Include="Models\PurchaseInvoiceReturnLine.cs" />
+    <Compile Include="Models\PurchaseInvoiceReturnLineCharge.cs" />
+    <Compile Include="Models\PurchaseInvoiceSetting.cs" />
+    <Compile Include="Models\PurchaseOrderAmendmentHeader.cs" />
+    <Compile Include="Models\PurchaseOrderCancelHeader.cs" />
+    <Compile Include="Models\PurchaseOrderCancelLine.cs" />
+    <Compile Include="Models\PurchaseOrderExcel.cs" />
+    <Compile Include="Models\PurchaseOrderHeader.cs" />
+    <Compile Include="Models\PurchaseOrderHeaderCharge.cs" />
+    <Compile Include="Models\PurchaseOrderHeaderStatus.cs" />
+    <Compile Include="Models\PurchaseOrderLine.cs" />
+    <Compile Include="Models\PurchaseOrderLineCharge.cs" />
+    <Compile Include="Models\PurchaseOrderLineRefData.cs" />
+    <Compile Include="Models\PurchaseOrderLineStatus.cs" />
+    <Compile Include="Models\PurchaseOrderQtyAmendmentLine.cs" />
+    <Compile Include="Models\PurchaseOrderRateAmendmentLine.cs" />
+    <Compile Include="Models\PurchaseOrderSetting.cs" />
+    <Compile Include="Models\PurchaseQuotationHeader.cs" />
+    <Compile Include="Models\PurchaseQuotationLine.cs" />
+    <Compile Include="Models\PurchaseWaybill.cs" />
+    <Compile Include="Models\RateConversionSetting.cs" />
+    <Compile Include="Models\RateList.cs" />
+    <Compile Include="Models\RateListHeader.cs" />
+    <Compile Include="Models\RateListLine.cs" />
+    <Compile Include="Models\RateListPersonRateGroup.cs" />
+    <Compile Include="Models\RateListProductRateGroup.cs" />
+    <Compile Include="Models\Reason.cs" />
+    <Compile Include="Models\RegistrationToken.cs" />
+    <Compile Include="Models\ReportHeader.cs" />
+    <Compile Include="Models\ReportLine.cs" />
+    <Compile Include="Models\RequisitionCancelHeader.cs" />
+    <Compile Include="Models\RequisitionCancelLine.cs" />
+    <Compile Include="Models\RequisitionHeader.cs" />
+    <Compile Include="Models\RequisitionLine.cs" />
+    <Compile Include="Models\RequisitionLineStatus.cs" />
+    <Compile Include="Models\RequisitionSetting.cs" />
+    <Compile Include="Models\RolesControllerAction.cs" />
+    <Compile Include="Models\RolesDivision.cs" />
+    <Compile Include="Models\RolesMenu.cs" />
+    <Compile Include="Models\RolesSite.cs" />
+    <Compile Include="Models\Route.cs" />
+    <Compile Include="Models\RouteLine.cs" />
+    <Compile Include="Models\RugStencil.cs" />
+    <Compile Include="Models\Rug_RetentionPercentage.cs" />
+    <Compile Include="Models\SaleDeliveryOrderHeader.cs" />
+    <Compile Include="Models\SaleDeliveryOrderLine.cs" />
+    <Compile Include="Models\SaleDispatchHeader.cs" />
+    <Compile Include="Models\SaleDispatchLine.cs" />
+    <Compile Include="Models\SaleDispatchReturnHeader.cs" />
+    <Compile Include="Models\SaleDispatchReturnLine.cs" />
+    <Compile Include="Models\SaleInvoiceHeader.cs" />
+    <Compile Include="Models\SaleInvoiceHeaderCharge.cs" />
+    <Compile Include="Models\SaleInvoiceHeaderDetail.cs" />
+    <Compile Include="Models\SaleInvoiceLine.cs" />
+    <Compile Include="Models\SaleInvoiceLineCharge.cs" />
+    <Compile Include="Models\SaleInvoiceReturnHeader.cs" />
+    <Compile Include="Models\SaleInvoiceReturnHeaderCharge.cs" />
+    <Compile Include="Models\SaleInvoiceReturnLine.cs" />
+    <Compile Include="Models\SaleInvoiceReturnLineCharge.cs" />
+    <Compile Include="Models\SaleInvoiceSetting.cs" />
+    <Compile Include="Models\SaleOrderAmendmentHeader.cs" />
+    <Compile Include="Models\SaleOrderCancelExcel.cs" />
+    <Compile Include="Models\SaleOrderCancelHeader.cs" />
+    <Compile Include="Models\SaleOrderCancelLine.cs" />
+    <Compile Include="Models\SaleOrderExcel.cs" />
+    <Compile Include="Models\SaleOrderHeader.cs" />
+    <Compile Include="Models\SaleOrderLine.cs" />
+    <Compile Include="Models\SaleOrderLineRefData.cs" />
+    <Compile Include="Models\SaleOrderLineStatus.cs" />
+    <Compile Include="Models\SaleOrderQtyAmendmentLine.cs" />
+    <Compile Include="Models\SaleOrderRateAmendmentLine.cs" />
+    <Compile Include="Models\SaleOrderSettings.cs" />
+    <Compile Include="Models\SalesOrderProduct.cs" />
+    <Compile Include="Models\SalesTaxGroup.cs" />
+    <Compile Include="Models\SalesTaxGroupParty.cs" />
+    <Compile Include="Models\SalesTaxGroupProduct.cs" />
+    <Compile Include="Models\SampleProductMapping.cs" />
+    <Compile Include="Models\SchemeDateDetail.cs" />
+    <Compile Include="Models\SchemeHeader.cs" />
+    <Compile Include="Models\SchemeRateDetail.cs" />
+    <Compile Include="Models\SecurityToken.cs" />
+    <Compile Include="Models\ServiceTaxCategory.cs" />
+    <Compile Include="Models\ShipMethod.cs" />
+    <Compile Include="Models\Site.cs" />
+    <Compile Include="Models\Size.cs" />
+    <Compile Include="Models\State.cs" />
+    <Compile Include="Models\Stock.cs" />
+    <Compile Include="Models\StockAdj.cs" />
+    <Compile Include="Models\StockHeader.cs" />
+    <Compile Include="Models\StockHeaderSetting.cs" />
+    <Compile Include="Models\StockInHandSetting.cs" />
+    <Compile Include="Models\StockLine.cs" />
+    <Compile Include="Models\StockProcess.cs" />
+    <Compile Include="Models\StockUid.cs" />
+    <Compile Include="Models\SubModule.cs" />
+    <Compile Include="Models\Supplier.cs" />
+    <Compile Include="Models\Tag.cs" />
+    <Compile Include="Models\TdsCategory.cs" />
+    <Compile Include="Models\TdsGroup.cs" />
+    <Compile Include="Models\TdsRate.cs" />
+    <Compile Include="Models\TempUserStore.cs" />
+    <Compile Include="Models\Transporter.cs" />
+    <Compile Include="Models\TrialBalanceSetting.cs" />
+    <Compile Include="Models\Unit.cs" />
+    <Compile Include="Models\UnitConversion.cs" />
+    <Compile Include="Models\UnitConversonForType.cs" />
+    <Compile Include="Models\Update.cs" />
+    <Compile Include="Models\UserBookMarks.cs" />
+    <Compile Include="Models\UserProfile.cs" />
+    <Compile Include="Models\VoucherSetting.cs" />
+    <Compile Include="Models\WeavingRetension.cs" />
+    <Compile Include="DatabaseViews\PurchaseIndentViewModel.cs" />
+    <Compile Include="DatabaseViews\PurchaseOrderViewModels.cs" />
+    <Compile Include="DatabaseViews\JobOrderViewModels.cs" />
+    <Compile Include="DatabaseViews\SaleOrderViewModels.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ViewModels\JobInvoiceAmendmentViewModel.cs" />
+    <Compile Include="ViewModels\PersonProcessViewModel.cs" />
+    <Compile Include="ViewModels\ProdOrderSettingsViewModel.cs" />
+    <Compile Include="ViewModels\ProductProcessViewModel.cs" />
+    <Compile Include="ViewModels\PurchaseEventArgs.cs" />
+    <Compile Include="ViewModels\JobInvoiceReturnViewModel.cs" />
+    <Compile Include="ViewModels\PurchaseOrderAmendmentViewModel.cs" />
+    <Compile Include="ViewModels\RateListHeaderViewModel.cs" />
+    <Compile Include="ViewModels\RateListLineHistoryViewModel.cs" />
+    <Compile Include="ViewModels\RateListLineViewModel.cs" />
+    <Compile Include="ViewModels\LedgerEventArgs.cs" />
+    <Compile Include="ViewModels\SaleDeliveryCancelViewModel.cs" />
+    <Compile Include="ViewModels\JobOrderInspectionRequestSettingsViewModel.cs" />
+    <Compile Include="ViewModels\SaleDeliveryOrderSettingsViewModel.cs" />
+    <Compile Include="ViewModels\StockEventArgs.cs" />
+    <Compile Include="ViewModels\ExcessMaterialViewModel.cs" />
+    <Compile Include="ViewModels\ExcessMaterialSettingsViewModel.cs" />
+    <Compile Include="ViewModels\SubReportViewModel.cs" />
+    <Compile Include="ViewModels\UserRoleViewModel.cs" />
+    <Compile Include="ViewModels\JobEventArgs.cs" />
+    <Compile Include="ViewModels\PurchaseOrderForExpiryViewModel.cs" />
+    <Compile Include="ViewModels\JobOrderForExpiryViewModel.cs" />
+    <Compile Include="ViewModels\SaleOrderForExpiryViewModel.cs" />
+    <Compile Include="ViewModels\ProductConsumptionViewModel.cs" />
+    <Compile Include="ViewModels\ExcessJobOrderReviewViewModel.cs" />
+    <Compile Include="ViewModels\JobInvoiceReceiveViewModel.cs" />
+    <Compile Include="ViewModels\LedgerSettingViewModel.cs" />
+    <Compile Include="ViewModels\ProductHelpListViewModel.cs" />
+    <Compile Include="ViewModels\PackingSettingsViewModel.cs" />
+    <Compile Include="ViewModels\SaleInvoiceReturnViewModel.cs" />
+    <Compile Include="ViewModels\SaleDispatchReturnViewModel.cs" />
+    <Compile Include="ViewModels\RequisitionSettingsViewModel.cs" />
+    <Compile Include="ViewModels\RequsitionCancelViewModel.cs" />
+    <Compile Include="ViewModels\SaleInvoiceSettingsViewModel.cs" />
+    <Compile Include="ViewModels\SaleDeliveryOrderViewModel.cs" />
+    <Compile Include="ViewModels\ProductCustomGroupExcel.cs" />
+    <Compile Include="ViewModels\CalculationHeaderLedgerAccountViewModel.cs" />
+    <Compile Include="ViewModels\CalculationLineLedgerAccountViewModel.cs" />
+    <Compile Include="ViewModels\CalculationProductViewModel.cs" />
+    <Compile Include="ViewModels\CalculationFooterViewModel.cs" />
+    <Compile Include="ViewModels\ActivityLogForEditViewModel.cs" />
+    <Compile Include="ViewModels\LedgerBalanceViewModel.cs" />
+    <Compile Include="ViewModels\DirectSaleInvoiceViewModel.cs" />
+    <Compile Include="ViewModels\RateListViewModel.cs" />
+    <Compile Include="ViewModels\StockLedgerViewModel.cs" />
+    <Compile Include="ViewModels\StockReceiveViewModel.cs" />
+    <Compile Include="ViewModels\SubTrialBalanceViewModel.cs" />
+    <Compile Include="ViewModels\StockInHandViewModel.cs" />
+    <Compile Include="ViewModels\TrialBalanceViewModel.cs" />
+    <Compile Include="ViewModels\DyeingOrderWizardViewModel.cs" />
+    <Compile Include="ViewModels\LogTypeViewModel.cs" />
+    <Compile Include="ViewModels\SmsContentViewModel.cs" />
+    <Compile Include="ViewModels\EmailContentViewModel.cs" />
+    <Compile Include="ViewModels\LedgerLineViewModel.cs" />
+    <Compile Include="ViewModels\LedgerPostingViewModel.cs" />
+    <Compile Include="ViewModels\JobInvoiceSettingsViewModel.cs" />
+    <Compile Include="ViewModels\JobReturnViewModel.cs" />
+    <Compile Include="ViewModels\SiteDivisionSummaryViewModel.cs" />
+    <Compile Include="ViewModels\MultipleDocumentPrint.cs" />
+    <Compile Include="ViewModels\PersonViewModel.cs" />
+    <Compile Include="ViewModels\PurchaseGoodsReturnViewModel.cs" />
+    <Compile Include="ViewModels\PurchaseOrderSettingsViewModel.cs" />
+    <Compile Include="ViewModels\PurchaseInvoiceSettingsViewModel.cs" />
+    <Compile Include="ViewModels\PurchaseIndentSettingsViewModel.cs" />
+    <Compile Include="ViewModels\ReasonViewModel.cs" />
+    <Compile Include="ViewModels\ReportCopyViewModel.cs" />
+    <Compile Include="ViewModels\UnitConversionViewModel.cs" />
+    <Compile Include="ViewModels\PurchaseGoodsReceiptSettingsViewModel.cs" />
+    <Compile Include="ViewModels\RolesViewModel.cs" />
+    <Compile Include="ViewModels\RequsitionViewModel.cs" />
+    <Compile Include="ViewModels\JobOrderAmendmentViewModel.cs" />
+    <Compile Include="ViewModels\JobReceiveByProductViewModel.cs" />
+    <Compile Include="ViewModels\JobReceiveBomViewModel.cs" />
+    <Compile Include="ViewModels\JobConsumptionSettingsViewModel.cs" />
+    <Compile Include="ViewModels\RateConversionSettingsViewModel.cs" />
+    <Compile Include="ViewModels\MaterialRequestSettingsViewModel.cs" />
+    <Compile Include="ViewModels\MaterialReceiveSettingsViewModel.cs" />
+    <Compile Include="ViewModels\MaterialTransferSettingsViewModel.cs" />
+    <Compile Include="ViewModels\StockHeaderSettingsViewModel.cs" />
+    <Compile Include="ViewModels\MaterialIssueViewModel.cs" />
+    <Compile Include="ViewModels\JobInvoiceViewModel.cs" />
+    <Compile Include="ViewModels\JobOrderBomViewModel.cs" />
+    <Compile Include="ViewModels\JobReceiveSettingsViewModel.cs" />
+    <Compile Include="ViewModels\MaterialPlanSettingsViewModel.cs" />
+    <Compile Include="ViewModels\PerkViewModel.cs" />
+    <Compile Include="ViewModels\JobOrderSettingsViewModel.cs" />
+    <Compile Include="ViewModels\JobOrderViewModel.cs" />
+    <Compile Include="ViewModels\JobReceiveViewModel.cs" />
+    <Compile Include="ViewModels\PurchaseInvoiceReturnViewModel.cs" />
+    <Compile Include="ViewModels\JobOrderCancelViewModel.cs" />
+    <Compile Include="ViewModels\SaleOrderQtyAmendmentViewModel.cs" />
+    <Compile Include="ViewModels\SaleOrderAmendmentHeaderViewModel.cs" />
+    <Compile Include="ViewModels\PurchaseOrderLineChargeViewModel.cs" />
+    <Compile Include="ViewModels\PurchaseOrderHeaderChargeViewModel.cs" />
+    <Compile Include="ViewModels\PurchaseIndentCancelViewModel.cs" />
+    <Compile Include="ViewModels\ProdOrderCancelViewModel.cs" />
+    <Compile Include="ViewModels\CustomDetailViewModel.cs" />
+    <Compile Include="ViewModels\ProductBuyerViewModel.cs" />
+    <Compile Include="ViewModels\ProdOrderViewModel.cs" />
+    <Compile Include="ViewModels\SiteSelectionViewModel.cs" />
+    <Compile Include="ViewModels\LedgerHeaderViewModel.cs" />
+    <Compile Include="ViewModels\PurchaseInvoiceViewModel.cs" />
+    <Compile Include="ViewModels\MaterialPlanLineViewModel.cs" />
+    <Compile Include="ViewModels\MaterialPlanHeaderViewModel.cs" />
+    <Compile Include="ViewModels\PurchaseOrderCancelViewModel.cs" />
+    <Compile Include="ViewModels\MaterialPlanForLineViewModel.cs" />
+    <Compile Include="ViewModels\PurchaseWaybillViewModel.cs" />
+    <Compile Include="ViewModels\DispatchWaybillViewModel.cs" />
+    <Compile Include="ViewModels\RouteLineViewModel.cs" />
+    <Compile Include="ViewModels\ProductUidViewModel.cs" />
+    <Compile Include="ViewModels\GateInViewModel.cs" />
+    <Compile Include="ViewModels\PurchaseOrderHeaderDetailViewModel.cs" />
+    <Compile Include="ViewModels\PurchaseGoodsReceiptHeaderViewModel.cs" />
+    <Compile Include="ViewModels\PurchaseOrderHeaderViewModel.cs" />
+    <Compile Include="ViewModels\PurchaseOrderLineViewModel.cs" />
+    <Compile Include="ViewModels\RugStencilViewModel.cs" />
+    <Compile Include="ViewModels\CopyFromExistingDesignViewModel.cs" />
+    <Compile Include="ViewModels\FinishedProductConsumptionViewModel.cs" />
+    <Compile Include="ViewModels\LedgerViewModel.cs" />
+    <Compile Include="ViewModels\StockProcessViewModel.cs" />
+    <Compile Include="ViewModels\StockViewModel.cs" />
+    <Compile Include="ViewModels\CourierViewModel.cs" />
+    <Compile Include="ViewModels\UnitViewModel.cs" />
+    <Compile Include="ViewModels\TransporterViewModel.cs" />
+    <Compile Include="ViewModels\ManufacturerViewModel.cs" />
+    <Compile Include="ViewModels\AutoCompleteDropDownViewModels.cs" />
+    <Compile Include="ViewModels\MenuViewModel.cs" />
+    <Compile Include="ViewModels\SubModuleViewModel.cs" />
+    <Compile Include="ViewModels\AddToExistingContactViewModel.cs" />
+    <Compile Include="ViewModels\AgentViewModel.cs" />
+    <Compile Include="ViewModels\EmployeeViewModel.cs" />
+    <Compile Include="ViewModels\PersonDocumentViewModel.cs" />
+    <Compile Include="ViewModels\SupplierViewModel.cs" />
+    <Compile Include="ViewModels\FinishedProductViewModel.cs" />
+    <Compile Include="ViewModels\JobWorkerViewModel.cs" />
+    <Compile Include="ViewModels\PersonBankAccountViewModel.cs" />
+    <Compile Include="ViewModels\ProductContentLineIndexViewModel.cs" />
+    <Compile Include="ViewModels\ProductCustomGroupLineIndexViewModel.cs" />
+    <Compile Include="ViewModels\CityViewModel.cs" />
+    <Compile Include="ViewModels\BuyerViewModel.cs" />
+    <Compile Include="ViewModels\DesignConsumptionViewModel.cs" />
+    <Compile Include="ViewModels\CarpetMasterViewModel.cs" />
+    <Compile Include="ViewModels\ProductSizeViewModel.cs" />
+    <Compile Include="ViewModels\PackingViewModel.cs" />
+    <Compile Include="ViewModels\ProductTypeAttributeViewModel.cs" />
+    <Compile Include="ViewModels\PurchaseGoodsReceiptLineViewModel.cs" />
+    <Compile Include="ViewModels\ReportMasterViewModel.cs" />
+    <Compile Include="ViewModels\ReviewSampleViewModel.cs" />
+    <Compile Include="ViewModels\ProductIndexViewModel.cs" />
+    <Compile Include="ViewModels\SaleOrderAmendmentPrintViewModel.cs" />
+    <Compile Include="ViewModels\SaleOrderCancelHeaderViewModel.cs" />
+    <Compile Include="ViewModels\SaleOrderCancelPrintViewModel.cs" />
+    <Compile Include="ViewModels\PurchaseIndentHeaderViewModels.cs" />
+    <Compile Include="ViewModels\ProcessSequenceHeaderViewModel.cs" />
+    <Compile Include="ViewModels\SaleInvoiceHeaderViewModel.cs" />
+    <Compile Include="ViewModels\SaleOrderHeaderViewModels.cs" />
+    <Compile Include="ViewModels\PurchaseIndentLineViewModel.cs" />
+    <Compile Include="ViewModels\ProcessSequenceLineViewModel.cs" />
+    <Compile Include="ViewModels\PersonContactViewModel.cs" />
+    <Compile Include="ViewModels\SaleInvoiceLineViewModel.cs" />
+    <Compile Include="ViewModels\SaleOrderLineViewModel.cs" />
+    <Compile Include="ViewModels\SaleInvoicePrintViewModel.cs" />
+    <Compile Include="ViewModels\SaleOrderPrintViewModel.cs" />
+    <Compile Include="ViewModels\SaleOrderCancelLineViewModel.cs" />
+    <Compile Include="ViewModels\SupplierRatingViewModel.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Core\Core.csproj">
+      <Project>{b1053a2d-a1ea-412f-ba95-19ce794f8891}</Project>
+      <Name>Core</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

@@ -1,0 +1,599 @@
+﻿@model Model.ViewModel.JobOrderCancelLineViewModel
+@using Core.Common
+
+<style type="text/css">
+    .ui-autocomplete {
+        max-height: 250px;
+        overflow-y: auto;
+        /* prevent horizontal scrollbar */
+        overflow-x: hidden;
+    }
+</style>
+
+<div class="modal-content">
+    <div class="modal-header" style="border-bottom: 1px solid #8E8888">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"> <span class="glyphicon glyphicon-remove"></span></button>
+        <h3>
+            <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-file black"></span> Job Order Cancel</span>
+        </h3>
+    </div>
+    <div>
+        @using (Html.BeginForm("_CreatePost", "JobOrderCancelLine", FormMethod.Post, new { enctype = "multipart/form-data", id = "modform" }))
+        {
+            @Html.ValidationLog((string)TempData["CSEXCL"])
+            @Html.AntiForgeryToken()
+
+
+            <div class="form-horizontal modal-body">
+
+                @Html.HiddenFor(model => model.JobOrderCancelHeaderId)
+                @Html.HiddenFor(m => m.JobOrderCancelLineId)
+                @Html.HiddenFor(m => m.JobOrderLineId)
+                @Html.HiddenFor(m => m.JobWorkerId)
+                @Html.HiddenFor(m => m.BalanceQty)
+                @Html.HiddenFor(m => m.GodownId)
+                @Html.HiddenFor(m => m.ProductUidId)
+                @Html.HiddenFor(m => m.JobOrderSettings.ProcessId)
+                @Html.HiddenFor(m => m.JobOrderSettings.isPostedInStock)
+                @Html.HiddenFor(m => m.JobOrderSettings.isPostedInStockProcess)
+
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+                <div class="row">
+
+                    <div class="col-md-6" style="display:@((Model.JobOrderSettings.isVisibleProductUID || !string.IsNullOrEmpty(Model.ProductUidName)) ? "" : "none")">
+                        @Html.HiddenFor(m => m.JobOrderSettings.isVisibleProductUID)
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.ProductUidId, (Model.DocumentTypeSettings.ProductUidCaption ?? "Product Uid"), new { @class = "control-label col-md-4 col-sm-2" })
+                            @Html.HiddenFor(m => m.DocumentTypeSettings.ProductUidCaption)
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.ProductUidName, new { @class = "form-control required" })
+                                @Html.ValidationMessageFor(model => model.ProductUidId, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.JobOrderLineId, (Model.DocumentTypeSettings.ContraDocTypeCaption ?? "Order No."), new { @class = "control-label col-md-4 col-sm-2" })
+                            @Html.HiddenFor(m => m.DocumentTypeSettings.ContraDocTypeCaption)
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBox(" ", "", new { @class = "form-control", @id = "autocompleteorder" })
+                                @Html.ValidationMessageFor(model => model.JobOrderLineId, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.ProductId, (Model.DocumentTypeSettings.ProductCaption ?? "Product"), new { @class = "control-label col-md-4 col-sm-2 " })
+                            @Html.HiddenFor(m => m.DocumentTypeSettings.ProductCaption)
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.ProductId, new { @class = "form-control  required", @readonly = true })
+                                @Html.ValidationMessageFor(model => model.ProductId, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6" style="display:@( ((bool ?)ViewBag.BarCodeGenerated==true && Model.JobOrderCancelLineId==0 )? "" : "none")">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.BarCodes, "ProductUid", new { @class = "control-label col-md-4 col-sm-2 " })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(m => m.BarCodes, "", new { @class = "form-control required" })
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Specification, "Specification", new { @class = "control-label col-md-4 col-sm-2 " })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.Specification, new { @class = "form-control  required", @readonly = true })
+                                @Html.ValidationMessageFor(model => model.Specification, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6" style="display:@(Model.JobOrderSettings.isVisibleLotNo?"":"none")">
+                        @Html.HiddenFor(m => m.JobOrderSettings.isVisibleLotNo)
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.LotNo, "LotNo", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.LotNo, new { @class = "form-control required", @readonly = true })
+                                @Html.ValidationMessageFor(model => model.LotNo, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6" style="display:@(Model.JobOrderSettings.isVisibleDimension1?"":"none")">
+                        @Html.HiddenFor(m => m.JobOrderSettings.isVisibleDimension1)
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Dimension1Name, (Model.DocumentTypeSettings.Dimension1Caption ?? "Dimension1"), new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.Dimension1Name, new { @class = "form-control required", @readonly = true })
+                                @Html.ValidationMessageFor(model => model.Dimension1Name, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6" style="display:@(Model.JobOrderSettings.isVisibleDimension2?"":"none")">
+                        @Html.HiddenFor(m => m.JobOrderSettings.isVisibleDimension2)
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Dimension2Name, (Model.DocumentTypeSettings.Dimension2Caption ?? "Dimension2"), new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.Dimension2Name, new { @class = "form-control required", @readonly = true })
+                                @Html.ValidationMessageFor(model => model.Dimension2Name, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6" style="display:@(Model.JobOrderSettings.isVisibleDimension3?"":"none")">
+                        @Html.HiddenFor(m => m.JobOrderSettings.isVisibleDimension3)
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Dimension3Name, (Model.DocumentTypeSettings.Dimension3Caption ?? "Dimension3"), new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.Dimension3Name, new { @class = "form-control required", @readonly = true })
+                                @Html.ValidationMessageFor(model => model.Dimension3Name, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6" style="display:@(Model.JobOrderSettings.isVisibleDimension4?"":"none")">
+                        @Html.HiddenFor(m => m.JobOrderSettings.isVisibleDimension4)
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Dimension4Name, (Model.DocumentTypeSettings.Dimension4Caption ?? "Dimension4"), new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.Dimension4Name, new { @class = "form-control required", @readonly = true })
+                                @Html.ValidationMessageFor(model => model.Dimension4Name, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Qty, "Cancel Qty", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10" style="padding:0px">
+                            <div class="col-xs-7" style="padding-right:0px">
+                                @Html.TextBoxFor(model => model.Qty, new { @class = "form-control required" })
+                                @Html.ValidationMessageFor(model => model.Qty, "", new { @class = "text-danger" })
+                            </div>
+                            <div class="col-xs-5" style="padding-left:0px">
+                                @Html.TextBoxFor(m => m.UnitId, new { @class = "form-control", @readonly = "true" })
+                            </div>
+                                </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Remark, "Remark", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextAreaFor(model => model.Remark, new { @class = "form-control required" })
+                                @Html.ValidationMessageFor(model => model.Remark, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer " style="padding: 19px 20px 0 20px; border-top:1px solid #8E8888">
+                    @if (ViewBag.LineMode == "Edit" || ViewBag.LineMode == "Create")
+                    {
+                        <button class="btn custom left" name="Command:Edit" type="submit" id="submit"><h2 style="margin:0px"><span class="glyphicon glyphicon-floppy-disk black"></span> </h2></button>}
+
+                    @if (ViewBag.LineMode == "Delete")
+                    {
+                        <button class="btn custom" name="Command:Delete" id="delete" type="submit"><h2 style="margin:0px"><span class="glyphicon glyphicon-trash black"></span> </h2></button>}
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+
+<script type="text/javascript">
+    $(function () {
+        CustomSelectFunction($("#ProductId"), '/ComboHelpList/GetProducts', '/ComboHelpList/SetSingleProducts', 'Enter Product Name', false, 3);
+
+        $('#ProductUidName').on('change', function (e) {
+
+            InitializePopover(this, $("#ProductUidName", '.modal-body').val(), $('#JobOrderSettings_isPostedInStock', '.modal-body').val(), $('#JobWorkerId', '.modal-body').val(), TransactionTypeConstantsEnum.Receive);
+            $(this).popover('show');
+            setTimeout(function () { $('#ProductUidName').popover('destroy') }, 10000);
+
+            UpdateJobOrderUidBased();
+
+        })
+
+
+
+        function UpdateJobOrderUidBased() {
+            if ($("#ProductUidId").val() && $("#ProductUidId").val() > 0) {
+                $.ajax({
+                    cache: false,
+                    type: "POST",
+                    url: "@(Url.Action("GetOrderLineForUid"))",
+                    data: { UId: $("#ProductUidId", '.modal-body').val(), CancelHeaderId: $('#JobOrderCancelHeaderId', '.modal-body').val() },
+                    success: function (data) {
+                        if (data) {
+                            $('#JobOrderLineId').val(data.JobOrderLineId);
+                            $('#autocompleteorder').val(data.JobOrderHeaderDocNo).attr('readonly', 'true');
+                            $('#Specification').val(data.Specification);
+                            $("#Dimension1Name").val(data.Dimension1Name);
+                            $("#Dimension2Name").val(data.Dimension2Name);
+                            $("#Dimension3Name").val(data.Dimension3Name);
+                            $("#Dimension4Name").val(data.Dimension4Name);
+                            $('#LotNo').val(data.LotNo);
+                            $('#UnitId').val(data.UnitName);
+                            $('#BalanceQty').val(data.ProdOrderBalanceQty);
+                        }
+                        else if (!data) {
+                            $('#JobOrderLineId').val(0);
+                            $('#autocompleteorder').val("").removeAttr('readonly');
+                            $('#Specification').val("");
+                            $("#Dimension1Name").val("");
+                            $("#ProductId").select2("val", "");
+                            $("#Dimension2Name").val("");
+                            $("#Dimension3Name").val("");
+                            $("#Dimension4Name").val("");
+                            $('#LotNo').val("");
+                            $('#UnitId').val("");
+                            $('#BalanceQty').val(0);
+                            $('#Qty').val(0);
+
+                            //TestPopOver($("#ProductUidName"), "BarCode is alerady Canceled/Received");
+
+                            $('#ProductUidName').popover('show');
+                        }
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        alert('Failed to retrieve product details.' + thrownError);
+                    }
+                });
+            }
+            else {
+                $('#JobOrderLineId').val(0);
+                $('#autocompleteorder').val("").removeAttr('readonly');
+                $('#Specification').val("");
+                $("#Dimension1Name").val("");
+                $("#ProductId").select2("val", "");
+                $("#Dimension2Name").val("");
+                $("#Dimension3Name").val("");
+                $("#Dimension4Name").val("");
+                $('#LotNo').val("");
+                $('#UnitId').val("");
+                $('#BalanceQty').val(0);
+                $('#Qty').val(0);
+            }
+
+        }
+
+
+    });
+
+    var id = '@Model.JobOrderCancelLineId';
+    if (id > 0) {
+        var order = '@Model.JobOrderDocNo';
+        $('#autocompleteorder').val(order).attr('disabled', 'disabled');
+        $('#ProductId').attr('readonly', 'true');
+
+        var IsBarCodeGenerated = '@ViewBag.BarCodeGenerated';
+
+        if (IsBarCodeGenerated == "True") {
+            $('#Qty').attr('readonly', 'true');
+            $('#ProductUidName').attr('readonly', 'true');
+        }
+
+
+    }
+
+    $('#delete', '.modal-content').click(function (e) {
+        if (id > 0) {
+            var url = '/JobOrderCancelLine/DeletePost';
+            $('form').attr('action', url);
+            return;
+        }
+        else {
+            return false;
+        }
+    })
+    $('#Qty').keyup(function () {
+        if (($('#BalanceQty').val() - $('#Qty').val()) < 0) {
+            $('#submit', '.modal-body').attr('disabled', 'disabled');
+            if ($(this).closest('div.col-xs-4').find('span#cerror').length == 0) {
+                $(this).parents('.col-xs-4').append("<span class='text-danger' id='cerror'>Qty exceeding BalQty</span>")
+            }
+        }
+        else {
+            $('#submit', '.modal-body').removeAttr('disabled');
+            if ($(this).closest('div.col-xs-4').find('span#cerror').length > 0) {
+                $(this).closest('.col-xs-4').find('span#cerror').remove();
+            }
+        }
+    })
+
+    $("#BarCodes").select2({
+        minimumInputLength: 0,
+        multiple: true,
+        ajax: {
+            url: function () { return '/JobOrderCancelLine/GetBarCodes/' + GetJobOrderLineId(); },
+            dataType: 'json',
+            type: "GET",
+            quietMillis: 500,
+            data: function (term) {
+                return {
+                    term: term,
+                };
+            },
+            results: function (data) {
+                return {
+                    results: $.map(data, function (item) {
+                        return {
+                            text: item.PropFirst,
+                            id: item.Id
+                        }
+                    })
+
+                };
+            }
+        },
+        initSelection: function (element, callback) {
+
+            var xval = element.val();
+            if (xval != 0) {
+                $.ajax({
+                    cache: false,
+                    type: "POST",
+                    url: '/ComboHelpList/SetProductUids',
+                    data: { Ids: element.val() },
+                    success: function (data) {
+                        callback(data);
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        alert('Failed to Retrive Qty' + thrownError);
+                    }
+                })
+            }
+            //callback([{ id: "1", text: "arpit" }, { id: "2", text: "akash" }]);
+        }
+
+    });
+
+    $("#BarCodes").on("change", function (e) {
+
+        var Qty = ($('#BarCodes').select2('val')).length;
+
+        $('#Qty').val(Qty);
+        $('#BalanceQty').val(Qty);
+
+    })
+
+    function GetJobOrderLineId() {
+        return $('#JobOrderLineId', '.modal-body').val();
+    }
+
+
+    $(document).ready(function () {
+        var IsSaved = false;
+        var ValidationCount = 0;
+
+        $('#modform').bind('submit', function (event) {
+
+            if (!IsSaved) {
+                if (!ValidateData()) {
+                    return false;
+                }
+                IsSaved = true;
+                $('button:submit').attr('disabled', 'disabled');
+                return IsSaved;
+            }
+            else {
+                return false;
+            }
+
+
+        });
+
+        function ValidateData() {
+            var ValidationMessage = "";
+
+            //Client Side Validaion.....
+
+            return (ValidationMessage == "");
+
+        }
+    });
+
+</script>
+
+
+
+
+@if (Model.JobOrderCancelLineId <= 0)
+{
+    <script type="text/javascript">
+
+        $("#autocompleteorder").focusout(function () {
+            if (!$(this).val()) {
+                $("#autocompleteorder").val("");
+                $('#JobOrderLineId').val("");
+            }
+
+
+            if ($("#autocompleteorder").val() == "") {
+                $('#JobOrderLineId').val("");
+            }
+
+
+            if ($('#JobOrderLineId').val() != "" && !($("#ProductUidId").val())) {
+                $.ajax({
+                    cache: false,
+                    type: "POST",
+                    url: "@(Url.Action("GetLineDetail"))",
+                    data: { LineId: $("#JobOrderLineId").val() },
+                    success: function (data) {
+
+                        $('#Specification').val(data.Specification);
+                        $("#Dimension1Name").val(data.Dimension1Name);
+                        $("#Dimension2Name").val(data.Dimension2Name);
+                        $("#Dimension3Name").val(data.Dimension3Name);
+                        $("#Dimension4Name").val(data.Dimension4Name);
+                        $('#LotNo').val(data.LotNo);
+                        $('#UnitId').val(data.UnitId);
+                        $("#ProductId").select2('data', { id: data.ProductId, text: data.ProductName });
+                        if (data.IsUidGenerated)
+                            AddBarCodesSelect2(data.BarCodes);
+                        else {
+                            $('#Qty').val(data.Qty);
+                            $('#BalanceQty').val(data.Qty);
+                            RemoveBarCodes();
+                        }
+
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        alert('Failed to retrieve product details.' + thrownError);
+                    }
+                });
+            }
+            else if ($('#JobOrderLineId').val() == "" && !($("#ProductUidId").val())) {
+                $("#ProductId").select2('val', "");
+                $('#BalanceQty').val("");
+                $('#Qty').val("");
+                $('#Specification').val("");
+                $('#Dimension1Name').val("");
+                $('#Dimension2Name').val("");
+                $('#Dimension3Name').val("");
+                $('#Dimension4Name').val("");
+                $('#LotNo').val("");
+                $('#UnitId').val("");
+            }
+        }
+        );
+
+
+
+
+
+        $(function () {
+            $("#autocompleteorder").autocomplete({
+                delay: 500,
+                minLength: 3,
+                source: function (request, response) {
+                    $.ajax({
+                        cache: false,
+                        type: "POST",
+                        url: "@(Url.Action("GetPendingOrders"))",
+                        data: { JobWorkerId: $("#JobWorkerId").val(), term: request.term, Limit: 20 },
+                        success: function (data) {
+                            if (data.length > 0) {
+                                var cachearray = data.error ? [] : $.map(data, function (m) {
+
+                                    return {
+                                        value: m.DocNo,
+                                        key: m.JobOrderLineId,
+                                        dim1: m.Dimension1Name,
+                                        dim2: m.Dimension2Name,
+                                        dim3: m.Dimension3Name,
+                                        dim4: m.Dimension4Name,
+                                        prod: m.ProductName,
+                                    };
+                                });
+                                response(cachearray);
+                            }
+                            else {
+                                var dimensions = { width: 10 };
+                                var cachearray = $.map(dimensions, function (value, key) {
+                                    return {
+                                        value: "No Record Found!",
+                                        key: null
+                                    }
+                                })
+                                response(cachearray);
+                            }
+                        },
+                        error: function (xhr, ajaxOptions, thrownError) {
+                            $('.ui-autocomplete-loading').removeClass("ui-autocomplete-loading");
+                            alert('Failed to retrieve Pending Orders.' + thrownError);
+                        }
+
+                    });
+
+
+                    //}
+
+                },
+                appendTo: $("#myModalContent"),
+                select: function (event, ui) {
+                    // prevent autocomplete from updating the textbox
+                    // navigate to the selected item's url
+                    if ($("#autocompleteorder").val() == "") {
+                        $('#JobOrderLineId').val("");
+                    }
+                    else {
+                        $("#JobOrderLineId").val(ui.item.key);
+                    }
+                },
+
+            }).data("ui-autocomplete")._renderItem = function (ul, item) {
+                var $a = $("<a></a>");
+                $("<strong></strong>").text(item.value).appendTo($a);
+                (item.prod == null) ? ("") : ($("<br /><span class='small' style='font-weight:bold'></span>").text(item.prod).appendTo($a));
+                $("<br />").appendTo($a);
+                (item.dim1 == null) ? ("") : ($("<span class='small'></span>").text(item.dim1 + ",").appendTo($a));
+                (item.dim2 == null) ? ("") : ($("<span class='small'></span>").text(item.dim2).appendTo($a));
+
+
+
+                return $("<li></li>").append($a).appendTo(ul);
+            }
+        });
+
+
+
+
+        function AddBarCodesSelect2(data) {
+            $('#BarCodes', '.modal-body').closest('div.col-md-6').css({ display: '' });
+            $('#Qty').val(data.length).attr('readonly', 'true');
+            $('#BalanceQty').val(data.length);
+            var TempData = [];
+            $.each(data, function (index, value) {
+                TempData.push({
+                    id: value.Id,
+                    text: value.PropFirst
+                });
+
+            });
+            $("#BarCodes").select2('data', TempData);
+        }
+
+        function RemoveBarCodes() {
+            $('#BarCodes', '.modal-body').closest('div.col-md-6').css({ display: 'none' });
+            $('#Qty').removeAttr('readonly');
+
+        }
+
+
+        function ValidateJobOrderLine() {
+            var Stat;
+            $.ajax({
+                url: "/JobOrderCancelLine/CheckDuplicateJobOrder", data: { LineId: $('#JobOrderLineId', '.modal-body').val(), CancelHeaderId: $('#JobOrderCancelHeaderId', '.modal-body').val() }, async: false,
+                success: function (data) {
+                    if (data) {
+                        if (!$('#modform').find('.modal-body #errormsg').length) {
+                            $('#modform').find('#submit').attr('disabled', 'disabled');
+                            $('#modform').find('.modal-body').prepend("<div class='alert alert-danger'><span id=errormsg >Duplicate record:Product already exists</span></div>")
+                        }
+                    }
+                    else {
+                        $('#modform').find('#submit:disabled').removeAttr('disabled');
+                        if ($('#modform').find('.modal-body #errormsg').length) {
+                            $('#modform').find('#errormsg').parent().remove();
+                        }
+                    }
+                    Stat = data;
+                }
+            });
+
+            return Stat;
+
+        }
+
+    </script>
+}

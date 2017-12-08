@@ -1,0 +1,118 @@
+﻿@model Surya.India.Model.ViewModel.PurchaseOrderMasterDetailModel
+@using Surya.India.Core.Common
+
+<div class="modal-content">
+    <div class="modal-header" style="border-bottom: 1px solid #8E8888">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"> <span class="glyphicon glyphicon-remove"></span></button>
+        <h3>
+            <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-file black"></span> Indents & Quantities</span>
+        </h3>
+    </div>
+    <div>
+        @using (Html.BeginForm("_ResultsPost", "PurchaseOrderLine", FormMethod.Post, new { enctype = "multipart/form-data", id = "modform" }))
+        {
+            @Html.AntiForgeryToken()
+
+            <div class="form-horizontal modal-body">
+
+                <div style="padding-right:15px">
+                    <div class="row">
+                        <div class="form-horizontal">
+                            @Html.ValidationSummary(true)
+
+                            <div class="panel panel-default" id="grid">
+                                <div class="panel-heading headrow" style="background-image: -webkit-linear-gradient(top, #428bca 0%, #428bca 100%);color:white">
+                                    <div class="row grid-head">
+                                        <div class="col-xs-1 text-left">
+                                            Srl.
+                                        </div>
+                                        <div class="col-xs-11">
+                                            <div class="row">
+                                                @*ProductInfo*@
+                                                <div class="col-sm-4">
+                                                    Product
+
+                                                </div>
+                                                <div class="col-sm-2">
+                                                    Indent No
+                                                </div>
+                                                @*Qty*@
+                                                <div class="col-sm-2 text-right">
+                                                    Indent Qty
+                                                </div>
+                                                <div class="col-sm-2 text-right" style="padding-right:30px">
+                                                    Qty
+                                                </div>                                                
+                                                <div class="col-sm-2 text-right" style="padding-right:30px">
+                                                    Rate
+                                                </div>
+                                            </div>
+                                        </div>
+                                      
+                                    </div>
+
+                                </div>
+                                <div class="panel-info" id="gbody" style="max-height:250px;overflow-y:scroll">
+                                    @for (int i = 0; i < Model.PurchaseOrderLineViewModel.Count(); i++)
+                                    {
+                                        @Html.HiddenFor(m => Model.PurchaseOrderLineViewModel[i].ProductId)
+                                        @Html.HiddenFor(m => Model.PurchaseOrderLineViewModel[i].DeliveryUnitId)
+                                        @Html.HiddenFor(m => Model.PurchaseOrderLineViewModel[i].ProductName)
+                                        @Html.HiddenFor(m => Model.PurchaseOrderLineViewModel[i].Specification)
+                                        @Html.HiddenFor(m => Model.PurchaseOrderLineViewModel[i].Dimension1Name)
+                                        @Html.HiddenFor(m => Model.PurchaseOrderLineViewModel[i].Dimension2Name)
+                                        @Html.HiddenFor(m => Model.PurchaseOrderLineViewModel[i].PurchaseIndentLineId)
+                                        @Html.HiddenFor(m => Model.PurchaseOrderLineViewModel[i].PurchaseOrderHeaderId)
+                                        @Html.HiddenFor(m => Model.PurchaseOrderLineViewModel[i].PurchaseIndentDocNo)
+                                        @Html.HiddenFor(m => Model.PurchaseOrderLineViewModel[i].IndentBalanceQty)
+                                        @Html.HiddenFor(m => Model.PurchaseOrderLineViewModel[i].UnitId)
+                                        <div class='row crow grid-body' style='margin-left:0px;margin-right:0px'>
+                                            <div class='col-xs-1 row-index'>
+                                                @(i + 1)
+                                                <input type='hidden' class='id' value="@Model.PurchaseOrderLineViewModel[i].PurchaseOrderHeaderId" />
+                                            </div>
+                                            <div class='col-xs-11'>
+                                                <div class='row'>
+                                                    <div class='col-sm-4'>
+                                                        <strong>@Model.PurchaseOrderLineViewModel[i].ProductName</strong>
+                                                        <br />
+                                                        @Model.PurchaseOrderLineViewModel[i].Specification
+                                                        <p>@Model.PurchaseOrderLineViewModel[i].Dimension1Name,@Model.PurchaseOrderLineViewModel[i].Dimension2Name</p>
+                                                        <div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-2 text-center">
+                                                        @Model.PurchaseOrderLineViewModel[i].PurchaseIndentDocNo
+                                                    </div>
+                                                    <div class='col-sm-2 text-right'>
+                                                        @Model.PurchaseOrderLineViewModel[i].IndentBalanceQty<br />
+                                                        <div>
+                                                            <small>@Model.PurchaseOrderLineViewModel[i].UnitId</small>
+                                                        </div>                                                        
+                                                    </div>
+                                                    <div class="col-md-2 text-right">
+                                                        @Html.TextBoxFor(m => Model.PurchaseOrderLineViewModel[i].Qty, new { @class="form-control text-right"})
+                                                        @Html.ValidationMessageFor(m => Model.PurchaseOrderLineViewModel[i].Qty, "", new { @class="text-danger"})
+                                                    </div>
+                                                    <div class='col-sm-2 text-right'>
+                                                        @Html.TextBoxFor(m => Model.PurchaseOrderLineViewModel[i].Rate, new { @class = "form-control text-right" })
+                                                        @Html.ValidationMessageFor(m => Model.PurchaseOrderLineViewModel[i].Rate, "", new { @class="text-danger"})
+                                                    </div>                                                                                                       
+                                                </div>
+                                            </div>
+                                           
+                                        </div>
+                                        <hr style='margin-top:0px;margin-bottom:0px' />
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer " style="padding: 19px 20px 0 20px; border-top:1px solid #8E8888">
+                    <button class="btn custom" name="Command:Edit" type="submit"><h2 style="margin:0px" id="submit" title="Proceed"><span class="glyphicon glyphicon-floppy-disk black black"></span> </h2></button>
+                </div>
+            </div>
+        }
+    </div>
+</div>

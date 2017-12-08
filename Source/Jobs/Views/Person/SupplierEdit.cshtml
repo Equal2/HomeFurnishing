@@ -1,0 +1,120 @@
+﻿@model Model.Models.Supplier
+
+@{
+    ViewBag.Title = "Edit";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    @Html.BootStrapValidationSummary()
+    @Html.HiddenFor(model => model.PersonID)
+    @Html.HiddenFor(m=>m.Code)
+    
+    
+    <div class="panel panel-default" style="padding:5px">
+
+    <div class="panel panel-heading">
+
+        <h4>
+            <span style="font-family: Calibri,sans-serif,Verdana"> Edit Supplier Details</span>
+        </h4>
+
+    </div>
+
+        <div class="panel panel-warning" style="padding:5px">
+            
+            <span style="font-family: Calibri,sans-serif,Verdana;color:green"><b>@ViewBag.Message</b> </span>
+           
+
+        </div>
+
+        <div class="panel panel-info" style="padding:5px">
+
+            <div class="form-horizontal">
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.Name, new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.Name)
+                        @Html.ValidationMessageFor(model => model.Name)
+                    </div>
+                </div>
+
+                                               
+                <div class="form-group">
+                    @Html.LabelFor(model => model.Active, new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.Active)
+                        @Html.ValidationMessageFor(model => model.Active)
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.CstNo, new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.CstNo)
+                        @Html.ValidationMessageFor(model => model.CstNo)
+                    </div>
+                </div>
+
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.LstNo, new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.LstNo)
+                        @Html.ValidationMessageFor(model => model.LstNo)
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.PanNo, new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.PanNo)
+                        @Html.ValidationMessageFor(model => model.PanNo)
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Phone, new { @class="control-label col-md-2"})
+                    <div class="col-md-10">
+                        @Html.EditorFor(m=>m.Phone)
+                        @Html.ValidationMessageFor(m=>m.Phone)
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Mobile, new {@class="control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(m=>m.Mobile)
+                        @Html.ValidationMessageFor(m=>m.Mobile)
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Email, new { @class="control-label col-md-2"})
+                    <div class="col-md-10">
+                        @Html.EditorFor(m=>m.Email)
+                        @Html.ValidationMessageFor(m=>m.Email)
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-10">
+                        <input type="submit" value="Save" class="btn btn-primary" />                       
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+</div>
+  
+}
+
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

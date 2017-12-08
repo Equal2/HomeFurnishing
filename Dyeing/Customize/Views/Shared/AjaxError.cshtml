@@ -1,0 +1,33 @@
+﻿@model System.Web.Mvc.HandleErrorInfo
+
+@{
+    ViewBag.Title = "Error";
+    Layout=null;
+}
+
+<div class="modal-content">
+<div class="modal-header" style="border-bottom: 1px solid #8E8888">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true"> <span class="glyphicon glyphicon-remove"></span></button>
+    <h3>
+        <span style="font-family: Calibri,sans-serif,Verdana">We'are sorry...</span>
+    </h3>
+</div>
+    <div>
+        <div class="form-horizontal modal-body">
+            <div class="row">
+                <div class="col-md-12">
+                   @Html.ValidationLog((string)TempData["CSEXC"])
+                </div> 
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+   
+
+
+

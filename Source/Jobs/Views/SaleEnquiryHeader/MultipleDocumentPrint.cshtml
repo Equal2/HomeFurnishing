@@ -1,0 +1,87 @@
+﻿@model Presentation.ViewModels.MultipleDocumentPrint
+
+
+@using Core.Common
+
+<div class="modal-content">
+    <div class="modal-header" style="border-bottom: 1px solid #8E8888">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"> <span class="glyphicon glyphicon-remove"></span></button>
+        <h3>
+            <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-file black"></span> Please select Records to Print </span>
+        </h3>
+    </div>
+    <div>
+        @using (Html.BeginForm("History", "SaleEnquiryHeader", FormMethod.Post, new { @class = "modal-form", id = "modform" }))
+        {
+            @Html.AntiForgeryToken()
+
+            <div class="form-horizontal modal-body">
+
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                <div class="row">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.SaleEnquiryHeaderId, new { @class = "control-label col-xs-4" })
+                                <div class="col-xs-6">
+                                    <input type='hidden' name='SaleEnquiryHeaderId' id='SaleEnquiryHeaderId' class="form-control col-xs-6" />
+                                    @Html.ValidationMessageFor(model => model.SaleEnquiryHeaderId)
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer " style="padding: 19px 20px 0 20px; border-top:1px solid #8E8888">                    
+                    <button class="btn custom left" name="Command:Edit" type="submit"><h2 style="margin:0px" id="submit"><span class="glyphicon glyphicon-print toolbar"></span> </h2></button>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+
+<script>
+    $(document).ready(function () {
+
+
+
+        CustomSelectFunction($("#SaleEnquiryHeaderId"), '/ComboHelpList/GetSaleEnquirys', '/ComboHelpList/SetSaleEnquirys', ' ', true, 0);
+
+
+    });
+</script>
+
+
+
+
+<script>
+
+    var SOarr = [];
+
+    $("#Print").click(function () {
+        //For Passing Ids String
+
+
+        $("#SaleEnquiryHeaderId").val($('#SaleEnquiryHeaderId').select2("val"));
+
+
+        //For Passing Parameter Names String for multi select text boxes
+
+
+
+
+
+        var products = (JSON.stringify($('#SaleEnquiryHeaderId').select2('data')));
+        var obj = jQuery.parseJSON(products);
+        $.each(obj, function (key, value) {
+            SOarr.push(value.text);
+        });
+        $("#SaleEnquiry").val(SOarr);
+
+
+
+
+
+    });
+</script>
+

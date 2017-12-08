@@ -1,0 +1,94 @@
+﻿@model Model.Models.ProductSupplier
+
+@{
+    ViewBag.Title = "Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+@ViewBag.ProductTypeId
+
+@*<h2>Create</h2>*@
+
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(model => model.ProductId)
+
+    @*<fieldset class="form-horizontal">
+        <legend>Product Supplier</legend>*@
+    <div class="panel panel-default">
+
+        <div class="panel-heading">
+
+            <h4>
+                <span style="font-family: Calibri,sans-serif,Verdana"> Create Product Supplier(@ViewBag.ProductName).</span>
+            </h4>
+
+        </div>
+        <div class="panel-info" style="padding-left:15px">
+            <div class="form-horizontal">
+                @*<hr />*@
+                @Html.ValidationSummary(true)
+
+                <div class="form-group" style="margin-top:15px">
+                    @Html.LabelFor(model => model.Supplier, new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.DropDownListFor(m => m.SupplierId, new SelectList(ViewBag.SupplierList as System.Collections.IEnumerable, "PersonId", "Name"),string.Empty, new { style = "width: 150px;" })
+                        @Html.ValidationMessageFor(model => model.Supplier)
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.LeadTime, new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(m=>m.LeadTime)
+                        @Html.ValidationMessageFor(model => model.LeadTime)
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.MinimumOrderQty, new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(m => m.MinimumOrderQty)
+                        @Html.ValidationMessageFor(model => model.MinimumOrderQty)
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.MaximumOrderQty, new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(m => m.MaximumOrderQty)
+                        @Html.ValidationMessageFor(model => model.MaximumOrderQty)
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.Cost, new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(m => m.Cost)
+                        @Html.ValidationMessageFor(model => model.Cost)
+                    </div>
+                </div>
+
+                <hr />
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-10">
+                        <input type="submit" value="Create" class="btn-primary xxlarge" />
+                        <span style="font-family: Calibri,sans-serif,Verdana;font-size:large">
+                            |@Html.ActionLink("Back to List", "Index", new { id = @Model.ProductId })
+
+                        </span>
+                    </div>
+                </div>
+            </div>
+            @*</fieldset>*@
+        </div>
+    </div>
+}
+
+@*<div>
+    @Html.ActionLink("Back to List", "Index", new { id = @Model.ProductId })
+</div>*@
+

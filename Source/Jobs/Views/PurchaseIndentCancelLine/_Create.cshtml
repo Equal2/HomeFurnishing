@@ -1,0 +1,316 @@
+﻿@model Model.ViewModel.PurchaseIndentCancelLineViewModel
+@using Core.Common
+
+<div class="modal-content">
+    <div class="modal-header" style="border-bottom: 1px solid #8E8888">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"> <span class="glyphicon glyphicon-remove"></span></button>
+        <h3>
+            <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-file black"></span> Products</span>
+        </h3>
+    </div>
+    <div>
+        @using (Html.BeginForm("_CreatePost", "PurchaseIndentCancelLine", FormMethod.Post, new { enctype = "multipart/form-data", id = "modform" }))
+        {
+            if (!string.IsNullOrEmpty((string)(TempData["CSEXCL"])))
+            {
+                <div class="alert alert-danger" role="alert" style="margin:0px;text-align:center" id="ExcAlert">
+                    <a href="#" class="alert-link" id="ExcAlert"> @((string)TempData["CSEXCL"]) </a>
+                </div>
+                <script type="text/javascript" id="CustomScript">
+                    $(document).ready(function () {
+                        $('a#ExcAlert').click(function () {
+                            $('div#ExcAlert').animate({ height: 0, padding: 0 }, 1500, "swing", function () {
+                                $('div#ExcAlert').remove();
+                            })
+                        })
+                    })
+                </script>
+                TempData.Remove("CSEXCL");
+            }
+            <div class="form-horizontal modal-body">
+
+                @Html.AntiForgeryToken()
+                @Html.HiddenFor(model => model.PurchaseIndentCancelHeaderId)
+                @Html.HiddenFor(m => m.PurchaseIndentCancelLineId)
+                @Html.HiddenFor(m => m.PurchaseIndentLineId)
+                @Html.HiddenFor(m => m.BalanceQty)
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                <div class="row">
+                    @if (Model.PurchaseIndentCancelLineId <= 0)
+                    {
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.ProductId, "Product", new { @class = "control-label col-md-4 col-sm-2" })
+                                <div class="col-md-7 col-sm-10">
+                                    @Html.TextBoxFor(model => model.ProductId, new { @class = "form-control col-xs-7 required" })
+                                    @Html.ValidationMessageFor(model => model.ProductId, "", new { @class = "text-danger" })
+                                    <span id="status" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.PurchaseIndentLineId, "Purchase Indent", new { @class = "control-label col-md-4 col-sm-2" })
+                                <div class="col-md-7 col-sm-10">
+                                    @Html.TextBox(" ", " ", new { @class = "form-control col-xs-7 required height", @id = "acPurchaseIndent" })
+                                    @Html.ValidationMessageFor(model => model.PurchaseIndentLineId, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+
+                        @Html.HiddenFor(m => m.ProductId)
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.ProductId, "Product", new { @class = "control-label col-md-4 col-sm-2" })
+                                <div class="col-md-7 col-sm-10">
+                                    @Html.TextBoxFor(model => model.ProductName, new { @class = "form-control col-xs-7 required", @readonly = "true" })
+                                    @Html.ValidationMessageFor(model => model.ProductName, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.DocNo, "Purchase Indent", new { @class = "control-label col-md-4 col-sm-2 " })
+                                <div class="col-md-7 col-sm-10">
+                                    @Html.TextBoxFor(model => model.DocNo, new { @class = "form-control col-xs-7 required", @readonly = "true" })
+                                    @Html.ValidationMessageFor(model => model.DocNo, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+                        </div>
+                    }
+
+
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6" style="display:@(Model.PurchIndentSettings.isVisibleDimension1 ? "" : "none")">
+                        @Html.HiddenFor(m => m.PurchIndentSettings.isVisibleDimension1)
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Dimension1Name, "Dimension1", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.Dimension1Name, new { @class = "form-control col-xs-7 required", @readonly = true })
+                                @Html.ValidationMessageFor(model => model.Dimension1Name, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6" style="display:@(Model.PurchIndentSettings.isVisibleDimension2 ? "" : "none")">
+                        @Html.HiddenFor(m => m.PurchIndentSettings.isVisibleDimension2)
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Dimension2Name, "Dimension2", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.Dimension2Name, new { @class = "form-control col-xs-7 required", @readonly = true })
+                                @Html.ValidationMessageFor(model => model.Dimension2Name, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Specification, "Specification", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.Specification, new { @class = "form-control col-xs-7 required", @readonly = true })
+                                @Html.ValidationMessageFor(model => model.Specification, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Qty, "Cancel Qty", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.Qty, new { @class = "form-control col-xs-7 required" })
+                                @Html.ValidationMessageFor(model => model.Qty, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer " style="padding: 19px 20px 0 20px; border-top:1px solid #8E8888">
+                    @if (ViewBag.LineMode == "Edit" || ViewBag.LineMode == "Create")
+                    {
+                        <button class="btn custom left" name="Command:Edit" type="submit" id="submit"><h2 style="margin:0px"><span class="glyphicon glyphicon-floppy-disk black"></span> </h2></button>}
+                    @if (ViewBag.LineMode == "Delete")
+                    {
+                        <button class="btn custom" name="Command:Delete" id="delete" type="submit"><h2 style="margin:0px"><span class="glyphicon glyphicon-trash black"></span> </h2></button>}
+
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+
+<script type="text/javascript">
+
+
+    $(document).ready(function () {
+        var id=@Model.PurchaseIndentCancelLineId;
+        if(id<=0)
+        {
+            CustomSelectFunction($("#ProductId"), '/ComboHelpList/GetProducts', '/ComboHelpList/SetSingleProducts', 'Enter Product Name', false, 3);
+        }
+        $("#ProductId").select2("focus");
+
+        $('#delete','.modal-content').click(function (e) {
+            if(id>0)
+            {
+                var url = '/PurchaseIndentCancelLine/DeletePost';
+                $('form#modform').attr('action',url);
+                return;
+            }
+            else
+            {
+                return false;
+            }
+        })
+
+
+        $('#Qty').keyup(function(){
+
+            if(($('#BalanceQty').val() - $('#Qty').val()) < 0)
+            {
+                $('#submit','.modal-body').attr('disabled','disabled');
+                if(!$(this).parent().find('#errormessage').length)
+                {
+                    $(this).parent().append('<span id="errormessage" class="text-danger">Qty Exceeding Bal Qty</span>');}
+            }
+            else
+            {
+                $('#submit','.modal-body').removeAttr('disabled');
+                if($(this).parent().find('#errormessage').length)
+                {
+                    $(this).parent().find('#errormessage').remove();}
+            }
+
+
+        });
+
+
+    });
+
+</script>
+
+@if (Model.PurchaseIndentCancelLineId <= 0)
+{
+    <script type="text/javascript">
+        $(function() {
+            $("#acPurchaseIndent").autocomplete({
+                source: function(request,response){
+                    var matcher = new RegExp( $.ui.autocomplete.escapeRegex( request.term ), "i" );
+                    $.ajax({
+                        cache: false,
+                        type: "POST",
+                        url: "@(Url.Action("GetPendingIndents"))",
+                        data: { ProductId: $("#ProductId").val(),PurchaseIndentCancelHeaderId:$("#PurchaseIndentCancelHeaderId",".modal-body").val() },
+                        success: function (data) {
+
+                            var cachearray = data.error ? [] : $.map(data, function(m) {
+                                return {
+                                    value: m.PurchaseIndentDocNo,
+                                    key: m.PurchaseIndentLineId,
+                                    MDocNo: m.MaterialPlanDocNo,
+                                    //dim2:m.Dimension2Name,
+
+                                };
+                            });
+                            response(cachearray);
+                        },
+                        error: function (xhr, ajaxOptions, thrownError) {
+                            alert('Failed to retrieve Pending Orders.' + thrownError);
+                        }
+
+                    });
+
+
+                },
+                appendTo : $("#myModalContent"),
+                select: function(event, ui) {
+                    // prevent autocomplete from updating the textbox
+                    // navigate to the selected item's url
+                    if($("#acPurchaseIndent").val()=="")
+                    {
+                        $('#PurchaseIndentLineId').val("");
+                    }
+                    else
+                        $("#PurchaseIndentLineId").val(ui.item.key);
+
+                },
+
+            }).data("ui-autocomplete")._renderItem = function(ul, item) {
+                var $a = $("<a></a>");
+                $("<strong></strong>").text(item.value).appendTo($a);
+                $("<br />").appendTo($a);
+
+                (item.MDocNo==null)?(""):($("<span class='small'></span>").text(item.MDocNo).appendTo($a));
+
+                //(item.dim2==null)?(""):($("<span class='small'></span>").text(item.dim2).appendTo($a));
+
+                return $("<li></li>").append($a).appendTo(ul);
+            }
+        });
+
+        $("#acPurchaseIndent").bind("focus",function(){
+            $(this).keydown();
+        })
+
+
+
+        $( "#acPurchaseIndent" ).autocomplete({
+            change: function( event, ui ) {
+
+                if (ui.item== null || ui.item.value == undefined) {
+                    $("#acPurchaseIndent").val("");
+                    $('#PurchaseIndentLineId').val("");
+                }
+
+
+                if($("#acPurchaseIndent").val()=="")
+                {
+                    $('#PurchaseIndentLineId').val("");
+                }
+
+                if($('#PurchaseIndentLineId').val()!="")
+                {
+                    $.ajax({
+                        cache: false,
+                        type: "POST",
+                        url: "@(Url.Action("GetBalQtyForPurchaseIndentLineJson"))",
+                        data: { PurchaseIndentLineId: $("#PurchaseIndentLineId").val() },
+                        success: function (data) {
+                            $('#Qty').val(data.Qty);
+                            $('#BalanceQty').val(data.BalanceQty);
+                            $('#Specification').val(data.Specification);
+                            (data.Dimension1Name==null)?(1==1):($("#Dimension1Name").val(data.Dimension1Name))
+                            if(data.Dimension2Name!=null)
+                            {
+                                $('#Dimension2Name').val(data.Dimension2Name);
+                            }
+                            //$("#Dimension1Id").attr('readonly','true');
+                            //$("#Dimension2Id").attr('readonly','true');
+                        },
+                        error: function (xhr, ajaxOptions, thrownError) {
+                            alert('Failed to retrieve product details.' + thrownError);
+                        }
+                    });
+                }
+                else if($('#PurchaseIndentLineId').val()=="")
+                {
+                    $('#Qty').val(0);
+                    $('#Specification').val("");
+                    $('#Dimension1Name').val("");
+                    $('#Dimension2Name').val("");
+                }
+            }
+        });
+
+
+    </script>
+}

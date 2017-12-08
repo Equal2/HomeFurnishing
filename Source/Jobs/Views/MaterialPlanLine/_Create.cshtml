@@ -1,0 +1,183 @@
+﻿
+@model Model.ViewModel.MaterialPlanLineViewModel
+@using Core.Common
+
+<div class="modal-content">
+    <div class="modal-header" style="border-bottom: 1px solid #8E8888">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"> <span class="glyphicon glyphicon-remove"></span></button>
+        <h3>
+            <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-file black"></span> Products</span>
+        </h3>
+    </div>
+    <div>
+        @using (Html.BeginForm("_CreatePost", "MaterialPlanLine", FormMethod.Post, new { enctype = "multipart/form-data", id = "modform" }))
+        {
+            @Html.AntiForgeryToken()
+
+            @Html.HiddenFor(model => model.MaterialPlanHeaderId)
+            @Html.HiddenFor(m => m.MaterialPlanLineId)            
+
+            <div class="form-horizontal modal-body">
+
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.ProductId, (Model.DocumentTypeSettings.ProductCaption ?? "Product"), new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.ProductId, new { @class = "form-control required", @readonly = true })
+                                @Html.ValidationMessageFor(model => model.ProductId, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.DueDate, "Due Date", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.DueDate, "{0:dd/MMMM/yyyy}", new { @class = "datepicker form-control required" })
+                                @Html.ValidationMessageFor(model => model.ProductId, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.RequiredQty, "Required Qty", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(m => m.RequiredQty, new { @class = "form-control", @readonly = true })
+                                @Html.ValidationMessageFor(model => model.RequiredQty, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.ExcessStockQty, "Excess Stock Qty", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(m => m.ExcessStockQty, new { @class = "form-control", @readonly = true })
+                                @Html.ValidationMessageFor(model => model.ExcessStockQty, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.StockPlanQty, "Stock Plan Qty", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.StockPlanQty, new { @class = "form-control required" })
+                                @Html.ValidationMessageFor(model => model.StockPlanQty, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.ProdPlanQty, "Prod Plan Qty", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(m => m.ProdPlanQty, new { @class = "form-control" })
+                                @Html.ValidationMessageFor(model => model.ProdPlanQty, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.PurchPlanQty, "Purch Plan Qty", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.PurchPlanQty, new { @class = "form-control required" })
+                                @Html.ValidationMessageFor(model => model.PurchPlanQty, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Remark, "Remark", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextAreaFor(m => m.Remark, new { @class = "form-control" })
+                                @Html.ValidationMessageFor(model => model.Remark, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer " style="padding: 19px 20px 0 20px; border-top:1px solid #8E8888">
+                    <button class="btn custom left" name="Command:Edit" type="submit" id="submit"><h2 style="margin:0px"><span class="glyphicon glyphicon-floppy-disk black"></span> </h2></button>
+
+                    <button class="btn custom" name="Command:Delete" id="delete" type="submit"><h2 style="margin:0px"><span class="glyphicon glyphicon-trash black"></span> </h2></button>
+
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+
+<script type="text/javascript">
+
+
+    $(document).ready(function () {
+        var id=@Model.MaterialPlanLineId;
+
+        CustomSelectFunction($("#ProductId"), '/ComboHelpList/GetProducts', '/ComboHelpList/SetSingleProducts', 'Enter Product Name', false, 3);
+
+
+        $("#ProductId").select2("focus");
+
+        var id=@Model.MaterialPlanLineId;
+        $('#delete','.modal-content').click(function (e) {
+            if(id>0)
+            {
+                var url = '/MaterialPlanLine/DeletePost';
+                $('form#modform').attr('action',url);
+                return;
+            }
+            else
+            {
+                return false;
+            }
+        })
+        if(id>0)
+        {
+            $('#ProdPlanQty').attr('readonly','true');
+            $('#StockPlanQty').attr('readonly','true');
+            $('#PurchPlanQty').attr('readonly','true');
+        }
+
+        $('.datepicker').datepicker({
+            format: 'dd/MM/yyyy',
+            "setDate": new Date(),
+            "autoclose": true
+
+        })
+    });
+
+
+    $('#StockPlanQty,#ProdPlanQty,#PurchPlanQty').change(validate);
+
+    function validate()
+    {
+        var total=(parseInt($('#StockPlanQty').val())||0)+(parseInt($('#ProdPlanQty').val())||0)+(parseInt($('#PurchPlanQty').val())||0);
+        var bal=parseInt(total-parseInt($('#RequiredQty').val()));
+        if( bal<0 )
+        {
+            $('#modform').find('#submit').attr('disabled','disabled');
+            if( !$('#modform').find('.modal-body #errormsg').length)
+            {
+                $('#modform').find('.modal-body').prepend("<div class='alert alert-danger'><span id=errormsg style='color:red'>Plan Qty should not be less than required qty</span></div>")}
+
+        }
+        else
+        {
+            $('#modform').find('#submit:disabled').removeAttr('disabled');
+            if( $('#modform').find('.modal-body #errormsg').length)
+            {
+                $('#modform').find('#errormsg').parent().remove();}
+        }
+      
+    }
+
+</script>

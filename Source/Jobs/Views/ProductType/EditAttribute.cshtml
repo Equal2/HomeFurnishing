@@ -1,0 +1,104 @@
+﻿@model Model.Models.ProductTypeAttribute
+
+@{
+    ViewBag.Title = "Edit";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(model => model.ProductTypeAttributeId)
+    @Html.HiddenFor(model => model.ProductType.ProductTypeId)
+    @Html.HiddenFor(model => model.CreatedBy)
+    @Html.HiddenFor(model => model.CreatedDate)
+
+    @*<fieldset class="form-horizontal">
+        <legend>Edit Product Type.</legend>*@
+
+    <div class="panel panel-default">
+
+        <div class="panel-heading">
+
+            <h4>
+                <span style="font-family: Calibri,sans-serif,Verdana"> Edit Product Attribute</span>
+            </h4>
+
+        </div>
+        <div class="panel-info" style="padding-left:15px">
+
+            <div class="form-horizontal">
+
+                
+                @Html.ValidationSummary(true)
+              
+
+                <div class="form-group" style="margin-top:15px">
+                    @Html.LabelFor(model => model.Name, new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.Name)
+                        @Html.ValidationMessageFor(model => model.Name)
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.Price, new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.Price)
+                        @Html.ValidationMessageFor(model => model.Price)
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-top:15px">
+                    @Html.LabelFor(model => model.IsMandatory, new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.IsMandatory)
+                        @Html.ValidationMessageFor(model => model.IsMandatory)
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.DataType, new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.DataType)
+                        @Html.ValidationMessageFor(model => model.DataType)
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.ListItem, new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.ListItem)
+                        @Html.ValidationMessageFor(model => model.ListItem)
+                    </div>
+                </div>
+
+                <hr />
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-10">
+                        <input type="submit" value="Save" class="btn-primary xxlarge" />
+                        <span style="font-family: Calibri,sans-serif,Verdana;font-size:large">
+                            |
+                            @Html.ActionLink("Back to List", "Edit", new { id = Model.ProductType.ProductTypeId})
+                        </span>
+                    </div>
+                </div>
+            </div>
+            @*</fieldset>*@
+        </div>
+    </div>
+}
+
+@*<div>
+   
+</div>*@
+
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#ProductTypeName').focus();
+    });
+</script>

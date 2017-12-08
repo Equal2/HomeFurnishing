@@ -1,0 +1,18 @@
+﻿
+@{
+    ViewBag.Title = "SaleDeliveryOrderExcelImport";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Sale Delivery Order Import</h2>
+
+    <p style="font:bold"><b>Check These Fields</b> </p>
+    @{
+        
+    <ul>
+        <p style="font:bold">@ViewBag.Error</p>
+    </ul>
+}
+
+    @Html.ActionLink("Go Back", "Index", "SaleDeliveryOrderExcelImport", new { @id = ViewBag.id }, new { @class = "btn btn-primary btn-sm col-md-offset-0 CurveBorder ActionLinkPadding" })
+    

@@ -1,0 +1,52 @@
+﻿
+
+
+ .panel-info .dropdown-toggle:hover {
+        color: #1AAFD0;
+    }
+
+    .btn-circle {
+        width: 35px;
+        height: 35px;
+        text-align: center;
+        padding: 4px 0;
+        font-size: 17px;
+        line-height: 1.428571429;
+        border-radius: 50%;
+        border: 2px solid grey;
+    }
+
+        .btn-circle:hover:before, .btn-circle:focus:before, .btn-circle:active:before {
+            color: #428bca;
+        }
+
+    .cbtn {
+        display: inline-block;
+        transition: all 0.3s ease;
+        color: grey;
+        text-decoration: none !important;
+    }
+
+    .cbtn {
+        opacity: 0.5;
+    }
+
+        .cbtn:hover {
+            opacity: 1;
+            color: #428bca;
+            border-color: #428bca;
+        }
+
+        .cbtn:focus.clicked {
+            animation: button-gradient-explosion 300ms;
+        }
+
+    .cbtn-selected {
+        color: #428bca;
+        border-color: #428bca;
+        opacity:1;
+    }
+        .cbtn-selected span.badge {
+            background-color: #428bca !important;
+            opacity:1;
+        }

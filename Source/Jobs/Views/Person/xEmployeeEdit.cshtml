@@ -1,0 +1,201 @@
+﻿@model Presentation.ViewModels.EmployeeViewModel
+
+@{
+    ViewBag.Title = "Edit";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+@using (Html.BeginForm("EmployeeEdit", "Person", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+    @*<fieldset class="form-horizontal">
+        <legend>Edit.</legend>*@
+    <div class="panel panel-default">
+
+        <div class="panel-heading">
+
+            <h4>
+                <span style="font-family: Calibri,sans-serif,Verdana"> Edit Employee.</span>
+            </h4>
+
+        </div>
+        <div class="panel-info" style="padding-left:15px">
+
+            <div class="form-horizontal">
+
+                @Html.ValidationSummary(true)
+                @Html.HiddenFor(model => model.Employee.PersonID)
+                @Html.HiddenFor(m => m.PersonAddress.PersonAddressID)
+
+                <div class="form-group" style="margin-top:15px">
+                    @Html.LabelFor(model => model.Employee.Name, new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.Employee.Name)
+                        @Html.ValidationMessageFor(model => model.Employee.Name)
+                    </div>
+                </div>
+
+                @*<div class="form-group">
+                    @Html.LabelFor(model => model.PersonType, new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.PersonType)
+                        @Html.ValidationMessageFor(model => model.PersonType)
+                    </div>
+                </div>*@
+
+
+                @*<div class="form-group">
+                    @Html.LabelFor(model => model.Code, new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.Code)
+                        @Html.ValidationMessageFor(model => model.Code)
+                    </div>
+                </div>*@
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.Employee.Active, new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.Employee.Active)
+                        @Html.ValidationMessageFor(model => model.Employee.Active)
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.Employee.Email, new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.Employee.Email)
+                        @Html.ValidationMessageFor(m => m.Employee.Email)
+                    </div>
+                </div> 
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.PersonAddress.Address, new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.PersonAddress.Address)
+                        @Html.ValidationMessageFor(m => m.PersonAddress.Address)
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.Employee.Mobile, new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.Employee.Mobile)
+                        @Html.ValidationMessageFor(m => m.Employee.Mobile)
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.Label("Country", new { @class = "control-label col-md-2" })
+
+                    <div class="col-md-10">
+                        @Html.DropDownList("CountryList", String.Empty)
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.Label("States", new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+
+                        @Html.DropDownList("StatesList", Enumerable.Empty<SelectListItem>(), string.Empty)
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(m => m.PersonAddress.CityId, new { @class = "control-label col-md-2" })
+
+                    <div class="col-md-10">
+                        @Html.DropDownListFor(m => m.PersonAddress.CityId, Enumerable.Empty<SelectListItem>(), string.Empty)
+                        @Html.ValidationMessageFor(m => m.PersonAddress.CityId)
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(model => model.PersonAddress.Zipcode, new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.PersonAddress.Zipcode)
+                        @Html.ValidationMessageFor(m => m.PersonAddress.Zipcode)
+                    </div>
+                </div>
+
+
+
+
+                <hr />
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-10">
+                        <input type="submit" value="Save" class="btn-primary xxlarge" />
+                        <span style="font-family: Calibri,sans-serif,Verdana;font-size:large">
+                            |@Html.ActionLink("Back to List", "EmployeeIndex")
+
+                        </span>
+                    </div>
+                </div>
+            </div>
+            @*</fieldset>*@
+        </div>
+    </div>
+}
+
+<script type="text/javascript">
+
+    $(function () {
+        $("#CountryList").change(function () {
+
+            var itemselected = $(this).val();
+            var stateslist = $("#StatesList");
+            $.ajax({
+                cache: false,
+                type: "POST",
+                url: "@(Url.Action("GetStatesJson"))",
+                data: { CountryId: itemselected },
+                success: function (data) {
+                    stateslist.html('');
+                    $("#CityId").html('');
+                    stateslist.append($('<option></option>').html('-Please Select-'));
+                    $.each(data, function (id, option) {
+                        stateslist.append($('<option> </option>').val(option.StateId).html(option.StateName));
+                    });
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    alert('Failed to Retrive' + thrownError);
+                }
+
+            });
+
+
+        });
+
+        $("#StatesList").change(function () {
+
+            var itemselected = $(this).val();
+            var citylist = $("#PersonAddress_CityId");
+            $.ajax({
+                cache: false,
+                type: "POST",
+                url: "@(Url.Action("GetCityJson"))",
+                data: { StateId: itemselected },
+            success: function (data) {
+                citylist.html('');
+                citylist.append($('<option></option>').html('-Please Select-'));
+                $.each(data, function (id, option) {
+                    citylist.append($('<option> </option>').val(option.CityId).html(option.CityName));
+                });
+            },
+            error: function (xhr, ajaxOptions, thrownError) {
+                alert('Failed to Retrive' + thrownError);
+            }
+
+        });
+
+
+    });
+
+
+    });
+
+
+</script>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

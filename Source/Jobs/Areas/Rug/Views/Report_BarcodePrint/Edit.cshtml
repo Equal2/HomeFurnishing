@@ -1,0 +1,74 @@
+﻿@model Model.Models.ReportHeader
+
+@{
+    ViewBag.Title = "Edit";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+@using (Html.BeginForm())
+{
+    <div class="panel panel-default">
+
+        <div class="panel-heading">
+
+            <h4>
+                <span style="font-family: Calibri,sans-serif,Verdana"> Edit ReportHeader.</span>
+            </h4>
+
+        </div>
+        <div class="panel-info" style="padding-left:15px">
+            @Html.AntiForgeryToken()
+            @Html.HiddenFor(model => model.ReportHeaderId)
+            <div class="form-horizontal">
+
+                
+                @Html.ValidationSummary(true)
+
+                <div class="form-group" style="padding-top:15px">
+                    @Html.LabelFor(model => model.ReportName, new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.ReportName)
+                        @Html.ValidationMessageFor(model => model.ReportName)
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Controller, new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(m => m.Controller)
+                        @Html.ValidationMessageFor(m => m.Controller)
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Action, new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(m => m.Action)
+                        @Html.ValidationMessageFor(m => m.Action)
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(m => m.SqlProc, new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(m => m.SqlProc)
+                        @Html.ValidationMessageFor(m => m.SqlProc)
+                    </div>
+                </div>
+
+                <hr />
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-10">
+                        <input type="submit" value="Save" class="btn-primary xxlarge" />
+
+                        <span style="font-family: Calibri,sans-serif,Verdana;font-size:large">
+                            |@Html.ActionLink("Back to List", "Index")
+
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}

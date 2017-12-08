@@ -1,0 +1,599 @@
+﻿@model Reports.ViewModels.SaleOrderSummaryLayout
+
+@{
+    ViewBag.Title = "Saler Order Summary";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+@using (Html.BeginForm("SaleOrderSummary", "Report_SaleOrderSummary", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(model => model.Currency)
+    @Html.HiddenFor(model => model.Buyer)
+    @Html.HiddenFor(model => model.ProductNature )
+    @Html.HiddenFor(model => model.ProductCategory )
+    @Html.HiddenFor(model => model.ProductType)
+    @Html.HiddenFor(model => model.ProductCollection)
+    @Html.HiddenFor(model => model.ProductQuality )
+    @Html.HiddenFor(model => model.ProductGroup)
+    @Html.HiddenFor(model => model.ProductStyle )
+    @Html.HiddenFor(model => model.ProductDesign)
+    @Html.HiddenFor(model => model.ProductShape)
+    @Html.HiddenFor(model => model.ProductSize )
+    @Html.HiddenFor(model => model.ProductInvoiceGroup  )
+    @Html.HiddenFor(model => model.ProductCustomGroup )
+    @Html.HiddenFor(model => model.ProductTag  )
+    @Html.HiddenFor(model => model.Product)
+    @Html.HiddenFor(model => model.SaleOrder)
+    @Html.HiddenFor(model => model.Site )
+    @Html.HiddenFor(model => model.Division)    
+
+    <div class="panel panel-default">
+        
+        <div class="panel-heading">
+            <h4>
+                <span style="font-family: Calibri,sans-serif,Verdana"> Sale Order Summary </span>
+                <input type="submit" name="Print:Excel" value="Excel" id="Print" class="btn btn-primary btn-sm CurveBorder height" style=" float: right; margin-left: 2px;" />
+                <input type="submit" name="Print:PDF" value="PDF" id="Print" class="btn btn-primary btn-sm CurveBorder height" style=" float : right " />                              
+             </h4>            
+        </div>
+
+        <div class="panel-info" style="padding-left:15px">
+            <div class="form-horizontal" role="form">
+                @Html.ValidationSummary(true)
+
+                <div class="row">@*/Beginning of Outer Div-Row/*@
+
+                    <h4 class="col-md-12" style="margin-top:15px">
+                        Formats
+                    </h4>
+
+                    <div>@*/Beginning of Formats Block/*@
+
+
+                        <div class="row">@*/Beginning of Inner Div-Row/*@
+                            <div class="col-md-6">
+                                <div class="form-group" style="margin-top:15px">
+                                    @Html.LabelFor(model => model.GroupOn, new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.DropDownListFor(model => model.GroupOn, new SelectList(ViewBag.GroupOn as System.Collections.IEnumerable, "Value", "Text"), new { @class = "form-control col-xs-6 height required" })
+                                        @Html.ValidationMessageFor(model => model.GroupOn)
+                                    </div>
+                                </div>
+                            </div>
+                        </div>@*/End of Inner Div-Row/*@
+
+
+                    </div>@*/End of Formats Block/*@
+
+
+                </div>@*/End of Outer Div-Row/*@
+
+                <hr />
+
+                <div class="row">@*/Beginning of Outer Div-Row/*@
+
+                    <h4 class="col-md-12" style="margin-top:15px">
+                        Filters
+                    </h4>
+
+                    <div>@*/Beginning of Filters Block/*@
+
+                        <div class="row">@*/Beginning of Inner Div-Row/*@
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.FromDate, new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(model => model.FromDate, "{0:dd/MMMM/yyyy}", new { @class = "datepicker form-control col-xs-6 required" })
+                                        @Html.ValidationMessageFor(model => model.FromDate)
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.ToDate, new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(model => model.ToDate, "{0:dd/MMMM/yyyy}", new { @class = "datepicker form-control col-xs-6 required" })
+                                        @Html.ValidationMessageFor(model => model.ToDate)
+                                    </div>
+                                </div>
+                            </div>
+                        </div>@*/End of Inner Div-Row/*@
+
+
+                        <div class="row">@*/Beginning of Inner Div-Row/*@
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.DocumentType , new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        <input type='hidden' name='SaleOrderDocumentTypeId' id='SaleOrderDocumentTypeId' class="form-control col-xs-6" />   
+                                        @Html.ValidationMessageFor(model => model.DocumentTypeId)
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.Currency, new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        <input type='hidden' name='CurrencyId' id='CurrencyId' class="form-control col-xs-6" />   
+                                        @Html.ValidationMessageFor(model => model.CurrencyId)
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.Buyer, new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        <input type='hidden' name='BuyerId' id='BuyerId' class="form-control col-xs-6" />   
+                                        @Html.ValidationMessageFor(model => model.BuyerId)
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.ProductNature , new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        <input type='hidden' name='ProductNatureId' id='ProductNatureId' class="form-control col-xs-6" />   
+                                        @Html.ValidationMessageFor(model => model.ProductNatureId)
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.ProductCategory , new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        <input type='hidden' name='ProductCategoryId' id='ProductCategoryId' class="form-control col-xs-6" />   
+                                        @Html.ValidationMessageFor(model => model.ProductCategoryId)
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.ProductTypeId, new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        <input type='hidden' name='ProductTypeId' id='ProductTypeId' class="form-control col-xs-6" />   
+                                        @Html.ValidationMessageFor(model => model.ProductTypeId)
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.ProductCollectionId, new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        <input type='hidden' name='ProductCollectionId' id='ProductCollectionId' class="form-control col-xs-6" />   
+                                        @Html.ValidationMessageFor(model => model.ProductCollectionId)
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.ProductQualityId, new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        <input type='hidden' name='ProductQualityId' id='ProductQualityId' class="form-control col-xs-6" />   
+                                        @Html.ValidationMessageFor(model => model.ProductQualityId)
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.ProductGroupId, new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        <input type='hidden' name='ProductGroupId' id='ProductGroupId' class="form-control col-xs-6" />   
+                                        @Html.ValidationMessageFor(model => model.ProductGroupId)
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.ProductStyleId, new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        <input type='hidden' name='ProductStyleId' id='ProductStyleId' class="form-control col-xs-6" />   
+                                        @Html.ValidationMessageFor(model => model.ProductStyleId)
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.ProductDesignId, new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        <input type='hidden' name='ProductDesignId' id='ProductDesignId' class="form-control col-xs-6" />   
+                                        @Html.ValidationMessageFor(model => model.ProductDesignId)
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.ProductShapeId, new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        <input type='hidden' name='ProductShapeId' id='ProductShapeId' class="form-control col-xs-6" />   
+                                        @Html.ValidationMessageFor(model => model.ProductShapeId)
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.ProductSizeId, new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        <input type='hidden' name='ProductSizeId' id='ProductSizeId' class="form-control col-xs-6" />   
+                                        @Html.ValidationMessageFor(model => model.ProductSizeId)
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.ProductInvoiceGroupId, new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        <input type='hidden' name='ProductInvoiceGroupId' id='ProductInvoiceGroupId' class="form-control col-xs-6" />   
+                                        @Html.ValidationMessageFor(model => model.ProductInvoiceGroupId)
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.ProductCustomGroupId, new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        <input type='hidden' name='ProductCustomGroupId' id='ProductCustomGroupId' class="form-control col-xs-6" />   
+                                        @Html.ValidationMessageFor(model => model.ProductCustomGroupId)
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.ProductTagId, new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        <input type='hidden' name='ProductTagId' id='ProductTagId' class="form-control col-xs-6" />   
+                                        @Html.ValidationMessageFor(model => model.ProductTagId)
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.ProductId, new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        <input type='hidden' name='ProductId' id='ProductId' class="form-control col-xs-6" />   
+                                        @Html.ValidationMessageFor(model => model.ProductId)
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.SaleOrderHeaderId, new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        <input type='hidden' name='SaleOrderHeaderId' id='SaleOrderHeaderId' class="form-control col-xs-6" />   
+                                        @Html.ValidationMessageFor(model => model.SaleOrderHeaderId)
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.SiteId, new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        <input type='hidden' name='SiteId' id='SiteId' class="form-control col-xs-6" />   
+                                        @Html.ValidationMessageFor(model => model.SiteId)
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.DivisionId, new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        <input type='hidden' name='DivisionId' id='DivisionId' class="form-control col-xs-6" />   
+                                        @Html.ValidationMessageFor(model => model.DivisionId)
+                                    </div>
+                                </div>
+                            </div>
+                        
+                        </div>@*/End of Inner Div-Row/*@                                     
+
+
+                    </div>@*/End of Filters Block/*@
+
+                </div>@*/End of Outer Div-Row/*@
+
+            </div>
+        </div>
+    </div>
+}
+
+<script>
+    $(document).ready(function () {
+
+        //For using Select2(selecting multiple items)
+        //MyFunction(elementId, string GetURL, string SetURL, string Placeholder, boolean Multiselect)
+        CustomSelectFunction($("#SiteId"), '/ComboHelpList/GetSite', '/ComboHelpList/SetSite', ' ', true, 0);
+        CustomSelectFunction($("#DivisionId"), '/ComboHelpList/GetDivision', '/ComboHelpList/SetDivision', ' ', true, 0);
+        CustomSelectFunction($("#CurrencyId"), '/ComboHelpList/GetCurrencys', '/ComboHelpList/SetCurrencys', ' ', true, 0);
+        CustomSelectFunction($("#BuyerId"), '/ComboHelpList/GetBuyers', '/ComboHelpList/SetBuyers', ' ', true, 0);
+        
+        CustomSelectFunction($("#ProductNatureId"), '/ComboHelpList/GetProductNature', '/ComboHelpList/SetProductNature', ' ', true, 0);
+        CustomSelectFunction($("#ProductCategoryId"), '/ComboHelpList/GetProductCategory', '/ComboHelpList/SetProductCategory', ' ', true, 0);
+        CustomSelectFunction($("#ProductTypeId"), '/ComboHelpList/GetProductType', '/ComboHelpList/SetProductType', ' ', true, 0);
+        CustomSelectFunction($("#ProductCollectionId"), '/ComboHelpList/GetProductCollection', '/ComboHelpList/SetProductCollection', ' ', true, 0);
+        CustomSelectFunction($("#ProductQualityId"), '/ComboHelpList/GetProductQuality', '/ComboHelpList/SetProductQuality', ' ', true, 0);
+        CustomSelectFunction($("#ProductGroupId"), '/ComboHelpList/GetProductGroup', '/ComboHelpList/SetProductGroup', ' ', true, 0);
+
+        CustomSelectFunction($("#ProductStyleId"), '/ComboHelpList/GetProductStyle', '/ComboHelpList/SetProductStyle', ' ', true, 0);
+        CustomSelectFunction($("#ProductDesignId"), '/ComboHelpList/GetProductDesign', '/ComboHelpList/SetProductDesign', ' ', true, 0);
+        CustomSelectFunction($("#ProductShapeId"), '/ComboHelpList/GetProductShape', '/ComboHelpList/SetProductShape', ' ', true, 0);
+        CustomSelectFunction($("#ProductSizeId"), '/ComboHelpList/GetProductSize', '/ComboHelpList/SetProductSize', ' ', true, 0);
+        CustomSelectFunction($("#ProductInvoiceGroupId"), '/ComboHelpList/GetProductInvoiceGroup', '/ComboHelpList/SetProductInvoiceGroup', ' ', true, 0);
+        CustomSelectFunction($("#ProductCustomGroupId"), '/ComboHelpList/GetProductCustomGroup', '/ComboHelpList/SetProductCustomGroupe', ' ', true, 0);
+        CustomSelectFunction($("#ProductId"), '/ComboHelpList/GetProducts', '/ComboHelpList/SetProducts', ' ', true, 3);
+        CustomSelectFunction($("#ProductTagId"), '/ComboHelpList/GetTag', '/ComboHelpList/SetTag', ' ', true, 0);
+
+
+        CustomSelectFunction($("#SaleOrderHeaderId"), '/ComboHelpList/GetSaleOrders', '/ComboHelpList/SetSaleOrders', ' ', true, 0);
+        CustomSelectFunction($("#SaleOrderDocumentTypeId"), '/ComboHelpList/GetSaleOrderDocumentType', '/ComboHelpList/SetSaleOrderDocumentType', ' ', true, 0);
+
+
+    });
+</script>
+
+<script>
+    var SIarr = [];
+    var DIarr = [];
+    var Buyarr = [];
+    var Curarr = [];
+
+    var PNaarr = [];
+    var PCaarr = [];
+    var PQarr = [];
+    var PStarr = [];
+    var PDearr = [];
+    var PSharr = [];
+    var PSiarr = [];
+    var PIGarr = [];
+    var PCGarr = [];
+    var arr = [];
+    var parr = [];
+    var tarr = [];
+    var typearr = [];
+    var carr = [];
+    var conarr = [];
+    var poarr = [];
+    var PTarr = [];
+    var darr = [];
+    $("#Print").click(function () {
+        //For Passing Ids String
+        $("#SiteId").val($('#SiteId').select2("val"));
+        $("#DivisionId").val($('#DivisionId').select2("val"));
+        $("#CurrencyId").val($('#CurrencyId').select2("val"));
+        $("#BuyerId").val($('#BuyerId').select2("val"));
+
+        $("#ProductNatureId").val($('#ProductNatureId').select2("val"));
+        $("#ProductCategoryId").val($('#ProductCategoryId').select2("val"));
+        $("#ProductTypeId").val($('#ProductTypeId').select2("val"));
+        $("#ProductCollectionId").val($('#ProductCollectionId').select2("val"));
+        $("#ProductQualityId").val($('#ProductQualityId').select2("val"));
+        $("#ProductGroupId").val($('#ProductGroupId').select2("val"));
+           
+        
+        
+        $("#ProductStyleId").val($('#ProductStyleId').select2("val"));
+        $("#ProductDesignId").val($('#ProductDesignId').select2("val"));
+        $("#ProductShapeId").val($('#ProductShapeId').select2("val"));
+        $("#ProductSizeId").val($('#ProductSizeId').select2("val"));
+        $("#ProductInvoiceGroupId").val($('#ProductInvoiceGroupId').select2("val"));
+        $("#ProductCustomGroupId").val($('#ProductCustomGroupId').select2("val"));
+        $("#ProductId").val($('#ProductId').select2('val'));
+        $("#ProductTagId").val($('#ProductTagId').select2("val"));
+
+        $("#SaleOrderHeaderId").val($('#SaleOrderHeaderId').select2("val"));
+        $("#SaleOrderDocumentTypeId").val($('#SaleOrderDocumentTypeId').select2("val"));
+       
+
+        //For Passing Parameter Names String for multi select text boxes
+
+        var selections = (JSON.stringify($('#SiteId').select2('data')));
+        var obj = jQuery.parseJSON(selections);
+        $.each(obj, function (key, value) {
+            SIarr.push(value.text);
+        });
+        $("#Site").val(SIarr);
+
+        var selections = (JSON.stringify($('#DivisionId').select2('data')));
+        var obj = jQuery.parseJSON(selections);
+        $.each(obj, function (key, value) {
+            DIarr.push(value.text);
+        });
+        $("#Division").val(DIarr);
+
+        var products = (JSON.stringify($('#CurrencyId').select2('data')));
+        var obj = jQuery.parseJSON(products);
+        $.each(obj, function (key, value) {
+            Curarr.push(value.text);
+        });
+        $("#Currency").val(Curarr);
+
+        var products = (JSON.stringify($('#BuyerId').select2('data')));
+        var obj = jQuery.parseJSON(products);
+        $.each(obj, function (key, value) {
+            Buyarr.push(value.text);
+        });
+        $("#Buyer").val(Buyarr);
+
+        var products = (JSON.stringify($('#ProductNatureId').select2('data')));
+        var obj = jQuery.parseJSON(products);
+        $.each(obj, function (key, value) {
+            PNaarr.push(value.text);
+        });
+        $("#ProductNature").val(PNaarr);
+
+        var products = (JSON.stringify($('#ProductCategoryId').select2('data')));
+        var obj = jQuery.parseJSON(products);
+        $.each(obj, function (key, value) {
+            PCaarr.push(value.text);
+        });
+        $("#ProductCategory").val(PCaarr);
+
+
+        var products = (JSON.stringify($('#ProductTypeId').select2('data')));
+        var obj = jQuery.parseJSON(products);
+        $.each(obj, function (key, value) {
+            typearr.push(value.text);
+        });
+        $("#ProductType").val(typearr);
+
+        var products = (JSON.stringify($('#ProductCollectionId').select2('data')));
+        var obj = jQuery.parseJSON(products);
+        $.each(obj, function (key, value) {
+            carr.push(value.text);
+        });
+        $("#ProductCollection").val(carr);
+
+        var products = (JSON.stringify($('#ProductQualityId').select2('data')));
+        var obj = jQuery.parseJSON(products);
+        $.each(obj, function (key, value) {
+            PQarr.push(value.text);
+        });
+        $("#ProductQuality").val(PQarr);
+
+        var products = (JSON.stringify($('#ProductGroupId').select2('data')));
+        var obj = jQuery.parseJSON(products);
+        $.each(obj, function (key, value) {
+            tarr.push(value.text);
+        });
+        $("#ProductGroup").val(tarr);
+
+        var products = (JSON.stringify($('#ProductStyleId').select2('data')));
+        var obj = jQuery.parseJSON(products);
+        $.each(obj, function (key, value) {
+            PStarr.push(value.text);
+        });
+        $("#ProductStyle").val(PStarr);
+
+        var products = (JSON.stringify($('#ProductDesignId').select2('data')));
+        var obj = jQuery.parseJSON(products);
+        $.each(obj, function (key, value) {
+            PDearr.push(value.text);
+        });
+        $("#ProductDesign").val(PDearr);
+
+        var products = (JSON.stringify($('#ProductShapeId').select2('data')));
+        var obj = jQuery.parseJSON(products);
+        $.each(obj, function (key, value) {
+            PSharr.push(value.text);
+        });
+        $("#ProductShape").val(PSharr);
+
+        var products = (JSON.stringify($('#ProductSizeId').select2('data')));
+        var obj = jQuery.parseJSON(products);
+        $.each(obj, function (key, value) {
+            PSiarr.push(value.text);
+        });
+        $("#ProductSize").val(PSiarr);
+
+        var products = (JSON.stringify($('#ProductInvoiceGroupId').select2('data')));
+        var obj = jQuery.parseJSON(products);
+        $.each(obj, function (key, value) {
+            PIGarr.push(value.text);
+        });
+        $("#ProductInvoiceGroup").val(PIGarr);
+
+        var products = (JSON.stringify($('#ProductCustomGroupId').select2('data')));
+        var obj = jQuery.parseJSON(products);
+        $.each(obj, function (key, value) {
+            PCGarr.push(value.text);
+        });
+        $("#ProductCustomGroup").val(PCGarr);
+
+        var products = (JSON.stringify($('#ProductId').select2('data')));
+        var obj = jQuery.parseJSON(products);
+        $.each(obj, function (key, value) {
+            carr.push(value.text);
+        });
+        $("#Product").val(carr);
+
+        var products = (JSON.stringify($('#ProductTagId').select2('data')));
+        var obj = jQuery.parseJSON(products);
+        $.each(obj, function (key, value) {
+            PTarr.push(value.text);
+        });
+        $("#ProductTag").val(PTarr);
+
+
+        var products = (JSON.stringify($('#SaleOrderHeaderId').select2('data')));
+        var obj = jQuery.parseJSON(products);
+        $.each(obj, function (key, value) {
+            poarr.push(value.text);
+        });
+        $("#SaleOrder").val(poarr);
+
+
+
+        var products = (JSON.stringify($('#SaleOrderDocumentTypeId').select2('data')));
+        var obj = jQuery.parseJSON(products);
+        $.each(obj, function (key, value) {
+            darr.push(value.text);
+        });
+        $("#SaleOrderDocumentType").val(darr);
+
+
+
+        //For Passing Parameter Names String for Combo boxes
+        //$("#ProductType").val($('option:selected', $("#ProductTypeId")).text());
+        //$("#ProductGroup").val($('option:selected', $("#ProductGroupId")).text());
+        //$("#ProductConstruction").val($('option:selected', $("#ProductConstructionId")).text());
+        //$("#ProductCollection").val($('option:selected', $("#ProductCollectionId")).text());
+        //$("#SaleOrder").val($('option:selected', $("#SaleOrderHeaderId")).text());
+        //$("#Currency").val($('option:selected', $("#CurrencyId")).text());
+        //$("#Buyer").val($('option:selected', $("#BuyerId")).text());
+        //$("#PODocumentType").val($('option:selected', $("#PODocumentTypeId")).text());
+    });
+</script>
+
+<script type="text/javascript">
+    @*$(function () {
+        $("#BuyerId").change(function () {
+            debugger;
+
+            var selectedList = $("#BuyerId").select2("val").toString();
+            var id = parseInt($("#BuyerId").val());
+            $.ajax({
+                cache: "False",
+                type: "POST",
+                url: "@(Url.Action("GetPoForBuyer"))",
+                data: { BuyerId: selectedList },
+            success: function (data) {
+                $("#SaleOrderHeaderId").html('');
+                $("#SaleOrderHeaderId").append($('<option></option>').html(''))
+                $.each(data, function (id, option) {
+                    $("#SaleOrderHeaderId").append($('<option></option>').val(option.SaleOrderHeaderId).html(option.DocNo));
+                });
+
+
+            },
+            error:function(xhr, ajaxoptions, error)
+            {
+                alert("Failed to retrieve the data" + error);
+            }
+        })
+
+    });
+
+    });*@
+</script>

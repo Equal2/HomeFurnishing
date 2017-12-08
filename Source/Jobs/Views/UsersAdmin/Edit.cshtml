@@ -1,0 +1,58 @@
+﻿@model Module.Controllers.SelectUserRolesViewModel
+@{
+    ViewBag.Title = "Edit";
+}
+
+@using (Html.BeginForm("UserRoles", "UsersAdmin", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(model => model.UserId)
+    @*@Html.HiddenFor(model => model.Roles)*@
+
+    <div class="panel panel-default">
+
+        <div class="panel-heading">
+
+            <h3>
+                <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-file black"></span>Add Roles</span>
+                <input type="submit" value="Save" class="btn btn-primary right" id="submit" style="width: 90px; background-color: #2980b9" />
+            </h3>
+            <hr style="margin-top:0px;margin-bottom:0px" />
+
+            <div class="panel-info">
+                <h4 style="padding:5px 0 0 0;margin:0px">
+                    @Html.ActionLink(" ", " ", " ", null, new { @class = "glyphicon glyphicon-refresh toolbar", @title = "Refresh Page", @data_toggle = "tooltip", @id = "RefreshPage" })
+                    @Html.ActionLink(" ", "Create", "UsersAdmin", null, new { @class = "glyphicon glyphicon-plus toolbar", @title = "Add New", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "Index", "UsersAdmin", null, new { @class = "glyphicon glyphicon-list toolbar right", @title = "List", @data_toggle = "tooltip" })
+                </h4>
+            </div>
+
+        </div>
+        <div class="panel panel-info" style="padding-left:15px;padding-right:10px">
+
+            <div class="form-group">
+                <div class="col-md-10">
+                    <h4><span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold"> User Name :  @Html.DisplayFor(model => model.UserName) </span></h4>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-10">
+                    <table>
+                        <tr>
+                            <th>
+                                Select &nbsp;
+                            </th>
+                            <th>
+                                Role
+                            </th>
+                        </tr>
+                        @Html.EditorFor(model => model.Roles)
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+}

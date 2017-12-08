@@ -1,0 +1,216 @@
+﻿@model Model.ViewModel.SaleOrderQtyAmendmentLineViewModel
+@using Core.Common
+
+<div class="modal-content">
+    <div class="modal-header" style="border-bottom: 1px solid #8E8888">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"> <span class="glyphicon glyphicon-remove"></span></button>
+        <h3>
+            <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-file black"></span> Sale Order Amendment</span>
+        </h3>
+    </div>
+    <div>
+        @using (Html.BeginForm("_CreatePost", "SaleOrderQtyAmendmentLine", FormMethod.Post, new { enctype = "multipart/form-data", id = "modform" }))
+        {
+            @Html.ValidationLog((string)TempData["CSEXCL"])
+            @Html.AntiForgeryToken()
+
+            @Html.HiddenFor(model => model.SaleOrderAmendmentHeaderId)
+            @Html.HiddenFor(m => m.SaleOrderQtyAmendmentLineId)
+            @Html.HiddenFor(m => m.SaleOrderLineId)
+            @Html.HiddenFor(m => m.BuyerId)
+
+            <div class="form-horizontal modal-body">
+
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.ProductId, "Product", new { @class = "control-label col-md-4 col-sm-2 " })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.ProductId, new { @class = "form-control col-xs-7 required" })
+                                @Html.ValidationMessageFor(model => model.ProductId, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.SaleOrderLineId, "Sale Order", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBox(" ", " ", new { @class = "form-control", @id = "acorders" })
+                                @Html.ValidationMessageFor(model => model.SaleOrderLineId, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.CurrentQty, "Order Qty", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10" style="padding:0px;">
+                                <div class="col-xs-7" style="padding-right:0px;">
+                                    @Html.TextBoxFor(model => model.CurrentQty, new { @class = "form-control required cusrightnormal", @readonly = "true" })
+                                    @Html.ValidationMessageFor(model => model.CurrentQty, "", new { @class = "text-danger" })
+                                </div>
+                                <div class="col-xs-5" style="padding-left:0px">
+                                    @Html.TextBoxFor(m => m.UnitId, new { @class = "form-control col-xs-2 cusleftnormal", @readonly = "true" })
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Qty, "Amendment Qty", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(m => m.Qty, new { @class = "form-control" })
+                                @Html.ValidationMessageFor(model => model.Qty, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Remark, "Remark", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextAreaFor(model => model.Remark, new { @class = "form-control required" })
+                                @Html.ValidationMessageFor(model => model.Remark, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+
+                </div>
+
+                <div class="modal-footer " style="padding: 19px 20px 0 20px; border-top:1px solid #8E8888">
+                    @if (ViewBag.LineMode == "Edit" || ViewBag.LineMode == "Create")
+                    {<button class="btn custom left" name="Command:Edit" type="submit" id="submit"><h2 style="margin:0px"><span class="glyphicon glyphicon-floppy-disk black"></span> </h2></button>
+                    }
+                    @if (ViewBag.LineMode == "Delete")
+                    {<button class="btn custom" name="Command:Delete" id="delete" type="submit"><h2 style="margin:0px"><span class="glyphicon glyphicon-trash black"></span> </h2></button>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@if (Model.SaleOrderQtyAmendmentLineId <= 0)
+{
+    <script type="text/javascript">
+        $("#acorders").autocomplete({
+            change: function (event, ui) {
+
+                if (ui.item == null || ui.item.value == undefined) {
+                    $("#acorders").val("");
+                    $('#SaleOrderLineId').val("");
+                }
+
+                if ($("#acorders").val() == "") {
+                    $('#SaleOrderLineId').val("");
+                }
+
+                if ($('#SaleOrderLineId').val() != "") {
+                    $.ajax({
+                        cache: false,
+                        type: "POST",
+                        url: "@(Url.Action("GetLineDetail"))",
+                        data: { LineId: $("#SaleOrderLineId").val() },
+                        success: function (data) {
+
+                            $('#CurrentQty').val(data.Qty);
+                            $('#UnitId').val(data.UnitId);
+                        },
+                        error: function (xhr, ajaxOptions, thrownError) {
+                            alert('Failed to retrieve product details.' + thrownError);
+                        }
+                    });
+                }
+                else if ($('#SaleOrderLineId').val() == "") {
+                    $('#Qty').val(0);
+                    $('#CurrentQty').val(0);
+                    $('#UnitId').val("");
+                }
+            }
+        });
+
+
+
+        $("#acorders").autocomplete({
+            source: function (request, response) {
+                $.ajax({
+                    cache: false,
+                    type: "POST",
+                    url: "@(Url.Action("GetSaleOrders"))",
+                    data: { ProductId: $("#ProductId").val(), BuyerId: $("#BuyerId").val() },
+                    success: function (data) {
+
+                        var cachearray = data.error ? [] : $.map(data, function (m) {
+                            return {
+                                value: m.DocNo,
+                                key: m.SaleOrderLineId,
+                            };
+                        });
+                        response(cachearray);
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        alert('Failed to retrieve Pending Orders.' + thrownError);
+                    }
+                });
+            },
+            appendTo: $("#myModalContent"),
+            select: function (event, ui) {
+                // prevent autocomplete from updating the textbox
+                // navigate to the selected item's url
+                if ($("#acorders").val() == "") {
+                    $('#SaleOrderLineId').val("");
+                }
+                else
+                    $("#SaleOrderLineId").val(ui.item.key);
+
+            },
+
+        }).data("ui-autocomplete")._renderItem = function (ul, item) {
+            var $a = $("<a></a>");
+            $("<strong></strong>").text(item.value).appendTo($a);
+            return $("<li></li>").append($a).appendTo(ul);
+        }
+
+
+        $("#acorders").bind("focus", function () {
+            $(this).keydown();
+        })
+    </script>
+}
+
+
+
+
+
+
+<script type="text/javascript">
+    $(function () {
+        CustomSelectFunction($("#ProductId"), '/ComboHelpList/GetProducts', '/ComboHelpList/SetSingleProducts', 'Enter Product Name', false, 3);
+        $("#ProductId").select2("focus");
+    });
+
+    var id = '@Model.SaleOrderQtyAmendmentLineId';
+    if (id > 0) {
+        var order = '@Model.SaleOrderDocNo';
+        $('#acorders').val(order).attr('disabled', 'disabled');
+        $('#ProductId').attr('readonly', 'true');
+
+    }
+
+    $('#delete', '.modal-content').click(function (e) {
+        if (id > 0) {
+            var url = '/SaleOrderQtyAmendmentLine/DeletePost';
+            $('form').attr('action', url);
+            return;
+        }
+        else {
+            return false;
+        }
+    })
+
+</script>

@@ -1,0 +1,301 @@
+﻿
+@model Model.ViewModel.CalculationFooterViewModel
+@using Core.Common
+
+<div class="modal-content">
+    <div class="modal-header" style="border-bottom: 1px solid #8E8888">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"> <span class="glyphicon glyphicon-remove"></span></button>
+        <h3>
+            <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-file black"></span> Footer</span>
+        </h3>
+    </div>
+    <div>
+        @using (Html.BeginForm("_CreatePost", "CalculationFooter", FormMethod.Post, new { enctype = "multipart/form-data", id = "modform" }))
+        {
+            @Html.AntiForgeryToken()
+
+            @Html.HiddenFor(model => model.CalculationId)
+            @Html.HiddenFor(m => m.Id)            
+
+            <div class="form-horizontal modal-body">
+
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                <div class="row">
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.ChargeId, "Charge", new { @class = "control-label col-xs-4 " })
+                            <div class="col-xs-7">
+                                @Html.TextBoxFor(model => model.ChargeId, new { @class = "form-control col-xs-7 height" })
+                                @Html.ValidationMessageFor(model => model.ChargeId, "", new { @class = "text-danger" })
+                            </div>                            
+                        </div>                       
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.AddDeduct, "Add/Deduct", new { @class = "control-label col-xs-4" })
+                            <div class="col-xs-7">
+                                @Html.DropDownListFor(m=>m.AddDeduct,new SelectList(ViewBag.AddList as System.Collections.IEnumerable,"Value","Text"),string.Empty, new { @class = "form-control height"})
+                                @Html.ValidationMessageFor(model => model.AddDeduct, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>                  
+                </div>
+
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.AffectCost, "Affect Cost", new { @class = "control-label col-xs-4 " })
+                            <div class="col-xs-7">
+                                @Html.DropDownListFor(model => model.AffectCost,new SelectList(ViewBag.AffectList as System.Collections.IEnumerable,"Value","Text"), new { @class = "form-control col-xs-7 required height" })
+                                @Html.ValidationMessageFor(model => model.AffectCost, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.ChargeTypeId, "Charge Type", new { @class = "control-label col-xs-4" })
+                            <div class="col-xs-7">
+                                @Html.TextBoxFor(model => model.ChargeTypeId, new { @class = "form-control col-xs-7 required" })
+                                @Html.ValidationMessageFor(model => model.ChargeTypeId, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>   
+                          
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.ProductChargeId, "Product Charge", new { @class = "control-label col-xs-4" })
+                            <div class="col-xs-7">
+                                @Html.TextBoxFor(model => model.ProductChargeId, new { @class = "form-control col-xs-7 required" })
+                                @Html.ValidationMessageFor(model => model.ProductChargeId, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>       
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.CalculateOnId, "Calculate On", new { @class = "control-label col-xs-4" })
+                            <div class="col-xs-7">
+                                @Html.DropDownListFor(m => m.CalculateOnId, new SelectList(ViewBag.CalculateOnList as System.Collections.IEnumerable, "ChargeId", "ChargeName"), string.Empty, new { @class = "form-control height" })
+                                @Html.ValidationMessageFor(model => model.CalculateOnId, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                                               
+                </div>
+
+                @*<div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.LedgerAccountDrId, "Ledger A/c (Dr.)", new { @class = "control-label col-xs-4" })
+                            <div class="col-xs-7">
+                                @Html.DropDownListFor(model => model.LedgerAccountDrId, new SelectList(ViewBag.LedgerAccountList as System.Collections.IEnumerable, "LedgerAccountId", "LedgerAccountName"), string.Empty, new { @class = "form-control col-xs-7 height" })
+                                @Html.ValidationMessageFor(model => model.LedgerAccountDrId, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>     
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.LedgerAccountCrId, "Ledger A/c (Cr.)", new { @class = "control-label col-xs-4" })
+                            <div class="col-xs-7">
+                                @Html.DropDownListFor(model => model.LedgerAccountCrId, new SelectList(ViewBag.LedgerAccountList as System.Collections.IEnumerable, "LedgerAccountId", "LedgerAccountName"), string.Empty, new { @class = "form-control col-xs-7 height" })
+                                @Html.ValidationMessageFor(model => model.LedgerAccountCrId, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>    
+                </div>*@
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.CostCenterId, "Cost Center", new { @class = "control-label col-xs-4" })
+                            <div class="col-xs-7">
+                                @Html.TextBoxFor(model => model.CostCenterId, new { @class = "form-control required" })
+                                @Html.ValidationMessageFor(model => model.CostCenterId, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.RateType, "Rate Type", new { @class = "control-label col-xs-4 " })
+                            <div class="col-xs-7">
+                                @Html.DropDownListFor(model => model.RateType, new SelectList(ViewBag.RateTypeList as System.Collections.IEnumerable, "Value", "Text"), new { @class = "form-control col-xs-7 height" })
+                                @Html.ValidationMessageFor(model => model.RateType, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                    
+                
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Rate, "Rate", new { @class = "control-label col-xs-4" })
+                            <div class="col-xs-7">
+                                @Html.TextBoxFor(model => model.Rate, new { @class = "form-control col-xs-7 required" })
+                                @Html.ValidationMessageFor(model => model.Rate, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.IncludedInBase, "Included in Base", new { @class = "control-label col-xs-4" })
+                            <div class="col-xs-7">
+                                @Html.DropDownListFor(model => model.IncludedInBase, new SelectList(ViewBag.IncludedList as System.Collections.IEnumerable, "Value", "Text"), new { @class = "form-control required height" })
+                                @Html.ValidationMessageFor(model => model.IncludedInBase, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                 
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.ParentChargeId, "Parent Charge", new { @class = "control-label col-xs-4" })
+                            <div class="col-xs-7">
+                                @Html.TextBoxFor(m => m.ParentChargeId, new { @class = "form-control height" })
+                                @Html.ValidationMessageFor(model => model.ParentChargeId, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Amount, "Amount", new { @class = "control-label col-xs-4" })
+                            <div class="col-xs-7">
+                                @Html.TextBoxFor(model => model.Amount, new { @class = "form-control col-xs-7 required" })
+                                @Html.ValidationMessageFor(model => model.Amount, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>     
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Sr, "Sr", new { @class = "control-label col-xs-4" })
+                            <div class="col-xs-7">
+                                @Html.TextBoxFor(model => model.Sr, new { @class = "form-control col-xs-7" })
+                                @Html.ValidationMessageFor(model => model.Sr, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>     
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.IncludedCharges, "Incl.Charges", new { @class = "control-label col-xs-4" })
+                            <div class="col-xs-7">
+                                @Html.TextBoxFor(model => model.IncludedCharges, new { @class = "form-control col-xs-7" })
+                                @Html.ValidationMessageFor(model => model.IncludedCharges, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+             <div class="row">
+                 <div class="col-md-6">
+                     <div class="form-group">
+                         @Html.LabelFor(model => model.IncludedChargesCalculation, "Incl.Calculation", new { @class = "control-label col-xs-4" })
+                         <div class="col-xs-7">
+                             @Html.TextBoxFor(model => model.IncludedChargesCalculation, new { @class = "form-control col-xs-7" })
+                             @Html.ValidationMessageFor(model => model.IncludedChargesCalculation, "", new { @class = "text-danger" })
+                         </div>
+                     </div>
+                 </div>
+                 <div class="col-md-6">
+                     <div class="form-group">
+                         @Html.LabelFor(model => model.IsVisible, "Is Visible", new { @class = "control-label col-xs-4 " })
+                         <div class="col-xs-7">
+                             @Html.DropDownListFor(model => model.IsVisible, new SelectList(ViewBag.AffectList as System.Collections.IEnumerable, "Value", "Text"), new { @class = "form-control col-xs-7 height" })
+                             @Html.ValidationMessageFor(model => model.IsVisible, "", new { @class = "text-danger" })
+                         </div>
+                     </div>
+                 </div>
+             </div>
+
+                <div class="modal-footer " style="padding: 19px 20px 0 20px; border-top:1px solid #8E8888">
+                    <button class="btn custom left" name="Command:Edit" type="submit"><h2 style="margin:0px" id="submit"><span class="glyphicon glyphicon-floppy-disk black"></span> </h2></button>
+                    <button class="btn custom" name="Command:Delete" id="delete" type="submit"><h2 style="margin:0px"><span class="glyphicon glyphicon-trash black"></span> </h2></button>
+                </div>
+                
+            </div>
+        }
+    </div>
+</div>
+
+<script type="text/javascript">
+
+    var id=@Model.Id;
+
+    $(document).ready(function(){
+        CustomSelectFunction($("#CostCenterId"), '/ComboHelpList/GetCostCenterWithDocType', '/ComboHelpList/SetSingleCostCenter', ' ', false, 1);
+        CustomSelectFunction($("#ChargeTypeId"), '/ComboHelpList/GetChargeTypeList', '/ComboHelpList/SetSingleChargeType', ' ', false, 1);   
+        CustomSelectFunction($("#ProductChargeId"), '/ComboHelpList/GetChargeList', '/ComboHelpList/SetSingleCharge', ' ', false, 1); 
+        CustomSelectFunction($("#ChargeId"), '/ComboHelpList/GetChargeList', '/ComboHelpList/SetSingleCharge', ' ', false, 1);
+        CustomSelectFunction($("#IncludedCharges"), '/ComboHelpList/GetChargeListWithCode', '/ComboHelpList/SetChargeWithCode', ' ', true, 1);
+        CustomSelectFunction($("#ParentChargeId"), '/ComboHelpList/GetChargeList', '/ComboHelpList/SetSingleCharge', ' ', false, 1); 
+    })
+
+    $('#delete','.modal-content').click(function (e) {
+        if(id>0)
+        {
+            var url = '/CalculationFooter/DeletePost';
+            $('form#modform').attr('action',url);
+            return;
+        }
+        else
+        {
+            return false;
+        }
+    });
+
+    
+
+    
+        
+        $('#ProductChargeId').change(DisableFields);
+
+        $('#ChargeTypeId').change(Disable2Fields);
+
+        function Disable2Fields(){
+            if($('#ChargeTypeId option:selected').text()=="Round Off"||$('#ChargeTypeId option:selected').text()=="Amount"||$('#ChargeTypeId option:selected').text()=="Sub Total")
+            {
+                $('#Rate').attr('disabled','disabled');
+                $('#RateType').val($('#RateType option').filter(function () { return $(this).html() == "NA"; }).val()).find('option:not(:selected)').attr('disabled','disabled');
+                
+            }
+            else
+            {
+                $('#RateType option').removeAttr('disabled');
+                $('#Rate').removeAttr('disabled');
+            }
+
+        }
+
+
+        function DisableFields(){
+            if($('#ProductChargeId').val()!='')
+            {          
+                $('#CalculateOnId').val('').find('option:not(:selected)').attr('disabled','disabled');
+                $('#RateType').val($('#RateType option').filter(function () { return $(this).html() == "NA"; }).val()).find('option:not(:selected)').attr('disabled','disabled');
+                $('#Rate').val(0).attr('readonly',true);
+                $('#ParentChargeId').val('').find('option:not(:selected)').attr('disabled','disabled');
+            }
+            else
+            {
+                $('#CalculateOnId option').removeAttr('disabled');
+                $('#RateType option').removeAttr('disabled');
+                $('#Rate').removeAttr('readonly');
+                $('#ParentChargeId option').removeAttr('disabled');
+
+            }
+
+        };
+    
+        
+        if($('#CalculationFooterLineId').val()>0)
+        {
+                DisableFields();
+        }
+
+</script>

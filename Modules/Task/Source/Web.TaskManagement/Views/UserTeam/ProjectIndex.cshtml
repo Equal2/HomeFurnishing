@@ -1,0 +1,71 @@
+﻿@model IEnumerable<Model.Tasks.ViewModel.ProjectIndexViewModel>
+
+@{
+    ViewBag.Title = "Project List";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3>
+            <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-list black"></span> @ViewBag.UserId / Project List</span>
+        </h3>
+        <hr style="margin-top:0px;margin-bottom:0px" />
+
+        <div class="panel-info">
+            <h4 style="padding:5px 0 0 0;margin:0px">
+                @Html.ActionLink(" ", " ", " ", null, new { @class = "glyphicon glyphicon-refresh toolbar", @title = "Refresh Page", @data_toggle = "tooltip", @id = "RefreshPage" })
+                @Html.ActionLink(" ", "UserIndex", "UserTeam", null, new { @class = "glyphicon glyphicon-list toolbar right", @title = "List", @data_toggle = "tooltip" })
+            </h4>
+        </div>
+
+    </div>
+    <div class="panel-info" style="width:100%">
+        <div class="Wrapper">
+            @if (Model.Where(m => m.UserTeamCount > 0).Count() > 0)
+            {
+                <h4 class="col-md-12 black">
+                    <span class="glyphicon glyphicon-align-justify"></span>
+                    Active Projects
+                </h4>
+                foreach (var item in Model.Where(m => m.UserTeamCount > 0))
+                {
+                    <div class="Box">
+
+                        <a href="/UserTeam/Index/@item.ProjectId?UserId=@ViewBag.UserId">
+                            <div class="InnerContent">
+                                <span class="badge" style="float: right; background-color: #E84848">@( (item.UserTeamCount.Value > 0) ? (item.UserTeamCount.Value.ToString()) : "")</span>
+                                <div style="width: 100%; height: 100%">
+                                    <h1><span class="glyphicon glyphicon-alert" style="width:100%;height:100%"></span></h1>
+                                </div>
+                                <div class="titleBox">@item.ProjectName</div>
+                            </div>
+                        </a>
+                    </div>
+                }
+            }
+            <h4 class="col-md-12 black">
+                <span class="glyphicon glyphicon-align-justify"></span>
+                InActive Projects
+            </h4>
+            @foreach (var item in Model.Where(m => m.UserTeamCount <= 0))
+            {
+                <div class="Box">
+
+                    <a href="/UserTeam/Index/@item.ProjectId?UserId=@ViewBag.UserId">
+                        <div class="InnerContent">
+                            <span class="badge" style="float: right; background-color: #E84848">@( (item.UserTeamCount.Value > 0) ? (item.UserTeamCount.Value.ToString()) : "")</span>
+                            <div style="width: 100%; height: 100%">
+                                <h1><span class="glyphicon glyphicon-alert" style="width:100%;height:100%"></span></h1>
+                            </div>
+                            <div class="titleBox">@item.ProjectName</div>
+                        </div>
+                    </a>
+                </div>
+            }
+
+        </div>
+    </div>
+
+
+</div> 

@@ -1,0 +1,214 @@
+﻿@model Model.ViewModels.SaleOrderLineViewModel
+@using Core.Common
+
+@{
+    ViewBag.Title = "Update Sale Expiry";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<link href="~/Content/DataTables/css/jquery.dataTables.min.css" rel="stylesheet" />
+<link href="~/Content/DataTables/css/scroller.dataTables.min.css" rel="stylesheet" />
+
+<script src="~/Scripts/DataTables/jquery.dataTables.min.js"></script>
+<script src="~/Scripts/DataTables/dataTables.scroller.js"></script>
+<style type="text/css">
+    .DTHidden {
+        display: none;
+    }
+
+    .TextRight {
+        text-align: right;
+    }
+
+    .dataTable {
+        font-size: 13px !important;
+        line-height: 1;
+    }
+
+    table.dataTable tbody td {
+        padding: 2px 10px;
+    }
+</style>
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3>
+            <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"> <span class="glyphicon glyphicon-file black"></span>@ViewBag.DocTypeName Expiry Date Revision</span>
+        </h3>
+    </div>
+
+    <div class="panel-info" style="padding-left:15px">
+        <div class="form-horizontal">
+            @Html.ValidationSummary(true)
+
+            <div class="row">
+                <div>
+
+                    <div class="col-md-12">
+                        <div>
+                            <div class="form-group" style="margin-left:0px;margin-right:0px;margin-top:15px">
+                                <strong> @ViewBag.DocTypeName Expiring in next  <input type="text" value="15" id="ExpiryDays" style="max-width:50px;"/> Days</strong> |
+                                <input type="checkbox" id="ShowExpired" checked/> <strong> Show Expired Records</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <hr style="margin-top:0px;margin-bottom:0px" />
+
+        <div style="margin:20px;">
+            <table id="example" class="display" cellspacing="0" width="100%">
+                <thead style="background: #428bca;color:white">
+                    <tr>
+                        <th>DocType</th>
+                        <th>DocNo</th>
+                        <th>Date</th>
+                        <th>Due Date</th>
+                        <th>IsRevised</th>
+                        <th>New DueDate</th>
+                        <th>Reason</th>
+                        <th>ProdOrderLineId</th>
+                    </tr>
+                </thead>
+                <tfoot>
+                    <tr>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    var selected = [];
+    $(document).ready(function () {
+        var Id = '@ViewBag.Id';
+   //     var tab = $('#example').dataTable({
+   //         select: true,
+   //         processing: true,
+   //         serverSide: true,
+   //         info: true,
+   //         stateSave: true,
+   //         lengthMenu: [[10, 20, 50, -1], [10, 20, 50]],
+   //         ajax: {
+   //             "url": "/UpdateSaleOrderExpiry/AjaxGetJsonData/?DueDays=" + $('#ExpiryDays').val() + "&ShowExpired=" + $('#ShowExpired').prop('checked') + "&DocType=" + Id,
+   //             "type": "POST"
+   //         },
+   //         columns: [
+   //             { "data": "DocTypeName", "width": "12%", "sortable": false },
+   //              { "data": "SaleOrderNo", "width": "12%", "sortable": false },
+   //              { "data": "SDocDate", "width": "10%", "sortable": false },
+   //              { "data": "SDueDate", "width": "13%", "sortable": false },
+   //              { "data": "Revised", "width": "11%", "sortable": false },
+   //              { "data": "NewDueDate", "width": "15%", "render": function (data, type, row) { return '<input style="width:100%;" class="datepickerForExpiry DueDate" type="text" name="DueDate' + row.SaleOrderHeaderId + '" id="DueDate' + row.SaleOrderHeaderId + '" />'; }, "sortable": false },
+   //              { "data": "Reason", "width": "27%", "render": function (data, type, row) { return '<input style="width:100%;" class="Reason"  type="text" name="Reason' + row.SaleOrderHeaderId + '" id="Reason' + row.SaleOrderHeaderId + '" />'; }, "sortable": false },
+   //              { "data": "SaleOrderHeaderId" },
+   //         ],
+   //         columnDefs: [
+   //{ "targets": 7, "searchable": false, className: "DTHidden", },
+   //         ],
+   //         order: [[0, "asc"]],
+   //         //ForRowSelecting in ServerSideLogic--Commented cuz not needed in this entry point
+   //         //"rowCallback": function (row, data) {
+   //         //    if ( data.DT_RowId && $.inArray((data.DT_RowId).toString(), selected) !== -1) {
+   //         //        $(row).addClass('selected');
+   //         //    }
+   //         //}
+   //     });
+
+
+
+        var tab = $('#example').DataTable({
+            serverSide: true,
+            ordering: false,
+            searching: false,
+            searchDelay: 1000,
+            ajax: {
+                "url": "/UpdateSaleOrderExpiry/AjaxGetJsonData/?DueDays=" + $('#ExpiryDays').val() + "&ShowExpired=" + $('#ShowExpired').prop('checked') + "&DocType=" + Id,
+                "type": "POST"
+            },
+            columns: [
+                { "data": "DocTypeName", "width": "12%", "sortable": false },
+                 { "data": "SaleOrderNo", "width": "12%", "sortable": false },
+                 { "data": "SDocDate", "width": "10%", "sortable": false },
+                 { "data": "SDueDate", "width": "13%", "sortable": false },
+                 { "data": "Revised", "width": "11%", "sortable": false },
+                 { "data": "NewDueDate", "width": "15%", "render": function (data, type, row) { return '<input style="width:100%;" class="datepickerForExpiry DueDate" type="text" name="DueDate' + row.SaleOrderHeaderId + '" id="DueDate' + row.SaleOrderHeaderId + '" />'; }, "sortable": false },
+                 { "data": "Reason", "width": "27%", "render": function (data, type, row) { return '<input style="width:100%;" class="Reason"  type="text" name="Reason' + row.SaleOrderHeaderId + '" id="Reason' + row.SaleOrderHeaderId + '" />'; }, "sortable": false },
+                 { "data": "SaleOrderHeaderId" },
+            ],
+            columnDefs: [
+  { "targets": 7, "searchable": false, className: "DTHidden", },
+            ],
+            scrollY: "250px",
+            dom: 'tri',
+            scroller: {
+                loadingIndicator: true
+            },
+            language: {
+                "loadingRecords": "Please wait - loading..."
+            },
+            scrollCollapse: true,
+        });
+
+
+        //tab.fnSetFilteringDelay(1000)
+
+        $(document).on('focusout', ' td > input:not(#ExpiryDays)', function () {
+
+            //var table = $('#example').dataTable();
+
+            var td = $(this).closest('td').get(0);
+
+            //var pos = tab.fnGetPosition(td); // Im not familiar with the plugin so the extra $() might be overkill
+            var JData = $(this).closest('tr');
+            var DueDate = JData.find('.DueDate').val();
+            var Reason = JData.find('.Reason').val();
+
+            if (DueDate && Reason) {
+                var data = tab.rows(JData).data(); // Im not familiar with the plugin so the extra $() might be overkill
+                $.ajax({
+                    url: '/UpdateSaleOrderExpiry/UpdateDueDate',
+                    type: "POST",
+                    data: { HeaderId: data[0].SaleOrderHeaderId, DueDate: DueDate, Reason: Reason },
+                    success: function (result) {
+                        if (result.Success == true) {
+
+                        }
+                        else if (!result.Success) {
+                            alert('Something went wrong');
+                        }
+                    },
+                    error: function () {
+
+                    },
+                });
+            }
+            return true;
+
+        })
+
+        $(document).on('focus', '.datepickerForExpiry', function () {
+            $(this).datepicker({
+                format: 'dd/MM/yyyy',
+                "setDate": new Date(),
+                "autoclose": true,
+            })
+        })
+
+        $('#ExpiryDays,#ShowExpired').change(function () {
+            var table = $('#example').DataTable();
+            table.ajax.url("/UpdateSaleOrderExpiry/AjaxGetJsonData/?DueDays=" + parseInt($('#ExpiryDays').val()) + "&ShowExpired=" + $('#ShowExpired').prop('checked') + "&DocType=" + Id).load();
+        })
+        
+    });
+</script>

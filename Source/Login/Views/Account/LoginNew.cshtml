@@ -1,0 +1,106 @@
+@model Login.Models.LoginViewModel
+
+@{
+    Layout = null;
+}
+
+@Styles.Render("~/Content/css")
+
+<style type="text/css">
+    .logincontainer {
+        margin: 80px auto;
+    }
+
+    .loginbox {
+        vertical-align: central;
+        padding: 10px 10px 10px 10px;
+    }
+
+    .imageholder {
+        padding: 0px 20px 20px 20px;
+    }
+
+    body {
+        background-color: white;
+        max-height: 400px !important;
+    }
+
+    input {
+        border-radius: 5px !important;
+    }
+
+    .hide {
+        display: none;
+    }
+</style>
+
+
+<div class="wrapper">
+
+    <div class="logincontainer" style="background-color:white">
+
+        <div class="col-sm-offset-1 col-sm-10 ">
+            <div class="row">
+
+                <div class="col-sm-8" style="">
+                    <div class="imageholder col-sm-12 img-responsive text-center">
+                        <img src="~/Images/Image2.jpg" style="max-width: inherit; height: auto; border-radius: 10px;" />
+                    </div>
+                </div>
+
+                @using (Html.BeginForm("Login", "Account", new { returnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+                {
+                    @Html.AntiForgeryToken()
+                    <div class="col-sm-4 loginbox imageholder">
+
+                        <div style="" class="text-center">
+                            <img src="~/Images/CompanyLogo.jpg" style="max-width:150px;height:auto" />
+                        </div>
+                        <div style="height:20px"></div>
+                        @Html.ValidationSummary(true, null, new { @style = "color:#12768C" })
+                        <div class="form-horizontal">
+                            <div class="form-group">
+                                <div class="col-sm-offset-1 col-sm-10">
+                                    @Html.TextBoxFor(m => m.UserName, new { @class = "form-control", @placeholder = "Email" })
+                                    @Html.ValidationMessageFor(m => m.UserName, null, new { @style = "color:#12768C" })
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-sm-offset-1 col-sm-10">
+                                    @Html.PasswordFor(m => m.Password, new { @class = "form-control", @placeholder = "Password" })
+                                    @Html.ValidationMessageFor(m => m.Password, null, new { @style = "color:#12768C" })
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-sm-offset-2 col-sm-10">
+                                    <div class="checkbox">
+                                        @Html.CheckBoxFor(m => m.RememberMe)
+                                        @Html.LabelFor(m => m.RememberMe)
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-sm-offset-2 col-sm-10">
+                                    <input type="submit" value="Log in" class="btn btn-default" />
+                                </div>
+                            </div>
+                            <p class="col-sm-offset-1 col-sm-10">
+                                @Html.ActionLink("Register", "Register", new { @RetUrl = ViewBag.ReturnUrl }) |
+                                @Html.ActionLink("Forgot Password", "ForgotPassword")
+                            </p>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@Scripts.Render("~/bundles/jquery")
+@Scripts.Render("~/bundles/jqueryval")
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#UserName').focus();
+    })
+</script>

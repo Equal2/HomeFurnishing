@@ -1,0 +1,83 @@
+﻿@model IEnumerable<Model.Models.ProductNature>
+@using GridMvc.Html;
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<!-- modal placeholder-->
+<div id='myModal' class='modal fade in'>
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div id='myModalContent'></div>
+        </div>
+    </div>
+</div>
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3>
+            <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-list black"></span> Product Nature List</span>
+        </h3>
+        <hr style="margin-top:0px;margin-bottom:0px" />
+
+        <div class="panel-info">
+            <div class="btn-group">
+                @Html.ActionLink(" ", "Create", "ProductNature", null, new { @class = "cbtn btn-circle glyphicon glyphicon-plus toolbar", @title = "Add New", @data_toggle = "tooltip" })
+                @Html.ActionLink(" ", "Print", "ProductNature", null, new { @class = "cbtn btn-circle glyphicon glyphicon-print toolbar", @title = "Print", @data_toggle = "tooltip" })
+                @Html.ActionLink(" ", "Delete", "ProductNature", null, new { @class = "cbtn btn-circle glyphicon glyphicon-trash toolbar", @title = "Delete", @data_toggle = "tooltip", @id = "DeleteRecord" , @data_modal="" })
+            </div>
+            <div class="btn-group">
+                <a class="cbtn btn-circle glyphicon glyphicon-option-horizontal dropdown-toggle" aria-expanded="false" style="padding-top: 6px;padding-bottom: 6px;" href="#" data-toggle="dropdown" id="dropdownMenu1">
+                </a>
+                <ul class="dropdown-menu pull-right" aria-labelledby="dropdownMenu1">
+                    <li><a target="_blank" href="@Url.Action("Report", "ProductNature")"><span class="glyphicon glyphicon-stats"> </span> Report</a></li>
+                </ul>
+            </div>
+        </div>
+
+    </div>
+    <div class="panel-info" style="padding-left:5px;padding-top:2px">
+        @Html.Grid(Model).Columns(columns =>
+           {
+               columns.Add(foo => foo.ProductNatureId, true);
+               columns.Add(foo => foo.ProductNatureName).Sortable(true).Titled("Name").Filterable(true).Css("modal-link");
+               columns.Add(m => m.IsSystemDefine).Sortable(true).Titled("System Defined");
+               columns.Add(m => m.IsActive).Sortable(true).Titled("Is Active").Filterable(true);                         
+           }).WithPaging(25).EmptyText("No records found.")
+    </div>
+</div>
+
+<script type="text/javascript">
+
+    $('table.grid-table td').dblclick(function () {
+        var $this = $(this);
+        var row = $this.closest("tr");
+        var editid = row.find('[data-name="ProductNatureId"]').text();
+        if (editid == 0) {
+            e.stopImmediatePropagation();
+            return false;
+        }
+        var url = '@Url.Action("Edit", "ProductNature")' + "/" + editid;
+        window.location.href = url;
+
+    });
+
+    $('a#DeleteRecord').click(function (e) {
+        
+        var tes = DeleteValidation();
+        if (!tes) {
+            e.stopImmediatePropagation();
+            return false;
+        }
+        var editiiid = $('table.grid-table .grid-row.grid-row-selected').find('[data-name="ProductNatureId"]').text();
+
+
+        var url = '/ProductNature/Delete/' + editiiid;
+        $(this).attr('href', url);
+        return;
+    });
+    $('#myModal').on('shown.bs.modal', function () {
+        $("#Reason").focus();
+    });
+
+</script>

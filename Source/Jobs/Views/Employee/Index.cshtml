@@ -1,0 +1,93 @@
+﻿@using Core.Common;
+@model IQueryable<Model.ViewModels.EmployeeIndexViewModel>
+@using GridMvc.Html;
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<!-- modal placeholder-->
+<div id='myModal' class='modal fade in'>
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div id='myModalContent'></div>
+        </div>
+    </div>
+</div>
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3>
+            <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-list black" ></span> Employee List</span>
+        </h3>
+        <hr style="margin-top:0px;margin-bottom:0px" />
+
+        <div class="panel-info">
+            <div class="btn-group">
+                @Html.ActionLink(" ", "ChooseContactType", "Employee", null, new { @class = "cbtn btn-circle glyphicon glyphicon-plus toolbar", @title = "Add New", @data_toggle = "tooltip", @data_modalCopy = "" })
+                @Html.ActionLink(" ", "Print", "Employee", null, new { @class = "cbtn btn-circle glyphicon glyphicon-print toolbar", @title = "Print", @data_toggle = "tooltip" })
+                @Html.ActionLink(" ", "Remove", "Employee", null, new { @class = "cbtn btn-circle glyphicon glyphicon-trash toolbar", @title = "Delete", @data_toggle = "tooltip", @id = "DeleteRecord", @data_modalDelete = "" })
+            </div>
+            <div class="btn-group">
+                <a class="cbtn btn-circle glyphicon glyphicon-option-horizontal dropdown-toggle" aria-expanded="false" style="padding-top: 6px;padding-bottom: 6px;" href="#" data-toggle="dropdown" id="dropdownMenu1">
+                </a>
+                <ul class="dropdown-menu pull-right" aria-labelledby="dropdownMenu1">
+                    <li><a target="_blank" href="@Url.Action("Report", "Employee", new { })"><span class="glyphicon glyphicon-stats"> </span> Report</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel-info" style="padding-left:5px;padding-top:2px">
+
+        @Html.Grid(Model).Columns(columns =>
+           {
+               columns.Add(m => m.PersonId, true);
+               columns.Add(m => m.Name).Sortable(true).Titled("Employee Name").Filterable(true).Sortable(true);
+               columns.Add(m => m.Code).Sortable(true).Titled("Code").Filterable(true).Sortable(true);
+               columns.Add(m => m.Suffix).Sortable(true).Titled("Suffix").Filterable(true).Sortable(true);
+               columns.Add(m => m.Phone).Sortable(true).Titled("Phone").Filterable(true).Sortable(true);
+               columns.Add(m => m.Mobile).Sortable(true).Titled("Mobile").Filterable(true).Sortable(true);
+               columns.Add(true).RenderValueAs(m => "<a href='/Employee/Edit/" + m.PersonId + "' hidden class='RecEditurl'></a><a href='/Employee/Delete/" + m.PersonId + "' hidden class='RecDelurl'></a>");
+           }).WithPaging(25).EmptyText("No records found.").Sortable().Filterable().WithMultipleFilters()
+    </div>
+</div>
+
+<script type="text/javascript">
+
+    $('table.grid-table td').dblclick(function () {
+        var $this = $(this);
+        var row = $this.closest("tr");
+        var editid = row.find('[data-name="PersonId"]').text();
+        var url = '@Url.Action("Edit","Employee")' + "/" + editid;
+        window.location.href = url;
+    });
+
+    //To focus on the first element on modal load
+    $('#myModal').on('shown.bs.modal', function () {
+        $("#Reason").focus();
+    });
+
+    //$('a#DeleteRecord').click(function (e) {        
+    //    var $row = $('table.grid-table .grid-row.grid-row-selected');        
+    //    var editiiid = $row.find('[data-name="PersonId"]').text();
+    //    if (!$('table.grid-table .grid-row.grid-row-selected').get(0))
+    //    {
+    //        e.stopImmediatePropagation();
+    //        return false;
+    //    }
+    //    var url = '/Employee/Delete/' + editiiid;
+    //    $(this).attr('href', url);
+    //    return;
+    //})
+
+    //$('a#PrintRecord').click(function () {
+    //    var $row = $('table.grid-table .grid-row.grid-row-selected');
+    //    var editiiid = $row.find('[data-name="PersonId"]').text();
+    //    var url = '/Employee/Print/' + editiiid;
+    //    $(this).attr('href', url);
+    //    return;
+    //})
+
+</script>

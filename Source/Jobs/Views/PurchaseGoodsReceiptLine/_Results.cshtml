@@ -1,0 +1,683 @@
+﻿@model Model.ViewModel.PurchaseGoodsReceiptMasterDetailModel
+@using Core.Common
+
+<div class="modal-content">
+    <div class="modal-header" style="border-bottom: 1px solid #8E8888">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"> <span class="glyphicon glyphicon-remove"></span></button>
+        <h3>
+            <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-file black"></span> Orders & Quantities</span>
+        </h3>
+    </div>
+    <div>
+        @using (Html.BeginForm("_ResultsPost", "PurchaseGoodsReceiptLine", FormMethod.Post, new { enctype = "multipart/form-data", id = "modform" }))
+        {
+           @Html.ValidationLog((string)TempData["CSEXCL"])
+            @Html.AntiForgeryToken()
+            if (Model.PurchGoodsReceiptSettings.isVisibleLotNo)
+            {
+                @Html.HiddenFor(m => m.PurchGoodsReceiptSettings.isVisibleLotNo)
+                @Html.HiddenFor(m => m.PurchGoodsReceiptSettings.isVisibleDimension1)
+                @Html.HiddenFor(m => m.PurchGoodsReceiptSettings.isVisibleDimension2)
+                <div class="form-horizontal modal-body">
+
+                    <div style="padding-right:15px">
+                        <div class="row">
+                            <div class="form-horizontal">
+                                @Html.ValidationSummary(true)
+
+                                <div class="panel panel-default" id="grid">
+                                    <div class="panel-heading headrow" style="background-image: -webkit-linear-gradient(top, #428bca 0%, #428bca 100%);color:white">
+                                        <div class="row grid-head">
+                                            <div class="block text-left" style="width:5%">
+                                                Srl.
+                                            </div>
+                                            <div class="block" style="width:92%">
+                                                <div class="row">
+                                                    @*ProductInfo*@
+                                                    <div class="block" style="width:20%">
+                                                        Product
+
+                                                    </div>
+                                                    <div class="block text-center" style="width:20%">
+                                                        Order No
+                                                    </div>
+                                                    @*Qty*@
+                                                    <div class="block text-right" style="width:15%">
+                                                        Order Qty
+                                                    </div>
+                                                    <div class="block text-right" style="width:15%">
+                                                        <a href="#" id="ToDoc" style="color:white">Doc Qty</a>
+                                                        <br />
+                                                        <a href="#" id="ToReceipt" style="color:white">Receipt Qty</a>
+                                                    </div>
+                                                    <div class="block text-right" style="width:15%">
+                                                        Receipt Deal Qty
+                                                    </div>
+                                                    <div class="block" style="width:15%">
+
+                                                    </div>
+
+                                                </div>
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+                                    <div class="panel-info" id="gbody" style="max-height:250px;overflow-y:scroll">
+
+                                        @{
+                decimal OrderQty = 0;
+                decimal ReceiptQty = 0;
+                int MaxUnitDecPlaces = 0;
+                int MaxDealUnitDecPlaces = 0;
+                                        }
+
+
+                                        @for (int i = 0; i < Model.PurchaseGoodsReceiptLineViewModel.Count(); i++)
+                                        {
+
+
+                                            if (MaxDealUnitDecPlaces < Model.PurchaseGoodsReceiptLineViewModel[i].DealunitDecimalPlaces)
+                                            {
+                                                MaxDealUnitDecPlaces = Model.PurchaseGoodsReceiptLineViewModel[i].DealunitDecimalPlaces;
+                                            }
+                                            if (MaxUnitDecPlaces < Model.PurchaseGoodsReceiptLineViewModel[i].unitDecimalPlaces)
+                                            {
+                                                MaxUnitDecPlaces = Model.PurchaseGoodsReceiptLineViewModel[i].unitDecimalPlaces;
+                                            }
+
+                                            <div class='row crow grid-body' style='margin-left:0px;margin-right:0px'>
+                                                @Html.HiddenFor(m => Model.PurchaseGoodsReceiptLineViewModel[i].ProductId)
+                                                @Html.HiddenFor(m => Model.PurchaseGoodsReceiptLineViewModel[i].DealUnitId)
+                                                @Html.HiddenFor(m => Model.PurchaseGoodsReceiptLineViewModel[i].ProductName)
+                                                @Html.HiddenFor(m => Model.PurchaseGoodsReceiptLineViewModel[i].Specification)
+                                                @Html.HiddenFor(m => Model.PurchaseGoodsReceiptLineViewModel[i].Dimension1Name)
+                                                @Html.HiddenFor(m => Model.PurchaseGoodsReceiptLineViewModel[i].Dimension2Name)
+                                                @Html.HiddenFor(m => Model.PurchaseGoodsReceiptLineViewModel[i].PurchaseOrderLineId)
+                                                @Html.HiddenFor(m => Model.PurchaseGoodsReceiptLineViewModel[i].PurchaseGoodsReceiptHeaderId)
+                                                @Html.HiddenFor(m => Model.PurchaseGoodsReceiptLineViewModel[i].PurchaseOrderDocNo)
+                                                @Html.HiddenFor(m => Model.PurchaseGoodsReceiptLineViewModel[i].UnitId)
+                                                @Html.HiddenFor(m => Model.PurchaseGoodsReceiptLineViewModel[i].unitDecimalPlaces, new { @class = "UDec" })
+                                                @Html.HiddenFor(m => Model.PurchaseGoodsReceiptLineViewModel[i].OrderBalanceQty, new { @class = "OrdBalQty" })
+                                                @Html.HiddenFor(m => Model.PurchaseGoodsReceiptLineViewModel[i].DealunitDecimalPlaces, new { @class = "DelUDec" })
+                                                @Html.HiddenFor(m => Model.PurchaseGoodsReceiptLineViewModel[i].OrderQty, new { @class = "OrdQty" })
+                                                @Html.HiddenFor(m => Model.PurchaseGoodsReceiptLineViewModel[i].OrderDealQty, new { @class = "OrdDelQty" })
+                                                @Html.HiddenFor(m => Model.PurchaseGoodsReceiptLineViewModel[i].UnitConversionMultiplier, new { @class = "UnitConvMul" })
+                                                <div class='block row-index' style='width:5%'>
+                                                    @(i + 1)
+                                                    <input type='hidden' class='id' value="@Model.PurchaseGoodsReceiptLineViewModel[i].PurchaseGoodsReceiptHeaderId" />
+                                                </div>
+                                                <div class='block pull-middle' style='width:94%'>
+                                                    <div class='row'>
+                                                        <div class='block' style='width:20%'>
+                                                            <strong>@Model.PurchaseGoodsReceiptLineViewModel[i].ProductName</strong>
+                                                            <br />
+                                                            @Model.PurchaseGoodsReceiptLineViewModel[i].Specification
+                                                            @{
+                                            var Dim1 = (string.IsNullOrEmpty(Model.PurchaseGoodsReceiptLineViewModel[i].Dimension1Name) && !Model.PurchGoodsReceiptSettings.isVisibleDimension1) ? "" : Model.PurchaseGoodsReceiptLineViewModel[i].Dimension1Name + ",";
+                                            var Dim2 = (string.IsNullOrEmpty(Model.PurchaseGoodsReceiptLineViewModel[i].Dimension2Name) && !Model.PurchGoodsReceiptSettings.isVisibleDimension2) ? "" : Model.PurchaseGoodsReceiptLineViewModel[i].Dimension2Name;
+                                                            }
+                                                            <p>@Dim1 @Dim2</p>
+                                                            <div>
+                                                            </div>
+                                                        </div>
+                                                        <div class='block text-center' style='width:20%'>
+                                                            @Model.PurchaseGoodsReceiptLineViewModel[i].PurchaseOrderDocNo
+                                                        </div>
+                                                        <div class='block text-right' style='width:15%'>
+                                                            <a href="#" class="ToReceipt" style="color:black">
+                                                                <span id="OrderQty"> @string.Format("{" + "0:0.".PadRight(@Model.PurchaseGoodsReceiptLineViewModel[i].unitDecimalPlaces + 4, '0') + "}", Model.PurchaseGoodsReceiptLineViewModel[i].OrderBalanceQty)</span><br /><div>
+                                                                    <small>@Model.PurchaseGoodsReceiptLineViewModel[i].UnitId</small>
+                                                                </div>
+                                                            </a>
+                                                            @{OrderQty += Model.PurchaseGoodsReceiptLineViewModel[i].OrderBalanceQty;}
+
+                                                        </div>
+                                                        <div class='block text-right' style='width:15%'>
+
+                                                            @Html.TextBoxFor(m => Model.PurchaseGoodsReceiptLineViewModel[i].DocQty, "{" + "0:0.".PadRight(Model.PurchaseGoodsReceiptLineViewModel[i].unitDecimalPlaces + 4, '0') + "}", new { @class = "form-control text-right DocQty", @style = "display:inline;margin-bottom:3px" })
+                                                            <br />
+                                                            @Html.TextBoxFor(m => Model.PurchaseGoodsReceiptLineViewModel[i].Qty, "{" + "0:0.".PadRight(Model.PurchaseGoodsReceiptLineViewModel[i].unitDecimalPlaces + 4, '0') + "}", new { @class = "form-control text-right ReceiptQty", @style = "display:inline" })
+                                                            @Html.ValidationMessageFor(m => Model.PurchaseGoodsReceiptLineViewModel[i].Qty, "", new { @class = "text-danger" })
+
+
+                                                        </div>
+                                                        @{ReceiptQty += Model.PurchaseGoodsReceiptLineViewModel[i].OrderBalanceQty;}
+
+                                                        @{
+                                            if (Model.PurchaseGoodsReceiptLineViewModel[i].UnitConversionMultiplier != 0)
+                                            {
+                                                Model.PurchaseGoodsReceiptLineViewModel[i].DealQty = Model.PurchaseGoodsReceiptLineViewModel[i].Qty * Model.PurchaseGoodsReceiptLineViewModel[i].UnitConversionMultiplier;
+                                            }
+                                            else if (Model.PurchaseGoodsReceiptLineViewModel[i].Qty == Model.PurchaseGoodsReceiptLineViewModel[i].OrderQty)
+                                            {
+                                                Model.PurchaseGoodsReceiptLineViewModel[i].DealQty = Model.PurchaseGoodsReceiptLineViewModel[i].OrderDealQty;
+                                            }
+                                            else
+                                            {
+                                                Model.PurchaseGoodsReceiptLineViewModel[i].DealQty = decimal.Round(Model.PurchaseGoodsReceiptLineViewModel[i].Qty * (Model.PurchaseGoodsReceiptLineViewModel[i].OrderDealQty / Model.PurchaseGoodsReceiptLineViewModel[i].OrderQty), Model.PurchaseGoodsReceiptLineViewModel[i].DealunitDecimalPlaces);
+                                            }
+                                                        }
+
+                                                        <div class='block text-right' style='width:15%'>
+                                                            @{if (Model.PurchaseGoodsReceiptLineViewModel[i].UnitConversionMultiplier <= 0)
+                                                            {
+                                                                @Html.TextBoxFor(m => Model.PurchaseGoodsReceiptLineViewModel[i].DealQty, "{" + "0:0.".PadRight(Model.PurchaseGoodsReceiptLineViewModel[i].unitDecimalPlaces + 4, '0') + "}", new { @class = "form-control text-right ReceiptDealQty" })
+                                                            }
+                                                            else
+                                                            {
+                                                                @Html.TextBoxFor(m => Model.PurchaseGoodsReceiptLineViewModel[i].DealQty, "{" + "0:0.".PadRight(Model.PurchaseGoodsReceiptLineViewModel[i].unitDecimalPlaces + 4, '0') + "}", new { @class = "form-control text-right ReceiptDealQty", @readonly = true })
+                                                            }
+                                                            }
+                                                            @Html.ValidationMessageFor(m => Model.PurchaseGoodsReceiptLineViewModel[i].DealQty, "", new { @class = "text-danger" })
+
+                                                        </div>
+
+                                                        <div class='block' style='width:15%'>
+                                                            @Html.TextBoxFor(m => Model.PurchaseGoodsReceiptLineViewModel[i].BaleNo, new { @class = "form-control", @placeholder = "BaleNo", @style = "display:inline;margin-bottom:3px" })
+                                                            <br />
+                                                            @Html.TextBoxFor(m => Model.PurchaseGoodsReceiptLineViewModel[i].LotNo, new { @class = "form-control", @style = "display:inline", @placeholder = "LotNo" })
+                                                            @Html.ValidationMessageFor(m => Model.PurchaseGoodsReceiptLineViewModel[i].LotNo, "", new { @class = "text-danger" })
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                            <hr style='margin-top:0px;margin-bottom:0px' />
+                                        }
+                                    </div>
+                                </div>
+
+
+                                <div class="row grid-head" style="margin-left:0px;margin-right:0px">
+                                    <div class="block text-left" style="width:5%">
+
+                                    </div>
+                                    <div class="block" style="width:92%">
+                                        <div class="row">
+                                            @*ProductInfo*@
+                                            <div class='block' style='width:20%'>
+                                                <strong>Total</strong>
+
+                                            </div>
+                                            <div class='block text-center' style='width:20%'>
+
+                                            </div>
+                                            @*Qty*@
+                                            <div class='block text-right' style='width:15%'>
+                                                @string.Format("{" + "0:0.".PadRight(MaxUnitDecPlaces + 4, '0') + "}", OrderQty)
+                                            </div>
+                                            <div class='block text-right' style='width:15%'>
+                                                <strong><span id="DocQty">@string.Format("{" + "0:0.".PadRight(MaxDealUnitDecPlaces + 4, '0') + "}", ReceiptQty)</span></strong><br />
+                                                <strong><span id="ReceiptQty">@string.Format("{" + "0:0.".PadRight(MaxDealUnitDecPlaces + 4, '0') + "}", ReceiptQty)</span></strong>
+                                            </div>
+                                            <div class='block text-right' style='width:15%'>
+
+                                            </div>
+                                            <div class='block' style='width:15%'>
+                                            </div>
+
+                                        </div>
+                                    </div>
+
+                                </div>
+
+
+
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer " style="padding: 19px 20px 0 20px; border-top:1px solid #8E8888">
+                        <button class="btn custom" name="Command:Edit" type="submit"><h2 style="margin:0px" id="submit" title="Proceed"><span class="glyphicon glyphicon-floppy-disk black black"></span> </h2></button>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="form-horizontal modal-body">
+
+                    <div style="padding-right:15px">
+                        <div class="row">
+                            <div class="form-horizontal">
+                                @Html.ValidationSummary(true)
+                                @Html.HiddenFor(m => m.PurchGoodsReceiptSettings.isVisibleDimension2)
+                                @Html.HiddenFor(m => m.PurchGoodsReceiptSettings.isVisibleDimension1)
+
+                                <div class="panel panel-default" id="grid">
+                                    <div class="panel-heading headrow" style="background-image: -webkit-linear-gradient(top, #428bca 0%, #428bca 100%);color:white">
+                                        <div class="row grid-head">
+                                            <div class="block text-left" style="width:5%">
+                                                Srl.
+                                            </div>
+                                            <div class="block" style="width:92%">
+                                                <div class="row">
+                                                    @*ProductInfo*@
+                                                    <div class="block" style="width:20%">
+                                                        Product
+
+                                                    </div>
+                                                    <div class="block text-center" style="width:20%">
+                                                        Order No
+                                                    </div>
+                                                    @*Qty*@
+                                                    <div class="block text-right" style="width:15%">
+                                                        Order Qty
+                                                    </div>
+                                                    <div class="block text-right" style="width:15%">
+                                                        Doc Qty
+                                                        <br />
+                                                        <a href="#" id="ToReceipt" style="color:white">Receipt Qty</a>
+                                                    </div>
+                                                    <div class="block text-right" style="width:15%">
+                                                        Receipt Deal Qty
+                                                    </div>
+                                                    <div class="block " style="width:15%">
+
+                                                    </div>
+
+                                                </div>
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+                                    <div class="panel-info" id="gbody" style="max-height:250px;overflow-y:scroll">
+
+                                        @{
+                decimal OrderQty = 0;
+                decimal ReceiptQty = 0;
+                int MaxUnitDecPlaces = 0;
+                int MaxDealUnitDecPlaces = 0;
+                                        }
+
+
+                                        @for (int i = 0; i < Model.PurchaseGoodsReceiptLineViewModel.Count(); i++)
+                                        {
+
+
+                                            if (MaxDealUnitDecPlaces < Model.PurchaseGoodsReceiptLineViewModel[i].DealunitDecimalPlaces)
+                                            {
+                                                MaxDealUnitDecPlaces = Model.PurchaseGoodsReceiptLineViewModel[i].DealunitDecimalPlaces;
+                                            }
+                                            if (MaxUnitDecPlaces < Model.PurchaseGoodsReceiptLineViewModel[i].unitDecimalPlaces)
+                                            {
+                                                MaxUnitDecPlaces = Model.PurchaseGoodsReceiptLineViewModel[i].unitDecimalPlaces;
+                                            }
+
+
+                                            <div class='row crow grid-body' style='margin-left:0px;margin-right:0px'>
+
+                                                @Html.HiddenFor(m => Model.PurchaseGoodsReceiptLineViewModel[i].ProductId)
+                                                @Html.HiddenFor(m => Model.PurchaseGoodsReceiptLineViewModel[i].DealUnitId)
+                                                @Html.HiddenFor(m => Model.PurchaseGoodsReceiptLineViewModel[i].ProductName)
+                                                @Html.HiddenFor(m => Model.PurchaseGoodsReceiptLineViewModel[i].Specification)
+                                                @Html.HiddenFor(m => Model.PurchaseGoodsReceiptLineViewModel[i].Dimension1Name)
+                                                @Html.HiddenFor(m => Model.PurchaseGoodsReceiptLineViewModel[i].Dimension2Name)
+                                                @Html.HiddenFor(m => Model.PurchaseGoodsReceiptLineViewModel[i].PurchaseOrderLineId)
+                                                @Html.HiddenFor(m => Model.PurchaseGoodsReceiptLineViewModel[i].PurchaseGoodsReceiptHeaderId)
+                                                @Html.HiddenFor(m => Model.PurchaseGoodsReceiptLineViewModel[i].PurchaseOrderDocNo)
+                                                @Html.HiddenFor(m => Model.PurchaseGoodsReceiptLineViewModel[i].UnitId)
+                                                @Html.HiddenFor(m => Model.PurchaseGoodsReceiptLineViewModel[i].unitDecimalPlaces, new { @class = "UDec" })
+
+                                                @Html.HiddenFor(m => Model.PurchaseGoodsReceiptLineViewModel[i].OrderBalanceQty, new { @class = "OrdBalQty" })
+                                                @Html.HiddenFor(m => Model.PurchaseGoodsReceiptLineViewModel[i].DealunitDecimalPlaces, new { @class = "DelUDec" })
+                                                @Html.HiddenFor(m => Model.PurchaseGoodsReceiptLineViewModel[i].OrderQty, new { @class = "OrdQty" })
+                                                @Html.HiddenFor(m => Model.PurchaseGoodsReceiptLineViewModel[i].OrderDealQty, new { @class = "OrdDelQty" })
+                                                @Html.HiddenFor(m => Model.PurchaseGoodsReceiptLineViewModel[i].UnitConversionMultiplier, new { @class = "UnitConvMul" })
+
+                                                <div class="block text-left" style="width:5%">
+                                                    @(i + 1)
+                                                    <input type='hidden' class='id' value="@Model.PurchaseGoodsReceiptLineViewModel[i].PurchaseGoodsReceiptHeaderId" />
+                                                </div>
+                                                <div class='block pull-middle' style='width:94%'>
+                                                    <div class='row'>
+                                                        <div class="block" style="width:20%">
+                                                            <strong>@Model.PurchaseGoodsReceiptLineViewModel[i].ProductName</strong>
+                                                            <br />
+                                                            @Model.PurchaseGoodsReceiptLineViewModel[i].Specification
+                                                            @{
+                                            var Dim1 = (string.IsNullOrEmpty(Model.PurchaseGoodsReceiptLineViewModel[i].Dimension1Name) && !Model.PurchGoodsReceiptSettings.isVisibleDimension1) ? "" : Model.PurchaseGoodsReceiptLineViewModel[i].Dimension1Name + ",";
+                                            var Dim2 = (string.IsNullOrEmpty(Model.PurchaseGoodsReceiptLineViewModel[i].Dimension2Name) && !Model.PurchGoodsReceiptSettings.isVisibleDimension2) ? "" : Model.PurchaseGoodsReceiptLineViewModel[i].Dimension2Name;
+                                                            }
+                                                            <p>@Dim1 @Dim2</p>
+                                                            <div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="block text-center" style="width:20%">
+                                                            @Model.PurchaseGoodsReceiptLineViewModel[i].PurchaseOrderDocNo
+                                                        </div>
+                                                        <div class="block text-right" style="width:15%">
+                                                            <a href="#" class="ToReceipt" style="color:black">
+                                                                <span id="OrderQty"> @string.Format("{" + "0:0.".PadRight(@Model.PurchaseGoodsReceiptLineViewModel[i].unitDecimalPlaces + 4, '0') + "}", Model.PurchaseGoodsReceiptLineViewModel[i].OrderBalanceQty)</span><br /><div>
+                                                                    <small>@Model.PurchaseGoodsReceiptLineViewModel[i].UnitId</small>
+                                                                </div>
+                                                            </a>
+                                                            @{OrderQty += Model.PurchaseGoodsReceiptLineViewModel[i].OrderBalanceQty;}
+
+                                                        </div>
+                                                        <div class="block text-right" style="width:15%">
+
+                                                            @Html.TextBoxFor(m => Model.PurchaseGoodsReceiptLineViewModel[i].DocQty, "{" + "0:0.".PadRight(Model.PurchaseGoodsReceiptLineViewModel[i].unitDecimalPlaces + 4, '0') + "}", new { @class = "form-control text-right DocQty", @style = "display:inline;margin-bottom:3px" })
+                                                            <br />
+                                                            @Html.TextBoxFor(m => Model.PurchaseGoodsReceiptLineViewModel[i].Qty, new { @class = "form-control text-right ReceiptQty", @style = "display:inline" })
+                                                            @Html.ValidationMessageFor(m => Model.PurchaseGoodsReceiptLineViewModel[i].Qty, "", new { @class = "text-danger" })
+
+                                                        </div>
+
+                                                        @{ReceiptQty += Model.PurchaseGoodsReceiptLineViewModel[i].OrderBalanceQty;}
+
+                                                        @{
+                                            if (Model.PurchaseGoodsReceiptLineViewModel[i].UnitConversionMultiplier != 0)
+                                            {
+                                                Model.PurchaseGoodsReceiptLineViewModel[i].DealQty = Model.PurchaseGoodsReceiptLineViewModel[i].Qty * Model.PurchaseGoodsReceiptLineViewModel[i].UnitConversionMultiplier;
+                                            }
+                                            else if (Model.PurchaseGoodsReceiptLineViewModel[i].Qty == Model.PurchaseGoodsReceiptLineViewModel[i].OrderQty)
+                                            {
+                                                Model.PurchaseGoodsReceiptLineViewModel[i].DealQty = Model.PurchaseGoodsReceiptLineViewModel[i].OrderDealQty;
+                                            }
+                                            else
+                                            {
+                                                Model.PurchaseGoodsReceiptLineViewModel[i].DealQty = decimal.Round(Model.PurchaseGoodsReceiptLineViewModel[i].Qty * (Model.PurchaseGoodsReceiptLineViewModel[i].OrderDealQty / Model.PurchaseGoodsReceiptLineViewModel[i].OrderQty), Model.PurchaseGoodsReceiptLineViewModel[i].DealunitDecimalPlaces);
+                                            }
+                                                        }
+
+                                                        <div class="block text-right" style="width:15%">
+                                                            @{if (Model.PurchaseGoodsReceiptLineViewModel[i].UnitConversionMultiplier <= 0)
+                                                            {
+                                                                @Html.TextBoxFor(m => Model.PurchaseGoodsReceiptLineViewModel[i].DealQty, new { @class = "form-control text-right ReceiptDealQty" })
+                                                            }
+                                                            else
+                                                            {
+                                                                @Html.TextBoxFor(m => Model.PurchaseGoodsReceiptLineViewModel[i].DealQty, new { @class = "form-control text-right ReceiptDealQty", @readonly = true })
+                                                            }
+                                                            }
+                                                            @Html.ValidationMessageFor(m => Model.PurchaseGoodsReceiptLineViewModel[i].DealQty, "", new { @class = "text-danger" })
+
+                                                        </div>
+
+                                                        <div class="block" style="width:15%">
+
+                                                            @Html.TextBoxFor(m => Model.PurchaseGoodsReceiptLineViewModel[i].BaleNo, new { @class = "form-control", @placeholder = "BaleNo", @style = "display:inline;margin-bottom:3px" })
+
+                                                        </div>
+
+
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                            <hr style='margin-top:0px;margin-bottom:0px' />
+                                        }
+                                    </div>
+                                </div>
+
+
+                                <div class="row grid-head" style="margin-left:0px;margin-right:0px">
+                                    <div class="block text-left" style="width:5%">
+
+                                    </div>
+                                    <div class="block" style="width:92%">
+                                        <div class="row">
+                                            @*ProductInfo*@
+                                            <div class="block" style="width:20%">
+                                                <strong>Total</strong>
+
+                                            </div>
+                                            <div class="block" style="width:20%">
+
+                                            </div>
+                                            @*Qty*@
+                                            <div class="block text-right" style="width:15%">
+                                                @string.Format("{" + "0:0.".PadRight(MaxUnitDecPlaces + 4, '0') + "}", OrderQty)
+                                            </div>
+                                            <div class="block text-right" style="width:15%">
+                                                <strong><span id="DocQty">@string.Format("{" + "0:0.".PadRight(MaxDealUnitDecPlaces + 4, '0') + "}", ReceiptQty)</span></strong><br />
+                                                <strong><span id="ReceiptQty">@string.Format("{" + "0:0.".PadRight(MaxDealUnitDecPlaces + 4, '0') + "}", ReceiptQty)</span></strong>
+                                            </div>
+                                            <div class="block" style="width:15%">
+
+                                            </div>
+                                            <div class="block" style="width:15%">
+
+                                            </div>
+
+                                        </div>
+                                    </div>
+
+                                </div>
+
+
+
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer " style="padding: 19px 20px 0 20px; border-top:1px solid #8E8888">
+                        <button class="btn custom" name="Command:Edit" type="submit"><h2 style="margin:0px" id="submit" title="Proceed"><span class="glyphicon glyphicon-floppy-disk black black"></span> </h2></button>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</div>
+
+
+
+
+<script type="text/javascript">
+
+
+    var reset = false;
+    var IsSaved = false;
+    var ValidationCount = 0;
+
+    $('#modform').bind('submit', function (event) {
+
+        if (!IsSaved) {
+            if (!ValidateData()) {
+                return false;
+            }
+            IsSaved = true;
+            $('button:submit').attr('disabled', 'disabled');
+            return IsSaved;
+        }
+        else {
+            return false;
+        }
+
+
+    });
+
+
+    function ValidateData() {
+        var ValidationMessage = "";
+
+        //Client Side Validaion.....
+
+        return (ValidationMessage == "");
+
+    }
+
+
+    $('input.ReceiptQty,input.DocQty').change(function () {
+
+        var $div = $(this).closest('div.row');
+        var OrderQty = parseFloat($div.find('#OrderQty').text()) || 0;
+
+        var ReceiptQty = parseFloat($div.find('input.ReceiptQty').val()) || 0;
+        var DocQty = parseFloat($div.find('input.DocQty').val()) || 0;
+
+        var bal = (DocQty) - (OrderQty);
+        var bal2 = (ReceiptQty) - (DocQty);
+
+        if (bal > 0) {
+            if (!$('#modform').find('.modal-body #errormsg').length) {
+                $('#modform').find('.modal-body').prepend("<div class='alert alert-danger'><span id=errormsg >Qty exceeding OrderQty</span></div>")
+            }
+            else {
+                $('#modform').find('#errormsg').text("Qty exceeding. Please check Qty");
+            }
+        }
+        else if (bal2 > 0) {
+            if (!$('#modform').find('.modal-body #errormsg').length) {
+                $('#modform').find('.modal-body').prepend("<div class='alert alert-danger'><span id=errormsg >Qty exceeding DocQty</span></div>")
+            }
+            else {
+                $('#modform').find('#errormsg').text("Qty exceeding. Please check Qty");
+            }
+        }
+        else {
+            if ($('#modform').find('.modal-body #errormsg').length) {
+                $('#modform').find('#errormsg').parent().remove();
+            }
+        }
+        CalculateTotal();
+
+    })
+
+    function CalculateTotal() {
+        var Receipt = 0;
+        var DocQty = 0;
+        var maxDeclaces = 0;
+        $('.row.crow.grid-body', '.modal-body').each(function () {
+
+            if ($(this).find('input.ReceiptQty').val()) {
+                Receipt += parseFloat($(this).find('input.ReceiptQty').val());
+                DocQty += parseFloat($(this).find('input.DocQty').val());
+                var $Hidiv = $(this).closest('div.row.crow');
+                var unitDecPlaces = parseFloat($Hidiv.find('.UDec').val()) || 0;
+                if (unitDecPlaces > maxDeclaces)
+                    maxDeclaces = unitDecPlaces;
+            }
+
+        })
+        $('#ReceiptQty', '.modal-body').text(Receipt.toFixed(maxDeclaces));
+        $('#DocQty', '.modal-body').text(DocQty.toFixed(maxDeclaces));
+    }
+
+    $('.ToReceipt').click(function () {
+
+        var $Hidiv = $(this).closest('div.row.crow');
+
+        var unitDecPlaces = parseFloat($Hidiv.find('.UDec').val()) || 0;
+
+        var $div = $(this).closest('div.row');
+
+        var ReceiptQty = parseFloat($div.find('#OrderQty').text()) || 0;
+
+        if ($div.find('input.ReceiptQty').val() && $div.find('input.ReceiptQty').val() > 0) {
+            $div.find('input.ReceiptQty').val(0);
+            $div.find('input.DocQty').val(0);
+            $div.find('input.ReceiptDealQty').val(0);
+        }
+
+        else {
+            $div.find('input.ReceiptQty').val(ReceiptQty.toFixed(unitDecPlaces));
+            $div.find('input.DocQty').val(ReceiptQty.toFixed(unitDecPlaces));
+            UpdateDealReceiptQty($(this));
+        }
+
+
+
+
+        CalculateTotal();
+
+    })
+
+    function UpdateDealReceiptQty(t) {
+
+        var $Hiddendiv = t.closest('div.row.crow');
+
+        var $div = t.closest('div.row');
+
+        var unitConvMul = parseFloat($Hiddendiv.find('.UnitConvMul').val()) || 0;
+        var DocQty = parseFloat($div.find('input.DocQty').val()) || 0;
+        var OrderQty = parseFloat($Hiddendiv.find('.OrdQty').val()) || 0;
+        var OrderDealQty = parseFloat($Hiddendiv.find('.OrdDelQty').val()) || 0;
+        var DealunitDecPlaces = parseFloat($Hiddendiv.find('.DelUDec').val()) || 0;
+
+        if (unitConvMul != 0) {
+            if ($div.find('input.ReceiptDealQty').length)
+                $div.find('input.ReceiptDealQty').val((DocQty * unitConvMul).toFixed(DealunitDecPlaces));
+        }
+        else if (DocQty == OrderQty) {
+            if ($div.find('input.ReceiptDealQty').length)
+                $div.find('input.ReceiptDealQty').val(OrderDealQty.toFixed(DealunitDecPlaces));
+        }
+        else {
+            if ($div.find('input.ReceiptDealQty').length)
+                $div.find('input.ReceiptDealQty').val((DocQty * (OrderDealQty / OrderQty)).toFixed(DealunitDecPlaces));
+        }
+
+
+    }
+
+    $('#ToReceipt,#ToDoc').click(function () {
+        if (reset) {
+            $('div.row.crow', "#gbody.panel-info").each(function (index) {
+
+
+                var $Hidiv = $(this);
+
+                var unitDecPlaces = parseFloat($Hidiv.find('.UDec').val()) || 0;
+
+                var ReceiptQty = parseFloat($Hidiv.find('#OrderQty').text()) || 0;
+
+                $Hidiv.find('input.ReceiptQty').val(ReceiptQty.toFixed(unitDecPlaces));
+                $Hidiv.find('input.DocQty').val(ReceiptQty.toFixed(unitDecPlaces));
+
+
+                var unitConvMul = parseFloat($Hidiv.find('.UnitConvMul').val()) || 0;
+                var OrderQty = parseFloat($Hidiv.find('.OrdQty').val()) || 0;
+                var OrderDealQty = parseFloat($Hidiv.find('.OrdDelQty').val()) || 0;
+                var DealunitDecPlaces = parseFloat($Hidiv.find('.DelUDec').val()) || 0;
+
+
+                if (unitConvMul != 0) {
+                    if ($Hidiv.find('input.ReceiptDealQty').length)
+                        $Hidiv.find('input.ReceiptDealQty').val((ReceiptQty * unitConvMul).toFixed(DealunitDecPlaces));
+                }
+                else if (ReceiptQty == OrderQty) {
+                    if ($Hidiv.find('input.ReceiptDealQty').length)
+                        $Hidiv.find('input.ReceiptDealQty').val(OrderDealQty.toFixed(DealunitDecPlaces));
+                }
+                else {
+                    if ($Hidiv.find('input.ReceiptDealQty').length)
+                        $Hidiv.find('input.ReceiptDealQty').val((ReceiptQty * (OrderDealQty / OrderQty)).toFixed(DealunitDecPlaces));
+                }
+
+
+            })
+            CalculateTotal();
+            reset = false;
+        }
+        else if (!reset) {
+            $('div.row.crow', "#gbody.panel-info").each(function (index) {
+
+                var $Hidiv = $(this);
+
+                var unitDecPlaces = parseFloat($Hidiv.find('.UDec').val()) || 0;
+
+                var ReceiptQty = parseFloat($Hidiv.find('#OrderQty').text()) || 0;
+
+                $Hidiv.find('input.ReceiptQty').val(0);
+                $Hidiv.find('input.DocQty').val(0);
+                $Hidiv.find('input.ReceiptDealQty').val(0);
+
+            })
+            CalculateTotal();
+            reset = true;
+        }
+    })
+
+    $('.DocQty').keyup(function () {
+
+        $(this).closest('div.row').find('input.ReceiptQty').val($(this).val());
+
+        UpdateDealReceiptQty($(this));
+
+    })
+
+</script>

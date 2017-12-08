@@ -1,0 +1,322 @@
+﻿@model Model.ViewModels.SaleOrderMasterDetailModel
+
+@{
+    ViewBag.Title = "Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<style type="text/css">
+    .CurveBorder {
+        border-radius: 5px;
+        width: 8em;
+        height: 3em;
+    }
+</style>
+
+
+@using (Html.BeginForm())
+{
+    <div class="panel panel-default">
+        <div class="panel-heading">
+
+
+            @if (ViewBag.transactionType == "submit")
+            {<h3>
+                <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"> <span class="glyphicon glyphicon-file black"></span>Submit Sale Order</span>
+                <input type="submit" value="Submit" name="Command:Submit" class="btn btn-primary right" style="width: 90px; background-color: #2980b9" />
+            </h3>}
+            else if (ViewBag.transactionType == "approve")
+            {<h3>
+                <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"> <span class="glyphicon glyphicon-file black"></span>Approve Sale Order</span>
+                <input type="submit" value="Approve" class="btn btn-primary right" name="Command:Approve" style="width: 90px; background-color: #2980b9" />
+            </h3>}
+            else
+            {<h3>
+                <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"> <span class="glyphicon glyphicon-file black"></span>Sale Order Details</span>
+            </h3>}
+            <hr style="margin-top:0px;margin-bottom:0px" />
+
+            <div class="panel-info">
+                <h4 style="padding:5px 0 0 0;margin:0px">
+                    @Html.ActionLink(" ", " ", " ", null, new { @class = "glyphicon glyphicon-refresh toolbar", @title = "Refresh Page", @data_toggle = "tooltip", @id = "RefreshPage" })
+
+                    @Html.ActionLink(" ", "History", "SaleOrderHeader", null, new { @class = "glyphicon glyphicon-user toolbar", @title = "History", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "Print", "SaleOrdeHeader", null, new { @class = "glyphicon glyphicon-print toolbar", @title = "Print", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "Email", "SaleOrderHeader", null, new { @class = "glyphicon glyphicon-envelope toolbar", @title = "Email", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "Index", "SaleOrderHeader", null, new { @class = "glyphicon glyphicon-list toolbar right", @title = "List", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "Report", "SaleOrderHeader", null, new { @class = "glyphicon glyphicon-th toolbar right", @title = "Report", @data_toggle = "tooltip" })
+                </h4>
+            </div>
+
+        </div>
+
+        <div class="panel-info" style="padding-left:15px">
+            @Html.AntiForgeryToken()
+            <div class="row">
+                <div class="col-md-6">
+                    <dl class="dl-horizontal" style="padding-top:15px">
+                        @Html.HiddenFor(m => m.SaleOrderHeaderId)
+                        @Html.HiddenFor(m => m.SaleOrderHeaderIndexViewModelForEdit.SaleOrderHeaderId)
+                        @Html.HiddenFor(m => m.SaleOrderHeaderIndexViewModelForEdit.DocNo)
+                        <dt>
+                            @Html.DisplayNameFor(model => model.SaleOrderHeaderIndexViewModelForEdit.DocumentTypeName)    :
+                        </dt>
+
+                        <dd>
+                            @Html.DisplayFor(model => model.SaleOrderHeaderIndexViewModelForEdit.DocumentTypeName)
+                        </dd>
+
+                        <dt>
+                            @Html.DisplayNameFor(model => model.SaleOrderHeaderIndexViewModelForEdit.DocDate)    :
+                        </dt>
+
+                        <dd>
+                            @Html.DisplayFor(model => model.SaleOrderHeaderIndexViewModelForEdit.DocDate)
+                        </dd>
+
+                        <dt>
+                            @Html.DisplayNameFor(model => model.SaleOrderHeaderIndexViewModelForEdit.DocNo)    :
+                        </dt>
+
+                        <dd>
+                            @Html.DisplayFor(model => model.SaleOrderHeaderIndexViewModelForEdit.DocNo)
+                        </dd>
+
+                        <dt>
+                            @Html.DisplayNameFor(model => model.SaleOrderHeaderIndexViewModelForEdit.BuyerOrderNo)    :
+                        </dt>
+
+                        <dd>
+                            @Html.DisplayFor(model => model.SaleOrderHeaderIndexViewModelForEdit.BuyerOrderNo)
+                        </dd>
+
+                        <dt>
+                            @Html.DisplayNameFor(model => model.SaleOrderHeaderIndexViewModelForEdit.DueDate)    :
+                        </dt>
+
+                        <dd>
+                            @Html.DisplayFor(model => model.SaleOrderHeaderIndexViewModelForEdit.DueDate)
+                        </dd>
+
+
+
+                        <dt>
+                            @Html.DisplayNameFor(model => model.SaleOrderHeaderIndexViewModelForEdit.SaleToBuyerName)    :
+                        </dt>
+
+                        <dd>
+                            @Html.DisplayFor(model => model.SaleOrderHeaderIndexViewModelForEdit.SaleToBuyerName)
+                        </dd>
+
+                        <dt>
+                            @Html.DisplayNameFor(model => model.SaleOrderHeaderIndexViewModelForEdit.BillToBuyerName)    :
+                        </dt>
+
+                        <dd>
+                            @Html.DisplayFor(model => model.SaleOrderHeaderIndexViewModelForEdit.BillToBuyerName)
+                        </dd>
+
+                        <dt>
+                            @Html.DisplayNameFor(model => model.SaleOrderHeaderIndexViewModelForEdit.ShipAddress)    :
+                        </dt>
+
+                        <dd>
+                            @Html.DisplayFor(model => model.SaleOrderHeaderIndexViewModelForEdit.ShipAddress)
+                        </dd>
+
+
+                    </dl>
+                </div>
+                <div class="col-md-6">
+
+                    <dl class="dl-horizontal" style=" padding-top:15px">
+
+                        <dt>
+                            @Html.DisplayNameFor(model => model.SaleOrderHeaderIndexViewModelForEdit.CurrencyName)    :
+                        </dt>
+
+                        <dd>
+                            @Html.DisplayFor(model => model.SaleOrderHeaderIndexViewModelForEdit.CurrencyName)
+                        </dd>
+
+
+                        <dt>
+                            @Html.DisplayNameFor(model => model.SaleOrderHeaderIndexViewModelForEdit.ShipMethodName)    :
+                        </dt>
+
+                        <dd>
+                            @Html.DisplayFor(model => model.SaleOrderHeaderIndexViewModelForEdit.ShipMethodName)
+                        </dd>
+
+                        <dt>
+                            @Html.DisplayNameFor(model => model.SaleOrderHeaderIndexViewModelForEdit.DeliveryTermsName)    :
+                        </dt>
+
+                        <dd>
+                            @Html.DisplayFor(model => model.SaleOrderHeaderIndexViewModelForEdit.DeliveryTermsName)
+                        </dd>
+
+                        <dt>
+                            @Html.DisplayNameFor(model => model.SaleOrderHeaderIndexViewModelForEdit.PriorityName)    :
+                        </dt>
+
+                        <dd>
+                            @Html.DisplayFor(model => model.SaleOrderHeaderIndexViewModelForEdit.PriorityName)
+                        </dd>
+
+                        <dt>
+                            @Html.DisplayNameFor(model => model.SaleOrderHeaderIndexViewModelForEdit.CreditDays)    :
+                        </dt>
+
+                        <dd>
+                            @Html.DisplayFor(model => model.SaleOrderHeaderIndexViewModelForEdit.CreditDays)
+                        </dd>
+
+                        <dt>
+                            @Html.DisplayNameFor(model => model.SaleOrderHeaderIndexViewModelForEdit.TermsAndConditions)    :
+                        </dt>
+
+                        <dd>
+                            @Html.DisplayFor(model => model.SaleOrderHeaderIndexViewModelForEdit.TermsAndConditions)
+                        </dd>
+
+                        <dt>
+                            @Html.DisplayNameFor(model => model.SaleOrderHeaderIndexViewModelForEdit.Remark)    :
+                        </dt>
+
+                        <dd>
+                            @Html.DisplayFor(model => model.SaleOrderHeaderIndexViewModelForEdit.Remark)
+                        </dd>
+
+                    </dl>
+
+                </div>
+            </div>
+
+            @{var objLine = Model.SaleOrderLineIndexViewModel.FirstOrDefault();}
+            <table class="table">
+                <tr>
+                    <th>
+                        @Html.DisplayNameFor(model => objLine.Product)
+                    </th>
+                    <th>
+                        <div class="text-right">
+                            @Html.DisplayNameFor(model => objLine.Qty)
+                        </div>
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => objLine.DeliveryUnit)
+                    </th>
+                    <th>
+                        <div class="text-right">
+                            @Html.DisplayNameFor(model => objLine.DeliveryQty)
+                        </div>
+                    </th>
+
+
+                    <th>
+                        <div class="text-right">
+                            @Html.DisplayNameFor(model => objLine.Rate)
+                        </div>
+                    </th>
+                    <th>
+                        <div class="text-right">
+                            @Html.DisplayNameFor(model => objLine.Amount)
+                        </div>
+                    </th>
+
+
+                </tr>
+
+
+                @{decimal TotalQty = 0;}
+                @{decimal TotalDeliveryQty = 0;}
+                @{decimal TotalAmount = 0;}
+
+                @foreach (var item in Model.SaleOrderLineIndexViewModel)
+                {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.ProductName)
+                        </td>
+                        <td>
+                            <div class="text-right">
+                                @Html.DisplayFor(modelItem => item.Qty)
+                            </div>
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.DeliveryUnitId)
+                        </td>
+                        <td>
+                            <div class="text-right">
+                                @Html.DisplayFor(modelItem => item.DeliveryQty)
+                            </div>
+                        </td>
+
+
+                        <td>
+                            <div class="text-right">
+                                @Html.DisplayFor(modelItem => item.Rate)
+                            </div>
+                        </td>
+                        <td>
+                            <div class="text-right">
+                                @Html.DisplayFor(modelItem => item.Amount)
+                            </div>
+                        </td>
+                    </tr>
+
+                    TotalQty = TotalQty + System.Convert.ToDecimal(Html.DisplayFor(modelItem => item.Qty).ToString());
+                    TotalDeliveryQty = TotalDeliveryQty + System.Convert.ToDecimal(Html.DisplayFor(modelItem => item.DeliveryQty).ToString());
+                    TotalAmount = TotalAmount + System.Convert.ToDecimal(Html.DisplayFor(modelItem => item.Amount).ToString());
+                }
+                <tr>
+                    <td>
+                        <b>Totals :</b>
+                    </td>
+                    <td class="text-right">
+                        <b>@TotalQty</b>
+                    </td>
+
+                    <td></td>
+                    <td class="text-right">
+                        <b>@TotalDeliveryQty</b>
+                    </td>
+                    <td></td>
+                    <td class="text-right">
+                        <b>@TotalAmount</b>
+                    </td>
+
+
+                </tr>
+            </table>
+
+
+            @*<hr />
+                <div class="form-actions no-color">
+                    @if (ViewBag.transactionType == "submit")
+                    {
+                        <input type="submit" name="Command:Submit" value="Submit" class="btn btn-primary btn-sm CurveBorder" />
+                        <span style="font-family: Calibri,sans-serif,Verdana;font-size:large">
+
+                            @Html.ActionLink("Back", "Index", null, new { @class = "btn btn-primary btn-sm col-md-offset-1 CurveBorder ActionLinkPadding" })
+                        </span>
+                    }
+
+                    else if (ViewBag.transactionType == "approve")
+                    {
+                        <input type="submit" name="Command:Approve" value="Approve" class="btn btn-primary btn-sm CurveBorder" />
+                        <span style="font-family: Calibri,sans-serif,Verdana;font-size:large">
+
+                            @Html.ActionLink("Back", "Index", null, new { @class = "btn btn-primary btn-sm col-md-offset-1 CurveBorder ActionLinkPadding" })
+                        </span>
+                    }
+                    else
+                    {
+                        <span style="font-family: Calibri,sans-serif,Verdana;font-size:large">
+                            @Html.ActionLink("Back", "Index", null, new { @class = "btn btn-primary btn-sm col-md-offset-0 CurveBorder ActionLinkPadding" })
+                        </span>
+                    }
+                </div>*@
+        </div>
+    </div>
+}

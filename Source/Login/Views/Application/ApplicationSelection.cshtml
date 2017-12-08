@@ -1,0 +1,56 @@
+﻿@model IEnumerable<Login.Models.Application>
+
+@{
+    ViewBag.Title = "Create";
+    Layout = null;
+}
+<link href="~/Content/bootstrap.min.css" rel="stylesheet" />
+
+<style type="text/css">
+    .container {       
+        width: 60%;
+        background: #fff;
+        position: relative;
+        margin: -150px 0 -150px  -30%;
+        top: 50%;
+        left: 50%;
+        bottom:50%;
+    }
+
+    img {
+        max-height: 150px;
+        -webkit-border-radius: 8px ;
+        -moz-border-radius: 8px ;
+        border-radius: 8px ;
+    }
+    .row{
+        padding:5px 5px 5px 5px;
+    }
+
+</style>
+
+<div class="container">
+
+    @foreach(var item in Model)
+    {
+      <div class="row">
+          <div class="col-xs-2" >
+              
+          </div> 
+          <div class="col-xs-8">
+              <a href="/Application/SelectedApplication/@item.ApplicationId">
+                  <img src="~/Images/@item.IconName" style="width:100%" />
+              </a>
+          </div>
+          
+      </div>
+      
+    }
+
+</div>
+
+
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

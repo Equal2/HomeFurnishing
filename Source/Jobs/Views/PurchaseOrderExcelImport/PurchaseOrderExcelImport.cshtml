@@ -1,0 +1,53 @@
+﻿
+@{
+    ViewBag.Title = "PurchaseOrderExcelImport";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Purchase Order Excel Import</h2>
+<html>
+<head>
+    
+</head>
+
+
+<body>
+    <p style="font:bold"><b>Check These Fields</b> </p>
+    @{
+        
+    <ul>
+        @if (ViewBag.orderno!=null)
+        {
+             <li>
+                 <p style="font:bold"><b>Order Numbers Already Exist:</b>@ViewBag.orderno</p> 
+        </li>
+        }
+        
+        @if (ViewBag.supplier!=null)
+        {
+            <li>
+                <p style="font:bold"><b>Supplier Names Doesn't Exist:</b>@ViewBag.supplier</p>
+        </li>
+        }
+
+
+        @if (ViewBag.product!=null)
+        {
+            <li>
+                <p style="font:bold"><b>Product Type Doesn't Exist:</b>@ViewBag.product</p>
+        </li>
+        }
+        
+
+
+       
+    </ul>
+}
+   
+    @*<p>@ViewBag.supplier</p>
+    <p>@ViewBag.product</p>*@
+
+    @Html.ActionLink("Click Here to Go Back","Index","PurchaseOrderExcelImport")
+
+</body>
+</html>

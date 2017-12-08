@@ -1,0 +1,45 @@
+﻿@model IEnumerable<Model.Models.ProductType>
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3>
+            <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-list black"></span> Product Collection </span>
+        </h3>
+        <hr style="margin-top:0px;margin-bottom:0px" />
+
+        <div class="panel-info">
+            <h4 style="padding:5px 0 0 0;margin:0px">
+                @Html.ActionLink(" ", " ", " ", null, new { @class = "glyphicon glyphicon-refresh toolbar", @title = "Refresh Page", @data_toggle = "tooltip", @id = "RefreshPage" })
+            </h4>
+
+            <div class="form-horizontal">
+                @Html.ValidationSummary(true)
+
+
+                <div class="row">
+
+
+                    @foreach (var item in Model)
+                    {
+                        <div class="col-md-3 col-sm-4 col-xs-5 thumb">
+                            <a href="/ProductCollection/Index/@item.ProductTypeId">
+                                <div class="thumbnail img-thumbnail">
+                                    <img src="~/Uploads/@(item.ImageFolderName)/Medium/@(item.ImageFileName)" style="max-width:100%; height:auto;" />
+                                    <div class="text-center black" style="font-family:'Arial Rounded MT';font-weight:bold;font-size:1.3em;color:black">@item.ProductTypeName</div>
+                                </div>
+                            </a>
+                        </div>
+                    }
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</div>

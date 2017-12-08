@@ -1,0 +1,61 @@
+﻿@model IQueryable<Microsoft.AspNet.Identity.EntityFramework.IdentityRole>
+@using GridMvc.Html;
+@{
+    ViewBag.Title = "Index";
+}
+
+<div class="panel panel-default">
+
+    <div class="panel-heading">
+
+        <h3>
+            <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-list black"></span> Roles List</span>
+        </h3>
+        <hr style="margin-top:0px;margin-bottom:0px" />
+        <div class="panel-info">
+            <h4 style="padding:5px 0 0 0;margin:0px">
+                @Html.ActionLink(" ", " ", " ", null, new { @class = "glyphicon glyphicon-refresh toolbar", @title = "Refresh Page", @data_toggle = "tooltip", @id = "RefreshPage" })
+                @Html.ActionLink(" ", "Create", "RolePermission", null, new { @class = "glyphicon glyphicon-plus toolbar", @title = "Add New", @data_toggle = "tooltip" })
+                @Html.ActionLink(" ", "Delete", "RolePermission", null, new { @class = "glyphicon glyphicon-trash toolbar", @title = "Delete", @data_toggle = "tooltip", @id = "DeleteRecord" })
+            </h4>
+        </div>
+    </div>
+    <div class="panel-info" style="padding-left:5px;padding-top:2px">
+        @Html.Grid(Model).Columns(columns =>
+           {
+               columns.Add(foo => foo.Id, true);
+               columns.Add(foo => foo.Name).Sortable(true).Titled(" Role Name").Filterable(true).Sortable(true).SetWidth(200);
+
+           }).WithPaging(25).EmptyText("No records found.")
+    </div>
+
+</div><!-- End .panel -->
+
+<script type="text/javascript">
+
+    $('table.grid-table td').dblclick(function () {
+        var $this = $(this);
+        var row = $this.closest("tr");
+        var editid = row.find('[data-name="Id"]').text();
+        var url = '@Url.Action("Edit", "RolePermission")' + "/" + editid;
+        window.location.href = url;
+
+    });
+
+    $('a#DeleteRecord').click(function (e) {
+
+        var tes = DeleteValidation();
+        if (!tes) {
+            e.stopImmediatePropagation();
+            return false;
+        }
+        var editiiid = $('table.grid-table .grid-row.grid-row-selected').find('[data-name="Id"]').text();
+        var url = '/RolePermission/Delete/' + editiiid;
+        $(this).attr('href', url);
+        return;
+    })
+    $('#myModal').on('shown.bs.modal', function () {
+        $("#Reason").focus();
+    });
+
+</script>

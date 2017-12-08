@@ -1,0 +1,237 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@ViewBag.ProductTypeId
+
+
+@using (Html.BeginForm("SaleOrderExcelImport", "SaleOrderExcelImport", new { id=ViewBag.id }, FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+    <div class="panel panel-default">
+        <div class="panel-heading">
+
+            <h3>
+                <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"> <span class="glyphicon glyphicon-export black"></span>@ViewBag.Name Excel Upload</span>
+              
+            </h3>
+
+            <hr style="margin-top:0px;margin-bottom:0px" />
+
+            <div class="panel-info">
+                <h4 style="padding:5px 0 0 0;margin:0px">
+                    @Html.ActionLink(" ", " ", " ", null, new { @class = "glyphicon glyphicon-refresh toolbar", @title = "Refresh Page", @data_toggle = "tooltip", @id = "RefreshPage" })
+                    @Html.ActionLink(" ", "Index", "SaleOrderHeader", new { id = ViewBag.id }, new { @class = "glyphicon glyphicon-list toolbar right", @title = "List", @data_toggle = "tooltip" })                    
+                </h4>
+            </div>
+
+        </div>
+        <div class="panel-info" style="padding-left:15px">
+            <div class="form-horizontal">
+                <h4 class="black">Upload Excel File in the Specified Format:</h4><p>
+                    <table class="table table-responsive table-hover" style="max-width:60%">
+                        <tr style="border-bottom:thin solid #dbd1d1;border-top:thin solid #dbd1d1">
+                            <td style="width:140px; padding-right:8px;">
+                                <h4>Coloumn Name</h4>
+                            </td>
+                            <td style="width:100px;">
+                                <h4>
+                                    Data Type
+                                </h4>
+                            </td>
+                            <td style="width:110px;">
+                                <h4>
+                                    Max Length
+                                </h4>
+                            </td>
+                        </tr>
+                        <tr style="border-bottom:thin solid #dbd1d1" class="danger">
+                            <td>
+                                OrderNo
+                            </td>
+                            <td>
+                                Text
+                            </td>
+                            <td>
+                                10
+                            </td>
+                        </tr>
+                        <tr style="border-bottom:thin solid #dbd1d1" class="danger">
+                            <td>
+                                OrderDate
+                            </td>
+                            <td>
+                                Date
+                            </td>
+                            <td>-</td>
+                        </tr>
+                        <tr style="border-bottom:thin solid #dbd1d1" class="danger">
+                            <td>
+                                DueDate
+                            </td>
+                            <td>
+                                Date
+                            </td>
+                            <td>-</td>
+                        </tr>
+                        <tr style="border-bottom:thin solid #dbd1d1" class="danger">
+                            <td>
+                                Product
+                            </td>
+                            <td>
+                                Text
+                            </td>
+                            <td>-</td>
+                        </tr>
+
+                        <tr style="border-bottom:thin solid #dbd1d1" class="danger">
+                            <td>
+                                Qty
+                            </td>
+                            <td>
+                                Number
+                            </td>
+                            <td>-</td>
+                        </tr>
+
+                        <tr style="border-bottom:thin solid #dbd1d1" class="danger">
+                            <td>
+                                Rate
+                            </td>
+                            <td>
+                                Number
+                            </td>
+                            <td>-</td>
+                        </tr>   
+                        <tr style="border-bottom:thin solid #dbd1d1" class="danger">
+                            <td>
+                                SaleToBuyer
+                            </td>
+                            <td>
+                                Text
+                            </td>
+                            <td>-</td>
+                        </tr>
+                        <tr style="border-bottom:thin solid #dbd1d1">
+                            <td>
+                                BuyerOrderNo
+                            </td>
+                            <td>
+                                Text
+                            </td>
+                            <td>-</td>
+                        </tr>
+
+                        <tr style="border-bottom:thin solid #dbd1d1">
+                            <td>
+                                BillToBuyer
+                            </td>
+                            <td>
+                                Text
+                            </td>
+                            <td>-</td>
+                        </tr>
+                        <tr style="border-bottom:thin solid #dbd1d1">
+                            <td>
+                                ShipAddress
+                            </td>
+                            <td>
+                                Text
+                            </td>
+                            <td>-</td>
+                        </tr>
+                        <tr style="border-bottom:thin solid #dbd1d1">
+                            <td>
+                                Currency
+                            </td>
+                            <td>
+                                Text
+                            </td>
+                            <td>-</td>
+                        </tr>
+                        <tr style="border-bottom:thin solid #dbd1d1">
+                            <td>
+                                ShipMethod
+                            </td>
+                            <td>
+                                Text
+                            </td>
+                            <td>-</td>
+                        </tr>
+                        <tr style="border-bottom:thin solid #dbd1d1">
+                            <td>
+                                DeliveryTerms
+                            </td>
+                            <td>
+                                Text
+                            </td>
+                            <td>-</td>
+                        </tr>
+                        <tr style="border-bottom:thin solid #dbd1d1">
+                            <td>
+                                Priority
+                            </td>
+                            <td>
+                                Text
+                            </td>
+                            <td>-</td>
+                        </tr>
+                        <tr style="border-bottom:thin solid #dbd1d1">
+                            <td>
+                                Terms&Conditions
+                            </td>
+                            <td>
+                                Text
+                            </td>
+                            <td>-</td>
+                        </tr>
+                        <tr style="border-bottom:thin solid #dbd1d1">
+                            <td>
+                                BuyerUpcCode
+                            </td>
+                            <td>
+                                Text
+                            </td>
+                            <td>-</td>
+                        </tr>
+
+                        <tr style="border-bottom:thin solid #dbd1d1">
+                            <td>
+                                Remark
+                            </td>
+                            <td>
+                                Text
+                            </td>
+                            <td>-</td>
+                        </tr>
+                     
+                    </table>
+                </p>
+
+                <div class="form-group">
+                    @*@Html.Label("", "Select File", new { @class = "control-label file-input-button" })*@
+                    <div class="col-md-10">
+                        <div class="row">
+                            <div class="col-md-3" style="padding-top:8px">
+                                <input type="file" name="FileUpload1" />
+                            </div>
+                            <div class="col-md-8">
+                                <input type="submit" value="Upload" class="btn btn-primary fileinput-button" id="submit" style="width: 90px; background-color: #2980b9" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                @*<div class="form-group">
+                    <div class="col-md-offset-1 col-md-10">
+                        <input type="submit" value="Upload" class="btn btn-primary btn-sm CurveBorder" />
+                        @Html.ActionLink("Back", "Index", "SaleOrderHeader",null, new { @class = "btn btn-primary btn-sm col-md-offset-1 CurveBorder ActionLinkPadding" })
+                    </div>
+                </div>*@
+            </div>
+        </div>
+    </div>
+}
+
+
+

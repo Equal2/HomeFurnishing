@@ -1,0 +1,217 @@
+﻿@model Microsoft.AspNet.Identity.EntityFramework.IdentityRole
+@using System.Text.RegularExpressions
+
+@{
+    ViewBag.Title = "Role Permission";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style type="text/css">
+    /*.grid {
+        width: 1140px;
+        height: 65vh;
+    }*/
+
+
+
+
+    .ui-grid-cell {
+        border-style: solid;
+        border-width: thin;
+        
+    }
+
+    .text-right {
+        text-align: right;
+        /*float: right;*/
+    }
+
+
+    .cell-text {
+        font-size: 13px;
+        font-weight: normal;
+    }
+
+    .cell-text-center {
+        font-size: 13px;
+        font-weight: normal;
+        text-align: center;
+    }
+
+    .header-text {
+        font-size: 13px;
+    }
+
+
+    .header-text-center {
+        font-size: 13px;
+        text-align: center;
+    }
+
+
+    /*.ui-grid-viewport .ui-grid-cell-contents {
+        word-wrap: break-word;white-space: normal !important;
+    }
+
+    .ui-grid-row, .ui-grid-cell {
+        height: auto !important;
+    }
+
+        .ui-grid-row div[role=row] {
+            display: flex;
+            align-content: stretch;
+        }
+
+    .ui-grid-header-cell-label {
+        display: inline-block;
+        white-space: initial;
+    }*/
+
+</style>
+
+
+<!doctype html>
+<html ng-app="RolePermission">
+<head>
+    <title>
+        UI-Grid
+    </title>
+    <script src="~/Scripts/angular.js"></script>
+    <script src="~/Scripts/angular-touch.js"></script>
+    <script src="~/Scripts/angular-animate.js"></script>
+    <script data-require="angular.js@1.4.x" src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.4.6/angular.min.js" data-semver="1.4.6"></script>
+    <script src="http://ui-grid.info/docs/grunt-scripts/csv.js"></script>
+    <script src="http://ui-grid.info/docs/grunt-scripts/pdfmake.js"></script>
+    <script src="http://ui-grid.info/docs/grunt-scripts/vfs_fonts.js"></script>
+    <script src="http://ui-grid.info/release/ui-grid-unstable.js"></script>
+    <link rel="stylesheet" href="http://ui-grid.info/release/ui-grid-unstable.css" type="text/css">
+
+
+    @*<script src="~/Scripts/pdfmake/pdfmake.min.js"></script>
+        <script src="~/Scripts/pdfmake/vfs_fonts.js"></script>*@
+    @*<script src="~/Scripts/app.js"></script>*@
+
+
+    @*<script src="~/Scripts/FinancialDisplay/FinancialDisplay.js"></script>
+    <script src="~/Scripts/ui-grid.js"></script>
+    <link href="~/Content/ui-grid.css" rel="stylesheet" />*@
+
+    <script src="~/Scripts/JSTable/jspdf.debug.js"></script>
+    <script src="~/Scripts/JSTable/faker.min.js"></script>
+    <script src="~/Scripts/JSTable/jspdf.plugin.autotable.js"></script>
+    <script src="~/Scripts/JSTable/examples.js"></script>
+</head>
+<body id="MyBody">
+
+    <div ng-controller="MainCtrl">
+        @using (Html.BeginForm())
+{
+            <div class="panel panel-default" style="margin-bottom: 0px; height: 140px">
+
+                <div class="panel-heading">
+                    <h3>
+                        <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-file black"></span> Roles</span>
+                        <input type="submit" value="Save" class="btn btn-primary right" id="submit" style="width: 90px; background-color: #2980b9" />
+                    </h3>
+                    <div class="panel-info">
+                        <h4 style="padding:5px 0 0 0;margin:0px">
+                            @Html.ActionLink(" ", " ", " ", null, new { @class = "glyphicon glyphicon-refresh toolbar", @title = "Refresh Page", @data_toggle = "tooltip", @id = "RefreshPage" })
+                            @Html.ActionLink(" ", "Create", "RolePermission", null, new { @class = "glyphicon glyphicon-plus toolbar", @title = "Add New", @data_toggle = "tooltip" })
+                            @Html.ActionLink(" ", "Index", "RolePermission", null, new { @class = "glyphicon glyphicon-list toolbar right", @title = "List", @data_toggle = "tooltip" })
+                        </h4>
+                    </div>
+                </div>
+
+                <div class="panel-info" style="padding-left:15px">
+                    @Html.AntiForgeryToken()
+                    @Html.HiddenFor(m => m.Id)
+                    @*@Html.HiddenFor(m => m.LedgerAccountGroup)
+                    @Html.HiddenFor(m => m.LedgerAccount)*@
+
+                    <div class="form-horizontal" role="form" id="ReportFilters">
+                        @Html.ValidationSummary(true)
+                        <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+                            <div class="panel-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            @Html.LabelFor(model => model.Name, "Role Name", new { @class = "control-label col-md-4 col-sm-2" })
+                                            <div class="col-xs-6">
+                                                @Html.TextBoxFor(m => m.Name, null, new { @class = "form-control col-xs-6" })
+                                                @Html.ValidationMessageFor(m => m.Name, null, new { @class = "has-error" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="col-md-offset-2 col-md-10">
+
+                                <span style="font-family: Calibri,sans-serif,Verdana;font-size:large">
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div id="tableDiv"></div>
+
+            </div>
+        }
+
+
+        @*<div ui-grid="gridOptions" ui-grid-exporter ui-grid-resize-columns ui-grid-move-columns ui-grid-cellnav ui-grid-pinning ui-grid-save-state  ui-grid-tree-view class="grid" style="margin-top:0px"></div>*@
+
+        <div ui-grid="gridOptions" ui-grid-exporter ui-grid-cellnav ui-grid-resize-columns ui-grid-move-columns ui-grid-pinning class="grid" style="margin-top:0px"></div>
+
+
+
+        
+    </div>
+   
+
+    <script src="~/Scripts/RolePermission/RolePermission.js"></script>
+    <script src="~/Scripts/ui-grid.js"></script>
+    <link href="~/Content/ui-grid.css" rel="stylesheet" />
+
+
+</body>
+
+
+</html>
+
+
+
+
+
+
+<script type="text/ng-template" id="ui-grid/uiGridCell">
+    <div class="ui-grid-cell-contents my-cell" data-ng-init="BindData()">{{COL_FIELD CUSTOM_FILTERS}}</div>
+
+
+</script>
+
+
+
+
+<script type="text/javascript">
+    var IsSaved = false;
+    var ValidationCount = 0;
+
+    $('form').submit(function (event) {
+
+        if (!IsSaved) {
+            IsSaved = true;
+            return IsSaved;
+        }
+        else {
+            return false;
+        }
+
+
+    });
+
+</script>
+

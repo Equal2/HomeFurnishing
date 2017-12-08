@@ -1,0 +1,715 @@
+﻿@model Model.ViewModel.PurchaseQuotationHeaderViewModel
+@using Core.Common
+@{
+    ViewBag.Title = "Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style type="text/css">
+    .ui-autocomplete .m-name {
+        display: block;
+        margin-right: 1em;
+        font-size: small;
+    }
+
+    .ui-autocomplete .m-year {
+        display: block;
+        font-size: small;
+    }
+
+    .ui-autocomplete .rt-bar span {
+        display: block;
+        height: 1em;
+    }
+
+    /*.ui-autocomplete span {
+        background-color: #C91B22;
+    }*/
+    .ui-widget {
+        font-family: Tahoma;
+    }
+    /*.ui-autocomplete li {
+        background-color: #94B13C;
+    }*/
+</style>
+<!-- modal placeholder-->
+<div id='myModal' class='modal fade in'>
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div id='myModalContent'></div>
+        </div>
+    </div>
+</div>
+
+@using (Html.BeginForm("Post", "PurchaseQuotationHeader", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(m => m.SiteId)
+    @Html.HiddenFor(m => m.DivisionId)
+    @Html.HiddenFor(m => m.Status)
+    @Html.HiddenFor(m => m.PurchaseQuotationHeaderId)
+    @Html.HiddenFor(m => m.DocTypeId)
+    @Html.HiddenFor(m => m.CreatedDate)
+    @Html.HiddenFor(m => m.PurchaseQuotationSettings.CalculationId)
+
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            @if (ViewBag.transactionType == "submit" || ViewBag.transactionType == "submitContinue")
+            {<h3>
+                <button type="submit" name="Command:Submit" class="btn btn-primary right" id="SubmitContinue" style="margin-left:5px;">Submit & Next<span class='badge'>@(ViewBag.PendingToSubmit != 0 ? ViewBag.PendingToSubmit : "")</span></button>
+                <button type="submit" name="Command:Submit" class="btn btn-primary right">Submit</button>
+                <input type="hidden" id="IsContinue" name="IsContinue" value="" />
+                <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"> <span class="glyphicon glyphicon-file black"></span>Submit @ViewBag.Name</span>
+            </h3>}
+            else if (ViewBag.transactionType == "review" || ViewBag.transactionType == "ReviewContinue")
+            {<h3 style="border-bottom:0px solid #e1dada;padding-bottom:0px;">
+                <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"> <span class="glyphicon glyphicon-file black"></span> Review @ViewBag.Name</span>
+                <button type="submit" name="Command:Review" class="btn btn-primary right" style="margin-left:5px" id="ReviewContinue">Review & Next<span class='badge'>@(ViewBag.PendingToReview != 0 ? ViewBag.PendingToReview : "")</span></button>
+                <button type="submit" class="btn btn-primary right" name="Command:Review">Review</button>
+                <input type="hidden" id="IsContinue" name="IsContinue" value="" />
+            </h3>}
+
+            else if (ViewBag.transactionType == "detail")
+            {
+                <h3>
+                    <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"> <span class="glyphicon glyphicon-file black"></span>@ViewBag.Name</span>
+                </h3>
+            }
+            else
+            {
+                <h3>
+                    <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"> <span class="glyphicon glyphicon-file black"></span>@ViewBag.Name</span>
+                    <input type="submit" value="Save" class="btn btn-primary right" id="submit" style="width: 90px; background-color: #2980b9" />
+                </h3>
+            }
+
+
+            <hr style="margin-top:0px;margin-bottom:0px" />
+
+            <div class="panel-info">
+                <h4 style="padding:5px 0 0 0;margin:0px">
+                   
+                </h4>
+            </div>
+        </div>
+        <div class="panel-info" style="padding-left:15px">
+            <div class="form-horizontal">
+                @Html.ValidationSummary(true)
+
+                <div class="row">
+                    <h4 class="col-md-12 black">
+                        <span class="glyphicon glyphicon-align-justify"></span>
+                        1.Document Details
+                    </h4>
+                    <div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group" style="margin-top:15px">
+                                    @Html.LabelFor(model => model.DocDate, "Order Date", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.DocDate, "{0:dd/MMMM/yyyy}", new { @class = "datepickerWithNFD form-control col-xs-6 required" })
+                                        @Html.ValidationMessageFor(model => model.DocDate, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6" style="margin-top:15px">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.DocNo, "Order No", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.DocNo, null, new { @class = "form-control col-xs-6 required" })
+                                        @Html.ValidationMessageFor(m => m.DocNo, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.SupplierId, "Supplier", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.SupplierId, null, new { @class = "form-control col-xs-6 required" })
+                                        @Html.ValidationMessageFor(m => m.SupplierId, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.DueDate, "Due Date", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.DueDate, "{0:dd/MMMM/yyyy}", new { @class = "datepicker form-control col-xs-6 required" })
+                                        @Html.ValidationMessageFor(model => model.DueDate, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.CurrencyId, "Currency", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.DropDownListFor(m => m.CurrencyId, new SelectList(ViewBag.CurrencyList as System.Collections.IEnumerable, "ID", "Name"), new { @class = "height form-control col-xs-6 " })
+                                        @Html.ValidationMessageFor(m => m.CurrencyId, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.SalesTaxGroupPersonId, "Sales Tax Group Person", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.DropDownListFor(m => m.SalesTaxGroupPersonId, new SelectList(ViewBag.SalesTaxGroupList as System.Collections.IEnumerable, "ChargeGroupPersonId", "ChargeGroupPersonName"), string.Empty, new { @class = "height form-control col-xs-6 required" })
+                                        @Html.ValidationMessageFor(m => m.SalesTaxGroupPersonId, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.DeliveryTermsId, "Delivery Terms", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.DropDownListFor(m => m.DeliveryTermsId, new SelectList(ViewBag.DeliveryTermsList as System.Collections.IEnumerable, "DeliveryTermsId", "DeliveryTermsName"), string.Empty, new { @class = "height form-control col-xs-6" })
+                                        @Html.ValidationMessageFor(m => m.DeliveryTermsId, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.ShipMethodId, "Ship Method", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.DropDownListFor(m => m.ShipMethodId, new SelectList(ViewBag.ShipMethodList as System.Collections.IEnumerable, "ShipMethodId", "ShipMethodName"), string.Empty, new { @class = "height form-control col-xs-6 required" })
+                                        @Html.ValidationMessageFor(m => m.ShipMethodId, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.UnitConversionForId, "Unit Conversion For", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.DropDownListFor(m => m.UnitConversionForId, new SelectList(ViewBag.UnitConvForList as System.Collections.IEnumerable, "UnitConversionForId", "UnitConversionForName"), new { @class = "form-control height" })
+                                        @Html.ValidationMessageFor(m => m.UnitConversionForId, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.CreditDays, "Credit Days", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.CreditDays, null, new { @class = "form-control col-xs-6 " })
+                                        @Html.ValidationMessageFor(m => m.CreditDays, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.TermsAndConditions, "Terms & Conditions", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextAreaFor(m => m.TermsAndConditions, new { @class = "form-control col-xs-6" })
+                                        @Html.ValidationMessageFor(m => m.TermsAndConditions, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.ShipAddress, "Ship Address", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextAreaFor(m => m.ShipAddress, new { @class = "form-control col-xs-6" })
+                                        @Html.ValidationMessageFor(m => m.ShipAddress, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.Remark, "Remark", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextAreaFor(m => m.Remark, new { @class = "form-control col-xs-6" })
+                                        @Html.ValidationMessageFor(m => m.Remark, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    @*<a tabindex="0" class="btn btn-lg btn-danger" role="button" data-toggle="popover" data-trigger="focus" title="Dismissible popover" data-content="And here's some amazing content. It's very engaging. Right?">Dismissible popover</a>*@
+}
+
+
+
+
+@if ((ViewBag.Mode == "Add") || (ViewBag.Mode == "Edit"))
+{
+
+    <script type="text/javascript">
+
+        $(function () {
+
+            $("#DocNo").on("change", function () {
+                $(this).DuplicateCheckForCreate({ name: 'PurchaseQuotationHeader', value: $(this).val(), doctype: $("#DocTypeId").val() });
+            });
+
+        });
+
+        //For Populating Modal PopUp on DoubleClick Of Row
+        $('#gbody').on("dblclick",'.grid-body',function(){
+            var text = $(this).find(".id").val();
+            var editurl=$(this).find('a[edit]').attr('href');
+            $('#myModalContent').load(editurl, function ( response, status, xhr) {
+                //alert('2');
+
+                if ( status == "error" ) {
+                }
+                else
+                {
+                    $('#myModal').modal({
+                        backdrop: 'static',
+                        keyboard: true
+                    }, 'show');
+
+                    bindForm1(this);
+                }
+            });
+        });
+
+        //For Populating Modal PopUp on DoubleClick Of Row
+        $('#gbodycharges').on("dblclick",'.grid-body',function(){
+            var text = $(this).find(".id").val();
+
+            var editurl="/TaxCalculation/GetPOHeaderChargeForEdit/";
+            $('#myModalContent').load(editurl,{Id:text,HeaderTable:"Web.PurchaseQuotationHeaderCharges",LineTable:"Web.PurchaseQuotationLineCharges"}, function ( response, status, xhr) {
+                //alert('2');
+                if ( status == "error" ) {
+                    var msg = "Sorry but there was an error: ";
+
+                }
+                else
+                {
+                    $('#myModal').modal({
+                        backdrop: 'static',
+                        keyboard: true
+                    }, 'show');
+
+                    bindForm1(this);}
+            });
+        });
+
+        //For Handling Modal PopUp on Clicking Delete Icon
+        $('#gbody').on("click",'a[Detail]', function (e) {
+            $('#myModalContent').load(this.href, function (response, status, xhr) {
+                //alert('2');
+                if ( status == "error" ) {
+                    var msg = "Sorry but there was an error: ";
+                }
+                else
+                {
+                    $('#myModal').modal({
+                        backdrop: 'static',
+                        keyboard: true
+                    }, 'show');
+
+                    bindForm1(this);}
+            });
+            return false;
+        });
+
+
+        //For Handling Modal PopUp on Clicking Delete Icon
+        $('#gbody').on("click",'a[delete]', function (e) {
+            $('#myModalContent').load(this.href, function (response, status, xhr) {
+                //alert('2');
+                if ( status == "error" ) {
+                    var msg = "Sorry but there was an error: ";
+                }
+                else
+                {
+                    $('#myModal').modal({
+                        backdrop: 'static',
+                        keyboard: true
+                    }, 'show');
+
+                    bindForm1(this);}
+            });
+            return false;
+        });
+
+
+        var id=@Model.PurchaseQuotationHeaderId;
+        if(id==null||id==0)
+        {
+            $(document).find('a#btnCreate').removeAttr('href').removeAttr('data-modal');
+            $("#btnCreateF").attr('disabled','disabled');
+            $('#CurrencyId option:contains("INR")').prop('selected',true);
+        }
+
+
+
+        //Reloading the table contents on modal hide
+        $('#myModal').on('hidden.bs.modal', function () {
+            LoadProducts();
+            var id=@Model.PurchaseQuotationHeaderId;
+            LoadCharges(id,"Web.PurchaseQuotationHeaderCharges","Web.PurchaseQuotationLineCharges");
+        });
+
+
+        //To focus on the first element on modal load
+        $('#myModal').on('shown.bs.modal', function () {
+            $("#ProductId").select2("focus");
+        });
+
+
+
+
+
+
+
+
+        function PurchaseQuotationChargeModel() {
+            var self = this;
+            self.PurchaseQuotationLineId = $("#PurchaseQuotationLineId").val();
+            self.PurchaseQuotationHeaderId = $("#PurchaseQuotationHeaderId").val();
+            self.PurchaseIndentLineId = $("#PurchaseIndentLineId").val();
+            self.ProductId = $("#ProductId").val();
+            self.PurchaseIndentDocNo = $("#PurchaseIndentDocNo").val();
+            self.ProductName = $("#ProductName").val();
+            self.Dimension1Id = $("#Dimension1Id").val();
+            self.Dimension2Id = $("#Dimension2Id").val();
+            self.Specification = $("#Specification").val();
+            self.SupplierId = $("#SupplierId").val();
+            self.ShipDate = $("#ShipDate").val();
+            self.LotNo = $("#LotNo").val();
+            self.DueDate = $("#DueDate").val();
+            self.DealUnitId = $("#DealUnitId").val();
+            self.DealQty = $("#DealQty").val();
+            self.Rate = $("#Rate").val();
+            self.DiscountPer = $("#DiscountPer").val();
+            self.Amount = $("#Amount").val();
+            self.Remark = $("#Remark").val();
+            self.UnitConversionMultiplier = $("#UnitConversionMultiplier").val();
+            self.UnitId = $("#UnitId").val();
+            self.Qty = $("#Qty").val();
+            self.__RequestVerificationToken= $('[name=__RequestVerificationToken]').val();
+            var settings=new SettingsViewModel();
+            self.PurchOrderSettings=settings;
+
+            self.linecharges =charges;
+            self.footercharges=footercharges;
+        }
+        var charges;
+        var footercharges;
+
+        function SettingsViewModel(){
+            var self=this;
+            var settings;
+
+            self.isPostedInStockVirtual=$("#PurchOrderSettings_isPostedInStockVirtual").val();
+            self.CalculationId=$("#PurchOrderSettings_CalculationId").val();
+            self.isVisibleDimension1=$("#PurchOrderSettings_isVisibleDimension1").val();
+            self.isVisibleDimension2=$("#PurchOrderSettings_isVisibleDimension2").val();
+            self.isVisibleLotNo=$("#PurchOrderSettings_isVisibleLotNo").val();
+            self.isMandatoryRate=$("#PurchOrderSettings_isMandatoryRate").val();
+            self.isEditableRate=$("#PurchOrderSettings_isEditableRate").val();
+
+        }
+
+
+        //For posting the data through ajax and render the contents sent back from the server
+        function bindForm1(dialog) {
+            //alert("binding1");
+            $('form#modform', dialog).submit(function () {
+                //alert(this.action);
+                charges= AssignValuesToCharges();
+                footercharges=AssignValuesToFooter();
+
+                var request = new PurchaseQuotationChargeModel();
+                //var token=$('input[name="__RequestVerificationToken"]', 'form').val();
+                //var headers = {};
+                // other headers omitted
+                //headers['__RequestVerificationToken'] = token;
+
+                $.ajax({
+                    contentType:'application/json',
+                    //headers: headers,
+                    url: this.action,
+                    type: this.method,
+                    data:JSON.stringify(request),
+                    success: function (result) {
+                        if (result.success) {
+                            $('#myModal').modal('hide');
+                            //Refresh
+                            //location.reload();
+                            //alert('Data Saved');
+                        }else if(!result.success)
+                        {
+                            $('#myModalContent').html(result);
+                            bindForm1();
+                        }
+                        else {
+                            $('#myModalContent').html(result);
+                            bindForm1();
+                        }
+                    },
+                });
+                return false;
+            });
+
+
+            $('form#modformcharges', dialog).submit(function () {
+                //alert(this.action);
+
+                footercharges=AssignValuesToFooter();
+
+                $.ajax({
+                    contentType:'application/json',
+                    url: this.action,
+                    type: this.method,
+                    data:JSON.stringify(footercharges),
+                    success: function (result) {
+                        if (result.success) {
+                            $('#myModal').modal('hide');
+                            //Refresh
+                            //location.reload();
+                            //alert('Data Saved');
+                        }else if(!result.success)
+                        {
+                            $('#myModalContent').html(result);
+                            bindForm1();
+                        }
+                        else {
+                            $('#myModalContent').html(result);
+                            bindForm1();
+                        }
+                    }
+                });
+                return false;
+            });
+
+        }
+
+        $(function () {
+
+            $.ajaxSetup({ cache: false });
+
+            $("a[data-modalCustom]").on("click", function (e) {
+                // hide dropdown if any
+                if(this.href=="")
+                {
+                    return false;
+                }
+                //alert(' Script');
+                $('#myModalContent').load(this.href, function () {
+                    $('#myModal').modal({
+                        backdrop: 'static',
+                        keyboard: true
+                    }, 'show');
+
+                    bindForm1(this);
+                });
+
+                return false;
+            });
+        });
+
+    </script>
+
+}
+<script type="text/javascript">
+
+    $('a#PrintRecord').click(function (e) {
+
+        var editiiid = $('#PurchaseQuotationHeaderId').val();
+
+
+        var Status = $('#Status').val();
+        var url;
+        if (Status == StatusContstantsEnum.Drafted) {
+            url = '@Url.Action("Print", "PurchaseQuotationHeader")' + "/" + editiiid;
+        }
+        else if (Status == StatusContstantsEnum.Submitted || Status == StatusContstantsEnum.Modified ) {
+            url = '@Url.Action("PrintAfter_Submit", "PurchaseQuotationHeader")' + "/" + editiiid;
+        }
+        else if ( Status == StatusContstantsEnum.Closed ) {
+            url = '@Url.Action("PrintAfter_Approve", "PurchaseQuotationHeader")' + "/" + editiiid;
+        }
+        $(this).attr('href', url);
+        return;
+    })
+
+
+    CustomSelectFunction($("#SupplierId"), '/ComboHelpList/GetSuppliers', '/ComboHelpList/SetSingleSupplier', ' ', false, 1);
+    $('#SupplierId').select2("focus");
+
+    $(document).ready(function () {
+
+        //Adding Hidden Input Fields
+        AddFields();
+
+        //Calling the function to load the table data/ Line information
+        LoadProducts();
+
+
+        LoadCharges(id,"Web.PurchaseQuotationHeaderCharges","Web.PurchaseQuotationLineCharges");
+    });
+
+
+    function AddFields(){
+        $('form:last').append($("<input type='hidden' name='UserRemark'></input>"))
+    }
+
+
+    function LoadProducts() {
+        var DomainName='@System.Configuration.ConfigurationManager.AppSettings["AdminSetupDomain"]';
+        var SelectedRecord='@ViewBag.DocLineId';
+        var LineEditUrl;
+        var LineDeleteUrl;
+        if(status==StatusContstantsEnum.Drafted)
+        {
+            LineEditUrl="/PurchaseQuotationLine/_ModifyLine/";
+            LineDeleteUrl="/PurchaseQuotationLine/_DeleteLine/";
+        }
+        else if(status==StatusContstantsEnum.Submitted || status == StatusContstantsEnum.Modified)
+        {
+            LineEditUrl="/PurchaseQuotationLine/_ModifyLineAfterSubmit/";
+            LineDeleteUrl="/PurchaseQuotationLine/_DeleteLine_AfterSubmit/";
+        }
+        else {
+            LineEditUrl = "/PurchaseQuotationLine/_Detail/";
+            LineDeleteUrl = "/PurchaseQuotationLine/_Detail/";
+        }
+        var link="/PurchaseQuotationLine/Index/"+groupId;
+        var QtyCount=0;
+        var DQtyCount=0;
+        var AmountCount=0;
+        var unit=true;
+        var dunit=true;
+        var prevunit;
+        var prevdunit;
+        var decimal=0;
+        var ddecimal=0;
+        $.ajax({
+            url: link,
+            type: "GET",
+            success: function (data) {
+                var row = ""
+                var srno=1;
+
+                if(data.length!=0)
+                {
+                    $.each(data, function (index, item) {
+                        var IndentUrl=DomainName+"/Redirect/RedirectToDocument?DocTypeId="+item.IndentDocTypeId+"&DocId="+item.IndentHeaderId+"&DocLineId="+item.PurchaseIndentLineId;
+
+                        row +="<div class='row crow grid-body' style='margin-left:0px;margin-right:0px' id='"+item.PurchaseQuotationLineId+"'>"
+                            +"      <div class='block row-index' style='width:5%'><a Detail='' href='/PurchaseQuotationLine/_Detail/"+item.PurchaseQuotationLineId+"'>"+srno+"</a><input type='hidden' class='id' value='"+item.PurchaseQuotationLineId+"' />"
+                            +"      </div>"
+                            +"      <div class='block' style='width:90%'>"
+                            +"          <div class='row'>"
+                            +"              <div class='block' style='width:23%'>"+(item.ProductName==null?" ":"<strong>"+item.ProductName+"</strong>")
+                            +"              <br />"
+                            +               (item.Specification==null?" ":item.Specification)
+                            +"              <p>"+(item.Dimension1Name==null?" ":item.Dimension1Name+",")+(item.Dimension2Name==null?" ":item.Dimension2Name)+"</p>"
+                            +"                  <div>"+((item.DueDate==null)?" ":"<span title='DueDate' class='label label-danger' style='font-weight:bold'>"+formatDate('d/m/Y',new Date(parseInt(item.DueDate.substr(6))))+"</span>")
+                            +"                  </div>"
+                            +              (item.Remark==null?" ":item.Remark)
+                            +"              </div>"
+                            +"              <div class='block' style='width:10%'>"+(item.PurchaseIndentDocNo==null?" ":" <a href='"+IndentUrl+"' style='color:black'> <span class='small' style='font-weight:bold'>"+item.PurchaseIndentDocNo+"</span> </a>")
+                            +"              </div>"
+                            +"              <div class='block text-right' style='width:18%'>"+(item.Qty==null?" ":item.Qty)+"<br />"
+                            +"                  <div><small>"+(item.UnitName==null?" ":item.UnitName)+"</small>"
+                            +"                  </div>"
+                            +"                       <div style='width:80%;float:right'> "
+                            +"                             <div class='progress'> "
+                            +"                                  <span class='progress-value'>"+item.ProgressPerc+"% </span> "
+                            +"                                  <div class='progress-bar' role='progressbar' aria-valuenow='"+item.ProgressPerc+"' aria-valuemin='0' aria-valuemax='100' style='width: "+item.ProgressPerc+"%;'>"
+                            +"                                   </div> "
+                            +"                              </div>"
+                            +"                       </div>"
+                            +"              </div>"
+                            +"              <div class='block text-right' style='width:13%'>"+(item.DealQty==null?" ":item.DealQty)+"<br />"
+                            +"                  <div><small>"+(item.DealUnitName==null?" ":item.DealUnitName)+"</small>"
+                            +"                  </div>"
+                            +"              </div>"
+                            +"              <div class='block text-right' style='width:13%'>"+(item.Rate==null?" ":item.Rate.toFixed(2))
+                            +"              </div>"
+                            +"              <div class='block text-right' style='width:10%'>"+(item.DiscountPer==null?" ":item.DiscountPer.toFixed(2))
+                            +"              </div>"
+                            +"              <div class='block text-right' style='width:13%'>"+(item.Amount==null?" ":item.Amount.toFixed(2))
+                            +"              </div>"
+                            +"          </div>"
+                            +"      </div>"
+                            +"      <div class='block' style='width:5%'>"
+                            +"          <a class='glyphicon glyphicon-trash icon-Cus-Size' delete='' href='"+LineDeleteUrl+item.PurchaseQuotationLineId+"'></a>"
+                            +"          <a  edit='' href='"+LineEditUrl+item.PurchaseQuotationLineId+"'></a>"
+                            +"      </div>"
+                            +"</div>"
+                            +"<hr style='margin-top:0px;margin-bottom:0px'/>";
+                        QtyCount+=item.Qty;
+                        DQtyCount+=item.DealQty;
+                        AmountCount+=item.Amount;
+                        if(srno!=1)
+                        {
+                            if(item.UnitName==prevunit)
+                            {}
+                            else
+                            {unit=false;}
+                            if(item.DealUnitName==prevdunit)
+                            {}
+                            else
+                            {dunit=false;}
+                        }
+                        if(decimal<item.unitDecimalPlaces){decimal=item.unitDecimalPlaces;}
+                        if(ddecimal<item.DealunitDecimalPlaces){ddecimal=item.DealunitDecimalPlaces;}
+                        srno++;
+                        prevunit=item.UnitName;
+                        prevdunit=item.DealUnitName;
+                    });
+                    row+="<div class='row tfooter' style='padding-top:10px;'>"
+                        +"  <div class='block' style='width:5%'>"
+                        +"  </div>"
+                        +"  <div class='block' style='width:90%'>"
+                        +"      <div class='row'> "
+                        +"          <div class='block' style='width:23%'><strong>Total</strong>"
+                        +"          </div>"
+                        +"          <div class='block' style='width:10%'><strong></strong>"
+                        +"          </div>"
+                        +"          <div class='block text-right' style='width:18%'><strong>"+ ((unit==true)?QtyCount.toFixed(decimal)+"<br /><small>"+prevunit:QtyCount.toFixed(decimal))+"</small></strong>"
+                        +"          </div>"
+                        +"          <div class='block text-right' style='width:13%'><strong>"+ ((dunit==true)?DQtyCount.toFixed(ddecimal)+"<br /><small>"+prevdunit:DQtyCount.toFixed(ddecimal))+"</small></strong>"
+                        +"          </div>"
+                        +"          <div class='block text-right' style='width:13%'>"
+                        +"          </div>"
+                        +"          <div class='block' style='width:10%'>"
+                        +"          </div>"
+                        +"          <div class='block text-right' style='width:13%'><strong>"+AmountCount.toFixed(2)+"</strong>"
+                        +"          </div>"
+                        +"      </div>"
+                        +"  </div>"
+                        +"  <div class='block' style='width:5%'></div>"
+                        +"</div>"
+                }
+                else
+                {
+                    ;
+                }
+                $("#gbody").html(row);
+                if(SelectedRecord)
+                {
+                    var Id="#"+SelectedRecord
+                    NavigateToLineRecord(Id);}
+            },
+            error: function (result) {
+                alert("Error");
+            }
+        });
+    }
+
+</script>

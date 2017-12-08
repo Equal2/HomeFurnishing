@@ -1,0 +1,214 @@
+﻿@model Model.ViewModel.JobReceiveQAWizardFilterViewModel
+@using Core.Common
+
+<style type="text/css">
+    .input-group[class*=col-] {
+        float: left;
+    }
+</style>
+
+<div class="modal-content">
+    <div class="modal-header" style="border-bottom: 1px solid #8E8888">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"> <span class="glyphicon glyphicon-remove"></span></button>
+        <h3>
+            <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-file black"></span> Wizard Filters</span>
+        </h3>
+    </div>
+    <div>
+        @using (Html.BeginForm("_FilterPost", "JobReceiveQAWizard", FormMethod.Post, new { enctype = "multipart/form-data", id = "modform" }))
+        {
+
+            <div class="form-horizontal modal-body">
+
+                @Html.HiddenFor(m => m.DocTypeId)
+
+                <div class="row">
+                   
+                    <div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.FromDate, "From Date", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-7">
+                                        @Html.TextBoxFor(m => m.FromDate, "{0:dd/MMMM/yyyy}", new { @class = "datepickerWithNFD form-control col-xs-7 required" })
+                                        @Html.ValidationMessageFor(model => model.FromDate, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.ToDate, "To Date", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-7">
+                                        @Html.TextBoxFor(m => m.ToDate, "{0:dd/MMMM/yyyy}", new { @class = "datepickerWithNFD form-control col-xs-7 required" })
+                                        @Html.ValidationMessageFor(model => model.ToDate, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.JobReceiveHeaderId, "Job Receive", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-7">
+                                        @Html.TextBoxFor(model => model.JobReceiveHeaderId, new { @class = "form-control col-xs-7 required" })
+                                        @Html.ValidationMessageFor(model => model.JobReceiveHeaderId, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.JobWorkerId, "JobWorker", new { @class = "control-label col-xs-4 " })
+                                    <div class="col-xs-7">
+                                        @Html.TextBoxFor(model => model.JobWorkerId, new { @class = "form-control col-xs-7 required" })
+                                        @Html.ValidationMessageFor(model => model.JobWorkerId, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.ProductId, "Product", new { @class = "control-label col-xs-4 " })
+                                    <div class="col-xs-7">
+                                        @Html.TextBoxFor(model => model.ProductId, new { @class = "form-control col-xs-7 required" })
+                                        @Html.ValidationMessageFor(model => model.ProductId, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.Dimension1Id, "Dimension1", new { @class = "control-label col-xs-4 " })
+                                    <div class="col-xs-7">
+                                        @Html.TextBoxFor(model => model.Dimension1Id, new { @class = "form-control col-xs-7 required" })
+                                        @Html.ValidationMessageFor(model => model.Dimension1Id, "", new { @class = "text-danger" })
+                                        <span id="status" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.Dimension2Id, "Dimension2", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-7">
+                                        @Html.TextBoxFor(model => model.Dimension2Id, new { @class = "form-control col-xs-7 required" })
+                                        @Html.ValidationMessageFor(model => model.Dimension2Id, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.ProductGroupId, "Product Group", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-7">
+                                        @Html.TextBoxFor(model => model.ProductGroupId, new { @class = "form-control col-xs-7 required" })
+                                        @Html.ValidationMessageFor(model => model.ProductGroupId, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.ProductCategoryId, "Prod Category", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-7">
+                                        @Html.TextBoxFor(model => model.ProductCategoryId, new { @class = "form-control col-xs-7 required" })
+                                        @Html.ValidationMessageFor(model => model.ProductCategoryId, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+                            @*<div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(m => m.Sample, "Sample", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-7">
+                                        @Html.DropDownListFor(m => m.Sample, new SelectList(ViewBag.SOD as System.Collections.IEnumerable, "Value", "Text"), new { @class = "height form-control col-xs-7 required" })
+                                        @Html.ValidationMessageFor(m => m.Sample, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>*@
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.MultiplierGT, "Multiplier", new { @class = "control-label col-xs-4" })
+
+                                    <div class="col-md-7">
+                                        <div class="row">
+                                            <div class="col-xs-6 input-group" style="padding-left: 15px">
+                                                <span class="input-group-addon">></span>
+                                                @Html.TextBoxFor(model => model.MultiplierGT, new { @class = "form-control col-xs-6 required" })
+                                                @Html.ValidationMessageFor(model => model.MultiplierGT, "", new { @class = "text-danger" })
+
+
+                                            </div>
+                                            <div class="col-xs-6  input-group" style="padding-right: 15px">
+                                                <span class="input-group-addon"><</span>
+                                                @Html.TextBoxFor(model => model.MultiplierLT, new { @class = "form-control col-xs-6 required" })
+                                                @Html.ValidationMessageFor(model => model.MultiplierLT, "", new { @class = "text-danger" })
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.BalanceQty, "Bal Qty", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-7">
+                                        @Html.TextBoxFor(model => model.BalanceQty, new { @class = "form-control col-xs-7 required" })
+                                        @Html.ValidationMessageFor(model => model.BalanceQty, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+                            @*<div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.CancelQty, "Cancel Qty", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-7">
+                                        @Html.TextBoxFor(model => model.CancelQty, new { @class = "form-control col-xs-7 required" })
+                                        @Html.ValidationMessageFor(model => model.CancelQty, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>*@
+                           
+                        </div>
+                    </div>
+                </div>
+               
+                <hr style="margin-bottom:0px" />
+
+
+                <div class="modal-footer " style="padding: 19px 20px 0 20px; border-top:1px solid #8E8888">
+                    <button class="btn custom" name="Command:Edit" type="submit"><h2 style="margin:0px" id="submit" title="Proceed"><span class="glyphicon glyphicon-arrow-right black"></span> </h2></button>
+                </div>
+
+            </div>
+
+        }
+    </div>
+</div>
+
+
+<script type="text/javascript">
+
+
+    $(document).ready(function () {
+
+        var DocId = $('#DocTypeId', '.modal-body').val();
+        var ProcId = $('#ProcessId', '.modal-body').val();
+
+        //CustomSelectFunction($("#ProductId"), '/JobReceiveQAWizard/GetPendingProductHelpList', '/ComboHelpList/SetProducts', 'Enter Product Name', true, 3, DocId);
+        CustomSelectFunction($("#JobWorkerId"), '/ComboHelpList/GetJobWorkers', '/ComboHelpList/SetJobWorkers', 'Enter JobWorker', true, 1);
+        CustomSelectFunction($("#Dimension1Id"), '/ComboHelpList/GetDimension1', '/ComboHelpList/SetSingleDimension1', 'Dimension1', true, 1);
+        CustomSelectFunction($("#Dimension2Id"), '/ComboHelpList/GetDimension2', '/ComboHelpList/SetSingleDimension2', 'Dimension2', true, 1);
+        //CustomSelectFunction($("#ProductGroupId"), '/ComboHelpList/GetProductGroup', '/ComboHelpList/SetProductGroup', 'Enter Group Name', true, 1);
+        CustomSelectFunction($("#JobReceiveHeaderId"), '/JobReceiveQAWizard/GetPendingJobReceivesHelpList', '/ComboHelpList/SetJobReceives', 'Enter Job Receive', true, 1, DocId);
+    });
+
+    $('.datepickerWithNFD').datepicker({
+        format: 'dd/MM/yyyy',
+        "setDate": new Date(),
+        "autoclose": true,
+        "endDate": new Date(),
+
+    })
+
+
+</script>

@@ -1,0 +1,89 @@
+﻿@using Core.Common
+@model Jobs.Areas.Rug.Controllers.FilterArgs
+
+<div class="modal-content">
+    <div class="modal-header" style="border-bottom: 1px solid #8E8888">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"> <span class="glyphicon glyphicon-remove"></span></button>
+        <h3>
+            <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-file black"></span> Wizard Filters</span>
+        </h3>
+    </div>
+    <div>
+        @using (Html.BeginForm("_FilterPost", "DesignRateList", FormMethod.Post, new { enctype = "multipart/form-data", id = "modform" }))
+        {
+            <div class="form-horizontal modal-body">
+                <div class="row">
+                    <div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(m => m.WizardType, "WizardType", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-7">
+                                        @Html.DropDownListFor(m => m.WizardType, new SelectList(ViewBag.WizType as System.Collections.IEnumerable, "Value", "Text"), new { @class = "height form-control col-xs-7 required" })
+                                        @Html.ValidationMessageFor(m => m.WizardType,"", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(m=>m.ProductCategory, "Construction", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-7">
+                                        @Html.TextBoxFor(m => m.ProductCategory, new { @class = "form-control col-xs-7 required" })
+                                        @Html.ValidationMessageFor(m => m.ProductCategory,"", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(m => m.ProductCollection, "Collection", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-7">
+                                        @Html.TextBoxFor(m => m.ProductCollection, new { @class = "form-control col-xs-7 required" })
+                                        @Html.ValidationMessageFor(m => m.ProductCollection,"", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(m => m.SOD, "SOD", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-7">
+                                        @Html.DropDownListFor(m => m.SOD, new SelectList(ViewBag.SOD as System.Collections.IEnumerable, "Value", "Text"), new { @class = "height form-control col-xs-7 required" })
+                                        @Html.ValidationMessageFor(m => m.SOD,"", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(m => m.DisContinued, "Discontinued", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-7">
+                                        @Html.DropDownListFor(m => m.DisContinued, new SelectList(ViewBag.Disc as System.Collections.IEnumerable, "Value", "Text"),"", new { @class = "height form-control col-xs-7 required" })
+                                        @Html.ValidationMessageFor(m => m.DisContinued, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <hr style="margin-bottom:0px" />
+
+                <div class="modal-footer " style="padding: 19px 20px 0 20px; border-top:1px solid #8E8888">
+                    <button class="btn custom" name="Command:Edit" type="submit"><h2 style="margin:0px" id="submit" title="Proceed"><span class="glyphicon glyphicon-arrow-right black"></span> </h2></button>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+
+<script type="text/javascript">
+    $(document).ready(function () {
+
+        CustomSelectFunction($("#ProductCollection"), '/ComboHelpList/GetProductCollection', '/ComboHelpList/SetProductCollection', 'Enter Collection Name', true, 1);
+        CustomSelectFunction($("#ProductCategory"), '/ComboHelpList/GetProductCategory', '/ComboHelpList/SetProductCategory', 'Enter Category Name', true, 1);
+
+    });
+</script>

@@ -1,0 +1,250 @@
+﻿@model Surya.India.Model.ViewModels.SaleOrderCancelMasterDetailModel
+
+@{
+    ViewBag.Title = "Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@using (Html.BeginForm("CompleteSaleOrderCancelLine", "SaleOrderCancelLine", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true)
+    @Html.HiddenFor(model => model.SaleOrderCancelHeaderDetailsViewModel.DocumentTypeName)
+    @Html.HiddenFor(model => model.SaleOrderCancelHeaderDetailsViewModel.DocDate)
+    @Html.HiddenFor(model => model.SaleOrderCancelHeaderDetailsViewModel.DocNo)
+    @Html.HiddenFor(model => model.SaleOrderCancelHeaderDetailsViewModel.Reason)
+    @Html.HiddenFor(model => model.SaleOrderCancelHeaderDetailsViewModel.Remark)
+    @Html.HiddenFor(m => m.SaleOrderCancelHeaderDetailsViewModel.LogReason)
+
+    <div class="panel panel-default">
+        <div class="panel-heading">
+
+            <h3>
+                <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"> <span class="glyphicon glyphicon-file black"></span> Sale Order Cancel (Multiple)</span>
+                <input type="submit" value="Save" class="btn btn-primary right" id="submit" style="width: 90px; background-color: #2980b9" />
+            </h3>
+            <hr style="margin-top:0px;margin-bottom:0px" />
+
+            <div class="panel-info">
+                <h4 style="padding:5px 0 0 0;margin:0px">
+                    @Html.ActionLink(" ", " ", " ", null, new { @class = "glyphicon glyphicon-refresh toolbar", @title = "Refresh Page", @data_toggle = "tooltip", @id = "RefreshPage" })
+                    @Html.ActionLink(" ", "Index", "SaleOrderCancelLine", new { id = @Model.SaleOrderCancelHeaderDetailsViewModel.SaleOrderCancelHeaderId }, new { @class = "glyphicon glyphicon-list toolbar right", @title = "List", @data_toggle = "tooltip" })
+                </h4>
+            </div>
+
+        </div>
+        <div class="panel-info" style="padding-left:15px">
+            <div class="form-horizontal">
+
+
+                <div class="row">
+                    <h4 class="col-md-12 black">
+                        <span class="glyphicon glyphicon-align-justify"></span>
+                        1.Document Details
+                    </h4>
+                    <div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group" style="margin-top:15px">
+                                    @Html.LabelFor(model => model.SaleOrderCancelHeaderDetailsViewModel.DocumentTypeName, "Entry Type", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.SaleOrderCancelHeaderDetailsViewModel.DocumentTypeName, new { @class = "form-control col-xs-6", @disabled = "disabled" })
+                                        @Html.ValidationMessageFor(m => m.SaleOrderCancelHeaderDetailsViewModel.DocumentTypeName, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group" style="margin-top:15px">
+                                    @Html.LabelFor(model => model.SaleOrderCancelHeaderDetailsViewModel.DocDate, "Cancel Date", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.SaleOrderCancelHeaderDetailsViewModel.DocDate, new { @class = "form-control col-xs-6 ", @disabled = "disabled" })
+                                        @Html.ValidationMessageFor(m => m.SaleOrderCancelHeaderDetailsViewModel.DocDate, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.SaleOrderCancelHeaderDetailsViewModel.DocNo, "Cancel No", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.SaleOrderCancelHeaderDetailsViewModel.DocNo, new { @class = "form-control col-xs-6", @disabled = "disabled" })
+                                        @Html.ValidationMessageFor(m => m.SaleOrderCancelHeaderDetailsViewModel.DocNo, "", new { @class = "text-danger" })
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.SaleOrderCancelHeaderDetailsViewModel.Reason, "Reason", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.SaleOrderCancelHeaderDetailsViewModel.Reason, new { @class = "form-control col-xs-6", @disabled = "disabled" })
+                                        @Html.ValidationMessageFor(m => m.SaleOrderCancelHeaderDetailsViewModel.Reason, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.SaleOrderCancelHeaderDetailsViewModel.Remark, "Remark", new { @class = "control-label col-xs-4" })
+                                <div class="col-xs-6">
+                                    @Html.TextBoxFor(m => m.SaleOrderCancelHeaderDetailsViewModel.Remark, null, new { @class = "form-control col-xs-6", @disabled = "disabled" })
+                                    @Html.ValidationMessageFor(m => m.SaleOrderCancelHeaderDetailsViewModel.Remark, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                @*<div class="form-group" style="margin-top:15px">
+                        @Html.LabelFor(model => model.SaleOrderCancelHeaderDetailsViewModel.DocumentTypeName,"Entry Type", new { @class = "control-label col-md-2" })
+                        <div class="col-md-10">
+                            @Html.DisplayFor(model => model.SaleOrderCancelHeaderDetailsViewModel.DocumentTypeName)
+                            @Html.ValidationMessageFor(model => model.SaleOrderCancelHeaderDetailsViewModel.DocumentTypeName)
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.SaleOrderCancelHeaderDetailsViewModel.DocDate,"Cancel Date", new { @class = "control-label col-md-2" })
+                        <div class="col-md-10">
+                            @Html.DisplayFor(model => model.SaleOrderCancelHeaderDetailsViewModel.DocDate)
+                            @Html.ValidationMessageFor(model => model.SaleOrderCancelHeaderDetailsViewModel.DocDate)
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.SaleOrderCancelHeaderDetailsViewModel.DocNo,"Cancel No", new { @class = "control-label col-md-2" })
+                        <div class="col-md-10">
+                            @Html.DisplayFor(model => model.SaleOrderCancelHeaderDetailsViewModel.DocNo)
+                            @Html.ValidationMessageFor(model => model.SaleOrderCancelHeaderDetailsViewModel.DocNo)
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="padding-top:0px !important">
+                        @Html.LabelFor(model => model.SaleOrderCancelHeaderDetailsViewModel.Reason, new { @class = "control-label col-md-2 none" })
+                        <div class="col-md-10">
+                            @Html.DisplayFor(model => model.SaleOrderCancelHeaderDetailsViewModel.Reason)
+                            @Html.ValidationMessageFor(model => model.SaleOrderCancelHeaderDetailsViewModel.Reason)
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.SaleOrderCancelHeaderDetailsViewModel.Remark, new { @class = "control-label col-md-2" })
+                        <div class="col-md-10">
+                            @Html.DisplayFor(model => model.SaleOrderCancelHeaderDetailsViewModel.Remark)
+                            @Html.ValidationMessageFor(model => model.SaleOrderCancelHeaderDetailsViewModel.Remark)
+                        </div>
+                    </div>*@
+
+                <div style="padding-right:15px">
+                    <hr style="margin-bottom:0px" />
+                    <div class="row">
+                        <h4 class="col-md-12 black">
+                            <span class="glyphicon glyphicon-align-justify"></span>
+                            2.Cancel Orders & Quantities
+                        </h4>
+
+
+                        @*<div class="panel-heading">
+                                <h4>
+                                    <span style="font-family: Calibri,sans-serif,Verdana">Sale Order Cancel Line.</span>
+                                </h4>
+                            </div>*@
+
+
+                        <div class="form-horizontal">
+                            @Html.ValidationSummary(true)
+                            <table class="table">
+                                <tr style="color:black">
+                                    <th>
+                                        Sale OrderNo
+                                    </th>
+                                    <th>
+                                        Buyer
+                                    </th>
+                                    <th>
+                                        Product
+                                    </th>
+                                    <th>
+                                        BalanceQty
+                                    </th>
+                                    <th>
+                                        Cancel Qty
+                                    </th>
+                                    <th>
+                                        Remark
+                                    </th>
+                                </tr>
+                                @for (int i = 0; i < Model.SaleOrderCancelViewModels.Count(); i++)
+                                {
+                                    @Html.HiddenFor(m => m.SaleOrderCancelViewModels[i].SaleOrderCancelHeaderId)
+                                    @Html.HiddenFor(m => m.SaleOrderCancelViewModels[i].DocNo)
+                                    @Html.HiddenFor(m => m.SaleOrderCancelViewModels[i].BuyerName)
+                                    @Html.HiddenFor(m => m.SaleOrderCancelViewModels[i].SaleOrderLineId)
+                                    @Html.HiddenFor(m => m.SaleOrderCancelViewModels[i].ProductName)
+                                    @Html.HiddenFor(m => m.SaleOrderCancelViewModels[i].ProductId)
+                                    @Html.HiddenFor(m => m.SaleOrderCancelViewModels[i].BalanceQty)
+                                    <tr>
+                                        <td style="padding-top:18px">
+                                            @Html.DisplayFor(m => m.SaleOrderCancelViewModels[i].DocNo)
+                                        </td>
+                                        <td style="padding-top:18px">
+                                            @Html.DisplayFor(m => m.SaleOrderCancelViewModels[i].BuyerName)
+                                        </td>
+                                        <td style="padding-top:18px">
+                                            @Html.DisplayFor(m => m.SaleOrderCancelViewModels[i].ProductName)
+                                        </td>
+                                        <td style="padding-top:18px">
+                                            @Html.DisplayFor(m => Model.SaleOrderCancelViewModels[i].BalanceQty)
+                                        </td>
+                                        <td>
+                                            @Html.TextBoxFor(m => m.SaleOrderCancelViewModels[i].Qty, new { @class = "form-control" })
+                                            @Html.ValidationMessageFor(m => m.SaleOrderCancelViewModels[i].Qty)
+                                        </td>
+                                        <td>
+                                            @Html.TextBoxFor(m => m.SaleOrderCancelViewModels[i].LineRemark, new { @class = "form-control" })
+                                            @Html.ValidationMessageFor(m => m.SaleOrderCancelViewModels[i].LineRemark)
+                                        </td>
+                                    </tr>
+                                }
+
+                            </table>
+                            @*<hr />
+
+                                <div class="form-group">
+                                    <div class="col-md-offset-0 col-md-10">
+                                        <input type="submit" id="btnSave2" name="Command" value="Submit" class="btn btn-primary btn-sm CurveBorder" />
+                                        <span style="font-family: Calibri,sans-serif,Verdana;font-size:large">
+                                            @Html.ActionLink("Back", "Index", "SaleOrderCancelHeader",null, new { @class = "btn btn-primary btn-sm col-md-offset-1 CurveBorder ActionLinkPadding" })
+                                        </span>
+                                    </div>
+                                </div>*@
+                        </div>
+                    </div>
+                </div>
+
+
+
+
+
+            </div>
+        </div>
+    </div>
+}

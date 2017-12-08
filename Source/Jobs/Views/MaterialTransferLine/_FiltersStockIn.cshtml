@@ -1,0 +1,251 @@
+﻿@model Model.ViewModel.StockInFiltersForIssue
+@using Core.Common
+
+<div class="modal-content">
+    <div class="modal-header" style="border-bottom: 1px solid #8E8888">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"> <span class="glyphicon glyphicon-remove"></span></button>
+        <h3>
+            <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-file black"></span> Filters</span>
+        </h3>
+    </div>
+    <div>
+        @using (Html.BeginForm("_FilterPostStockIn", "MaterialTransferLine", FormMethod.Post, new { enctype = "multipart/form-data", id = "modform" }))
+        {
+           
+
+            <div class="form-horizontal modal-body">
+
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                @Html.AntiForgeryToken()
+                @Html.HiddenFor(model => model.StockHeaderId)
+                <input type="hidden" name="All" value="" id="All"/>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.StockInHeaderId, "Stock In No.", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.StockInHeaderId, new { @class = "form-control col-xs-7 required" })
+                                @Html.ValidationMessageFor(model => model.StockInHeaderId, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                   
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.ProductId, (Model.DocumentTypeSettings.ProductCaption ?? "Product"), new { @class = "control-label col-md-4 col-sm-2 " })
+                                @Html.HiddenFor(m => m.DocumentTypeSettings.ProductCaption)
+                                <div class="col-md-7 col-sm-10">
+                                    @Html.TextBoxFor(model => model.ProductId, new { @class = "form-control col-xs-7 required" })
+                                    @Html.ValidationMessageFor(model => model.ProductId, "", new { @class = "text-danger" })
+                                    <span id="status" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>                                                  
+                </div>
+              
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Dimension1Id, (Model.DocumentTypeSettings.Dimension1Caption ?? "Dimension1"), new { @class = "control-label col-md-4 col-sm-2" })
+                            @Html.HiddenFor(m => m.DocumentTypeSettings.Dimension1Caption)
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.Dimension1Id, new { @class = "form-control col-xs-7 required" })
+                                @Html.ValidationMessageFor(model => model.Dimension1Id, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Dimension2Id, (Model.DocumentTypeSettings.Dimension2Caption ?? "Dimension2"), new { @class = "control-label col-md-4 col-sm-2" })
+                            @Html.HiddenFor(m => m.DocumentTypeSettings.Dimension2Caption)
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.Dimension2Id, new { @class = "form-control col-xs-7 required" })
+                                @Html.ValidationMessageFor(model => model.Dimension2Id, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Dimension3Id, (Model.DocumentTypeSettings.Dimension3Caption ?? "Dimension3"), new { @class = "control-label col-md-4 col-sm-2" })
+                            @Html.HiddenFor(m => m.DocumentTypeSettings.Dimension3Caption)
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.Dimension3Id, new { @class = "form-control col-xs-7 required" })
+                                @Html.ValidationMessageFor(model => model.Dimension3Id, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Dimension4Id, (Model.DocumentTypeSettings.Dimension4Caption ?? "Dimension4"), new { @class = "control-label col-md-4 col-sm-2" })
+                            @Html.HiddenFor(m => m.DocumentTypeSettings.Dimension4Caption)
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.Dimension4Id, new { @class = "form-control col-xs-7 required" })
+                                @Html.ValidationMessageFor(model => model.Dimension4Id, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.ProductGroupId, (Model.DocumentTypeSettings.ProductGroupCaption ?? "Product Group"), new { @class = "control-label col-md-4 col-sm-2" })
+                            @Html.HiddenFor(m => m.DocumentTypeSettings.ProductGroupCaption)
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.ProductGroupId, new { @class = "form-control col-xs-7 required" })
+                                @Html.ValidationMessageFor(model => model.ProductGroupId, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.CostCenterId, "Cost Centers", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.CostCenterId, new { @class = "form-control col-xs-7 required" })
+                                @Html.ValidationMessageFor(model => model.CostCenterId, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.LotNo, "Lot No.", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.LotNo, new { @class = "form-control col-xs-7 required" })
+                                @Html.ValidationMessageFor(model => model.LotNo, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="modal-footer " style="padding: 19px 20px 0 20px; border-top:1px solid #8E8888">
+                    <button class="btn custom" type="submit" id="submit"><h2 style="margin:0px" title="Proceed"><span class="glyphicon glyphicon-arrow-right black"></span> </h2><div>Proceed</div></button>
+                </div>
+
+            </div>
+
+        }
+    </div>
+</div>
+
+
+<script type="text/javascript">
+
+    var DocID = $('#StockHeaderId', '.modal-body').val();
+    var PerId = $('#PersonId', '.modal-body').val();
+
+    $(document).ready(function () {
+              
+        //CustomSelectFunction($("#ProductGroupId"), '/ComboHelpList/GetProductGroup', '/ComboHelpList/SetProductGroup', ' ', true, 1);
+        CustomSelectFunction($("#ProductId"), '/StockIssueLine/GetProductsHelpList', '/ComboHelpList/SetSingleProducts', ' ', false, 0, $('#StockHeaderId').val());
+        CustomSelectFunction($("#ProductId"), '/StockIssueLine/GetProductsHelpList', '/ComboHelpList/SetProducts', ' ', true, 0, DocID);
+        CustomSelectFunction($("#ProductGroupId"), '/StockIssueLine/GetCustomProductGroups', '/ComboHelpList/SetProductGroup', ' ', true, 0, DocID);
+        CustomSelectFunction($("#Dimension1Id"), '/ComboHelpList/GetDimension1', '/ComboHelpList/SetDimension1', ' ', true, 0);
+        CustomSelectFunction($("#Dimension2Id"), '/ComboHelpList/GetDimension2', '/ComboHelpList/SetDimension2', ' ', true, 0);
+        CustomSelectFunction($("#Dimension3Id"), '/ComboHelpList/GetDimension3', '/ComboHelpList/SetDimension3', ' ', true, 0);
+        CustomSelectFunction($("#Dimension4Id"), '/ComboHelpList/GetDimension4', '/ComboHelpList/SetDimension4', ' ', true, 0);
+        CustomSelectFunction($("#CostCenterId"), '/StockIssueLine/GetCostCenters', '/ComboHelpList/SetCostCenter', ' ', true, 0, PerId);
+        CustomSelectFunction($("#StockInHeaderId"), '/StockIssueLine/GetStockInHeader', '/ComboHelpList/SetStockHeader', ' ', true, 0, $('#StockHeaderId').val());
+        CustomSelectFunction($("#LotNo"), '/StockIssueLine/GetLotNo', '/ComboHelpList/SetLotNo', ' ', true, 0, $('#StockHeaderId').val());
+    });
+
+    //$('#Allsubmit').on('click', function () {
+    //    $('#All', '.modal-body').val("All")
+    //    return;
+    //})
+
+    
+    //var URL = '/StockIssueLine/GetRequisitions/' + DocID;
+    //$("#RequisitionHeaderId").select2({
+    //    minimumInputLength: 0,
+    //    multiple: true,
+    //    ajax: {
+    //        url: URL,
+    //        dataType: 'json',
+    //        type: "GET",
+    //        quietMillis: 1000,
+    //        data: function (term) {
+    //            return {
+    //                term: term,
+    //                PersonId: PerId,
+    //            };
+    //        },
+    //        results: function (data) {
+    //            return {
+    //                results: $.map(data, function (item) {
+    //                    return {
+    //                        text: item.PropFirst,
+    //                        id: item.Id
+    //                    }
+    //                })
+
+    //            };
+    //        }
+    //    },
+
+
+    //});
+
+
+    //var URL = '/StockIssueLine/GetProductsForFilter/' + DocID;
+    //$("#ProductId").select2({
+    //    minimumInputLength: 1,
+    //    multiple: true,
+    //    ajax: {
+    //        url: URL,
+    //        dataType: 'json',
+    //        type: "GET",
+    //        quietMillis: 1000,
+    //        data: function (term) {
+    //            return {
+    //                term: term,
+    //                PersonId: PerId,
+    //                Limit:20,
+    //            };
+    //        },
+    //        results: function (data) {
+    //            return {
+    //                results: $.map(data, function (item) {
+    //                    return {
+    //                        text: item.PropFirst,
+    //                        id: item.Id
+    //                    }
+    //                })
+
+    //            };
+    //        }
+    //    },
+    //    initSelection: function (element, callback) {
+
+    //        var xval = element.val();
+    //        if (xval != 0) {
+    //            $.ajax({
+    //                cache: false,
+    //                type: "POST",
+    //                url: SetAction,
+    //                data: { Ids: element.val() },
+    //                success: function (data) {
+    //                    callback(data);
+    //                },
+    //                error: function (xhr, ajaxOptions, thrownError) {
+    //                    alert('Failed to Retrive Qty' + thrownError);
+    //                }
+    //            })
+    //        }
+    //        //callback([{ id: "1", text: "arpit" }, { id: "2", text: "akash" }]);
+    //    }
+
+
+    //});
+
+    $("#ProductId").select2("focus");
+
+</script>

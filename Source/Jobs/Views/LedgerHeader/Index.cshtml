@@ -1,0 +1,105 @@
+﻿@using Core.Common;
+@using Model.ViewModels;
+@using GridMvc.Html;
+@model IQueryable<Model.ViewModel.LedgerHeaderViewModel>
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    string ControllerName = (string)ViewContext.RouteData.Values["controller"];
+    string IndexStatus = (string)ViewBag.IndexStatus;
+}
+
+<!-- modal placeholder-->
+<div id='myModal' class='modal fade in'>
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div id='myModalContent'></div>
+        </div>
+    </div>
+</div>
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3>
+            <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-list black"></span> @ViewBag.Name List</span>
+        </h3>
+        <hr style="margin-top:0px;margin-bottom:0px" />
+        <input type="hidden" class="DocType_Id" value="@ViewBag.id">
+        <div class="panel-info">
+            @*<h4 style="padding:5px 0 0 0;margin:0px">
+                @Html.ActionLink(" ", " ", " ", null, new { @class = "glyphicon glyphicon-refresh toolbar", @title = "Refresh Page", @data_toggle = "tooltip", @id = "RefreshPage" })
+                @Html.ActionLink(" ", "Create", "LedgerHeader", new { id = @ViewBag.id }, new { @class = "glyphicon glyphicon-plus toolbar", @title = "Add New", @data_toggle = "tooltip" })
+                @Html.ActionLink(" ", "GetHistory", "LogHistory", null, new { @class = "glyphicon glyphicon-user toolbar", @title = "History", @data_toggle = "tooltip", @id = "DocHistoryI" })
+                @Html.ActionLink(" ", "GeneratePrints", "LedgerHeader", null, new { @class = "glyphicon glyphicon-print toolbar", @title = "Print", @data_toggle = "tooltip", @id = "PrintRecordI", target = "_blank" })
+                @Html.ActionLink(" ", "Remove", "LedgerHeader", null, new { @class = "glyphicon glyphicon-trash toolbar", @title = "Delete", @data_toggle = "tooltip", @id = "DeleteRecord", @data_modal = "" })
+                @Html.ActionLink(" ", "Report", "LedgerHeader", new { @id = @ViewBag.id }, new { @class = "glyphicon glyphicon-stats toolbar right", @title = "Report", @data_toggle = "tooltip", target = "_blank" })
+                @Html.ActionLink(" ", "Wizard", "LedgerHeader", new { @id = @ViewBag.id }, new { @class = "glyphicon glyphicon-random toolbar right", @title = "Wizard", @data_toggle = "tooltip" })
+                @Html.ActionLink(" ", "Create", "LedgerSetting", new { @id = @ViewBag.id }, new { @class = "glyphicon glyphicon-cog toolbar right", @title = "Default Settings", @data_toggle = "tooltip" })
+                @Html.ActionLink(" ", "", "", null, new { @class = "glyphicon glyphicon-export toolbar right", @title = "Export", @data_toggle = "tooltip" })
+            </h4>*@
+            <div class="btn-group">
+                @Html.ActionLink(" ", "Create", "LedgerHeader", new { id = @ViewBag.id }, new { @class = "cbtn btn-circle glyphicon glyphicon-plus toolbar", @title = "Add New", @data_toggle = "tooltip" })
+                @Html.ActionLink(" ", "GeneratePrints", "LedgerHeader", null, new { @class = "cbtn btn-circle glyphicon glyphicon-print toolbar", @title = "Print", @data_toggle = "tooltip", @id = "PrintRecordI", target = "_blank" })
+                @Html.ActionLink(" ", "Remove", "LedgerHeader", null, new { @class = "cbtn btn-circle glyphicon glyphicon-trash toolbar", @title = "Delete", @data_toggle = "tooltip", @id = "DeleteRecord", @data_modalDelete = "" })
+            </div>
+            <div class="btn-group">
+                <a class="cbtn btn-circle glyphicon glyphicon-option-horizontal dropdown-toggle" title="More Option" aria-expanded="false" style="padding-top: 6px;padding-bottom: 6px;" href="#" data-toggle="dropdown" id="dropdownMenu1">
+                </a>
+                <ul class="dropdown-menu pull-right" aria-labelledby="dropdownMenu1">
+                    <li><a href="@Url.Action("Wizard", "LedgerHeader", new { @id = @ViewBag.id })"><span class="glyphicon glyphicon-random"> </span>&nbsp;&nbsp;Wizard</a></li>                    
+                    <li><a href="@Url.Action("Create", "LedgerSetting", new { @id = @ViewBag.id })"><span class="glyphicon glyphicon-cog"> </span>&nbsp;&nbsp;Settings</a></li>
+                    <li role="separator" class="divider"></li>
+                    <li><a id="DocHistoryI" href="@Url.Action("GetHistory", "LogHistory", new {  })"><span class="glyphicon glyphicon-user"> </span> History</a></li>
+                    <li><a target="_blank" href="@Url.Action("Report", "LedgerHeader", new { @ViewBag.id })"><span class="glyphicon glyphicon-stats"> </span> Report</a></li>
+                </ul>
+          </div>
+            <div class="btn-group right">
+                @CustomHelpers.RenderIconStatusFilters(ViewBag.PendingToSubmit, ViewBag.PendingToReview, ControllerName, ViewBag.id, ViewBag.IndexStatus)
+            </div>
+        </div>
+       @*<hr style="margin-top: 5px; margin-bottom: 5px; border-top: 1px solid #706f6f; " />
+        @CustomHelpers.RenderStatusFilters(ViewBag.PendingToSubmit, ViewBag.PendingToReview, ControllerName, ViewBag.id, ViewBag.IndexStatus)*@
+    </div>
+
+    <div class="panel-info" style="padding-left:5px;padding-top:2px; font-size :small ">
+        @if (ViewBag.IsVisibleLineDrCr == true)
+        {
+            @Html.Grid(Model).Columns(columns =>
+           {
+               columns.Add().Encoded(false).Sanitized(false).SetWidth("3%").RenderValueAs(m => CustomHelpers.RenderCheckBox());
+               columns.Add(m => m.LedgerHeaderId, true).Css("Header_Id");
+               columns.Add(m => m.Status, true);
+               columns.Add(foo => foo.DocDate).Sortable(true).Titled("Doc.Date").Format("{0:dd/MMM/yyyy}").Filterable(true).SetWidth("10%");
+               columns.Add(m => m.DocNo).Sortable(true).Titled("Doc.No").Filterable(true).Sortable(true).SetWidth("10%");
+               columns.Add(m => m.Narration).Sortable(true).Filterable(true).Titled("Narration").SetWidth("70%");
+               columns.Add().Sanitized(false).Encoded(false).RenderValueAs(m => CustomHelpers.RenderStatus(m.Status)).Titled("Status").SetWidth("8%");
+               columns.Add().Titled("").Encoded(false).Sanitized(false).RenderValueAs(m => CustomHelpers.RenderUserImage(m.ModifiedBy)).Titled("User").SetWidth("5%").Css("UserImageIndex");
+               columns.Add().Encoded(false).Sanitized(false).RenderValueAs(m => CustomHelpers.RenderActionColumn(ControllerName, m.LedgerHeaderId, m.Status, m.Reviewed, m.ReviewCount, (string)ViewBag.IndexStatus)).SetWidth(20).Css("icon-Cus-Size");
+               columns.Add(true).RenderValueAs(m => CustomHelpers.RenderHEDActionLink(ControllerName, m.LedgerHeaderId, m.Status, IndexStatus));
+           }).WithPaging(25).EmptyText("No records found.").Sortable().Filterable().WithMultipleFilters()
+        }
+        else
+        {
+            @Html.Grid(Model).Columns(columns =>
+           {
+               columns.Add().Encoded(false).Sanitized(false).SetWidth("3%").RenderValueAs(m => CustomHelpers.RenderCheckBox());
+               columns.Add(m => m.LedgerHeaderId, true).Css("Header_Id");
+               columns.Add(m => m.Status, true);
+               columns.Add(foo => foo.DocDate).Sortable(true).Titled("Doc.Date").Format("{0:dd/MMM/yyyy}").Filterable(true).SetWidth("10%");
+               columns.Add(m => m.DocNo).Sortable(true).Titled("Doc.No").Filterable(true).Sortable(true).SetWidth("10%");
+               columns.Add(m => m.LedgerAccountName).Titled("Debit A/C").Filterable(true).Sortable(true).SetWidth("15%");
+               columns.Add(m => m.AccountName).Titled("Account Name").Filterable(true).Sortable(true).SetWidth("23%");
+               columns.Add().RenderValueAs(m => CustomHelpers.RenderTotal(m.TotalAmount, 2)).Sanitized(false).Encoded(false).Titled("Total Amount").SetWidth("10%");
+               columns.Add(m => m.Narration).Sortable(true).Filterable(true).Titled("Narration").SetWidth("23%");
+               columns.Add().Sanitized(false).Encoded(false).RenderValueAs(m => CustomHelpers.RenderStatus(m.Status)).Titled("Status").SetWidth("8%");
+               columns.Add().Titled("").Encoded(false).Sanitized(false).RenderValueAs(m => CustomHelpers.RenderUserImage(m.ModifiedBy)).Titled("User").SetWidth("5%").Css("UserImageIndex");
+               columns.Add().Encoded(false).Sanitized(false).RenderValueAs(m => CustomHelpers.RenderActionColumn(ControllerName, m.LedgerHeaderId, m.Status, m.Reviewed, m.ReviewCount, (string)ViewBag.IndexStatus)).SetWidth(20).Css("icon-Cus-Size");
+               columns.Add(true).RenderValueAs(m => CustomHelpers.RenderHEDActionLink(ControllerName, m.LedgerHeaderId, m.Status, IndexStatus));
+           }).WithPaging(25).EmptyText("No records found.").Sortable().Filterable().WithMultipleFilters()
+        }
+    </div>
+</div>
+
+
+

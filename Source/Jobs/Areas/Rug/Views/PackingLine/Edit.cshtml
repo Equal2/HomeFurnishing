@@ -1,0 +1,312 @@
+﻿@model Model.ViewModels.PackingLineViewModel
+
+
+@{
+    ViewBag.Title = "Edit";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+@using (Html.BeginForm("Edit", "PackingLine", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.HiddenFor(model => model.PackingLineId)
+    @Html.HiddenFor(model => model.PackingHeaderId)
+    @Html.HiddenFor(model => model.CreatedBy)
+    @Html.HiddenFor(model => model.CreatedDate)
+    @Html.HiddenFor(model => model.DeliveryUnitId)
+    @Html.HiddenFor(model => model.FromProcessId)
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(m=>m.UnitId)
+    @Html.HiddenFor(m=>m.UnitConversionMultiplier)
+  
+
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h4>
+                <span style="font-family: Calibri,sans-serif,Verdana"> Edit Sale Order Line(@ViewBag.DocNo)</span>
+            </h4>
+        </div>
+        <div class="panel-info" style="padding-left:15px">
+            <div class="form-horizontal">
+                @Html.ValidationSummary(true)
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.ProductUidName, "Barcode", new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.ProductUidName)
+                        @Html.ValidationMessageFor(model => model.ProductUidName)
+                        <span id="ProductUidValidation"></span>
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-top:15px">
+                    @Html.LabelFor(model => model.ProductId, new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.TextBoxFor(a => a.ProductId)
+                        @Html.ValidationMessageFor(model => model.ProductId)
+                        <span id="ProductValidation"></span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.BaleNo, new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.BaleNo)
+                        @Html.ValidationMessageFor(model => model.BaleNo)
+                        <span id="BaleNoValidation"></span>
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-top:15px">
+                    @Html.LabelFor(model => model.SaleOrderLineId, new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.TextBoxFor(a => a.SaleOrderLineId)
+                        @Html.ValidationMessageFor(model => model.SaleOrderLineId)
+                        <span id="SaleOrderValidation"></span>
+                    </div>
+                </div>
+
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.Qty, new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.Qty)
+                        @Html.ValidationMessageFor(model => model.Qty)
+                        <span id="QtyValidation"></span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.DeliveryQty, new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.DeliveryQty)
+                        @Html.ValidationMessageFor(model => model.DeliveryQty)
+                        <span id="DeliveryQtyValidation"></span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.GrossWeight, new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.GrossWeight)
+                        @Html.ValidationMessageFor(model => model.GrossWeight)
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.NetWeight, new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.NetWeight)
+                        @Html.ValidationMessageFor(model => model.NetWeight)
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.Remark, new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.Remark)
+                        @Html.ValidationMessageFor(model => model.Remark)
+                    </div>
+                </div>
+
+                <hr />
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-10">
+                        <input type="submit" value="Save" class="btn btn-primary btn-sm CurveBorder" />
+                        <span style="font-family: Calibri,sans-serif,Verdana;font-size:large">
+                           @Html.ActionLink("Back", "Index", new { PackingHeaderId = @Model.PackingHeaderId }, new { @class = "btn btn-primary btn-sm col-md-offset-1 CurveBorder ActionLinkPadding" })
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<style>
+    .select2-container {
+        width: 300px;
+    }
+</style>
+
+<script>
+    $(document).ready(function () {
+
+        //For using Select2(selecting multiple items)
+        //MyFunction(elementId, string GetURL, string SetURL, string Placeholder, boolean Multiselect)
+
+        CustomSelectFunction($("#ProductId"), '/ComboHelpList/GetProducts', '/ComboHelpList/SetSingleProducts', 'Enter Product Name', false, 3);
+        CustomSelectFunction($("#SaleOrderLineId"), '/ComboHelpList/GetSaleOrders', '/ComboHelpList/SetSingleSaleOrder', 'Enter Sale Order', false, 3);
+
+    });
+</script>
+
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#ProductId").select2("focus");
+        if ($("#ProductId") != 0 && $("#ProductId") != null) {
+            CreateSaleOrderLineIdList()
+        }
+    })
+
+    $(function () {
+        $("#DeliveryQty,#Qty").keyup(Calculation);
+        $("#ProductUidName").change(Validate_ProductUid);
+        $("#ProductId").change(Validate_Product);
+
+
+    })
+
+    function Validate_ProductUid() {
+        var ProcessProgress = $("#Product Uid detail loading progress");
+        ProcessProgress.show();
+        if ($("#ProductUidName").val() != 0 || $("#ProductUidName").val() != NULL) {
+            $.ajax({
+                cache: false,
+                type: "POST",
+                url: "@(Url.Action("GetProductUIDDetailJson"))",
+                data: { ProductUIDNo: $("#ProductUidName").val() },
+                success: function (data) {
+                    if (Object.keys(data).length != 0) {
+                        $("#ProductUidValidation").text("");
+                        $("#ProductId").val(data[0].ProductId);
+                        $("#ProductUidId").val(data[0].ProductUidId);
+                        $("#ProductId").select2("data", { id: data[0].ProductId, text: data[0].ProductName });
+                        $("#FromProcessId").val(data[0].PrevProcessId);
+                        $("#Qty").val(1);
+                        Validate_Product();
+                        Calculation();
+
+                    }
+                    else {
+                        $("#ProductUidId").val("");
+                        $("#ProductId").val("");
+                        $("#ProductId").select2("data", { id: "", text: "" });
+                        $("#Qty").val("");
+                        $("#FromProcessId").val("");
+                        $("#ProductUidValidation").text("Invalid Bar Code.");
+                        $("#SaleOrderLineId").select2("data", { id: "", text: "" });
+                    }
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    alert('Failed to retrieve product Uid details.' + thrownError);
+                    ProcessProgress.hide();
+                }
+            });
+        }
+    }
+
+    function Validate_Product() {
+        var ProcessProgress = $("#Product detail loading progress");
+        ProcessProgress.show();
+
+        if ($("#ProductUid").val() != 0 || $("#ProductUid").val() != NULL){
+            //$('#ProductId').select2().enable(false);
+        }
+
+        if ($("#ProductId").val() != 0 || $("#ProductId").val() != NULL) {
+
+            $.ajax({
+                cache: false,
+                type: "POST",
+                url: "@(Url.Action("GetProductSaleOrderFifoJson"))",
+                data: { ProductId: $("#ProductId").val(), PackingHeaderId : $("#PackingHeaderId").val() },
+                success: function (data) {
+                    CreateSaleOrderLineIdList();
+                    if (Object.keys(data).length != 0) {
+                        $("#SaleOrderLineId").val(data[0].ProductId);
+                        $("#SaleOrderValidation").text("");
+                    }
+                    else {
+                        $("#SaleOrderLineId").val("");
+                        $("#SaleOrderValidation").text("No Sale Order is pending for this product.");
+                    }
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    alert('Failed to retrieve Sale Order for Product.' + thrownError);
+                    ProcessProgress.hide();
+                }
+            });
+
+            $.ajax({
+                cache: false,
+                type: "POST",
+                url: "@(Url.Action("GetProductAreaJson"))",
+                data: { ProductId: $("#ProductId").val(), PackingHeaderId : $("#PackingHeaderId").val() },
+                success: function (data) {
+                    $("#UnitConversionMultiplier").val(data[0].ProductArea);
+                    Calculation();
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    alert('Failed to retrieve Area for Product.' + thrownError);
+                    ProcessProgress.hide();
+                }
+            });
+
+
+            $.ajax({
+                cache: false,
+                type: "POST",
+                url: "@(Url.Action("GetProductDetailJson"))",
+                data: { ProductId: $("#ProductId").val()},
+                success: function (data) {
+                    $("#UnitId").val(data[0].UnitId);
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    alert('Failed to retrieve Product Detail.' + thrownError);
+                    ProcessProgress.hide();
+                }
+            });
+
+
+            $.ajax({
+                cache: false,
+                type: "POST",
+                url: "@(Url.Action("GetNewPackingBaleNoJson"))",
+                data: { PackingHeaderId: $("#PackingHeaderId").val() },
+            success: function (data) {
+                $("#BaleNo").val(data[0].NewBaleNo);
+            },
+            error: function (xhr, ajaxOptions, thrownError) {
+                alert('Failed to retrieve Bale No.' + thrownError);
+                ProcessProgress.hide();
+            }
+        });
+
+        }
+        else {
+            $("#UnitConversionMultiplier").val(0);
+            $("#UnitId").val("");
+            $("#SaleOrderLineId").select2("data", { id: "", text: ""});
+        }
+    }
+
+    function Calculation() {
+        if ($('#UnitConversionMultiplier').val() != 0) {
+            $('#DeliveryQty').val($('#Qty').val() * $('#UnitConversionMultiplier').val())
+        }
+    }
+
+
+    function CreateSaleOrderLineIdList() {
+        var SaleOrderLineId = $("#SaleOrderLineId");
+
+        $.ajax({
+            cache: false,
+            type: "POST",
+            url: "@(Url.Action("GetSaleOrderLineIdListJson"))",
+            data: { ProductId: $("#ProductId").val(), PackingHeaderId: $("#PackingHeaderId").val() },
+        success: function (data) {
+            SaleOrderLineId.html('');
+            //SaleOrderLineId.append($('<option></option>').html('-Please Select-'));
+            $.each(data, function (id, option) {
+                SaleOrderLineId.append($('<option> </option>').val(option.SaleOrderLineId).html(option.SaleOrderNo));
+            });
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            alert('Failed to Retrive Sale Order List.' + thrownError);
+        }
+        });
+    }
+</script>

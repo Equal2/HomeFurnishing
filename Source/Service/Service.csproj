@@ -1,0 +1,575 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{BFBAB8EE-BE97-4467-837E-09F142F1BF44}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Service</RootNamespace>
+    <AssemblyName>Service</AssemblyName>
+    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
+    <RestorePackages>true</RestorePackages>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>
+    </DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <UseVSHostingProcess>true</UseVSHostingProcess>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="AutoMapper, Version=3.3.1.0, Culture=neutral, PublicKeyToken=be96cd2c38ef1005, processorArchitecture=MSIL">
+      <HintPath>..\packages\AutoMapper.3.3.1\lib\net40\AutoMapper.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="AutoMapper.Net4, Version=3.3.1.0, Culture=neutral, PublicKeyToken=be96cd2c38ef1005, processorArchitecture=MSIL">
+      <HintPath>..\packages\AutoMapper.3.3.1\lib\net40\AutoMapper.Net4.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Components">
+      <HintPath>..\Components\bin\Debug\Components.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AspNet.Identity.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Microsoft.AspNet.Identity.Core.2.2.1\lib\net45\Microsoft.AspNet.Identity.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AspNet.Identity.EntityFramework, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Microsoft.AspNet.Identity.EntityFramework.2.2.1\lib\net45\Microsoft.AspNet.Identity.EntityFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AspNet.Identity.Owin">
+      <HintPath>..\packages\Microsoft.AspNet.Identity.Owin.2.2.1\lib\net45\Microsoft.AspNet.Identity.Owin.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Owin, Version=3.0.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Microsoft.Owin.3.0.1\lib\net45\Microsoft.Owin.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Owin.Security, Version=3.0.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Microsoft.Owin.Security.3.0.1\lib\net45\Microsoft.Owin.Security.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Owin.Security.Cookies, Version=3.0.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Microsoft.Owin.Security.Cookies.3.0.1\lib\net45\Microsoft.Owin.Security.Cookies.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Owin.Security.OAuth, Version=3.0.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Microsoft.Owin.Security.OAuth.3.0.1\lib\net45\Microsoft.Owin.Security.OAuth.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.ReportViewer.Common, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
+    <Reference Include="Microsoft.ReportViewer.WebForms, Version=11.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
+      <HintPath>..\packages\MicosoftReportViewerWebForms_v11.1.0.1\lib\Microsoft.ReportViewer.WebForms.DLL</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Newtonsoft.Json.6.0.8\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="Owin">
+      <HintPath>..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data.Linq" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Web.Mvc, Version=5.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Microsoft.AspNet.Mvc.5.2.3\lib\net45\System.Web.Mvc.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AccountService.cs" />
+    <Compile Include="AdminSetupService.cs" />
+    <Compile Include="ChargeGroupPersonCalculationService.cs" />
+    <Compile Include="ChargeGroupSettingsService.cs" />
+    <Compile Include="CompanyService.cs" />
+    <Compile Include="CompanySettingsService.cs" />
+    <Compile Include="DARService.cs" />
+    <Compile Include="Display_JobInvoiceSummaryService.cs" />
+    <Compile Include="Display_SaleOrderInventoryStatusService.cs" />
+    <Compile Include="RolePermissionService.cs" />
+    <Compile Include="Display_ProdOrderBalanceService.cs" />
+    <Compile Include="DashBoardAutoService.cs" />
+    <Compile Include="Display_SaleOrderBalanceService.cs" />
+    <Compile Include="InitiallizeRugDataService.cs" />
+    <Compile Include="ImportAWService.cs" />
+    <Compile Include="Display_JobOrderBalanceService.cs" />
+    <Compile Include="Display_PaymentAdivcewithInvoiceService.cs" />
+    <Compile Include="GridReportService.cs" />
+    <Compile Include="PersonProductUidService.cs" />
+    <Compile Include="UserRolesNewService.cs" />
+    <Compile Include="ProjectService.cs" />
+    <Compile Include="RedirectService.cs" />
+    <Compile Include="ReportHeaderService.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ReportLineService.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Rug\Constants\LedgerAccountConstants.cs" />
+    <Compile Include="Rug\Constants\ProcessConstants.cs" />
+    <Compile Include="Rug\Constants\ProductTypeConstants.cs" />
+    <Compile Include="SiteDivisionSettingsService.cs" />
+    <Compile Include="SalesTaxProductCodeService.cs" />
+    <Compile Include="Dimension4Service.cs" />
+    <Compile Include="Dimension3Service.cs" />
+    <Compile Include="FeetConversionToCmsService.cs" />
+    <Compile Include="DocumentTypeSettingsService.cs" />
+    <Compile Include="LedgerAccountOpeningService.cs" />
+    <Compile Include="PersonOpeningService.cs" />
+    <Compile Include="PersonRoleService.cs" />
+    <Compile Include="ImportHeaderService.cs" />
+    <Compile Include="ImportLineService.cs" />
+    <Compile Include="SaleDeliveryHeaderService.cs" />
+    <Compile Include="SaleDeliverySettingsService.cs" />
+    <Compile Include="SaleDeliveryLineService.cs" />
+    <Compile Include="SaleQuotationHeaderChargeService.cs" />
+    <Compile Include="SaleInvoiceLineDetailService.cs" />
+    <Compile Include="SaleQuotationHeaderDetailService.cs" />
+    <Compile Include="SaleQuotationHeaderService.cs" />
+    <Compile Include="SaleQuotationLineChargeService.cs" />
+    <Compile Include="SaleQuotationLineService.cs" />
+    <Compile Include="SaleQuotationSettingsService.cs" />
+    <Compile Include="SiteSelectionService.cs" />
+    <Compile Include="StockProcessDisplayService.cs" />
+    <Compile Include="TasksService.cs" />
+    <Compile Include="FinancialDisplayService.cs" />
+    <Compile Include="UserPermissionService.cs" />
+    <Compile Include="UserRolesService.cs" />
+    <Compile Include="UserService.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="UserTeamService.cs" />
+    <Compile Include="WeavingReceiveQaCombinedService.cs" />
+    <Compile Include="JobReceiveQaLineExtendedService.cs" />
+    <Compile Include="PackingLineExtendedService.cs" />
+    <Compile Include="ProductTypeSettingsService.cs" />
+    <Compile Include="QAGroupLineService.cs" />
+    <Compile Include="QAGroupService.cs" />
+    <Compile Include="JobReceiveQaAttributeService.cs" />
+    <Compile Include="JobReceiveQaPenaltyService.cs" />
+    <Compile Include="ProductGroupProcessSettingsService.cs" />
+    <Compile Include="ProductCategoryProcessSettingsService.cs" />
+    <Compile Include="ProductGroupSettingsService.cs" />
+    <Compile Include="ProductCategorySettingsService.cs" />
+    <Compile Include="ProductBuyerSettingsService.cs" />
+    <Compile Include="PersonSettingsService.cs" />
+    <Compile Include="UserReferralService.cs" />
+    <Compile Include="OverTimeApplicationHeaderService.cs" />
+    <Compile Include="AttendanceHeaderService.cs" />
+    <Compile Include="CostCenterStatusService.cs" />
+    <Compile Include="MaterialPlanCancelHeaderService.cs" />
+    <Compile Include="MaterialPlanCancelLineService.cs" />
+    <Compile Include="MaterialPlanCancelForSaleOrderService.cs" />
+    <Compile Include="MaterialPlanCancelForProdOrderService.cs" />
+    <Compile Include="MaterialPlanCancelForProdOrderLineService.cs" />
+    <Compile Include="PromoCodeService.cs" />
+    <Compile Include="DocumentTypeTimeExtensionService.cs" />
+    <Compile Include="DocumentTypeTimePlanService.cs" />
+    <Compile Include="GateService.cs" />
+    <Compile Include="JobInvoiceAmendmentHeaderChargeService.cs" />
+    <Compile Include="JobInvoiceRateAmendmentLineChargeService.cs" />
+    <Compile Include="JobInvoiceLineStatusService.cs" />
+    <Compile Include="JobOrderLineExtendedService.cs" />
+    <Compile Include="JobReceiveQaLineService.cs" />
+    <Compile Include="JobReceiveQaHeaderService.cs" />
+    <Compile Include="JobReceiveQaSettingsService.cs" />
+    <Compile Include="ProductAliasService.cs" />
+    <Compile Include="JobInvoiceReturnHeaderChargeService.cs" />
+    <Compile Include="JobInvoiceReturnHeaderService.cs" />
+    <Compile Include="JobInvoiceReturnLineChargeService.cs" />
+    <Compile Include="JobInvoiceReturnLineService.cs" />
+    <Compile Include="PurchaseQuotationLineChargeService.cs" />
+    <Compile Include="PurchaseQuotationHeaderChargeService.cs" />
+    <Compile Include="PurchaseQuotationLineService.cs" />
+    <Compile Include="PurchaseQuotationHeaderService.cs" />
+    <Compile Include="PurchaseOrderAmendmentHeaderChargeService.cs" />
+    <Compile Include="PurchaseOrderRateAmendmentLineChargeService.cs" />
+    <Compile Include="PurchaseOrderRateAmendmentService.cs" />
+    <Compile Include="PurchaseOrderAmendmentHeaderService.cs" />
+    <Compile Include="JobOrderInspectionRequestCancelHeaderService.cs" />
+    <Compile Include="JobOrderInspectionRequestHeaderService.cs" />
+    <Compile Include="JobOrderInspectionRequestCancelLineService.cs" />
+    <Compile Include="JobOrderInspectionRequestLineService.cs" />
+    <Compile Include="JobOrderInspectionSettingsService.cs" />
+    <Compile Include="JobOrderInspectionHeaderService.cs" />
+    <Compile Include="JobOrderInspectionLineService.cs" />
+    <Compile Include="PurchaseQuotationSettingsService.cs" />
+    <Compile Include="ReportColumnService.cs" />
+    <Compile Include="SaleDeliveryOrderCancelHeaderService.cs" />
+    <Compile Include="SaleDeliveryOrderCancelLineService.cs" />
+    <Compile Include="JobOrderInspectionRequestSettingsService.cs" />
+    <Compile Include="SaleDeliveryOrderSettingsService.cs" />
+    <Compile Include="JobInvoiceAmendmentHeaderService.cs" />
+    <Compile Include="JobInvoiceRateAmendmentService.cs" />
+    <Compile Include="JobReceiveLineStatusService.cs" />
+    <Compile Include="ProdOrderSettingsService.cs" />
+    <Compile Include="RateListLineHistoryService.cs" />
+    <Compile Include="RateListProductRateGroupService.cs" />
+    <Compile Include="RateListPersonRateGroupService.cs" />
+    <Compile Include="RateListHeaderService.cs" />
+    <Compile Include="ProductRateGroupService.cs" />
+    <Compile Include="RateListLineService.cs" />
+    <Compile Include="ExcessMaterialHeaderService.cs" />
+    <Compile Include="ExcessMaterialLineService.cs" />
+    <Compile Include="ExcessMaterialSettingsService.cs" />
+    <Compile Include="SaleDispatchSettingsService.cs" />
+    <Compile Include="SaleEnquiryHeaderService.cs" />
+    <Compile Include="SaleEnquiryLineService.cs" />
+    <Compile Include="SaleEnquiryLineExtendedService.cs" />
+    <Compile Include="CarpetSkuSettingsService.cs" />
+    <Compile Include="SaleEnquirySettingsService.cs" />
+    <Compile Include="StockAdjService.cs" />
+    <Compile Include="SubReportService.cs" />
+    <Compile Include="UpdatePurchaseExpiryService.cs" />
+    <Compile Include="UpdateJobExpiryService.cs" />
+    <Compile Include="UpdateSaleExpiryService.cs" />
+    <Compile Include="LedgerLineRefValueService.cs" />
+    <Compile Include="ModificationsCheckService.cs" />
+    <Compile Include="CommonService.cs" />
+    <Compile Include="CalculationHeaderLedgerAccountService.cs" />
+    <Compile Include="CalculationLineLedgerAccountService.cs" />
+    <Compile Include="CalculationProductService.cs" />
+    <Compile Include="CalculationFooterService.cs" />
+    <Compile Include="CalculationService.cs" />
+    <Compile Include="ExcessJobReviewService.cs" />
+    <Compile Include="ProdOrderHeaderStatusService.cs" />
+    <Compile Include="ProdOrderLineStatusService.cs" />
+    <Compile Include="PackingSettingsService.cs" />
+    <Compile Include="SaleInvoiceReturnLineChargeService.cs" />
+    <Compile Include="SaleInvoiceReturnHeaderChargeService.cs" />
+    <Compile Include="SaleInvoiceReturnLineService.cs" />
+    <Compile Include="SaleInvoiceReturnHeaderService.cs" />
+    <Compile Include="SaleDispatchReturnLineService.cs" />
+    <Compile Include="SaleDispatchReturnHeaderService.cs" />
+    <Compile Include="SaleOrderLineStatusService.cs" />
+    <Compile Include="RequisitionLineStatusService.cs" />
+    <Compile Include="PurchaseOrderLineStatusService.cs" />
+    <Compile Include="PurchaseOrderHeaderStatusService.cs" />
+    <Compile Include="JobOrderHeaderStatusService.cs" />
+    <Compile Include="JobOrderLineStatusService.cs" />
+    <Compile Include="CommonDocumentService.cs" />
+    <Compile Include="ChargeService.cs" />
+    <Compile Include="LedgerSettingService.cs" />
+    <Compile Include="NextPrevIdService.cs" />
+    <Compile Include="LeaveTypeServices.cs" />
+    <Compile Include="RateListHistoryService.cs" />
+    <Compile Include="ReasonService.cs" />
+    <Compile Include="RequisitionCancelHeaderService.cs" />
+    <Compile Include="RequisitionSettingsService.cs" />
+    <Compile Include="SaleInvoiceLineChargeService.cs" />
+    <Compile Include="SaleInvoiceHeaderChargeService.cs" />
+    <Compile Include="SaleInvoiceSettingsService.cs" />
+    <Compile Include="RequisitionCancelLineService.cs" />
+    <Compile Include="SaleDeliveryOrderLineService.cs" />
+    <Compile Include="SaleDeliveryOrderHeaderService.cs" />
+    <Compile Include="RateListService.cs" />
+    <Compile Include="StockInHandService.cs" />
+    <Compile Include="StockInHandSettingService.cs" />
+    <Compile Include="TrialBalanceSettingService.cs" />
+    <Compile Include="TrialBalanceService.cs" />
+    <Compile Include="DocSmsContentService.cs" />
+    <Compile Include="DocNotificationContentService.cs" />
+    <Compile Include="DocEmailContentService.cs" />
+    <Compile Include="NotificationUserService.cs" />
+    <Compile Include="NotificationSubjectService.cs" />
+    <Compile Include="NotificationService.cs" />
+    <Compile Include="LedgerAdjService.cs" />
+    <Compile Include="GatePassLineService.cs" />
+    <Compile Include="GatePassHeaderService.cs" />
+    <Compile Include="LedgerLineService.cs" />
+    <Compile Include="JobInvoiceSettingsService.cs" />
+    <Compile Include="JobInvoiceHeaderChargeService.cs" />
+    <Compile Include="JobInvoiceLineChargeService.cs" />
+    <Compile Include="ProductProcessService.cs" />
+    <Compile Include="ProductUidHeaderService.cs" />
+    <Compile Include="PurchaseGoodsReceiptSettingsService.cs" />
+    <Compile Include="JobReturnHeaderService.cs" />
+    <Compile Include="PurchaseGoodsReturnHeaderService.cs" />
+    <Compile Include="JobReturnLineService.cs" />
+    <Compile Include="PurchaseGoodsReturnLineService.cs" />
+    <Compile Include="PurchaseInvoiceReturnLineChargeService.cs" />
+    <Compile Include="PurchaseInvoiceReturnHeaderChargeService.cs" />
+    <Compile Include="PurchaseInvoiceSettingsService.cs" />
+    <Compile Include="PurchaseIndentSettingsService.cs" />
+    <Compile Include="ChargesCalculationService.cs" />
+    <Compile Include="JobOrderHeaderChargeService.cs" />
+    <Compile Include="JobOrderLineChargeService.cs" />
+    <Compile Include="PurchaseOrderSettingsService.cs" />
+    <Compile Include="RolesControllerActionService.cs" />
+    <Compile Include="RolesMenuService.cs" />
+    <Compile Include="RolesDivisionService.cs" />
+    <Compile Include="RolesSiteService.cs" />
+    <Compile Include="MVCControllerService.cs" />
+    <Compile Include="JobOrderAmendmentHeaderService.cs" />
+    <Compile Include="JobOrderRateAmendmentService.cs" />
+    <Compile Include="JobReceiveByProductService.cs" />
+    <Compile Include="JobReceiveBomService.cs" />
+    <Compile Include="JobOrderCancelBomService.cs" />
+    <Compile Include="JobOrderBomService.cs" />
+    <Compile Include="JobOrderPerkService.cs" />
+    <Compile Include="JobConsumptionSettingsService.cs" />
+    <Compile Include="RequisitionLineService.cs" />
+    <Compile Include="RequisitionHeaderService.cs" />
+    <Compile Include="RateConversionSettingsService.cs" />
+    <Compile Include="MaterialRequestSettingsService.cs" />
+    <Compile Include="MaterialReceiveSettingsService.cs" />
+    <Compile Include="StockHeaderSettingsService.cs" />
+    <Compile Include="JobReceiveSettingsService.cs" />
+    <Compile Include="MaterialPlanSettingsService.cs" />
+    <Compile Include="PerkDocumentTypeService.cs" />
+    <Compile Include="PerksService.cs" />
+    <Compile Include="JobReceiveHeaderService.cs" />
+    <Compile Include="JobReceiveLineService.cs" />
+    <Compile Include="JobInvoiceHeaderService.cs" />
+    <Compile Include="PurchaseInvoiceLineChargeService.cs" />
+    <Compile Include="PurchaseInvoiceHeaderChargeService.cs" />
+    <Compile Include="JobInvoiceLineService.cs" />
+    <Compile Include="JobOrderCancelHeaderService.cs" />
+    <Compile Include="JobOrderCancelLineService.cs" />
+    <Compile Include="StockLineService.cs" />
+    <Compile Include="SaleOrderQtyAmendmentService.cs" />
+    <Compile Include="SaleOrderAmendmentHeaderService.cs" />
+    <Compile Include="ReportGenerateService.cs" />
+    <Compile Include="JobOrderSettingsService.cs" />
+    <Compile Include="JobOrderHeaderService.cs" />
+    <Compile Include="JobOrderLineService.cs" />
+    <Compile Include="PurchaseInvoiceReturnHeaderService.cs" />
+    <Compile Include="PurchaseInvoiceReturnLineService.cs" />
+    <Compile Include="PurchaseOrderHeaderChargeService.cs" />
+    <Compile Include="PurchaseOrderLineChargeService.cs" />
+    <Compile Include="PurchaseIndentCancelLineService.cs" />
+    <Compile Include="PurchaseIndentCancelHeaderService.cs" />
+    <Compile Include="CustomDetailService.cs" />
+    <Compile Include="ProductBuyerService.cs" />
+    <Compile Include="MaterialPlanForProdOrderLineService.cs" />
+    <Compile Include="ProdOrderLineService.cs" />
+    <Compile Include="ProdOrderHeaderService.cs" />
+    <Compile Include="NarrationService.cs" />
+    <Compile Include="PurchaseInvoiceLineService.cs" />
+    <Compile Include="PurchaseInvoiceHeaderService.cs" />
+    <Compile Include="MaterialPlanLineService.cs" />
+    <Compile Include="MaterialPlanForProdOrderService.cs" />
+    <Compile Include="MaterialPlanForLineForJobOrderService.cs" />
+    <Compile Include="MaterialPlanForSaleOrderService.cs" />
+    <Compile Include="MaterialPlanForSaleOrderLineService.cs" />
+    <Compile Include="MaterialPlanHeaderService.cs" />
+    <Compile Include="PurchaseOrderCancelLineService.cs" />
+    <Compile Include="PurchaseOrderCancelHeaderService.cs" />
+    <Compile Include="DispatchWaybillHeaderService.cs" />
+    <Compile Include="DispatchWaybillLineService.cs" />
+    <Compile Include="ProdOrderCancelHeaderService.cs" />
+    <Compile Include="ProdOrderCancelLineService.cs" />
+    <Compile Include="StockHeaderService.cs" />
+    <Compile Include="RouteLineService.cs" />
+    <Compile Include="RouteService.cs" />
+    <Compile Include="ChargeGroupProductService.cs" />
+    <Compile Include="ChargeTypeService.cs" />
+    <Compile Include="ChargeGroupPersonService.cs" />
+    <Compile Include="GateInService.cs" />
+    <Compile Include="PurchaseWaybillService.cs" />
+    <Compile Include="PurchaseGoodsReceiptHeaderService.cs" />
+    <Compile Include="PurchaseGoodsReceiptLineService.cs" />
+    <Compile Include="PurchaseOrderLineService.cs" />
+    <Compile Include="PurchaseOrderHeaderService.cs" />
+    <Compile Include="Dimension2Service.cs" />
+    <Compile Include="RugStencilService.cs" />
+    <Compile Include="MenuService.cs" />
+    <Compile Include="ControllerActionService.cs" />
+    <Compile Include="Dimension1Service.cs" />
+    <Compile Include="LedgerService.cs" />
+    <Compile Include="LedgerHeaderService.cs" />
+    <Compile Include="StockProcessService.cs" />
+    <Compile Include="StockUidService.cs" />
+    <Compile Include="CourierService.cs" />
+    <Compile Include="UserBookMarkService.cs" />
+    <Compile Include="SubModuleService.cs" />
+    <Compile Include="ModuleService.cs" />
+    <Compile Include="ProductSiteDetailService.cs" />
+    <Compile Include="ServiceTaxCategoryService.cs" />
+    <Compile Include="TransporterService.cs" />
+    <Compile Include="ManufacturerService.cs" />
+    <Compile Include="AgentService.cs" />
+    <Compile Include="EmployeeService.cs" />
+    <Compile Include="LedgerAccountGroupService.cs" />
+    <Compile Include="BusinessEntityService.cs" />
+    <Compile Include="JobWorkerService.cs" />
+    <Compile Include="CounterService.cs" />
+    <Compile Include="ColourService.cs" />
+    <Compile Include="DescriptionOfGoodsService.cs" />
+    <Compile Include="DrawBackTariffService.cs" />
+    <Compile Include="LedgerAccountService.cs" />
+    <Compile Include="PersonDocumentService.cs" />
+    <Compile Include="PersonBankAccountService.cs" />
+    <Compile Include="PersonRegistrationService.cs" />
+    <Compile Include="ProductDesignPatternService.cs" />
+    <Compile Include="ProductContentHeaderService.cs" />
+    <Compile Include="ProductContentLineService.cs" />
+    <Compile Include="ProductDesignService.cs" />
+    <Compile Include="ProductInvoiceGroupService.cs" />
+    <Compile Include="DesignationService.cs" />
+    <Compile Include="PersonProcessService.cs" />
+    <Compile Include="PersonRateGroupService.cs" />
+    <Compile Include="ExceptionHandlingService.cs" />
+    <Compile Include="ProcessSequenceHeaderService.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ProductCategoryService.cs" />
+    <Compile Include="BomDetailService.cs" />
+    <Compile Include="ProcessSequenceLineService.cs" />
+    <Compile Include="CostCenterService.cs" />
+    <Compile Include="ProductCustomGroupHeaderService.cs" />
+    <Compile Include="ProductCustomGroupLineService.cs" />
+    <Compile Include="FinishedProductService.cs" />
+    <Compile Include="SaleDispatchHeaderService.cs" />
+    <Compile Include="SaleInvoiceHeaderService.cs" />
+    <Compile Include="SaleDispatchLineService.cs" />
+    <Compile Include="SaleInvoiceLineService.cs" />
+    <Compile Include="SaleTaxGroupService.cs" />
+    <Compile Include="SupplierService.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="TdsGroupService.cs" />
+    <Compile Include="TdsCategoryService.cs" />
+    <Compile Include="SalesTaxGroupPartyService.cs" />
+    <Compile Include="SalesTaxGroupProductService.cs" />
+    <Compile Include="ProductNatureService.cs" />
+    <Compile Include="ProductShapeService.cs" />
+    <Compile Include="ProductStyleService.cs" />
+    <Compile Include="ProductSizeTypeService.cs" />
+    <Compile Include="ProductQualityService.cs" />
+    <Compile Include="ProductSizeService.cs" />
+    <Compile Include="ProcessService.cs" />
+    <Compile Include="DuplicateDocumentCheckService.cs" />
+    <Compile Include="ProductConstructionService.cs" />
+    <Compile Include="SizeService.cs" />
+    <Compile Include="StockService.cs" />
+    <Compile Include="ComboHelpListService.cs" />
+    <Compile Include="DepartmentService.cs" />
+    <Compile Include="GodownService.cs" />
+    <Compile Include="ProductUidService.cs" />
+    <Compile Include="SaleOrderCancelLineService.cs" />
+    <Compile Include="SaleOrderCancelHeaderService.cs" />
+    <Compile Include="PackingHeaderService.cs" />
+    <Compile Include="PackingLineService.cs" />
+    <Compile Include="PurchaseIndentHeaderService.cs" />
+    <Compile Include="PurchaseIndentLineService.cs" />
+    <Compile Include="SaleOrderSettingsService.cs" />
+    <Compile Include="PurchaseTransportGRService.cs" />
+    <Compile Include="SiteService.cs" />
+    <Compile Include="SaleOrderLineService.cs" />
+    <Compile Include="SaleOrderHeaderService.cs" />
+    <Compile Include="StoredProcedureService.cs" />
+    <Compile Include="CityService.cs" />
+    <Compile Include="CountryService.cs" />
+    <Compile Include="InspectionQaAttributeService.cs" />
+    <Compile Include="ProductTypeQaAttributeService.cs" />
+    <Compile Include="PersonContactTypeService.cs" />
+    <Compile Include="ProductIncludedAccessoriesService.cs" />
+    <Compile Include="ProductRelatedAccessoriesService.cs" />
+    <Compile Include="ProductSampleAttributeService.cs" />
+    <Compile Include="ProductAttributeService.cs" />
+    <Compile Include="ProductTypeAttributeService.cs" />
+    <Compile Include="StateService.cs" />
+    <Compile Include="TempUserStoreService.cs" />
+    <Compile Include="BuyerService.cs" />
+    <Compile Include="ActivityLogService.cs" />
+    <Compile Include="UnitConverionService.cs" />
+    <Compile Include="ProductSamplePhotoService.cs" />
+    <Compile Include="ProductSampleApprovalService.cs" />
+    <Compile Include="LocationService.cs" />
+    <Compile Include="DocumentCategoryService.cs" />
+    <Compile Include="ProductSampleShipmentService.cs" />
+    <Compile Include="ProductSamplePhotoApprovalService.cs" />
+    <Compile Include="CurrencyService.cs" />
+    <Compile Include="DeliveryTermsService.cs" />
+    <Compile Include="DocumentTypeService.cs" />
+    <Compile Include="PersonAddressService.cs" />
+    <Compile Include="ProductCollectionService.cs" />
+    <Compile Include="DivisionService.cs" />
+    <Compile Include="ProductPhotoService.cs" />
+    <Compile Include="ProductSampleService.cs" />
+    <Compile Include="ProductSupplierService.cs" />
+    <Compile Include="ProductManufacturingStyleService.cs" />
+    <Compile Include="ShipMethodService.cs" />
+    <Compile Include="UnitService.cs" />
+    <Compile Include="ProductGroupService.cs" />
+    <Compile Include="ProductTypeService.cs" />
+    <Compile Include="ProductService.cs" />
+    <Compile Include="PersonContactService.cs" />
+    <Compile Include="PersonService.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Core\Core.csproj">
+      <Project>{b1053a2d-a1ea-412f-ba95-19ce794f8891}</Project>
+      <Name>Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Data\Data.csproj">
+      <Project>{23b3d0d9-0f5c-4fd7-ba7e-a9e0c53a86c9}</Project>
+      <Name>Data</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Model\Model.csproj">
+      <Project>{4d4923f5-548c-4d13-859d-7f5e9699facd}</Project>
+      <Name>Model</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

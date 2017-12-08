@@ -1,0 +1,683 @@
+﻿@model Model.ViewModel.PurchaseQuotationHeaderViewModel
+
+@{
+    ViewBag.Title = "Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<link href="~/Content/Slick/slick.grid.css" rel="stylesheet" />
+@*<link href="~/Content/Slick/css/smoothness/jquery-ui-1.11.3.custom.min.css" rel="stylesheet" />*@
+<link href="~/Content/Slick/slick-default-theme.css" rel="stylesheet" />
+
+<link href="~/Scripts/skins/flat/green.css" rel="stylesheet" />
+
+<style>
+    .slick-row {
+        line-height: 16px;
+    }
+
+    #prodList *, #quantites * {
+        box-sizing: content-box !important;
+    }
+
+    .slick-header-column.ui-state-default {
+        background-color: #428bca;
+        color: white;
+        height: 35px;
+        line-height: 35px;
+    }
+
+    .loading-indicator {
+        display: inline-block;
+        padding: 12px;
+        background: white;
+        opacity: 0.5;
+        color: black;
+        font-weight: bold;
+        z-index: 9999;
+        border: 1px solid red;
+        -moz-border-radius: 10px;
+        -webkit-border-radius: 10px;
+        -moz-box-shadow: 0 0 5px red;
+        -webkit-box-shadow: 0px 0px 5px red;
+        -text-shadow: 1px 1px 1px white;
+    }
+
+        .loading-indicator label {
+            padding-left: 20px;
+            background: url('../images/ajax-loader-small.gif') no-repeat center left;
+        }
+
+    .rowSelected {
+        background-color: beige !important;
+    }
+
+    span.checkbox {
+        color: lightgray;
+    }
+
+    .checked {
+        color: #9add4e !important;
+    }
+    /* Slick.Editors.Text, Slick.Editors.Date */
+    input.editor-text {
+        width: 100%;
+        height: 100%;
+        border: 0;
+        margin: 0;
+        background: transparent;
+        outline: 0;
+        padding: 0;
+    }
+</style>
+
+<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+    <div class="panel panel-info">
+        <div class="panel-heading" role="tab" id="headingOne">
+            <h4 class="panel-title text-center">
+                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#" aria-expanded="true" aria-controls="">
+                    Products
+                </a>
+            </h4>
+        </div>
+        <div id="collapseOne" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingOne">
+            <div class="panel-body">
+                <div style="width:100%;">
+                    <div class="grid-header" style="width: 100%">
+                        <label>Products</label>
+                        <span style="float:right;display:inline-block;">
+                            Search:
+                            <input type="text" id="prodSearch" value="">
+                            <span class="glyphicon glyphicon-shopping-cart" style="font-size:x-large;cursor:pointer" id="cart"> <span class="badge" style="position:absolute;top:-10px;right:-12px;font-size:9px;background-color:coral" id="cartSum"></span> </span>
+                        </span>
+                    </div>
+                    <div id="prodList" style="width:100%;height:500px;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="panel panel-danger">
+        <div class="panel-heading" role="tab" id="headingTwo">
+            <h4 class="panel-title text-center">
+                <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#" aria-expanded="false" aria-controls="">
+                    Quantities
+                </a>
+            </h4>
+        </div>
+        <div id="collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
+            <div class="panel-body">
+
+                <div style="width:100%;">
+                    <div class="grid-header" style="width: 100%">
+
+                        <span class="glyphicon glyphicon-hand-left" style="font-size:x-large;cursor:pointer" id="Previous"> </span>
+                        <span style="float:right;display:inline-block;">
+                            Search:
+                            <input type="text" id="qtySearch" value="">
+                            <span class="glyphicon glyphicon-hand-right" style="font-size:x-large;cursor:pointer" id="Proceed"> </span>
+                        </span>
+                        <br />
+                        <label>Products</label>
+                    </div>
+                    <div id="quantites" style="width:100%;height:500px;"></div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <div class="panel panel-success">
+        <div class="panel-heading" role="tab" id="headingThree">
+            <h4 class="panel-title text-center">
+                <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#" aria-expanded="false" aria-controls="">
+                    Details
+                </a>
+            </h4>
+        </div>
+        <div id="collapseThree" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingThree">
+            <div class="panel-body">
+
+
+                @using (Html.BeginForm("WizardPost", "PurchaseQuotationWizard", FormMethod.Post, new { enctype = "multipart/form-data", id = "WizardForm" }))
+                {
+                    @Html.AntiForgeryToken()
+                    <span class="glyphicon glyphicon-hand-left" style="font-size:x-large;cursor:pointer" id="PreviousQty"> </span>
+                    <input type="submit" value="Save" class="btn btn-primary right" id="submit" style="width: 90px; background-color: #2980b9" />
+                    <br />
+                    <div class="form-horizontal">
+                        <div class="row">
+                            <h4 class="col-md-12 black">
+                                <span class="glyphicon glyphicon-align-justify"></span>
+                                1.Document Details
+                            </h4>
+                            <div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group" style="margin-top:15px">
+                                            @Html.LabelFor(model => model.DocDate, "Order Date", new { @class = "control-label col-xs-4" })
+                                            <div class="col-xs-6">
+                                                @Html.TextBoxFor(m => m.DocDate, "{0:dd/MMMM/yyyy}", new { @class = "datepickerWithNFD form-control col-xs-6 required" })
+                                                @Html.ValidationMessageFor(model => model.DocDate, "", new { @class = "text-danger" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6" style="margin-top:15px">
+                                        <div class="form-group">
+                                            @Html.LabelFor(model => model.DocNo, "Order No", new { @class = "control-label col-xs-4" })
+                                            <div class="col-xs-6">
+                                                @Html.TextBoxFor(m => m.DocNo, null, new { @class = "form-control col-xs-6 required" })
+                                                @Html.ValidationMessageFor(m => m.DocNo, "", new { @class = "text-danger" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            @Html.LabelFor(model => model.SupplierId, "Supplier", new { @class = "control-label col-xs-4" })
+                                            <div class="col-xs-6">
+                                                @Html.TextBoxFor(m => m.SupplierId, null, new { @class = "form-control col-xs-6 required" })
+                                                @Html.ValidationMessageFor(m => m.SupplierId, "", new { @class = "text-danger" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            @Html.LabelFor(model => model.DueDate, "Due Date", new { @class = "control-label col-xs-4" })
+                                            <div class="col-xs-6">
+                                                @Html.TextBoxFor(m => m.DueDate, "{0:dd/MMMM/yyyy}", new { @class = "datepicker form-control col-xs-6 required" })
+                                                @Html.ValidationMessageFor(model => model.DueDate, "", new { @class = "text-danger" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            @Html.LabelFor(model => model.CurrencyId, "Currency", new { @class = "control-label col-xs-4" })
+                                            <div class="col-xs-6">
+                                                @Html.DropDownListFor(m => m.CurrencyId, new SelectList(ViewBag.CurrencyList as System.Collections.IEnumerable, "ID", "Name"), new { @class = "height form-control col-xs-6 " })
+                                                @Html.ValidationMessageFor(m => m.CurrencyId, "", new { @class = "text-danger" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            @Html.LabelFor(model => model.SalesTaxGroupPersonId, "Sales Tax Group Person", new { @class = "control-label col-xs-4" })
+                                            <div class="col-xs-6">
+                                                @Html.DropDownListFor(m => m.SalesTaxGroupPersonId, new SelectList(ViewBag.SalesTaxGroupList as System.Collections.IEnumerable, "ChargeGroupPersonId", "ChargeGroupPersonName"), string.Empty, new { @class = "height form-control col-xs-6 required" })
+                                                @Html.ValidationMessageFor(m => m.SalesTaxGroupPersonId, "", new { @class = "text-danger" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            @Html.LabelFor(model => model.DeliveryTermsId, "Delivery Terms", new { @class = "control-label col-xs-4" })
+                                            <div class="col-xs-6">
+                                                @Html.DropDownListFor(m => m.DeliveryTermsId, new SelectList(ViewBag.DeliveryTermsList as System.Collections.IEnumerable, "DeliveryTermsId", "DeliveryTermsName"), string.Empty, new { @class = "height form-control col-xs-6" })
+                                                @Html.ValidationMessageFor(m => m.DeliveryTermsId, "", new { @class = "text-danger" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            @Html.LabelFor(model => model.ShipMethodId, "Ship Method", new { @class = "control-label col-xs-4" })
+                                            <div class="col-xs-6">
+                                                @Html.DropDownListFor(m => m.ShipMethodId, new SelectList(ViewBag.ShipMethodList as System.Collections.IEnumerable, "ShipMethodId", "ShipMethodName"), string.Empty, new { @class = "height form-control col-xs-6 required" })
+                                                @Html.ValidationMessageFor(m => m.ShipMethodId, "", new { @class = "text-danger" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            @Html.LabelFor(model => model.UnitConversionForId, "Unit Conversion For", new { @class = "control-label col-xs-4" })
+                                            <div class="col-xs-6">
+                                                @Html.DropDownListFor(m => m.UnitConversionForId, new SelectList(ViewBag.UnitConvForList as System.Collections.IEnumerable, "UnitConversionForId", "UnitConversionForName"), new { @class = "form-control height" })
+                                                @Html.ValidationMessageFor(m => m.UnitConversionForId, "", new { @class = "text-danger" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            @Html.LabelFor(model => model.CreditDays, "Credit Days", new { @class = "control-label col-xs-4" })
+                                            <div class="col-xs-6">
+                                                @Html.TextBoxFor(m => m.CreditDays, null, new { @class = "form-control col-xs-6 " })
+                                                @Html.ValidationMessageFor(m => m.CreditDays, "", new { @class = "text-danger" })
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            @Html.LabelFor(model => model.VendorQuotationDate, "Quotation Date", new { @class = "control-label col-xs-4" })
+                                            <div class="col-xs-6">
+                                                @Html.TextBoxFor(m => m.VendorQuotationDate, "{0:dd/MMMM/yyyy}", new { @class = "datepicker form-control col-xs-6 required" })
+                                                @Html.ValidationMessageFor(m => m.VendorQuotationDate, "", new { @class = "text-danger" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            @Html.LabelFor(model => model.VendorQuotationNo, "Quotation No", new { @class = "control-label col-xs-4" })
+                                            <div class="col-xs-6">
+                                                @Html.TextBoxFor(m => m.VendorQuotationNo, new { @class = "form-control col-xs-6" })
+                                                @Html.ValidationMessageFor(m => m.VendorQuotationNo, "", new { @class = "text-danger" })
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            @Html.LabelFor(model => model.TermsAndConditions, "Terms & Conditions", new { @class = "control-label col-xs-4" })
+                                            <div class="col-xs-6">
+                                                @Html.TextAreaFor(m => m.TermsAndConditions, new { @class = "form-control col-xs-6" })
+                                                @Html.ValidationMessageFor(m => m.TermsAndConditions, "", new { @class = "text-danger" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            @Html.LabelFor(model => model.ShipAddress, "Ship Address", new { @class = "control-label col-xs-4" })
+                                            <div class="col-xs-6">
+                                                @Html.TextAreaFor(m => m.ShipAddress, new { @class = "form-control col-xs-6" })
+                                                @Html.ValidationMessageFor(m => m.ShipAddress, "", new { @class = "text-danger" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            @Html.LabelFor(model => model.Remark, "Remark", new { @class = "control-label col-xs-4" })
+                                            <div class="col-xs-6">
+                                                @Html.TextAreaFor(m => m.Remark, new { @class = "form-control col-xs-6" })
+                                                @Html.ValidationMessageFor(m => m.Remark, "", new { @class = "text-danger" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                }
+
+
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+@*<script src="~/Scripts/jquery-ui-1.11.4.min.js"></script>*@
+<script src="~/Scripts/icheck.js"></script>
+<script src="~/Scripts/Slick/slick.checkboxselectcolumn.js"></script>
+<script src="~/Scripts/Slick/jquery.event.drag-2.2.js"></script>
+<script src="~/Scripts/Slick/jquery.jsonp-2.4.min.js"></script>
+<script src="~/Scripts/Slick/slick.core.js"></script>
+<script src="~/Scripts/Slick/slick.remotemodel.js"></script>
+<script src="~/Scripts/Slick/slick.editors.js"></script>
+<script src="~/Scripts/Slick/slick.dataview.js"></script>
+
+<script src="~/Scripts/Slick/slick.grid.js"></script>
+<script src="~/Scripts/Slick/slick.rowselectionmodel.js"></script>
+
+
+@*ProdList Scripting*@
+<script>
+    var grid, s;
+    var loader = new Slick.Data.RemoteModel();
+
+    var imageFormatter = function (row, cell, value, columnDef, dataContext) {
+        //var s = "<p> <img src='" + dataContext["url"] + "' style=\"width:50px;height:50px\" align='left'  onerror=\"this.src=\'\'\"   /><span style='font-size:small'>" +
+        var s = "<p> <img src='' style=\"width:50px;height:50px\" align='left' /><span style='font-size:small'>" +
+                  dataContext["title"] + "</span><br/>  <span style='font-size:small'>" + dataContext["description"] + " </span></p>";
+        return s;
+    };
+
+    var _selectedRowsLookup = [];
+    var selectedDictionary = {};
+
+
+    function checkboxSelectionFormatter(row, cell, value, columnDef, dataContext) {
+        if (dataContext) {
+            return Lookup(dataContext.id)
+                ? "<input type='checkbox' checked='checked' data-id='" + dataContext.id + "'>"
+                : "<input type='checkbox' data-id='" + dataContext.id + "'>";
+        }
+        return null;
+    }
+
+    $(document).on("ifChanged", "input", function (e) {
+
+        if ($(e.target).is(":checked")) {
+            _selectedRowsLookup.push($(e.target).attr("data-id"));
+            updateCartSum();
+        }
+        else {
+            var idx = _selectedRowsLookup.indexOf($(e.target).attr("data-id"))
+            if (idx > -1)
+                _selectedRowsLookup.splice(idx, 1);
+
+            updateCartSum();
+        }
+    });
+
+    function Lookup(ite) {
+        console.log(_selectedRowsLookup.indexOf(ite))
+        if (_selectedRowsLookup.indexOf(ite.toString()) > -1)
+            return true;
+        else
+            return false;
+    }
+
+    var prodColumn = [
+        { id: "lk", name: "", field: "index", sortable: true },
+         { id: "Img", name: "Img", width: 520, formatter: imageFormatter },
+         { id: "Name", name: "Name", width: 200, field: "title", sortable: true },
+         { id: "Code", name: "Code", width: 200, field: "description", sortable: true },
+          {
+              id: "chkbox", name: "", resizable: false,
+              sortable: false, cssClass: "slick-cell-checkboxsel",
+              formatter: checkboxSelectionFormatter,
+          },
+    ];
+
+    function updateCartSum() {
+        $("#cartSum").text(_selectedRowsLookup.length > 0 ? _selectedRowsLookup.length : "");
+    }
+
+    var options = {
+        rowHeight: 60,
+        editable: false,
+        enableAddRow: false,
+        enableCellNavigation: true,
+    };
+    var loadingIndicator = null;
+
+    $(function () {
+        grid = new Slick.Grid("#prodList", loader.data, prodColumn, options);
+        grid.onViewportChanged.subscribe(function (e, args) {
+            var vp = grid.getViewport();
+            loader.ensureData(vp.top, vp.bottom);
+        });
+        grid.onSort.subscribe(function (e, args) {
+            loader.setSort(args.sortCol.field, args.sortAsc ? 1 : -1);
+            var vp = grid.getViewport();
+            loader.ensureData(vp.top, vp.bottom);
+        });
+
+        loader.onDataLoading.subscribe(function () {
+            if (!loadingIndicator) {
+                loadingIndicator = $("<span class='loading-indicator'><label>Buffering...</label></span>").appendTo(document.body);
+                var $g = $("#prodList");
+                loadingIndicator
+                        .css("position", "absolute")
+                        .css("top", $g.position().top + $g.height() / 2 - loadingIndicator.height() / 2)
+                        .css("left", $g.position().left + $g.width() / 2 - loadingIndicator.width() / 2);
+            }
+            loadingIndicator.show();
+        });
+        loader.onDataLoaded.subscribe(function (e, args) {
+            for (var i = args.from; i <= args.to; i++) {
+                grid.invalidateRow(i);
+            }
+            grid.updateRowCount();
+            grid.render();
+            loadingIndicator.fadeOut();
+            enableiCheck();
+        });
+
+        $("#prodSearch").keyup(function (e) {
+            if (e.which == 13) {
+                loader.setSearch($(this).val());
+                var vp = grid.getViewport();
+                loader.ensureData(vp.top, vp.bottom);
+            }
+        });
+        loader.setSearch($("#prodSearch").val());
+        loader.setSort("score", -1);
+        grid.setSortColumn("score", false);
+        // load the first page
+        grid.onViewportChanged.notify();
+    })
+
+    function enableiCheck() {
+
+        $('input').iCheck({
+            checkboxClass: 'icheckbox_flat-green',
+            radioClass: 'iradio_flat-green'
+        });
+
+    }
+
+    $("#cart").click(function (e) {
+
+        $("#collapseOne").collapse('hide');
+        grid.destroy();
+        grid = null;
+        $("#collapseTwo").collapse('show');
+        UpdateProducts();
+        return false;
+    });
+
+
+    @*QtyList Scripting*@
+
+    var qtyGrid;
+    var qtyColumns;
+    var qtyData;
+
+    //Columns Specification
+    qtyColumns = [
+   { id: "Srl", name: "Srl", field: "Sr", width: 30, minWidth: 30 },
+   { id: "Img", name: "Img", width: 400, formatter: imageFormatter, hasTotalName: true },
+   { id: "Name", name: "Name", width: 200, field: "title", sortable: true },
+   { id: "Code", name: "Code", width: 200, field: "description", sortable: true },
+   { id: "Qty", name: "Qty", field: "Qty", cssClass: "text-right", headerCssClass: "text-right", width: 100, minWidth: 100, hasTotal: true, editor: Slick.Editors.Text }
+    ];
+
+    //Options Initialization
+    var qtyOptions = {
+        editable: true,
+        enableCellNavigation: true,
+        enableColumnReorder: false,
+        forceFitColumns: true,
+        showFooterRow: true,
+        explicitInitialization: true,
+        rowHeight: 60
+    };
+
+
+    //Creating Custom FilterFunction that can be passed to slickgrid for search
+    var searchString = "";
+    function myFilter(item, args) {
+        if (args.searchString != "" && (item["title"]).toLowerCase().indexOf(args.searchString.toLowerCase()) == -1) {
+            return false;
+        }
+        return true;
+    }
+
+    //Instantiating the Grid
+    var dataView = new Slick.Data.DataView();
+    qtyGrid = new Slick.Grid("#quantites", dataView, qtyColumns, qtyOptions);
+
+    //Adding Grid functionalities
+    qtyGrid.setSelectionModel(new Slick.RowSelectionModel());
+
+    //Functionality for adding Totals on cell render
+    qtyGrid.onFooterRowCellRendered.subscribe(function (e, args) {
+        if (args.column.hasTotal) {
+            $(args.node).empty();
+            $("<span id='Total'></span>").text((getColumnTotal(args.column.field, qtyGrid.getData())).toFixed(2))
+               .appendTo(args.node);
+            $(args.node).addClass(args.column.headerCssClass);
+        }
+        else if (args.column.hasTotalName) {
+            $(args.node).empty();
+            $("<span></span>").text("Total")
+               .appendTo(args.node);
+            $(args.node).addClass(args.column.headerCssClass);
+        }
+    });
+
+    ////Functionality for Enter key navigation
+    //grid.onKeyDown.subscribe(function (e) {
+    //    if (e.which == 13) {
+    //        var DocTypeId = parseInt(grid.getDataItem(grid.getSelectedRows()).DocTypeId);
+    //        var DocId = parseInt(grid.getDataItem(grid.getSelectedRows()).DocHeaderId);
+    //        if (DocTypeId != 0 && DocId != 0)
+    //            window.location.href = '/TrialBalance/DocumentMenu/?DocTypeId=' + DocTypeId + '&DocId=' + DocId;
+    //    }
+    //});
+
+    qtyGrid.onCellChange.subscribe(function (e, args) {
+        $(qtyGrid.getFooterRow()).find('span#Total').text((getColumnTotal(qtyGrid.getColumns()[args.cell].name, qtyGrid.getData())).toFixed(2))
+    });
+
+
+    //Functionality for search events
+    $("#qtySearch").keyup(function (e) {
+        Slick.GlobalEditorLock.cancelCurrentEdit();
+        // clear on Esc
+        if (e.which == 27) {
+            this.value = "";
+        }
+        searchString = this.value;
+        updateFilter();
+    });
+    function updateFilter() {
+        dataView.setFilterArgs({
+            searchString: searchString
+        });
+        dataView.refresh();
+    }
+
+    // wire up model events to drive the grid
+    dataView.onRowCountChanged.subscribe(function (e, args) {
+        qtyGrid.updateRowCount();
+        qtyGrid.render();
+    });
+
+    dataView.onRowsChanged.subscribe(function (e, args) {
+        qtyGrid.invalidateRows(args.rows);
+        qtyGrid.render();
+    });
+
+
+    //Data Fetching
+    function UpdateProducts() {
+        $.ajax({
+            type: "POST",
+            url: "/PurchaseQuotationWizard/GetProductSummary",
+            data: { ProductId: _selectedRowsLookup },
+            async: true,
+            success: function (rest) {
+                qtyData = rest;
+                InitializeGrid();
+            },
+            error: function () {
+                onError(fromPage, toPage)
+            }
+        });
+    }
+
+
+    function InitializeGrid() {
+        // initialize the model after all the events have been hooked up
+        dataView.beginUpdate();
+        dataView.setItems(qtyData);
+        dataView.setFilterArgs({
+            searchString: ""
+        });
+        dataView.setFilter(myFilter);
+        dataView.endUpdate();
+
+        // if you don't want the items that are not visible (due to being filtered out
+        // or being on a different page) to stay selected, pass 'false' to the second arg
+        dataView.syncGridSelection(qtyGrid, true);
+
+        qtyGrid.init();
+    }
+    var _selectedQtyData = [];
+    $("span#Proceed").click(function () {
+
+        $("#collapseTwo").collapse("hide");
+        _selectedQtyData = qtyGrid.getData().getItems();
+        qtyGrid.destroy();
+        qtyGrid = null;
+        $("#collapseThree").collapse("show");
+
+    })
+
+    $(window).resize(function (e) {
+        qtyGrid.resizeCanvas();
+    })
+
+
+
+
+    //ForHeaderView
+
+
+    $("form#WizardForm").submit(function () {
+
+        var head = GetSerializeData($(this).serializeArray());
+
+        $.ajax({
+            type: this.method,
+            url: this.action,
+            data: { __RequestVerificationToken: $("input[name='__RequestVerificationToken']", "form#WizardForm").val(), Header: head, Lines: _selectedQtyData },
+            async: true,
+            success: function (data) {
+                if (data.Success) {
+                    window.location.href = data.url;
+                }
+                else {
+                    $("body").CustomNotify({ message: data.Message });
+                }
+            },
+            error: function () {
+                onError(fromPage, toPage)
+            }
+        });
+
+        return false;
+
+    })
+
+
+    function GetSerializeData(data) {
+        var self = {};
+        $.each(data, function (index, item) {
+            self[item.name] = item.value;
+        })
+        return self;
+    }
+
+
+
+    $(function () {
+
+        $("#DocNo").on("change", function () {
+            $(this).DuplicateCheckForCreate({ name: 'PurchaseOrderHeader', value: $(this).val(), doctype: $("#DocTypeId").val() });
+        });
+
+        CustomSelectFunction($("#SupplierId"), '/ComboHelpList/GetSuppliers', '/ComboHelpList/SetSingleSupplier', ' ', false, 1);
+    });
+
+
+</script>

@@ -1,0 +1,272 @@
+﻿@model Model.Models.PersonAddress
+
+@{
+    ViewBag.Title = "Edit";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    #map-canvas {
+        height: 100%;
+        margin: 0px;
+        padding: 0px;
+    }
+
+    .controls {
+        margin-top: 5px;
+        border: 1px solid transparent;
+        border-radius: 2px 0 0 2px;
+        box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        height: 32px;
+        outline: none;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+    }
+
+    #pac-input {
+        background-color: #fff;
+        padding: 0 11px 0 13px;
+        width: 400px;
+        font-family: Roboto;
+        font-size: 15px;
+        font-weight: 300;
+        text-overflow: ellipsis;
+    }
+
+        #pac-input:focus {
+            border-color: #4d90fe;
+            margin-left: -1px;
+            padding-left: 14px; /* Regular padding-left + 1. */
+            width: 401px;
+        }
+
+    .pac-container {
+        font-family: Roboto;
+    }
+
+    #type-selector {
+        color: #fff;
+        background-color: #4d90fe;
+        padding: 5px 11px 0px 11px;
+    }
+
+        #type-selector label {
+            font-family: Roboto;
+            font-size: 13px;
+            font-weight: 300;
+        }
+</style>
+
+
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(model => model.PersonAddressID)
+     @Html.ValidationSummary(true)                     
+    @Html.HiddenFor(model => model.CreatedBy)
+    @Html.HiddenFor(model => model.CreatedDate)
+    
+    
+     <div class="panel panel-default" style="padding:5px">
+
+        <div class="panel panel-heading">
+
+            <h4>
+                <span style="font-family: Calibri,sans-serif,Verdana">Edit Address Details</span>
+            </h4>
+
+        </div>
+        
+        <div class="panel panel-info" style="padding:5px">
+
+            <div class="form-horizontal">
+
+                <div class="container">
+                    <div class="row">
+
+
+                        <div class="col-md-5">
+
+                            <div class="panel panel-info" style="padding:5px">
+                                <div class="form-group">
+                                    @Html.Label("", "Contected Employee", new { @class = "control-label col-md-4" })
+                                    <div class="col-md-8">
+                                        @Html.DropDownListFor(Model => Model.PersonID, new SelectList(ViewBag.PersonList as System.Collections.IEnumerable, "PersonID", "Name"), "PersonID", "Name")
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.AddressType, new { @class = "control-label col-md-4" })
+                                    <div class="col-md-8">
+                                        @Html.DropDownListFor(Model => Model.AddressType, new SelectList(ViewBag.AddressType as System.Collections.IEnumerable, "Value", "Text"))
+                                        @Html.ValidationMessageFor(model => model.AddressType)
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.Address, new { @class = "control-label col-md-4" })
+                                    <div class="col-md-8">
+                                        @Html.EditorFor(model => model.Address, new { @class = "editor-for-dbgeography" })
+                                        @Html.ValidationMessageFor(model => model.Address)
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.Email, new { @class = "control-label col-md-4" })
+                                    <div class="col-md-8">
+                                        @Html.EditorFor(model => model.Email)
+                                        @Html.ValidationMessageFor(model => model.Email)
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.PhoneNo, new { @class = "control-label col-md-4" })
+                                    <div class="col-md-8">
+                                        @Html.EditorFor(model => model.PhoneNo)
+                                        @Html.ValidationMessageFor(model => model.PhoneNo)
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.Zipcode, new { @class = "control-label col-md-4" })
+                                    <div class="col-md-8">
+                                        @Html.EditorFor(model => model.Zipcode)
+                                        @Html.ValidationMessageFor(model => model.Zipcode)
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    @Html.Label("Country", new { @class = "control-label col-md-4" })
+
+                                    <div class="col-md-8">
+                                        @*@Html.DropDownList("CountryList", String.Empty)*@
+                                        @Html.DropDownList("CountryList", new SelectList(ViewBag.CountryList as System.Collections.IEnumerable, "Value", "Text"), string.Empty , new { style = "width: 150px;" })
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    @Html.Label("States", new { @class = "control-label col-md-4" })
+                                    <div class="col-md-8">
+                                        @*@Html.DropDownList("StatesList", Enumerable.Empty<SelectListItem>(), string.Empty)*@
+                                        @Html.DropDownList("StatesList", new SelectList(ViewBag.StateList as System.Collections.IEnumerable, "Value", "Text"), string.Empty, new { style = "width: 150px;" })
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    @Html.LabelFor(m => m.CityId, new { @class = "control-label col-md-4" })
+
+                                    <div class="col-md-8">
+                                        @*@Html.DropDownListFor(m => m.CityId, Enumerable.Empty<SelectListItem>(), string.Empty)*@
+                                        @Html.DropDownList("CityId", new SelectList(ViewBag.CityList as System.Collections.IEnumerable, "Value", "Text"), string.Empty, new { style = "width: 150px;" })
+                                        @Html.ValidationMessageFor(m => m.CityId)
+                                    </div>
+
+                                </div>
+
+
+                                <div class="form-group">
+                                    <div class="col-md-4"></div>
+                                    <div class="col-md-8">
+                                        <input type="submit" value="Edit" class="btn btn-primary" />
+                                        @Html.ActionLink("Cancel", "Index", null, null, new { @class="btn btn-primary"})
+                                    </div>
+                                </div>
+
+                               
+                            </div>
+
+                        </div>
+
+
+
+                        <div class="col-md-7">
+                            <div class="panel panel-info" style="padding:5px">
+
+                                @Html.EditorFor(model => model.Location, new { @class = "disable" })
+
+                                <input id="pac-input" class="controls" type="text" placeholder="Enter a Location">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+    <div>
+
+    </div>
+}
+
+
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}
+
+
+<script type="text/javascript">
+
+    $(function () {
+        $("#CountryList").change(function () {
+
+            var itemselected = $(this).val();
+            $("#StatesList").cleardraw()
+            var stateslist = $("#StatesList");
+            $.ajax({
+                cache: false,
+                type: "POST",
+                url: "@(Url.Action("GetStatesJson"))",
+                data: { CountryId: itemselected },
+                success: function (data) {
+                    stateslist.html('');
+                    $("#CityId").html('');
+                    stateslist.append($('<option></option>').html('-Please Select-'));
+                    $.each(data, function (id, option) {
+                        stateslist.append($('<option> </option>').val(option.StateId).html(option.StateName));
+                    });
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    alert('Failed to Retrive' + thrownError);
+                }
+
+            });
+
+
+        });
+
+   $("#StatesList").change(function () {
+
+       var itemselected = $(this).val();
+       $("#CityId").cleardraw()
+
+            var citylist = $("#CityId");
+            $.ajax({
+                cache: false,
+                type: "POST",
+                url: "@(Url.Action("GetCityJson"))",
+                data: { StateId: itemselected },
+            success: function (data) {
+                citylist.html('');
+                citylist.append($('<option></option>').html('-Please Select-'));
+                $.each(data, function (id, option) {
+                    citylist.append($('<option> </option>').val(option.CityId).html(option.CityName));
+                });
+            },
+            error: function (xhr, ajaxOptions, thrownError) {
+                alert('Failed to Retrive' + thrownError);
+            }
+
+        });
+
+
+    });
+
+
+    });
+
+
+</script>

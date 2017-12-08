@@ -1,0 +1,1399 @@
+﻿@model Models.Customize.ViewModels.JobOrderHeaderViewModel
+@using ProjLib.Constants
+@using Components.Logging
+
+@{
+    ViewBag.Title = "Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!-- modal placeholder-->
+<div id='myModal' class='modal fade in'>
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div id='myModalContent'></div>
+        </div>
+    </div>
+</div>
+
+@using (Html.BeginForm("Post", "JobOrderHeader", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(m => m.SiteId)
+    @Html.HiddenFor(m => m.Status)
+    @Html.HiddenFor(m => m.DivisionId)
+    @Html.HiddenFor(m => m.JobOrderHeaderId)
+    @Html.HiddenFor(m => m.DocTypeId)
+    @Html.HiddenFor(m => m.ProcessId)
+    @Html.HiddenFor(m => m.CreatedDate)
+    @Html.HiddenFor(m => m.JobOrderSettings.ProcessId)
+    @Html.HiddenFor(m => m.JobOrderSettings.isUniqueCostCenter)
+    @Html.HiddenFor(m => m.JobOrderSettings.isVisibleFromProdOrder)
+
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            @if (ViewBag.transactionType == "submit" || ViewBag.transactionType == "submitContinue")
+            {<h3 style="border-bottom:0px solid #e1dada;padding-bottom:0px;">
+                <button type="submit" name="Command:Submit" class="btn btn-primary right" id="SubmitContinue" style="margin-left:5px;">Submit & Next<span class='badge'>@(ViewBag.PendingToSubmit != 0 ? ViewBag.PendingToSubmit : "")</span></button>
+                <button type="submit" name="Command:Submit" class="btn btn-primary right">Submit</button>
+                <input type="hidden" id="IsContinue" name="IsContinue" value="" />
+                <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"> <span class="glyphicon glyphicon-file black"></span>Submit @ViewBag.Name</span>
+            </h3>}
+            else if (ViewBag.transactionType == "review" || ViewBag.transactionType == "ReviewContinue")
+            {<h3 style="border-bottom:0px solid #e1dada;padding-bottom:0px;">
+                <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"> <span class="glyphicon glyphicon-file black"></span> Review @ViewBag.Name</span>
+                <button type="submit" name="Command:Review" class="btn btn-primary right" style="margin-left:5px" id="ReviewContinue">Review & Next<span class='badge'>@(ViewBag.PendingToReview != 0 ? ViewBag.PendingToReview : "")</span></button>
+                <button type="submit" class="btn btn-primary right" name="Command:Review">Review</button>
+                <input type="hidden" id="IsContinue" name="IsContinue" value="" />
+            </h3>}
+            else if (ViewBag.transactionType == "detail")
+            {
+                <h3>
+                    <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"> <span class="glyphicon glyphicon-file black"></span>@ViewBag.Name</span>
+                </h3>
+            }
+            else
+            {
+                <h3 style="border-bottom:0px solid #e1dada;padding-bottom:0px;">
+                    <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"> <span class="glyphicon glyphicon-file black"></span> @ViewBag.Name</span>
+                    <input type="submit" value="Save" class="btn btn-primary right" id="submit" style="width: 90px; background-color: #2980b9" />
+                </h3>
+                if (Model.JobOrderSettings.isVisibleFromProdOrder)
+                {
+                    @Html.ActionLink("For Production Order", "_ForProdOrder", "JobOrderLine", new { id = @Model.JobOrderHeaderId, jid = @Model.JobWorkerId }, new { data_modal = "", id = "btnCreateF", @class = "btn btn-primary borderradii", @title = "For ProductionOrder", @data_toggle = "tooltip" })
+                }
+            }
+            <hr style="margin-top:0px;margin-bottom:0px" />
+
+            <div class="panel-info">
+                <h4 style="padding:5px 0 0 0;margin:0px">
+                    @Html.ActionLink(" ", " ", " ", null, new { @class = "glyphicon glyphicon-refresh toolbar", @title = "Refresh Page", @data_toggle = "tooltip", @id = "RefreshPage" })
+                    @Html.ActionLink(" ", "Create", "JobOrderHeader", new { @id = ViewBag.id }, new { @class = "glyphicon glyphicon-plus toolbar", @title = "Add New", @data_toggle = "tooltip", target = "_blank" })
+                    @Html.ActionLink(" ", "GetHistory", "LogHistory", new { Ids = Model.JobOrderHeaderId, DocTypeId = Model.DocTypeId }, new { @class = "glyphicon glyphicon-user toolbar", @title = "History", @data_toggle = "tooltip", @id = "DocHistory", @data_modal = "" })
+                    @Html.ActionLink(" ", "GeneratePrints", "JobOrderHeader", new { Ids = Model.JobOrderHeaderId, DocTypeId = Model.DocTypeId }, new { @class = "glyphicon glyphicon-print toolbar", @title = "Print", @data_toggle = "tooltip", @id = "PrintRecordC", target = "_blank" })
+
+                    @if (@Model.JobOrderSettings.SqlProcGenProductUID != null)
+                    {
+                        @Html.ActionLink(" ", "BarcodePrint", "JobOrderHeader", new { id = @Model.JobOrderHeaderId }, new { @class = "glyphicon glyphicon-barcode toolbar", @title = "Barcode Print", @data_toggle = "tooltip", target = "_blank" })
+                    }
+                    @if (Model.Status == (int)StatusConstants.Submitted && !Model.GatePassHeaderId.HasValue)
+                    {
+                        @Html.ActionLink(" ", "GenerateGatePass", "JobOrderHeader", new { Ids = @Model.JobOrderHeaderId, DocTypeId = Model.DocTypeId }, new { @class = "glyphicon glyphicon-log-out toolbar", @title = "GatePass", @data_toggle = "tooltip", @id = "GenGatePassC" })
+                    }
+                    @Html.ActionLink(" ", "Email", "JobOrderHeader", null, new { @class = "glyphicon glyphicon-envelope toolbar", @title = "Email", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "PrevPage", "JobOrderHeader", new { DocId = @Model.JobOrderHeaderId, DocTypeId = Model.DocTypeId }, new { @class = "glyphicon glyphicon-arrow-left toolbar", @title = "Prev Record", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "NextPage", "JobOrderHeader", new { DocId = @Model.JobOrderHeaderId, DocTypeId = Model.DocTypeId }, new { @class = "glyphicon glyphicon-arrow-right toolbar", @title = "Next Record", @data_toggle = "tooltip" })
+
+                    @Html.ActionLink(" ", "Index", "JobOrderHeader", new { id = ViewBag.id, IndexType = ViewBag.IndexStatus }, new { @class = "glyphicon glyphicon-list toolbar right", @title = "List", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "Report", "JobOrderHeader", null, new { @class = "glyphicon glyphicon-th toolbar right", @title = "Report", @data_toggle = "tooltip" })
+                </h4>
+            </div>
+        </div>
+
+        <div class="panel-info" style="padding-left:15px">
+
+            <div class="form-horizontal">
+
+                @Html.ValidationSummary(true)
+                <div class="row">
+                    <h4 class="col-md-12 black">
+                        <span class="glyphicon glyphicon-align-justify"></span>
+                        1.Job Order Details
+                        @if (Model.GatePassHeaderId.HasValue)
+                        {
+                            <span class="label label-danger right">
+                                <span class="glyphicon glyphicon-log-out"></span>
+                                GPNo:@Model.GatePassDocNo,GPDate:@Model.GatePassDocDate.Value.ToString("dd/MMM/yyyy")
+                                @Html.ActionLink(" ", "DeleteGatePass", "JobOrderHeader", new { Id = @Model.JobOrderHeaderId }, new { @class = "glyphicon glyphicon-remove", @title = "GatePass", @data_toggle = "tooltip", @id = "GenGatePassD", @style = "color:white;opacity:0.4" })
+                            </span>
+                        }
+                    </h4>
+                    <div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group" style="margin-top:15px">
+                                    @Html.LabelFor(model => model.DocDate, "Order Date", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.DocDate, "{0:dd/MMMM/yyyy}", new { @class = "datepickerWithNFD form-control col-xs-6 required" })
+                                        @Html.ValidationMessageFor(model => model.DocDate, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <div class="col-md-6">
+                                <div class="form-group" style="margin-top:15px">
+                                    @Html.LabelFor(model => model.DocNo, "Order No", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.DocNo, null, new { @class = "form-control col-xs-6 required" })
+                                        @Html.ValidationMessageFor(m => m.DocNo, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.DueDate, "Due Date", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.DueDate, "{0:dd/MMMM/yyyy}", new { @class = "datepicker form-control col-xs-6 required" })
+                                        @Html.ValidationMessageFor(model => model.DueDate, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.JobWorkerId, "Job Worker", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.JobWorkerId, new { @class = "form-control col-xs-6 required" })
+                                        @Html.ValidationMessageFor(model => model.JobWorkerId, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <div class="col-md-6" style='display:@(Model.JobOrderSettings.isVisibleMachine?"":"none")'>
+                                <div class="form-group">
+                                    @Html.HiddenFor(m => m.JobOrderSettings.isMandatoryMachine)
+                                    @Html.HiddenFor(m => m.JobOrderSettings.isVisibleMachine)
+                                    @Html.LabelFor(model => model.MachineId, "Machine", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.MachineId, new { @class = "form-control col-xs-6" + (Model.JobOrderSettings.isMandatoryMachine ? " required" : "") })
+                                        @Html.ValidationMessageFor(m => m.MachineId, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.BillToPartyId, "Billing A/C", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.BillToPartyId, new { @class = "form-control col-xs-6 required" })
+                                        @Html.ValidationMessageFor(m => m.BillToPartyId, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.OrderById, "Order By", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.OrderById, new { @class = "form-control col-xs-6" })
+                                        @Html.ValidationMessageFor(m => m.OrderById, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6" style='display:@(Model.JobOrderSettings.isVisibleGodown?"":"none")'>
+                                @Html.HiddenFor(m => m.JobOrderSettings.isVisibleGodown)
+                                @Html.HiddenFor(m => m.JobOrderSettings.isMandatoryGodown)
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.GodownId, "Godown", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.GodownId, new { @class = "form-control col-xs-6 " + (Model.JobOrderSettings.isMandatoryGodown == true ? "required" : "") })
+                                        @Html.ValidationMessageFor(m => m.GodownId, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+
+
+                            <div class="col-md-6" style='display:@(Model.JobOrderSettings.isVisibleCostCenter?"":"none")'>
+                                @Html.HiddenFor(m => m.JobOrderSettings.isVisibleCostCenter)
+                                <div class="form-group">
+                                    @Html.HiddenFor(m => m.JobOrderSettings.isMandatoryCostCenter)
+                                    @Html.LabelFor(model => model.CostCenterName, "Cost Center", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.CostCenterName, new { @class = "form-control col-xs-6" + (Model.JobOrderSettings.isMandatoryCostCenter ? " required" : "") })
+                                        @Html.ValidationMessageFor(m => m.CostCenterName, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.CreditDays, "Credit Days", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.CreditDays, new { @class = "form-control col-xs-6" })
+                                        @Html.ValidationMessageFor(m => m.CreditDays, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.UnitConversionForId, "Unit Conversion For", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.DropDownListFor(m => m.UnitConversionForId, new SelectList(ViewBag.UnitConvForList as System.Collections.IEnumerable, "UnitConversionForId", "UnitConversionForName"), new { @class = "form-control height" })
+                                        @Html.ValidationMessageFor(m => m.UnitConversionForId, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.TermsAndConditions, "Terms & Conditions", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextAreaFor(m => m.TermsAndConditions, new { @class = "form-control col-xs-6" })
+                                        @Html.ValidationMessageFor(m => m.TermsAndConditions, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.Remark, "Remark", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextAreaFor(m => m.Remark, new { @class = "form-control col-xs-6" })
+                                        @Html.ValidationMessageFor(m => m.Remark, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+
+
+                @if (Model.PerkViewModel != null && Model.PerkViewModel.Count > 0)
+                {
+                    <hr />
+                    <div class="row">
+                        <h4 class="col-md-12 black" style="margin-top:15px">
+                            <span class="glyphicon glyphicon-share"></span>
+                            2.Perks
+                        </h4>
+                    </div>
+
+                    <div style="padding-right:15px">
+
+                        @for (int i = 0; i < Model.PerkViewModel.Count; i++)
+                        {
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <h4 style="color:#342c26;padding-left:20px" class="caption">@Model.PerkViewModel[i].PerkName :</h4>
+                                </div>
+
+                                <div class="col-md-4" style="display: @(  (@Model.PerkViewModel[i].BaseDescription == null || @Model.PerkViewModel[i].BaseDescription == "") ? "none" : "")">
+                                    <div class="form-group">
+                                        @Html.LabelFor(model => @Model.PerkViewModel[i].BaseDescription, @Model.PerkViewModel[i].BaseDescription, new { @class = "control-label col-xs-8" })
+                                        <div class="col-xs-4">
+                                            @Html.TextBoxFor(m => m.PerkViewModel[i].Base, new { @class = "form-control col-xs-3" })
+                                            @Html.ValidationMessageFor(m => m.PerkViewModel[i].Base, "", new { @class = "text-danger" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4" style="display: @(  (@Model.PerkViewModel[i].WorthDescription == null || @Model.PerkViewModel[i].WorthDescription == "") ? "none" : "")">
+                                    <div class="form-group">
+                                        @Html.LabelFor(model => @Model.PerkViewModel[i].WorthDescription, @Model.PerkViewModel[i].WorthDescription, new { @class = "control-label col-xs-8" })
+                                        <div class="col-xs-4">
+                                            @if (Model.JobOrderHeaderId > 0 && !Model.PerkViewModel[i].IsEditableRate)
+                                            {
+                                                @Html.TextBoxFor(m => m.PerkViewModel[i].Worth, new { @class = "form-control col-xs-3", @readonly = "true" })
+                                                @Html.ValidationMessageFor(m => m.PerkViewModel[i].Worth, "", new { @class = "text-danger" })
+                                            }
+                                            else
+                                            {
+                                                @Html.TextBoxFor(m => m.PerkViewModel[i].Worth, new { @class = "form-control col-xs-3" })
+                                                @Html.ValidationMessageFor(m => m.PerkViewModel[i].Worth, "", new { @class = "text-danger" })
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                                @Html.HiddenFor(m => @Model.PerkViewModel[i].CostConversionMultiplier)
+                                @Html.HiddenFor(m => @Model.PerkViewModel[i].PerkName)
+                                @Html.HiddenFor(m => @Model.PerkViewModel[i].BaseDescription)
+                                @*@Html.HiddenFor(m => @Model.PerkViewModel[i].Base)*@
+                                @Html.HiddenFor(m => @Model.PerkViewModel[i].WorthDescription)
+                                @*@Html.HiddenFor(m => @Model.PerkViewModel[i].Worth)*@
+                                @Html.HiddenFor(m => @Model.PerkViewModel[i].JobOrderPerkId)
+                                @Html.HiddenFor(m => @Model.PerkViewModel[i].JobOrderHeaderId)
+                                @Html.HiddenFor(m => @Model.PerkViewModel[i].PerkId)
+                                @Html.HiddenFor(m => @Model.PerkViewModel[i].IsEditableRate)
+                            </div>
+
+                        }
+                    </div>
+                }
+
+
+                <hr />
+
+                <div class="row">
+                    <h4 class="col-md-12 black" style="margin-top:15px">
+                        <span class="glyphicon glyphicon-shopping-cart"></span>
+                        3.Products
+                    </h4>
+                </div>
+
+                <div class="panel-info">
+                    <h5 style="padding:5px 0 3px 0;margin:0px;font-weight:bold">
+                        <span class="glyphicon glyphicon-plus-sign"></span>
+                        @{string Action = "";
+                        if (Model.Status == (int)StatusConstants.Drafted || Model.Status == (int)StatusConstants.Import)
+                        { Action = "CreateLine"; }
+                        else if (Model.Status == (int)StatusConstants.Submitted || Model.Status == (int)StatusConstants.Modified)
+                        { Action = "CreateLineAfter_Submit"; }
+                        }
+                        @if (Model.JobOrderSettings.isVisibleFromProdOrder)
+                        {
+                            @Html.ActionLink("For Production Order /", Action, "JobOrderLine", new { id = @Model.JobOrderHeaderId, IsProdBased = true }, new { data_modalCustom = "", id = "btnCreate", @class = "toolbar", @title = "Add New", @data_toggle = "tooltip" })
+                        }
+                        @Html.ActionLink("Add New Row ", Action, "JobOrderLine", new { id = @Model.JobOrderHeaderId, IsProdBased = false }, new { data_modalCustom = "", id = "btnCreatePO", @class = "toolbar", @title = "Add New", @data_toggle = "tooltip" })
+                    </h5>
+                </div>
+                <div style="padding-right:15px">
+
+
+
+                    <div class="panel panel-default" id="grid">
+
+                        <div class="panel-heading headrow">
+                            <div class="row grid-head">
+                                <div class="text-left block" style="width: 5%; ">
+                                    Srl.
+                                </div>
+                                <div class="block" style="width: 90%;">
+                                    <div class="row">
+                                        @*ProductInfo*@
+                                        <div class="block" style="width: 25%; ">
+                                            Product Name
+                                        </div>
+                                        <div class="block" style="width: 12%;">
+                                            Production Order
+                                        </div>
+                                        @*Qty*@
+                                        <div class="text-right block" style="width: 13%;">
+                                            Qty
+                                        </div>
+                                        @*Rate*@
+                                        <div class="text-right block" style="width: 10%; ">
+                                            Deal Qty
+                                        </div>
+                                        @*Amount*@
+                                        <div class="text-right block" style="width: 10%;">
+                                            Rate
+                                        </div>
+                                        <div class="text-right block" style="width: 10%; ">
+                                            Amount
+                                        </div>
+                                        @*Remark*@
+                                        <div class="block" style="width: 20%;">
+                                            Remark
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <div class="" style="width:5%">
+
+                                </div>
+                            </div>
+
+                        </div>
+
+
+                        <div class="panel-info" id="gbody">
+
+
+                        </div>
+                    </div>
+
+
+                    <div class="panel panel-default" id="gridcharges">
+                        <div class="panel-heading headrow">
+                            <div class="row grid-head">
+                                <div class="col-xs-1 text-left">
+                                    Srl.
+                                </div>
+                                <div class="col-xs-11">
+                                    <div class="row">
+
+                                        <div class="col-sm-4">
+                                            Charge
+                                        </div>
+
+                                        <div class="col-sm-3">
+                                            Calculate On
+                                        </div>
+                                        <div class="col-sm-2">
+                                            Add/Deduct
+                                        </div>
+                                        @*Rate*@
+                                        <div class="col-sm-1 text-right">
+                                            Rate
+                                        </div>
+                                        @*Amount*@
+                                        <div class="col-sm-2 text-right">
+                                            Amount
+                                        </div>
+                                        @*Remark*@
+
+                                    </div>
+                                </div>
+                                <div>
+
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="panel-info" id="gbodycharges">
+
+
+                        </div>
+                    </div>
+
+                </div>
+
+
+                @if (!string.IsNullOrEmpty(Model.JobOrderSettings.SqlProcConsumption))
+                {
+
+                    <div class="row">
+                        <h4 class="col-md-12 black" style="margin-top:15px">
+                            <span class="glyphicon glyphicon-shopping-cart"></span>
+                            4.Consumption
+                        </h4>
+                    </div>
+
+                    <div class="panel-info">
+                        <h5 style="padding:5px 0 3px 0;margin:0px;font-weight:bold">
+                            <span class="glyphicon glyphicon-plus-sign"></span>
+                            @Html.ActionLink("Add New Row ", "_Create", "JobOrderLine", new { id = @Model.JobOrderHeaderId }, new { data_modalCustom = "", id = "btnCreatePO", @class = "toolbar", @title = "Add New", @data_toggle = "tooltip" })
+                        </h5>
+                    </div>
+                    <div style="padding-right:15px">
+
+
+
+                        <div class="panel panel-default" id="grid">
+
+                            <div class="panel-heading headrow">
+                                <div class="row grid-head">
+                                    <div class="text-left block" style="width: 5%; ">
+                                        Srl.
+                                    </div>
+                                    <div class="block" style="width: 90%;">
+                                        <div class="row">
+                                            @*ProductInfo*@
+                                            <div class="block" style="width: 30%; ">
+                                                Product Name
+                                            </div>
+                                            <div class="block" style="width: 20%;">
+                                                Dimension1
+                                            </div>
+                                            <div class="block" style="width: 20%;">
+                                                Dimension2
+                                            </div>
+                                            @*Qty*@
+                                            <div class="text-right block" style="width: 15%;">
+                                                Qty
+                                            </div>
+                                            @*Rate*@
+                                            <div class="block" style="width: 15%; ">
+                                                Unit
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+                                    <div class="" style="width:5%">
+
+                                    </div>
+                                </div>
+
+                            </div>
+
+
+                            <div class="panel-info" id="gbodyconsumption">
+
+
+                            </div>
+                        </div>
+
+                    </div>
+
+
+                }
+
+
+            </div>
+        </div>
+    </div>
+}
+
+
+@if ((ViewBag.Mode == "Add") || (ViewBag.Mode == "Edit"))
+{
+
+    <script type="text/javascript">
+
+        //Reloading the table contents on modal hide
+        //$('#myModal').on('hidden.bs.modal', function () {
+        //    window.location.reload();
+        //});
+
+        $('#JobWorkerId').change(function () {
+
+            var cid = $("#JobWorkerId").val();
+            var cdata = $('#JobWorkerId').select2('data').text;
+            $("#BillToPartyId").select2('data', { id: cid, text: cdata });
+
+
+        });
+
+
+        //For Populating Modal PopUp on DoubleClick Of Row
+        $('#gbody').on("dblclick",'.grid-body',function(){
+            var editurl=$(this).find('a[edit]').attr('href');
+            $('#myModalContent').load(editurl, function () {
+                //alert('2');
+                $('#myModal').modal({
+                    backdrop: 'static',
+                    keyboard: true
+                }, 'show');
+
+                bindForm1(this);
+            });
+        });
+
+        //For Populating Modal PopUp on DoubleClick Of Row
+        $('#gbodycharges').on("dblclick",'.grid-body',function(){
+            var text = $(this).find(".id").val();
+
+            var editurl="/TaxCalculation/GetJOHeaderChargeForEdit/";
+            $('#myModalContent').load(editurl,{Id:text,HeaderTable:"Web.JobOrderHeaderCharges",LineTable:"Web.JobOrderLineCharges"}, function ( response, status, xhr) {
+                //alert('2');
+                if ( status == "error" ) {
+                    var msg = "Sorry but there was an error: ";
+
+                }
+                else
+                {
+                    $('#myModal').modal({
+                        backdrop: 'static',
+                        keyboard: true
+                    }, 'show');
+
+                    bindForm1(this);}
+            });
+        });
+
+        //For Handling Modal PopUp on Clicking Delete Icon
+        $('#gbody').on("click",'a[delete]', function (e) {
+            $('#myModalContent').load(this.href, function () {
+                //alert('2');
+                $('#myModal').modal({
+                    backdrop: 'static',
+                    keyboard: true
+                }, 'show');
+
+                bindForm1(this);
+            });
+            return false;
+        });
+
+        //For Handling Modal PopUp on Clicking Delete Icon
+        $('#gbody').on("click",'a[Detail]', function (e) {
+            $('#myModalContent').load(this.href, function (response, status, xhr) {
+                //alert('2');
+                if ( status == "error" ) {
+                    var msg = "Sorry but there was an error: ";
+                }
+                else
+                {
+                    $('#myModal').modal({
+                        backdrop: 'static',
+                        keyboard: true
+                    }, 'show');
+
+                    bindForm1(this);}
+            });
+            return false;
+        });
+
+
+        //Reloading the table contents on modal hide
+        $('#myModal').on('hidden.bs.modal', function () {
+            LoadProducts();
+            var id=@Model.JobOrderHeaderId;
+            LoadCharges(id,"Web.JobOrderHeaderCharges","Web.JobOrderLineCharges");
+        });
+
+
+
+        function JobOrderChargeModel() {
+            var self = this;
+            self.JobOrderLineId = $("#JobOrderLineId").val();
+            self.JobOrderHeaderId = $("#JobOrderHeaderId").val();
+            self.ProdOrderLineId = $("#ProdOrderLineId").val();
+            self.ProdOrderBalanceQty = $("#ProdOrderBalanceQty").val();
+            self.GodownId = $("#GodownId").val();
+            self.ProductUidId = $("#ProductUidId").val();
+            self.ProductUidName = $("#ProductUidName").val();
+            self.ProductId = $("#ProductId").val();
+            self.Specification = $("#Specification").val();
+            self.Dimension2Id = $("#Dimension2Id").val();
+            self.Dimension1Id = $("#Dimension1Id").val();
+            self.LotNo = $("#LotNo").val();
+            self.FromProcessId = $("#FromProcessId").val();
+            self.Qty = $("#Qty").val();
+            self.Rate = $("#Rate").val();
+            self.DealUnitId = $("#DealUnitId").val();
+            self.DealQty = $("#DealQty").val();
+            self.LossQty = $("#LossQty").val();
+            self.NonCountedQty = $("#NonCountedQty").val();
+            self.DueDate = $("#DueDate").val();
+            self.Amount = $("#Amount").val();
+            self.Remark = $("#Remark").val();
+            self.UnitConversionMultiplier = $("#UnitConversionMultiplier").val();
+            self.UnitId = $("#UnitId").val();
+
+            self.__RequestVerificationToken= $('[name=__RequestVerificationToken]').val();
+            var settings=new SettingsViewModel();
+            self.JobOrderSettings=settings;
+
+            self.linecharges =charges;
+            self.footercharges=footercharges;
+
+        }
+        var charges;
+        var footercharges;
+
+        function SettingsViewModel(){
+            var self=this;
+            var settings;
+
+            self.isPostedInStock=$("#JobOrderSettings_isPostedInStock").val();
+            self.ProcessId=$("#JobOrderSettings_ProcessId").val();
+            self.SqlProcConsumption=$("#JobOrderSettings_SqlProcConsumption").val();
+            self.isPostedInStockProcess=$("#JobOrderSettings_isPostedInStockProcess").val();
+            self.isVisibleProductUID=$("#JobOrderSettings_isVisibleProductUID").val();
+            self.isMandatoryProductUID=$("#JobOrderSettings_isMandatoryProductUID").val();
+            self.isVisibleDimension1=$("#JobOrderSettings_isVisibleDimension1").val();
+            self.isVisibleDimension2=$("#JobOrderSettings_isVisibleDimension2").val();
+            self.isVisibleLotNo=$("#JobOrderSettings_isVisibleLotNo").val();
+            self.isMandatoryProcessLine=$("#JobOrderSettings_isMandatoryProcessLine").val();
+            self.isMandatoryProcessLine=$("#JobOrderSettings_isVisibleProcessLine").val();
+            self.isVisibleRate=$("#JobOrderSettings_isVisibleRate").val();
+            self.isMandatoryRate=$("#JobOrderSettings_isMandatoryRate").val();
+            self.CalculationId=$("#JobOrderSettings_CalculationId").val();
+            self.AmountRoundOff=$("#JobOrderSettings_AmountRoundOff").val();
+
+        }
+
+
+
+        //For posting the data through ajax and render the contents sent back from the server
+        function bindForm1(dialog) {
+            $('form#modform', dialog).submit(function () {
+
+                charges= AssignValuesToCharges();
+                footercharges=AssignValuesToFooter();
+
+                var request = new JobOrderChargeModel();
+
+                $.ajax({
+                    contentType:'application/json',
+                    //headers: headers,
+                    url: this.action,
+                    type: this.method,
+                    data:JSON.stringify(request),
+                    success: function (result) {
+                        if (result.success) {
+                            $('#myModal').modal('hide');
+                        }else if(!result.success)
+                        {
+                            $('#myModalContent').html(result);
+                            bindForm1();
+                        }
+                        else {
+                            $('#myModalContent').html(result);
+                            bindForm1();
+                        }
+                    },
+                });
+                return false;
+            });
+
+
+            $('form#modformcharges', dialog).submit(function () {
+                //alert(this.action);
+
+                footercharges=AssignValuesToFooter();
+
+                $.ajax({
+                    contentType:'application/json',
+                    url: this.action,
+                    type: this.method,
+                    data:JSON.stringify(footercharges),
+                    success: function (result) {
+                        if (result.success) {
+                            $('#myModal').modal('hide');
+                            //Refresh
+                            //location.reload();
+                            //alert('Data Saved');
+                        }else if(!result.success)
+                        {
+                            $('#myModalContent').html(result);
+                            bindForm1();
+                        }
+                        else {
+                            $('#myModalContent').html(result);
+                            bindForm1();
+                        }
+                    }
+                });
+                return false;
+            });
+
+        }
+
+        $(function () {
+
+            $.ajaxSetup({ cache: false });
+
+            $("a[data-modalCustom]").on("click", function (e) {
+                // hide dropdown if any
+                if(this.href=="")
+                {
+                    return false;
+                }
+                //alert(' Script');
+                $('#myModalContent').load(this.href, function () {
+                    $('#myModal').modal({
+                        backdrop: 'static',
+                        keyboard: true
+                    }, 'show');
+
+                    bindForm1(this);
+                });
+
+                return false;
+            });
+        });
+
+
+
+        var IsSaved=false;
+        var ValidationCount=0;
+        var CostCenterUnique='@Model.JobOrderSettings.isUniqueCostCenter';
+
+        $('form').submit(function(event){
+
+            if(!IsSaved)
+            {
+                //if(!ValidateData() || !ValidateCostCenter())
+                if(!ValidateData())
+                {
+                    return false;
+                }
+                IsSaved=true;
+                return IsSaved;
+            }
+            else
+            {
+                return false;
+            }
+
+
+        });
+
+
+        function ValidateData() {
+            var DocId=@Model.JobOrderHeaderId;
+            var TempValue;
+            var ValidationMessage="";
+
+
+
+            //Checking for dulicate key value
+            if(DocId<=0)
+            {
+                TempValue= $('#DocNo').DuplicateCheckForCreate({value: $('#DocNo').val(), doctype: $('#DocTypeId').val(), url:'/JobOrderHeader/DuplicateCheckForCreate/' });
+                if (TempValue){ ValidationMessage=$('#DocNo').val() + " already exist <br />";}
+            }
+            else
+            {
+                TempValue = $('#DocNo').DuplicateCheckForEdit({ value: $('#DocNo').val(), doctype: $('#DocTypeId').val(),headerId:DocId, url: '/JobOrderHeader/DuplicateCheckForEdit/' });
+                if (TempValue) {ValidationMessage+=$('#DocNo').val() + " already exist <br />";}
+            }
+            if(TempValue)
+            {
+                if($('#validationerrormsg').length==0){
+                    $('.panel-info').filter(':eq(1)').before('<div class="alert alert-danger" role="alert" id="validationerrormsg">'+ValidationMessage+'</div>');}
+                else
+                {
+                    $('#validationerrormsg').html(ValidationMessage);
+                }
+            }
+
+            return  (ValidationMessage=="");
+        }
+
+        $('#CostCenterName').change(function(){
+            var disv=$(this);
+            if( $('#JobWorkerId').val() && $('#JobWorkerId').val() > 0 && ValidateCostCenter(disv) )
+            {
+
+            }
+            else
+            {
+
+            }
+        })
+
+        function ValidateCostCenter(thisv) {
+            var DocId=@Model.JobOrderHeaderId;
+            var TempValue;
+            var ValidationMessage="";
+
+            //if(CostCenterUnique=="True")
+            //{
+            
+
+            $.ajax({
+                url:'/JobOrderHeader/ValidateCostCenter',
+                data:{DocTypeId:$('#DocTypeId').val(),CostCenterName:thisv.val(),HeaderId:$('#JobOrderHeaderId').val(),JobWorkerId:$('#JobWorkerId').val()},
+                async:false,
+                success:function(data)
+                {
+                    ValidationMessage=data;
+                }
+            });
+
+            if(ValidationMessage)
+            {
+                if($('#csvalidationerrormsg').length==0){
+                    $('.panel-info').filter(':eq(1)').before('<div class="alert alert-danger" role="alert" id="csvalidationerrormsg">'+ValidationMessage+'</div>');}
+                else
+                {
+                    $('#csvalidationerrormsg').html(ValidationMessage);
+                }
+            }
+            else
+            {
+                $('#csvalidationerrormsg').remove();
+            }
+            //$.get('/JobOrderHeader/ValidateCostCenter',{DocTypeId:$('#DocTypeId').val(),CostCenterName:disv.val(),HeaderId:$('#JobOrderHeaderId').val()},function(data){});
+            //TempValue= $('#CostCenterName').DuplicateCheckForCreate({ name: 'JobOrderCostCenter', value: $('#CostCenterName').val(), doctype: $('#DocTypeId').val() });
+            //if (TempValue){ ValidationMessage=$('#CostCenterName').val() + " already exist <br />";}
+            //}
+            //else
+            //{
+            //    TempValue = $('#CostCenterName').DuplicateCheckForEdit({ name: 'JobOrderCostCenter', value: $('#CostCenterName').val(), doctype: $('#DocTypeId').val(),headerId:DocId });
+            //    if (TempValue) {ValidationMessage+=$('#CostCenterName').val() + " already exist <br />";}
+            //}
+            //if(TempValue)
+            //{
+            //    if($('#validationerrormsg').length==0){
+            //        $('.panel-info').filter(':eq(1)').before('<div class="alert alert-danger" role="alert" id="validationerrormsg">'+ValidationMessage+'</div>');}
+            //    else
+            //    {
+            //        $('#validationerrormsg').html(ValidationMessage);
+            //    }
+            //}
+
+            //}
+
+
+
+            return  (ValidationMessage=="");
+
+        }
+
+
+    </script>
+
+}
+
+
+<script type="text/javascript">
+
+
+    $(document).ready(function () {
+        var id=@Model.JobOrderHeaderId;
+        if(id==null||id==0)
+        {
+            $(document).find('a#btnCreateF').removeAttr('href').removeAttr('data-modal');
+            $(document).find('a#btnCreate').removeAttr('href').removeAttr('data-modal');
+            $(document).find('a#btnCreatePO').removeAttr('href').removeAttr('data-modal');
+        }
+
+        $(document).ajaxStart(function () {
+            if ($(':submit', 'div.modal-content').length)
+                $(':submit', 'div.modal-content').attr("disabled", 'disabled');
+            return;
+        });
+
+        $(document).ajaxStop(function () {
+            if ($(':submit', 'div.modal-content').length)
+                $(':submit', 'div.modal-content').removeAttr("disabled");
+            return;
+        });
+
+        if('@Model.JobOrderSettings.isMandatoryProductUID'=="True")
+            $(document).find('a#btnCreateF').removeAttr('href').removeAttr('data-modal').attr("disabled","disabled");
+
+        CustomSelectFunction($("#JobWorkerId"), '/ComboHelpList/GetJobWorkersWithProcess', '/ComboHelpList/SetSingleJobWorker', ' ', false, 1,$('#ProcessId').val());
+        CustomSelectFunction($("#MachineId"), '/ComboHelpList/GetMachine', '/ComboHelpList/SetSingleMachine', ' ', false, 1);
+        CustomSelectFunction($("#BillToPartyId"), '/ComboHelpList/GetJobWorkersWithProcess', '/ComboHelpList/SetSingleJobWorker', ' ', false, 1,$('#ProcessId').val());
+        CustomSelectFunction($("#OrderById"), '/ComboHelpList/GetEmployeeWithProcess', '/ComboHelpList/SetSingleEmployee', ' ', false, 1, $('#ProcessId').val());
+        CustomSelectFunction($("#GodownId"), '/ComboHelpList/GetGodown', '/ComboHelpList/SetSingleGodown', ' ', false, 1);
+
+        $('#JobWorkerId').select2('focus');
+        //Calling the function to load the table data/ Line information
+        LoadProducts();
+
+        //Adding Hidden Input Fields
+        AddFields();
+
+        //Calling the function to load Consumption Details
+        LoadConsumption();
+
+        var id=@Model.JobOrderHeaderId;
+
+        LoadCharges(id,"Web.JobOrderHeaderCharges","Web.JobOrderLineCharges");
+
+    });
+
+
+
+
+
+    //function AddFields() {
+    //    $('form:last').append($("<input type='hidden' name='UserRemark'></input>"))
+    //    $('form:last').append($("<input type='hidden' name='GenGatePass'></input>"))
+    //}
+
+    function LoadProducts() {
+        var SelectedRecord='@ViewBag.DocLineId';
+        var DomainName='@System.Configuration.ConfigurationManager.AppSettings["MenuDomain"]';
+        var groupId=@Model.JobOrderHeaderId;
+        var status='@Model.Status';
+        var LineEditUrl;
+        var LineDeleteUrl;
+        if(status==StatusContstantsEnum.Drafted||status==StatusContstantsEnum.Import)
+        {
+            LineEditUrl="/JobOrderLine/_ModifyLine/";
+            LineDeleteUrl="/JobOrderLine/_DeleteLine/";
+        }
+        else if(status==StatusContstantsEnum.Submitted || status == StatusContstantsEnum.Modified )
+        {
+            LineEditUrl="/JobOrderLine/_ModifyLineAfterSubmit/";
+            LineDeleteUrl="/JobOrderLine/_DeleteLine_AfterSubmit/";
+        }
+        else if(status==StatusContstantsEnum.Closed)
+        {
+            LineEditUrl="/JobOrderLine/_ModifyLineAfterApprove/";
+            LineDeleteUrl="/JobOrderLine/_DeleteLine_AfterApprove/";
+        }
+        else if(status==StatusContstantsEnum.Completed)
+        {
+            LineEditUrl="/JobOrderLine/_ModifyLineAfterApprove/";
+            LineDeleteUrl="/JobOrderLine/_DeleteLine_AfterApprove/";
+        }
+        var link="/JobOrderLine/Index/"+groupId;
+        var QtyCount=0;
+        var DealQtyCount=0;
+        var AmountCount=0;
+        var unit=true;
+        var dunit=true;
+        var prevunit;
+        var prevdunit;
+        var decimal=0;
+        var DUdecimal=0;
+        $.ajax({
+            url: link,
+            type: "GET",
+            success: function (data) {
+                var row = ""
+                var srno=1;
+
+                if(data.length!=0)
+                {
+                    if(status!=StatusContstantsEnum.Drafted && status!=StatusContstantsEnum.Import)
+                        $('#JobWorkerId').attr('readonly','true');
+                    $('#GodownId').attr('readonly','true');
+
+                    $.each(data, function (index, item) {
+                        var BarCodeUrl=DomainName+"/Redirect/BarCodeDetail?BarCode="+item.ProductUidName;
+
+                        row += " <div class='row crow grid-body' style='margin-left:0px;margin-right:0px' id='"+item.JobOrderLineId+"'>"
+                            +"      <div class='row-index block'  style='width:5%'>"+srno+"<input type='hidden' class='id' value='"+item.JobOrderLineId+"' /></div>"
+                            +"          <div class='block'  style='width:90%'>"
+                            +"              <div class='row'>"
+                            +"                  <div class='block' style='width:25%'>"+(item.ProductName==null?" ":"<strong>"+item.ProductName+"</strong>")
+                            +"                      <div>"+(item.Specification==null?" ":item.Specification)+"</div>"
+                            +"                          <div>"+(item.Dimension1Name==null?" ":item.Dimension1Name+",")+(item.Dimension2Name==null?" ":item.Dimension2Name)+"</div>"
+                            +"                          <div>"+((item.DueDate==null)?" ":"<span title='DueDate' class='label label-danger' style='font-weight:bold'>"+formatDate('d/m/Y',new Date(parseInt(item.DueDate.substr(6))))+"</span>")
+                            +"                          </div>"
+                            +"                          "+(item.ProductUidName==null?" ":"ProductUID: <a href='"+BarCodeUrl+"' target='_blank'>"+item.ProductUidName+"</a><br/>")
+                            +"                  </div>"
+                            +"                  <div class='block'  style='width:12%'>"+(item.ProdOrderDocNo==null?" ":"<span title='DueDate' class='' style='font-weight:bold'>"+item.ProdOrderDocNo)+"</span><br />"
+                            +"                      <div>"+(item.PurchaseOrderHeaderDocNo==null?" ":item.PurchaseOrderHeaderDocNo)
+                            +"                      </div>"
+                            +"                   </div>"
+                            +"                  <div class='text-right block'  style='width:13%'>"+(item.Qty==null?" ":item.Qty.toFixed(item.UnitDecimalPlaces))+"<br />"
+                            +"                      <div><small>"+(item.UnitName==null?" ":item.UnitName)+"</small>"
+                            +"                      </div>"
+                            +"                            <div style='width:80%;float:right'> "
+                            +"                                  <div class='progress'> "
+                            +"                                      <span class='progress-value'>"+item.ProgressPerc+"% </span> "
+                            +"                                     <div class='progress-bar' role='progressbar' aria-valuenow='"+item.ProgressPerc.toFixed(0)+"' aria-valuemin='0' aria-valuemax='100' style='width: "+item.ProgressPerc.toFixed(0)+"%;'>"
+                            +"                                     </div> "
+                            +"                                  </div>"
+                            +"                            </div>"
+                            +"                      </div>"
+                            +"                   <div class='text-right block'  style='width:10%'>"+(item.DealQty==null?" ":item.DealQty.toFixed(item.DealUnitDecimalPlaces))+"<br />"
+                            +"                      <div><small>"+(item.DealUnitName==null?" ":item.DealUnitName)+"</small>"
+                            +"                      </div>"
+                            +"                   </div>"
+                            +"                   <div class='text-right block'  style='width:10%'>"+(item.Rate==null?" ":item.Rate.toFixed(2))
+                            +"                   </div>"
+                            +"                   <div class=' text-right block'  style='width:10%'>"+(item.Amount==null?" ":item.Amount.toFixed(2))
+                            +"                   </div>"
+                            +"                   <div class='block'  style='width:10%'>"+(item.LotNo==null?" ":"Lot-No:"+item.LotNo+"<br />")+(item.Remark==null?" ":item.Remark)
+                            +"                   </div>"
+                            +"              </div>"
+                            +"          </div>"
+                            +"      <div class='block'  style='width:5%'>"
+                            +"          <a class='glyphicon glyphicon-trash icon-Cus-Size' delete='' href='"+LineDeleteUrl+item.JobOrderLineId+"'></a>"
+                            +"          <a  edit='' href='"+LineEditUrl+item.JobOrderLineId+"'></a>"
+                            +"      </div>"
+                            +"  </div>"
+                            +"<hr style='margin-top:0px;margin-bottom:0px'/>";
+                        QtyCount+=item.Qty;
+                        DealQtyCount+=item.DealQty;
+                        AmountCount+=item.Amount;
+                        if(srno!=1)
+                        {
+                            if(item.UnitName==prevunit && unit!=false)
+                            {}
+                            else
+                            {unit=false;}
+                            if(item.DealUnitName==prevdunit && dunit!=false)
+                            {}
+                            else
+                            {dunit=false;}
+                        }
+
+                        if(decimal- parseInt(item.UnitDecimalPlaces) < 0){decimal=item.UnitDecimalPlaces;}
+                        if(DUdecimal- parseInt(item.DealUnitDecimalPlaces) < 0){DUdecimal=item.DealUnitDecimalPlaces;}
+                        srno++;
+                        prevunit=item.UnitName;
+                        prevdunit=item.DealUnitName;
+                    });
+
+                    row+="<div class='row tfooter' style='padding-top:10px;'>"
+                        +"  <div class='block' style='width:5%'>"
+                        +"  </div>"
+                        +"  <div class='block' style='width:90%'>"
+                        +"      <div class='row'> "
+                        +"          <div class='block'  style='width:25%'><strong>Total</strong></div>"
+                        +"          <div class='block' style='width:15%'>"
+                        +"          </div>"
+                        +"          <div class='block text-right' style='width:10%'><strong>"
+                        +               ((unit==true)?QtyCount.toFixed(decimal)+"<br /><small>"+prevunit:QtyCount.toFixed(decimal))+"</small></strong>"
+                        +"          </div>"
+                        +"          <div class='block text-right' style='width:10%'><strong>"
+                        +               ((dunit==true)?DealQtyCount.toFixed(DUdecimal)+"<br /><small>"+prevdunit:DealQtyCount.toFixed(DUdecimal))+"</small></strong>"
+                        +"          </div>"
+                        +"          <div class='block text-right' style='width:10%'>"
+                        +"          </div>"
+                        +"          <div class='block text-right' style='width:10%'><strong>"+AmountCount.toFixed(2)+"</strong>"
+                        +"          </div>"
+                        +"          <div class='block' style='width:20%'>"
+                        +"          </div>"
+                        +"      </div>"
+                        +"  </div>"
+                        +"  <div class='block'  style='width:5%'>"
+                        +"  </div>"
+                        +"</div>"
+                }
+                else
+                {
+                    ;
+                }
+                $("#gbody").html(row);
+                if(SelectedRecord)
+                {
+                    var Id="#"+SelectedRecord
+                    NavigateToLineRecord(Id);}
+
+            },
+            error: function (result) {
+                alert("Error");
+            }
+        });
+    };
+
+
+    function LoadConsumption() {
+        var groupId=@Model.JobOrderHeaderId;
+        var link="/JobOrderLine/ConsumptionIndex/"+groupId;
+        var QtyCount=0;
+        var DealQtyCount=0;
+        var AmountCount=0;
+        var unit=true;
+        var dunit=true;
+        var prevunit;
+        var prevdunit;
+        var decimal=0;
+        var DUdecimal=0;
+        $.ajax({
+            url: link,
+            type: "GET",
+            success: function (data) {
+                var row = ""
+                var srno=1;
+
+                if(data.length!=0)
+                {
+                    $.each(data, function (index, item) {
+                        row += " <div class='row crow grid-body' style='margin-left:0px;margin-right:0px'>"
+                            +"      <div class='row-index block'  style='width:5%'>"+srno+"<input type='hidden' class='id' value='"+item.JobOrderLineId+"' /></div>"
+                            +"          <div class='block'  style='width:90%'>"
+                            +"              <div class='row'>"
+                            +"                  <div class='block' style='width:30%'>"+(item.ProductName==null?" ":"<strong>"+item.ProductName+"</strong>")
+                            +"                  </div>"
+                            +"                  <div class='block'  style='width:20%'>"+(item.Dimension1Name==null?" ":"<span title='Dim1' class='' style='font-weight:bold'>"+item.Dimension1Name)+"</span><br />"
+                            +"                   </div>"
+                            +"                  <div class='block'  style='width:20%'>"+(item.Dimension2Name==null?" ":item.Dimension2Name)+"<br />"
+                            +"                   </div>"
+                            +"                  <div class='text-right block'  style='width:15%'>"+(item.Qty==null?" ":item.Qty.toFixed(item.UnitDecimalPlaces))+"<br />"
+                            +"                   </div>"
+                            +"                   <div class='block'  style='width:15%'>"+(item.UnitName==null?" ":item.UnitName)
+                            +"                   </div>"
+                            +"              </div>"
+                            +"          </div>"
+                            +"      <div class='block'  style='width:5%'><a class='glyphicon glyphicon-trash icon-Cus-Size' delete='' href='/JobOrderLine/_Edit/"+item.JobOrderLineId+"'></a>"
+                            +"      </div>"
+                            +"  </div>"
+                            +"<hr style='margin-top:0px;margin-bottom:0px'/>";
+                        QtyCount+=item.Qty;
+                        if(srno!=1)
+                        {
+                            if(item.UnitName==prevunit && unit!=false)
+                            {}
+                            else
+                            {unit=false;}
+                        }
+
+                        if(decimal- parseInt(item.UnitDecimalPlaces) < 0){decimal=item.UnitDecimalPlaces;}
+                        srno++;
+                        prevunit=item.UnitName;
+                    });
+                    row+="<div class='row tfooter' style='padding-top:10px;margin-left:0px;margin-right:0px'>"
+                        +"  <div class='block' style='width:5%'>"
+                        +"  </div>"
+                        +"  <div class='block' style='width:90%'>"
+                        +"      <div class='row'> "
+                        +"          <div class='block'  style='width:30%'><strong>Total</strong></div>"
+                        +"          <div class='block' style='width:20%'>"
+                        +"          </div>"
+                        +"          <div class='block text-right' style='width:20%'><strong>"
+                        +               "</strong>"
+                        +"          </div>"
+                        +"          <div class='block text-right' style='width:15%'><strong>"
+                        +              (QtyCount.toFixed(decimal))+"</strong>"
+                        +"          </div>"
+                        +"          <div class='block' style='width:15%'><strong>"
+                        +               ((unit==true)?prevunit:"")+"</strong>"
+                        +"          </div>"
+                        +"      </div>"
+                        +"  </div>"
+                        +"  <div class='block'  style='width:5%'>"
+                        +"  </div>"
+                        +"</div>"
+                }
+                else
+                {
+                    ;
+                }
+                $("#gbodyconsumption").html(row);
+
+            },
+            error: function (result) {
+                alert("Error");
+            }
+        });
+    };
+</script>
+
+
+@if ((ViewBag.Mode != "Add") && (ViewBag.Mode != "Edit"))
+{
+    <script type="text/javascript">
+
+        RemoveFields();
+
+        function RemoveFields(){
+            //Disabling input fields
+            $(':input:not(:submit,#IsContinue)').attr('disabled','disabled');
+
+            //Removing all the events from the newly created lines
+            $('#gbody').unbind();
+
+            //Removing Add New Row ActionLink
+            if($('a#btnCreate').length)
+                $('a#btnCreate').parents('h5')[0].remove();
+            if($('a#btnCreatePO').length)
+                $('a#btnCreatePO').parents('h5')[0].remove();
+            //Preventing the click event on newly created elements
+            $(document).on('click','#gbody a[edit],#gbody a[delete],#gbodyconsumption a',function(event){
+                event.preventDefault();
+            })
+            //Removing the action link from the form so that the request will be redirected to the Submit function in the controller instead of the hardcoded path
+            $('form:last').prop('action','');
+
+            //For Populating Modal PopUp on DoubleClick Of Row
+            //$('#gbody').on("dblclick",'.grid-body',function(){
+            //    var editurl=$(this).find('a[edit]').attr('href');
+            //    $('#myModalContent').load(editurl, function () {
+            //        //alert('2');
+            //        $('#myModal').modal({
+            //            backdrop: 'static',
+            //            keyboard: true
+            //        }, 'show');
+            //    });
+            //});
+        }
+
+
+    </script>
+}
+
+@if ((Model.Status == (int)ActivityTypeContants.Modified || Model.Status == (int)ActivityTypeContants.Submitted)
+    && (ViewBag.transactionType == "submit" || ViewBag.transactionType == "submitContinue" || ViewBag.transactionType == "review" || ViewBag.transactionType == "ReviewContinue"))
+{
+    <script type="text/javascript">
+
+        var GatePassGen='@Model.JobOrderSettings.SqlProcGatePass'
+        var GatePassId='@Model.GatePassHeaderId'
+        var TrancType='@ViewBag.transactionType'
+
+        var href = '/ActivityLog/LogEditReason';
+
+        var $btnClicked;
+
+        $(':submit').bind('click', function () {
+            $btnClicked=$(this);
+            $('#myModalContent').load(href, function () {
+
+                $('#myModal').modal({
+                    backdrop: 'static',
+                    keyboard: true
+                }, 'show');
+
+                bindForm1(this);
+            });
+
+            return false;
+        })
+
+        function bindForm1(dialog) {
+
+            $('#modformr', dialog).submit(function () {
+
+                $.ajax({
+                    url: this.action,
+                    type: this.method,
+                    data: $(this).serialize(),
+                    success: function (result) {
+                        if (result.success) {
+                            $('#myModal').modal('hide');
+
+                            $(':submit').unbind();
+
+                            $('input[name="UserRemark"]').val(result.UserRemark);
+
+                            if(GatePassGen && !GatePassId && (TrancType=="submit"||TrancType=="submitContinue"))
+                            {
+                                alertify.confirm('Generate GatePass ?').set({
+                                    'closable': false, 'onok': function (onok) {
+
+                                        $('input[name="GenGatePass"]').val('true');
+                                        $btnClicked.trigger('click');
+
+                                    }, 'oncancel': function (oncancel) {
+
+                                        $('input[name="GenGatePass"]').val('false');
+                                        $btnClicked.trigger('click');
+
+                                    }
+                                }).setting('labels',{'ok':'Yes', 'cancel': 'No'});
+                            }
+                            else
+                            {
+                                $btnClicked.trigger('click');
+                            }
+                        } else {
+                            $('#myModalContent').html(result);
+                            bindForm1();
+                        }
+                    }
+                });
+                return false;
+            });
+
+        }
+
+    </script>
+}
+else if (Model.GatePassHeaderId == null && (ViewBag.transactionType == "submit" || ViewBag.transactionType == "submitContinue") && !string.IsNullOrEmpty(Model.JobOrderSettings.SqlProcGatePass))
+{
+    <script type="text/javascript">
+
+        $(':submit','form .panel.panel-default').one('click', function () {
+            $btnClicked=$(this);
+            var uChoice=false;
+            alertify.confirm('Generate GatePass ?').set({
+                'closable': false, 'onok': function (onok) {
+
+                    $('input[name="GenGatePass"]').val('true');
+                    $btnClicked.trigger('click');
+                    uChoice=true;
+
+                }, 'oncancel': function (oncancel) {
+
+                    $('input[name="GenGatePass"]').val('false');
+                    $btnClicked.trigger('click');
+                    uChoice=true;
+                }
+            }).setting('labels',{'ok':'Yes', 'cancel': 'No'});
+            return uChoice;
+        })
+
+
+    </script>
+}
+
+
+@if (ViewBag.transactionType != null && (ViewBag.transactionType == "submitContinue" || ViewBag.transactionType == "ReviewContinue"))
+{
+    <script type="text/javascript">
+        CreateTrasitionEffectForSubmit();
+
+        function CreateTrasitionEffectForSubmit() {
+
+            //$('body').find('.container.body-content > div.row ').wrap("<div class='animsition' data-animsition-in='fade-in-right-lg' data-animsition-out='fade-out-left-lg' style='animation-duration: 1.5s; -webkit-animation-duration: 1.5s; opacity: 0;'> </div>");
+
+            $('body').find('form').filter(":last").wrapInner("<div class='animsition' data-animsition-in='fade-in-right-lg' data-animsition-out='fade-out-left-lg' style='animation-duration: 1.5s; -webkit-animation-duration: 1.5s; opacity: 0;'> </div>");
+
+            var script = document.createElement('script');
+
+            script.setAttribute('type', 'text/javascript');
+
+            script.text = " $(document).ready(function () {$('.animsition').animsition().one('animsition.start', function () {}).one('animsition.end', function () {$(this).find('.animsition-child').addClass('zoom-in').css({'opacity': 1});})});";
+
+            $('body').append(script);
+
+        }
+
+    </script>
+}

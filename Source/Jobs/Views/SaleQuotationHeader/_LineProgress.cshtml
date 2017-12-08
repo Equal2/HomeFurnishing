@@ -1,0 +1,173 @@
+﻿@model Model.ViewModel.JobOrderLineProgressViewModel
+
+
+<div class="modal-content">
+    <div class="modal-header" style="border-bottom: 1px solid #8E8888">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"> <span class="glyphicon glyphicon-remove"></span></button>
+        <h3>
+            <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-file black"></span> Progress Detail</span>
+        </h3>
+    </div>
+    <div>
+        @Html.ValidationLog((string)TempData["CSEXC"])
+
+        @{
+
+            var DomainName = System.Configuration.ConfigurationManager.AppSettings["AdminSetupDomain"];
+        }
+        <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true" style="max-height:400px;overflow-y:scroll;font-size:13px">
+
+            @if (Model.JobReceievs.Count > 0)
+            {
+                decimal QtyTotal = 0;
+                int MaxDecPlaces = 0;
+                <div class="panel panel-success">
+                    <div class="panel-heading" role="tab" id="headingTwo">
+                        <h4 class="panel-title text-center">
+                            <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                Job Receives
+                            </a>
+                        </h4>
+                    </div>
+                    <div id="collapseOne" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingTwo">
+                        <div class="panel-body">
+                            <div class="box-body table-responsive no-padding">
+                                <table class="table table-hover">
+                                    <tr>
+                                        <th>SKU</th>
+                                        <th>DocNo</th>
+                                        <th>DocDate</th>
+                                        <th class="text-right">Qty</th>
+                                    </tr>
+                                    @foreach (var item2 in Model.JobReceievs)
+                                    {
+                                        QtyTotal += item2.Qty;
+                                        if (item2.DecimalPlaces > MaxDecPlaces)
+                                        { MaxDecPlaces = item2.DecimalPlaces; }
+                                        var Url = DomainName + "/Redirect/RedirectToDocument?DocTypeId=" + item2.DocTypeId + "&DocId=" + item2.DocId;
+                                        <tr>
+                                            <td>@item2.SKU</td>
+                                            <td> <a href="@Url" target="_blank">@item2.DocNo</a> </td>
+                                            <td>@item2.DocDate.ToString("dd/MMM/yyyy")</td>
+                                            <td class="text-right">@string.Format("{" + "0:0.".PadRight(item2.DecimalPlaces + 4, '0') + "}", item2.Qty)</td>
+                                        </tr>
+                                    }
+                                    <tfoot>
+                                        <tr>
+                                            <td><strong>Total</strong></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td class="text-right">@string.Format("{" + "0:0.".PadRight(MaxDecPlaces + 4, '0') + "}", QtyTotal)</td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+
+
+            @if (Model.JobCancels.Count > 0)
+            {
+                decimal QtyTotal = 0;
+                int MaxDecPlaces = 0;
+                <div class="panel panel-danger">
+                    <div class="panel-heading" role="tab" id="headingTwo">
+                        <h4 class="panel-title text-center">
+                            <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                Job Cancel
+                            </a>
+                        </h4>
+                    </div>
+                    <div id="collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
+                        <div class="panel-body">
+                            <div class="box-body table-responsive no-padding">
+                                <table class="table table-hover">
+                                    <tr>
+                                        <th>SKU</th>
+                                        <th>DocNo</th>
+                                        <th>DocDate</th>
+                                        <th class="text-right">Qty</th>
+                                    </tr>
+                                    @foreach (var item2 in Model.JobCancels)
+                                    {
+                                        QtyTotal += item2.Qty;
+                                        if (item2.DecimalPlaces > MaxDecPlaces)
+                                        { MaxDecPlaces = item2.DecimalPlaces; }
+                                        var Url = DomainName + "/Redirect/RedirectToDocument?DocTypeId=" + item2.DocTypeId + "&DocId=" + item2.DocId;
+                                        <tr>
+                                            <td>@item2.SKU</td>
+                                            <td> <a href="@DomainName" target="_blank">@item2.DocNo</a> </td>
+                                            <td>@item2.DocDate.ToString("dd/MMM/yyyy")</td>
+                                            <td class="text-right">@string.Format("{" + "0:0.".PadRight(item2.DecimalPlaces + 4, '0') + "}", item2.Qty)</td>
+                                        </tr>
+                                    }
+                                    <tfoot>
+                                        <tr>
+                                            <td><strong>Total</strong></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td class="text-right">@string.Format("{" + "0:0.".PadRight(MaxDecPlaces + 4, '0') + "}", QtyTotal)</td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            @if (Model.JobAmendment.Count > 0)
+            {
+                decimal QtyTotal = 0;
+                int MaxDecPlaces = 0;
+                <div class="panel panel-info">
+                    <div class="panel-heading" role="tab" id="headingTwo">
+                        <h4 class="panel-title text-center">
+                            <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                                Job Amendment
+                            </a>
+                        </h4>
+                    </div>
+                    <div id="collapseThree" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
+                        <div class="panel-body">
+                            <div class="box-body table-responsive no-padding">
+                                <table class="table table-hover">
+                                    <tr>
+                                        <th>SKU</th>
+                                        <th>DocNo</th>
+                                        <th>DocDate</th>
+                                        <th class="text-right">Qty</th>
+                                    </tr>
+                                    @foreach (var item2 in Model.JobAmendment)
+                                    {
+                                        QtyTotal += item2.Qty;
+                                        if (item2.DecimalPlaces > MaxDecPlaces)
+                                        { MaxDecPlaces = item2.DecimalPlaces; }
+                                        var Url = DomainName + "/Redirect/RedirectToDocument?DocTypeId=" + item2.DocTypeId + "&DocId=" + item2.DocId;
+                                        <tr>
+                                            <td>@item2.SKU</td>
+                                            <td> <a href="@DomainName" target="_blank">@item2.DocNo</a> </td>
+                                            <td>@item2.DocDate.ToString("dd/MMM/yyyy")</td>
+                                            <td class="text-right">@string.Format("{" + "0:0.".PadRight(item2.DecimalPlaces + 4, '0') + "}", item2.Qty)</td>
+                                        </tr>
+                                    }
+                                    <tfoot>
+                                        <tr>
+                                            <td><strong>Total</strong></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td class="text-right">@string.Format("{" + "0:0.".PadRight(MaxDecPlaces + 4, '0') + "}", QtyTotal)</td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+
+        </div>
+    </div>
+</div>

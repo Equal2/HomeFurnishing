@@ -1,0 +1,282 @@
+﻿@model Model.ViewModels.ExcessMaterialLineViewModel
+@using Core.Common
+
+<style type="text/css">
+    .cusleftnormal {
+        border-bottom-left-radius: 0pc !important;
+        border-top-left-radius: 0px !important;
+    }
+
+    .cusrightnormal {
+        border-bottom-right-radius: 0px !important;
+        border-top-right-radius: 0px !important;
+    }
+
+    .ui-autocomplete {
+        max-height: 250px;
+        overflow-y: auto;
+        /* prevent horizontal scrollbar */
+        overflow-x: hidden;
+    }
+
+    .ui-widget {
+        font-size: 1em /*{fsDefault}*/;
+    }
+</style>
+
+
+<div class="modal-content">
+    <div class="modal-header" style="border-bottom: 1px solid #8E8888">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"> <span class="glyphicon glyphicon-remove"></span></button>
+        <h3>
+            <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-file black"></span> @ViewBag.DocNo</span>
+        </h3>
+    </div>
+    <div>
+        @using (Html.BeginForm("_CreatePost", "ExcessMaterialLine", FormMethod.Post, new { enctype = "multipart/form-data", id = "modform" }))
+        {
+            @Html.ValidationLog((string)TempData["CSEXCL"])
+            <div class="form-horizontal modal-body">
+
+                @Html.AntiForgeryToken()
+
+                @Html.HiddenFor(model => model.ExcessMaterialHeaderId)
+                @Html.HiddenFor(m => m.ExcessMaterialLineId)
+                @Html.HiddenFor(m => m.ProductUidId)
+                @Html.HiddenFor(m => m.ExcessMaterialSettings.ProcessId)
+
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+                <div class="row">
+                    <div class="col-md-6" style="display:@(Model.ExcessMaterialSettings.isVisibleProductUID ? "":"none")">
+                        @Html.HiddenFor(m => m.ExcessMaterialSettings.isVisibleProductUID)
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.ProductUidName, "Product UID", new { @class = "control-label col-md-4 col-sm-2 " })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.ProductUidName, new { @class = "form-control col-xs-7 required" })
+                                @Html.ValidationMessageFor(model => model.ProductUidName, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.ProductId, "Product", new { @class = "control-label col-md-4 col-sm-2 " })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.ProductId, new { @class = "form-control col-xs-7 required" })
+                                @Html.ValidationMessageFor(model => model.ProductId, "", new { @class = "text-danger" })
+                                @*<span id="status" class="text-danger"></span>*@
+                            </div>
+                        </div>
+                    </div>
+
+
+
+                    <div class="col-md-6" style="display:@(Model.ExcessMaterialSettings.isVisibleDimension1?"":"none")">
+                        @Html.HiddenFor(m => m.ExcessMaterialSettings.isVisibleDimension1)
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Dimension1Id, "Dimension1", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.Dimension1Id, new { @class = "form-control col-xs-7 required" })
+                                @Html.ValidationMessageFor(model => model.Dimension1Id, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6" style="display:@(Model.ExcessMaterialSettings.isVisibleDimension2?"":"none")">
+                        @Html.HiddenFor(m => m.ExcessMaterialSettings.isVisibleDimension2)
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Dimension2Id, "Dimension2", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.Dimension2Id, new { @class = "form-control col-xs-7 required" })
+                                @Html.ValidationMessageFor(model => model.Dimension2Id, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        @Html.HiddenFor(m => m.ExcessMaterialSettings.isMandatoryProcessLine)
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.ProcessId, "Process", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.ProcessId, new { @class = "form-control col-xs-7 required" })
+                                @Html.ValidationMessageFor(model => model.ProcessId, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Qty, "Qty", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.Qty, new { @class = "form-control col-xs-7 required" })
+                                @Html.ValidationMessageFor(model => model.Qty, "", new { @class = "text-danger" })
+                            </div>
+                            @*<div class="col-xs-3" style="padding-left:0px">
+                                    @Html.TextBoxFor(m => m.UnitName, new { @class = "form-control col-xs-2 cusleftnormal", @readonly = "true" })
+                                </div>*@
+                        </div>
+                    </div>
+
+                    <div class="col-md-6" style="display:@(Model.ExcessMaterialSettings.isVisibleLotNo?"":"none")">
+                        @Html.HiddenFor(m => m.ExcessMaterialSettings.isVisibleLotNo)
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.LotNo, "LotNo", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.LotNo, new { @class = "form-control col-xs-7 required" })
+                                @Html.ValidationMessageFor(model => model.LotNo, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Remark, "Remark", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextAreaFor(model => model.Remark, new { @class = "form-control col-xs-7 required" })
+                                @Html.ValidationMessageFor(model => model.Remark, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer " style="padding: 19px 20px 0 20px; border-top:1px solid #8E8888">
+                    @if (ViewBag.LineMode == "Edit" || ViewBag.LineMode == "Create")
+                    {
+                        <button class="btn custom left" name="Command:Edit" type="submit" id="submit"><h2 style="margin:0px"><span class="glyphicon glyphicon-floppy-disk black"></span> </h2></button>}
+                    @if (ViewBag.LineMode == "Delete")
+                    {
+                        <button class="btn custom" name="Command:Delete" id="delete" type="submit"><h2 style="margin:0px"><span class="glyphicon glyphicon-trash black"></span> </h2></button>
+                    }
+                </div>
+
+            </div>
+
+        }
+    </div>
+</div>
+
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        CustomSelectFunction($("#ProductId"), '/ComboHelpList/GetProducts', '/ComboHelpList/SetSingleProducts', 'Enter Product Name', false, 3);
+        CustomSelectFunction($("#Dimension1Id"), '/ComboHelpList/GetDimension1', '/ComboHelpList/SetSingleDimension1', 'Enter Dimension1', false, 1);
+        CustomSelectFunction($("#Dimension2Id"), '/ComboHelpList/GetDimension2', '/ComboHelpList/SetSingleDimension2', 'Enter Dimension2 ', false, 1);
+        CustomSelectFunction($("#ProcessId"), '/ComboHelpList/GetProcess', '/ComboHelpList/SetSingleProcess', 'Enter Process Name', false, 1);
+
+
+
+        var reset = false;
+        var IsSaved = false;
+        var ValidationCount = 0;
+
+        $('#modform').bind('submit', function (event) {
+
+            if (!IsSaved) {
+                if (!ValidateData()) {
+                    return false;
+                }
+                IsSaved = true;
+                $('button:submit').attr('disabled', 'disabled');
+                return IsSaved;
+            }
+            else {
+                return false;
+            }
+
+
+        });
+
+
+        function ValidateData() {
+            var ValidationMessage = "";
+
+            //Client Side Validaion.....
+
+            return (ValidationMessage == "");
+
+        }
+
+        //$('input:not(:readonly:disabled):first','.modal-body').focus();
+        $('input:not(:hidden,disabled,readonly,visible):first', '.modal-body').focus();
+
+
+        $('.datepicker').datepicker({
+            format: 'dd/MM/yyyy',
+            "setDate": new Date(),
+            "autoclose": true
+
+        })
+        var id = '@Model.ExcessMaterialLineId';
+
+        $('#delete', '.modal-content').click(function (e) {
+            if (id > 0) {
+                var url = '/ExcessMaterialLine/DeletePost';
+                $('form#modform').attr('action', url);
+                return;
+            }
+            else {
+                return false;
+            }
+        })
+
+        if (id > 0 && $('#ProductUidId').val() && $('#ProductUidId').val() > 0) {
+
+            $("#ProductId").attr('readonly', 'true');
+            $("#Dimension1Id").attr('readonly', 'true');
+            $("#Dimension2Id").attr('readonly', 'true');
+            $("#ProcessId").attr('readonly', 'true');
+            $("#Qty").attr('readonly', 'true');
+            $("#ProductUidName").attr('readonly', 'true');
+
+        }
+
+        $('#ProductUidName').change(function () {
+
+            $.get("/ExcessMaterialLine/GetBarCodeDetails", { ProductUId: $(this).val() }, function (data, stat, xhr) {
+
+                if (data.ErrorType == "Success") {
+
+                    $('#ProductId', '.modal-body').select2("data", { id: data.ProductId, text: data.ProductName }).attr('readonly', 'true').trigger('change');
+                    $('#Qty', '.modal-body').val(1).attr('readonly', 'true');
+                    $('#ProductUidId', '.modal-body').val(data.ProductUIDId);
+
+                    if (data.Dimension1Id)
+                        $('#Dimension1Id', '.modal-body').select2("data", { id: data.Dimension1Id, text: data.Dimension1Name }).attr('readonly', 'true');
+                    else
+                        $('#Dimension1Id', '.modal-body').attr('readonly', 'true');
+
+                    if (data.Dimension2Id)
+                        $('#Dimension2Id', '.modal-body').select2("data", { id: data.Dimension2Id, text: data.Dimension2Name }).attr('readonly', 'true');
+                    else
+                        $('#Dimension2Id', '.modal-body').attr('readonly', 'true');
+
+                    if (data.CurrenctProcessId)
+                        $('#ProcessId', '.modal-body').select2("data", { id: data.CurrenctProcessId, text: data.CurrentProcessName }).attr('readonly', 'true');
+                    else
+                        $('#ProcessId', '.modal-body').attr('readonly', 'true');
+
+                    $('#LotNo', '.modal-body').val(data.LotNo);
+
+
+                    if ($('#modform').find('.modal-body #errormsg').length) {
+                        $('#modform').find('#errormsg').parent().remove();
+                    }
+
+                    $("#ProductId").select2("focus");
+                }
+                else {
+                    if (!$('#modform').find('.modal-body #errormsg').length) {
+                        $('#modform').find('.modal-body').prepend("<div class='alert alert-danger'><span id=errormsg >" + data.ErrorMessage + "</span></div>")
+                    }
+                }
+
+            })
+
+        })
+
+
+    });
+
+</script>

@@ -1,0 +1,49 @@
+﻿@{
+    ViewBag.Title = "jTable Demos-Examples";
+}
+@section CssImport 
+{
+    <style type="text/css">
+        ul#DemoList > li
+        {
+            font-weight: bold;
+        }
+        
+        ul#DemoList ul
+        {
+            font-weight: normal;
+        }
+    </style>
+}
+<h2>
+    jTable ASP.NET MVC Demos</h2>
+<ul id="DemoList">
+    <li>Paging & Sorting<ul>
+        <li>@Html.ActionLink("Paging and sorting", "PagingAndSorting")</li></ul>
+    </li>
+    <li>Selecting<ul>
+        <li>@Html.ActionLink("Selecting rows", "SelectingRows")</li></ul>
+    </li>
+    <li>Master/Child tables<ul>
+        <li>@Html.ActionLink("Master/Child tables", "MasterChild")</li></ul>
+    </li>
+    <li>Filtering<ul>
+        <li>@Html.ActionLink("Filtering records", "Filtering")</li></ul>
+    </li>
+    <li>Validation<ul>
+        <li>@Html.ActionLink("Using with 'validation engine' plugin", "UsingWithValidationEngine1")</li>
+        <li>@Html.ActionLink("Using with 'validation engine' plugin (easy way)", "UsingWithValidationEngine2")</li>
+    </ul>
+    </li>
+    <li>Localization<ul>
+        <li>@Html.ActionLink("A sample localization (Turkish)", "TurkishLocalization")</li></ul>
+    </li>
+    <li>Others<ul>
+        <li>@Html.ActionLink("Column resizing", "ColumnResizing")</li>
+        <li>@Html.ActionLink("Column hide/show", "ColumnHideShow")</li></ul>
+    </li>
+    <li>Themes<ul>
+        <li>Visit <a href="http://www.jtable.org/Themes">http://jtable.org/Themes</a> for list of latest themes</li>
+    </ul>
+    </li>
+</ul>

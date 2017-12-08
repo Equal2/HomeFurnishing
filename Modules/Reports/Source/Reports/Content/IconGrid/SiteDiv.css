@@ -1,0 +1,57 @@
+
+
+        .login-wraper {
+            -webkit-border-radius: 15px;
+            -moz-border-radius: 15px;
+            -ms-border-radius: 15px;
+            -o-border-radius: 15px;
+            border-radius: 15px;
+            -webkit-box-shadow: 0 0 8px rgba(0, 0, 0, 0.4);
+            -moz-box-shadow: 0 0 8px rgba(0, 0, 0, 0.4);
+            box-shadow: 0 0 8px rgba(0, 0, 0, 0.4);
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            display: block;
+            margin-top: -185px;
+            margin-left: -235px;
+            padding: 25px;
+            width: 420px;
+            height: 320px;
+            background: white;
+            text-align: center;
+        }
+
+        /* line 97, ../sass/typica-login.scss */
+        .login-form legend {
+            margin-top: 5px;
+            margin-bottom: 30px;
+            padding-bottom: 25px;
+        }
+        /* line 102, ../sass/typica-login.scss */
+        .login-form .body {
+            padding-bottom: 30px;
+            border-bottom: 1px solid #eeeeee;
+        }
+        /* line 106, ../sass/typica-login.scss */
+        .login-form .footer {
+            margin-top: 20px;
+        }
+            /* line 108, ../sass/typica-login.scss */
+            .login-form .footer .checkbox.inline {
+                display: inline;
+            }
+                /* line 110, ../sass/typica-login.scss */
+                .login-form .footer .checkbox.inline input[type="checkbox"] {
+                    float: none;
+                    margin-top: -4px;
+                }
+            /* line 115, ../sass/typica-login.scss */
+            .login-form .footer .btn {
+                -webkit-box-shadow: none;
+                -moz-box-shadow: none;
+                box-shadow: none;
+                margin-left: 15px;
+                padding: 7px 25px;
+                background-image: none;
+            }

@@ -1,0 +1,153 @@
+﻿@model Model.Models.ProductType
+
+@{
+    ViewBag.Title = "Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<script src="~/Scripts/Jasny/jasny-bootstrap.min.js"></script>
+<link href="~/Content/jasny/jasny-bootstrap.min.css" rel="stylesheet" />
+
+@using (Html.BeginForm("Post", "ProductType", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(model => model.ProductTypeId)
+    
+    <div class="panel panel-default">
+
+        <div class="panel panel-heading">
+            <h3>
+                <span srueyle="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-file black"></span> Product Type</span>
+                @if (@Model.IsSystemDefine)
+                {
+                    <input type="submit" value="Save" class="btn btn-primary right" id="submit" style="width: 90px; background-color: #2980b9;margin-left:20px" disabled="disabled" />
+                    <span style="font-family: Calibri,sans-serif,Verdana; font-weight:bold ;font-size: large" class="text-danger right "><span class="glyphicon glyphicon-floppy-remove"></span> System Defined</span>
+                }
+                else
+                {
+                    <input type="submit" value="Save" class="btn btn-primary right" id="submit" style="width: 90px; background-color: #2980b9" />
+                }
+            </h3>
+            <hr style="margin-top:0px;margin-bottom:0px" />
+
+
+            <div class="panel-info">
+                @*<h4 style="padding:5px 0 0 0;margin:0px">
+                    @Html.ActionLink(" ", " ", " ", null, new { @class = "glyphicon glyphicon-refresh toolbar", @title = "Refresh Page", @data_toggle = "tooltip", @id = "RefreshPage" })
+                    @Html.ActionLink(" ", "Create", "ProductType", null, new { @class = "glyphicon glyphicon-plus toolbar", @title = "Add New", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "History", "ProductType", null, new { @class = "glyphicon glyphicon-user toolbar", @title = "History", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "PrevPage", "ProductType", new { id = @Model.ProductTypeId }, new { @class = "glyphicon glyphicon-arrow-left toolbar", @title = "Prev Record", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "NextPage", "ProductType", new { id = @Model.ProductTypeId }, new { @class = "glyphicon glyphicon-arrow-right toolbar", @title = "Next Record", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "Index", "ProductType", null, new { @class = "glyphicon glyphicon-list toolbar right", @title = "List", @data_toggle = "tooltip" })
+                </h4>*@
+                <div class="btn-group">
+                    @Html.ActionLink(" ", "Create", "ProductType", null, new { @class = "cbtn btn-circle glyphicon glyphicon-plus toolbar", @title = "Add New", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "History", "ProductType", null, new { @class = "cbtn btn-circle glyphicon glyphicon-user toolbar", @title = "History", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "PrevPage", "ProductType", new { id = @Model.ProductTypeId }, new { @class = "cbtn btn-circle glyphicon glyphicon-arrow-left toolbar", @title = "Prev Record", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "NextPage", "ProductType", new { id = @Model.ProductTypeId }, new { @class = "cbtn btn-circle glyphicon glyphicon-arrow-right toolbar", @title = "Next Record", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "Index", "ProductType", null, new { @class = "cbtn btn-circle glyphicon glyphicon-list", @title = "List", @data_toggle = "tooltip" })
+                </div>
+            </div>
+
+        </div>
+        <div class="form-horizontal">
+
+            @Html.ValidationSummary(true)
+
+            <div>
+                <div class="col-md-6">
+                    <div>
+                        <div class="col-md-12">
+                            <div class="form-group" style="margin-top:15px">
+                                @Html.LabelFor(model => model.ProductTypeName, "Product Type", new { @class = "control-label col-md-4 col-sm-2" })
+                                <div class="col-md-7 col-sm-10">
+                                    @Html.TextBoxFor(m => m.ProductTypeName, null, new { @class = "form-control col-xs-6 required" })
+                                    @Html.ValidationMessageFor(m => m.ProductTypeName, null, new { @class = "has-error" })
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.ProductNatureId, "Product Nature", new { @class = "control-label col-md-4 col-sm-2" })
+                                <div  class="col-md-7 col-sm-10">
+                                    @Html.DropDownListFor(m => m.ProductNatureId, new SelectList(ViewBag.NatureList as System.Collections.IEnumerable, "ProductNatureId", "ProductNatureName"), new { @class = "form-control col-xs-6 required height" })
+                                    @Html.ValidationMessageFor(m => m.ProductNatureId, null, new { @class = "has-error" })
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.IsActive, "Is Active", new { @class = "control-label col-md-4 col-sm-2" })
+                                <div  class="col-md-7 col-sm-10" style=" padding-top:4px">
+                                    @Html.CheckBoxFor(m => m.IsActive, new { @class = "checkbox col-xs-1" })
+                                    @Html.ValidationMessageFor(model => model.IsActive)
+                                </div>
+                            </div>
+                        </div>                        
+                    </div>
+                    <div>
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.IsPostedInStock, "Is Posted InStock", new { @class = "control-label col-md-4 col-sm-2" })
+                                <div  class="col-md-7 col-sm-10" style="padding-top:4px">
+                                    @Html.CheckBoxFor(m => m.IsPostedInStock, new { @class = "checkbox col-xs-1" })
+                                    @Html.ValidationMessageFor(model => model.IsPostedInStock)
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div>
+                        <div class="col-md-offset-4 col-md-8">
+                            <div class="fileinput fileinput-new" data-provides="fileinput">
+                                <div class="fileinput-new thumbnail" style="width: 200px; height: 150px;">
+                                    <img src="~/Uploads/@(Model.ImageFolderName)/Medium/@(Model.ImageFileName)" alt="...">
+                                </div>
+                                <div class="fileinput-preview fileinput-exists thumbnail" style="max-width: 200px; max-height: 150px;"></div>
+                                <div>
+                                    <span class="btn btn-default btn-file" style="background-color: transparent; color: black; font-family:Arial; border-radius:5px">
+                                        <span id="Select" class="fileinput-new">Select</span>
+                                        <span id="Change" class="fileinput-exists">Change</span>
+                                        <input type="file" name="upload">
+                                    </span>
+                                    <a href="#" class="btn btn-default fileinput-exists" style="background-color: transparent; color: black; font-family: Arial; border-radius: 5px" data-dismiss="fileinput">Remove</a>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+<script type="text/javascript">
+
+     $(":submit").on("click", function () {
+         var mpoid=@Model.ProductTypeId;
+         var tes;
+         if(mpoid<=0)
+         {
+             tes= $('#ProductTypeName').DuplicateCheckForCreate({ name: 'ProductType', value: $('#ProductTypeName').val(), doctype: 0 });
+         }
+         else
+         {
+             tes = $('#ProductTypeName').DuplicateCheckForEdit({ name: 'ProductType', value: $('#ProductTypeName').val(), doctype: 0,headerId:mpoid });
+         }
+         if (tes) {
+             return false;
+         }
+         else
+         {
+             return;
+         }
+     });
+
+</script>

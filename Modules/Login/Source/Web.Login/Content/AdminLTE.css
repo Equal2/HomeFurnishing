@@ -1,0 +1,58 @@
+﻿
+/*
+ * Component: Box
+ * --------------
+ */
+.box {
+    position: relative;
+    border-radius: 3px;
+    background: #ffffff;
+    margin-bottom: 20px;
+    width: 100%;
+}
+
+.box-body {
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 3px;
+    border-bottom-left-radius: 3px;
+    padding: 10px;
+}
+
+.box-footer {
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 3px;
+    border-bottom-left-radius: 3px;
+    padding: 10px;
+}
+
+    .box-footer button {
+        margin: auto;
+    }
+
+.container {
+    margin: 10% auto;
+    width: 400px;
+    -webkit-box-shadow: 0 0 8px rgba(0, 0, 0, 0.4);
+    -moz-box-shadow: 0 0 8px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.4);
+}
+
+@media (max-width: 768px) {
+    .container {
+        width: 90%;
+        margin-top: 20px;
+    }
+}
+
+legend {
+    margin-top: 5px;
+    margin-bottom: 30px;
+    padding-bottom: 25px;
+}
+
+.body {
+    padding-bottom: 30px;
+    border-bottom: 1px solid #eeeeee;
+}

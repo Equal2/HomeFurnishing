@@ -1,0 +1,807 @@
+﻿@model Model.ViewModel.PurchaseQuotationLineViewModel
+@using Core.Common
+
+<style type="text/css">
+    .cusleftnormal {
+        border-bottom-left-radius: 0pc !important;
+        border-top-left-radius: 0px !important;
+    }
+
+    .cusrightnormal {
+        border-bottom-right-radius: 0px !important;
+        border-top-right-radius: 0px !important;
+    }
+
+    .ui-autocomplete {
+        max-height: 250px;
+        overflow-y: auto;
+        /* prevent horizontal scrollbar */
+        overflow-x: hidden;
+    }
+
+    .ui-widget {
+        font-size: 1em /*{fsDefault}*/;
+    }
+</style>
+
+<div class="modal-content">
+    <div class="modal-header" style="border-bottom: 1px solid #8E8888">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"> <span class="glyphicon glyphicon-remove"></span></button>
+        <h3>
+            <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-file black"></span> Products</span>
+        </h3>
+    </div>
+    <div>
+        @using (Html.BeginForm("_CreatePost", "PurchaseQuotationLine", FormMethod.Post, new { enctype = "multipart/form-data", id = "modform" }))
+        {
+            @Html.ValidationLog((string)TempData["CSEXCL"])
+            <div class="form-horizontal modal-body">
+
+                @Html.AntiForgeryToken()
+
+                @Html.HiddenFor(model => model.PurchaseQuotationHeaderId)
+                @Html.HiddenFor(m => m.PurchaseQuotationLineId)
+                @Html.HiddenFor(m => m.PurchaseIndentLineId)
+                @Html.HiddenFor(m => m.IndentBalanceQty)
+                @Html.HiddenFor(m => m.DocTypeId)
+                @Html.HiddenFor(m => m.SiteId)
+                @Html.HiddenFor(m => m.DivisionId)
+                @Html.HiddenFor(m => m.ProductId)
+                @Html.HiddenFor(m => m.SupplierId)
+                @Html.HiddenFor(m => m.CalculateDiscountOnRate)
+                @Html.HiddenFor(m => m.UnitId)
+                @Html.HiddenFor(m => m.PurchQuotationSettings.CalculationId)
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                <div class="row">
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.ProductId, "Product", new { @class = "control-label col-xs-4 " })
+                            <div class="col-xs-7">
+                                @Html.TextBox(" ", "", new { @class = "form-control", @id = "acProducts" })
+                                @Html.ValidationMessageFor(model => model.ProductId, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.PurchaseIndentLineId, "Indents", new { @class = "control-label col-xs-4" })
+                            <div class="col-xs-7">
+                                @Html.TextBox(" ", "", new { @class = "form-control", @id = "acPurchaseIndents" })
+                                @Html.ValidationMessageFor(model => model.PurchaseIndentLineId, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    @*<div class="col-md-6">
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.ProductId, "Product", new { @class = "control-label col-xs-4 " })
+                                <div class="col-xs-7">
+                                    @Html.TextBoxFor(model => model.ProductId, new { @class = "form-control col-xs-7 required" })
+                                    @Html.ValidationMessageFor(model => model.ProductId, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+                        </div>*@
+                    @*<div class="col-md-6">
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.PurchaseIndentLineId, "Purchase Indents", new { @class = "control-label col-xs-4" })
+                                <div class="col-xs-7">
+                                    @Html.TextBox(" ", " ", new { @class = "form-control", @id = "acPurchaseIndents" })
+                                    @Html.ValidationMessageFor(model => model.PurchaseIndentLineId, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+                        </div>*@
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Specification, "Specification", new { @class = "control-label col-xs-4 " })
+                            <div class="col-xs-7">
+                                @Html.TextBoxFor(model => model.Specification, new { @class = "form-control col-xs-7 required" })
+                                @Html.ValidationMessageFor(model => model.Specification, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6" style="display:@(Model.PurchQuotationSettings.isVisibleDimension1 ? "" : "none")">
+                        @Html.HiddenFor(m => m.PurchQuotationSettings.isVisibleDimension1)
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Dimension1Id, "Dimension1", new { @class = "control-label col-xs-4" })
+                            <div class="col-xs-7">
+                                @Html.TextBoxFor(model => model.Dimension1Id, new { @class = "form-control col-xs-7 required" })
+                                @Html.ValidationMessageFor(model => model.Dimension1Id, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6" style="display:@(Model.PurchQuotationSettings.isVisibleDimension2 ? "" : "none")">
+                        @Html.HiddenFor(m => m.PurchQuotationSettings.isVisibleDimension2)
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Dimension2Id, "Dimension2", new { @class = "control-label col-xs-4" })
+                            <div class="col-xs-7">
+                                @Html.TextBoxFor(model => model.Dimension2Id, new { @class = "form-control col-xs-7 required" })
+                                @Html.ValidationMessageFor(model => model.Dimension2Id, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6" style="display:@(Model.PurchQuotationSettings.isVisibleLotNo ? "" : "none")">
+                        @Html.HiddenFor(m => m.PurchQuotationSettings.isVisibleLotNo)
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.LotNo, "Lot No", new { @class = "control-label col-xs-4" })
+                            <div class="col-xs-7">
+                                @Html.TextBoxFor(model => model.LotNo, new { @class = "form-control col-xs-7 required" })
+                                @Html.ValidationMessageFor(model => model.LotNo, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Qty, "Qty", new { @class = "control-label col-xs-4" })
+                            <div class="col-xs-4" style="padding-right:0px;">
+                                @Html.TextBoxFor(model => model.Qty, new { @class = "form-control required cusrightnormal text-right" })
+                                @Html.ValidationMessageFor(model => model.Qty, "", new { @class = "text-danger" })
+                            </div>
+                            <div class="col-xs-3" style="padding-left:0px">
+                                @Html.TextBoxFor(m => m.UnitName, new { @class = "form-control col-xs-2 cusleftnormal", @readonly = "true" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Rate, "Rate", new { @class = "control-label col-xs-4" })
+                            @Html.HiddenFor(m => m.PurchQuotationSettings.isMandatoryRate)
+                            @Html.HiddenFor(m => m.PurchQuotationSettings.isEditableRate)
+                            <div class="col-xs-7">
+                                @if (Model.PurchQuotationSettings.isEditableRate && Model.PurchaseQuotationLineId > 0)
+                                {
+                                    @Html.TextBoxFor(model => model.Rate, new { @class = "form-control col-xs-7 required text-right", @readonly = true })
+                                    @Html.ValidationMessageFor(model => model.Rate, "", new { @class = "text-danger" })
+                                }
+                                else
+                                {
+                                    @Html.TextBoxFor(model => model.Rate, new { @class = "form-control col-xs-7 required text-right" })
+                                    @Html.ValidationMessageFor(model => model.Rate, "", new { @class = "text-danger" })
+                                }
+
+                            </div>
+                        </div>
+                    </div>
+
+
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.DealUnitId, "Deal Unit& Multiplier", new { @class = "control-label col-xs-4" })
+                            <div class="col-xs-4" style="padding-right:0px">
+                                @Html.DropDownListFor(model => model.DealUnitId, new SelectList(ViewBag.DeliveryUnitList as System.Collections.IEnumerable, "UnitId", "UnitName"), new { @class = "form-control height cusrightnormal required" })
+                                @Html.ValidationMessageFor(model => model.DealUnitId, "", new { @class = "text-danger" })
+                            </div>
+                            <div class="col-xs-3" style="padding-left:0px">
+                                @Html.TextBoxFor(model => model.UnitConversionMultiplier, new { @class = "form-control cusleftnormal required text-right" })
+                                @Html.ValidationMessageFor(model => model.UnitConversionMultiplier, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.DealQty, "Deal Qty", new { @class = "control-label col-xs-4" })
+                            <div class="col-xs-7">
+                                @Html.TextBoxFor(model => model.DealQty, new { @class = "form-control col-xs-7 required text-right" })
+                                @Html.ValidationMessageFor(model => model.DealQty, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.DiscountPer, "Discount %", new { @class = "control-label col-xs-4" })
+                            <div class="col-xs-7">
+                                @Html.TextBoxFor(model => model.DiscountPer, new { @class = "form-control col-xs-7 text-right" })
+                                @Html.ValidationMessageFor(model => model.DiscountPer, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Amount, "Amount", new { @class = "control-label col-xs-4" })
+                            <div class="col-xs-7">
+                                @Html.TextBoxFor(model => model.Amount, new { @class = "form-control col-xs-7 required text-right" })
+                                @Html.ValidationMessageFor(model => model.Amount, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Remark, "Remark", new { @class = "control-label col-xs-4" })
+                            <div class="col-xs-7">
+                                @Html.TextBoxFor(model => model.Remark, new { @class = "form-control col-xs-7 required" })
+                                @Html.ValidationMessageFor(model => model.Remark, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer " style="padding: 19px 20px 0 20px; border-top:1px solid #8E8888">
+                    @if (ViewBag.LineMode == "Edit" || ViewBag.LineMode == "Create")
+                    {
+                        <button class="btn custom left" name="Command:Edit" type="submit" id="submit"><h2 style="margin:0px"><span class="glyphicon glyphicon-floppy-disk black"></span> </h2></button>}
+                    @if (ViewBag.LineMode == "Delete")
+                    {
+                        <button class="btn custom" name="Command:Delete" id="delete" type="submit"><h2 style="margin:0px"><span class="glyphicon glyphicon-trash black"></span> </h2></button>
+                    }
+                </div>
+
+            </div>
+        }
+    </div>
+</div>
+
+
+@if (Model.PurchaseQuotationLineId <= 0)
+{
+    <script type="text/javascript">
+        $(function(){
+
+            $.ajax({
+                cache: false,
+                url: "/TaxCalculation/GetMaxLineId/",
+                data: { HeaderId: parseInt($('#PurchaseQuotationHeaderId').val()), LineTable:"Web.PurchaseQuotationLines" , LineKeyField: "PurchaseQuotationLineId" ,HeaderKeyField:"PurchaseQuotationHeaderId"},
+                success: function (data) {
+                    AddCalculation(data);
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    alert('Failed to retrive calculation footer' + thrownError);
+                },
+            });
+
+
+            function AddCalculation(MaxLineId)
+            {
+                AddCalculationFields(parseInt($('#PurchaseQuotationHeaderId').val()),false,'@Model.PurchQuotationSettings.CalculationId',"Web.PurchaseQuotationHeaderCharges","Web.PurchaseQuotationLineCharges",MaxLineId, $('#DocTypeId','.modal-body').val(),$('#SiteId','.modal-body').val(),$('#DivisionId','.modal-body').val());
+            }
+
+        })
+    </script>
+}
+else
+{
+    <script type="text/javascript">
+        $(function(){
+            AddCalculationFieldsEdit(parseInt($('#PurchaseQuotationHeaderId').val()),$('#PurchaseQuotationLineId').val(),false,"Web.PurchaseQuotationHeaderCharges","Web.PurchaseQuotationLineCharges");
+        })
+    </script>
+}
+
+
+<script type="text/javascript">
+
+    //var cachearray={};
+
+    $(document).ready(function () {
+        CustomSelectFunction($("#Dimension1Id"), '/ComboHelpList/GetDimension1', '/ComboHelpList/SetSingleDimension1', 'Dimension1', false, 1);
+        CustomSelectFunction($("#Dimension2Id"), '/ComboHelpList/GetDimension2', '/ComboHelpList/SetSingleDimension2', 'Dimension2', false, 1);
+
+        var DocID = $('#PurchaseQuotationHeaderId', '.modal-body').val();
+        var URL = '/PurchaseQuotationLine/GetCustomProducts/'+ DocID;
+        //$("#ProductId").select2({
+        //    minimumInputLength: 1,
+        //    multiple: false,
+        //    ajax: {
+        //        url: URL,
+        //        dataType: 'json',
+        //        type: "GET",
+        //        quietMillis: 1000,
+        //        data: function (term) {
+        //            return {
+        //                term: term,
+        //            };
+        //        },
+        //        results: function (data) {
+        //            return {
+        //                results: $.map(data, function (item) {
+        //                    return {
+        //                        text: item.PropFirst,
+        //                        id: item.Id
+        //                    }
+        //                })
+
+        //            };
+        //        }
+        //    },
+        //    initSelection: function (element, callback) {
+
+        //        var xval = element.val();
+        //        if (xval != 0) {
+        //            $.ajax({
+        //                cache: false,
+        //                type: "POST",
+        //                url: "/ComboHelpList/SetSingleProducts",
+        //                data: { Ids: element.val() },
+        //                success: function (data) {
+        //                    callback(data);
+        //                },
+        //                error: function (xhr, ajaxOptions, thrownError) {
+        //                    alert('Failed to Retrive Qty' + thrownError);
+        //                }
+        //            })
+        //        }
+        //        //callback([{ id: "1", text: "arpit" }, { id: "2", text: "akash" }]);
+        //    }
+
+
+        //});
+
+
+        var IsSaved=false;
+        var ValidationCount=0;
+
+        $('#modform').bind('submit',function(event){
+
+            if(!IsSaved)
+            {
+                if(!ValidateData())
+                {
+                    return false;
+                }
+                IsSaved=true;
+                $('button:submit').attr('disabled','disabled');
+                return IsSaved;
+            }
+            else
+            {
+                return false;
+            }
+
+
+        });
+
+        function ValidateData() {
+            var ValidationMessage = "";
+
+            //Client Side Validaion.....
+
+            return  (ValidationMessage=="");
+
+        }
+
+
+
+        //$("#ProductId").select2("focus");
+
+        $('.datepicker').datepicker({
+            format: 'dd/MM/yyyy',
+            "setDate": new Date(),
+            "autoclose": true
+        })
+
+        var id=@Model.PurchaseQuotationLineId;
+        if(id>0)
+        {
+            var tex='@Model.PurchaseIndentDocNo';
+            var prod='@Model.ProductName';
+            $("#acPurchaseIndents").val(tex);
+            $("#acProducts").val(prod).attr('readonly','true');
+            LockFields();
+            $('#acProducts').attr('readonly','true');
+            $('#acPurchaseIndents').attr('disabled','disabled');
+        }
+
+        $('#delete','.modal-content').click(function (e) {
+            if(id>0)
+            {
+                var url = '/PurchaseQuotationLine/DeletePost';
+                $('form#modform').attr('action',url);
+                DeletingProductCharges();
+                return;
+            }
+            else
+            {
+                return false;
+            }
+        })
+    });
+
+    function LockFields(){
+        $("#acPurchaseIndents").attr('readonly','true');
+        $("#Dimension1Id").attr('readonly','true');
+        $("#Dimension2Id").attr('readonly','true');
+        $('#LotNo').attr('readonly','true');
+        $('#Specification').attr('readonly','true');
+    }
+    function UnLockFields(){
+        $("#acPurchaseIndents").removeAttr('readonly');
+        $("#Dimension1Id").removeAttr('readonly');
+        $("#Dimension2Id").removeAttr('readonly');
+        $("#LotNo").removeAttr('readonly');
+        $("#Specification").removeAttr('readonly');
+    }
+
+
+    $( "#acProducts" ).focusout( function( ) {
+
+        if (!$(this).val()) {
+            $("#acProducts").val("");
+            $('#ProductId').val("");
+            $('#PurchaseIndentLineId').val("");
+        }
+
+
+        if($("#acProducts").val()=="")
+        {
+            $('#ProductId').val("");
+            $('#PurchaseIndentLineId').val("");
+        }
+
+        if($('#PurchaseIndentLineId').val()!="" && $('#PurchaseIndentLineId').val()!=0)
+        {
+            $.ajax({
+                cache: false,
+                type: "POST",
+                url: "@(Url.Action("GetIndentDetail"))",
+                data: { IndentId: $("#PurchaseIndentLineId").val() },
+                success: function (data) {
+                    $('#acPurchaseIndents').val(data.PurchaseIndentDocNo);
+                    $('#Qty').val(data.Qty);
+                    $('#DealQty').val(data.Qty);
+                    $('#IndentBalanceQty').val(data.Qty);
+                    //$('#DealQty').val(data.DealQty);
+                    $('#DealUnitId').val(data.DealUnitId);
+                    $('#UnitId').val(data.UnitId);
+                    $('#UnitName').val(data.UnitName);
+                    $('#UnitConversionMultiplier').val(data.UnitConversionMultiplier);
+                    //$('#Rate').val(data.Rate);
+                    //$('#Amount').val(data.Amount);
+                    $('#Specification').val(data.Specification);
+                    //$('#LotNo').val(data.LotNo);
+                    (data.Dimension1Id==null)?(1==1):($("#Dimension1Id").select2("data", {id: data.Dimension1Id, text: data.Dimension1Name}));
+
+                    if(data.Dimension2Id!=null)
+                    {
+                        $("#Dimension2Id").select2("data", {id: data.Dimension2Id, text: data.Dimension2Name});
+                    }
+                    LockFields();
+                    ChargeCalculation();
+
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    alert('Failed to retrieve product details.' + thrownError);
+                }
+            });
+        }
+        else if($('#PurchaseIndentLineId').val()=="")
+        {
+            $('#Qty').val(0);
+            $('#Rate').val(0);
+            $('#IndentBalanceQty').val(0);
+            $('#Amount').val(0);
+            $('#LotNo').val("");
+            $('#DealQty').val(0);
+            $('#DealUnitId').val("");
+            $('#UnitConversionMultiplier').val(0);
+            $('#Specification').val("");
+            $("#Dimension1Id").select2("val","");
+            $("#Dimension2Id").select2("val","");
+            UnLockFields();
+        }
+    }
+        );
+
+    $(function() {
+        $("#acProducts").autocomplete({
+            delay: 500,
+            minLength: 3,
+            source: function(request,response){
+
+                var DocID = $('#PurchaseQuotationHeaderId', '.modal-body').val();
+                $.ajax({
+                    cache: false,
+                    type: "POST",
+                    url: "@(Url.Action("GetCustomProducts"))",
+                    data: { id:DocID, term:request.term, Limit:30 },
+                    success: function (data) {
+                        if(data.length>0){
+                            var cachearray = data.error ? [] : $.map(data, function(m) {
+
+                                return {
+                                    value: m.ProductName,
+                                    key: m.ProductId,
+                                    spec:m.Specification,
+                                    dim1: m.Dimension1Name,
+                                    dim2:m.Dimension2Name,
+                                    PI:m.PurchaseIndentNo,
+                                    balqty:m.Qty,
+                                    linekey:m.PurchaseIndentLineId,
+                                };
+                            });
+                            response(cachearray);
+                        }
+                        else
+                        {
+                            var dimensions = { width: 10};
+                            var cachearray=$.map(dimensions,function(value,key){
+                                return{
+                                    value:"No Record Found!",
+                                    key:null
+                                }
+                            })
+                            response(cachearray);
+                        }
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        $('.ui-autocomplete-loading').removeClass("ui-autocomplete-loading");
+                        alert('Failed to retrieve Pending Orders.' + thrownError);
+                    }
+
+                });
+
+            },
+            appendTo : $("#myModalContent"),
+            select: function(event, ui) {
+                // prevent autocomplete from updating the textbox
+                // navigate to the selected item's url
+                if($("#acProducts").val()=="")
+                {
+                    $('#ProductId').val("");
+                    $('#PurchaseIndentLineId').val("");
+                }
+                else{
+                    $("#ProductId").val(ui.item.key);
+                    $("#PurchaseIndentLineId").val(ui.item.linekey);
+                }
+            },
+
+        }).data("ui-autocomplete")._renderItem = function(ul, item) {
+            var $a = $("<a></a>");
+            $("<strong></strong>").text(item.value).appendTo($a);
+            (item.balqty==null)?(""):($("<small></small>").text(" (Qty:"+item.balqty+")").appendTo($a));
+            (item.spec==null)?(""):($("<br /><span class='small' style='font-weight:bold'></span>").text(item.spec).appendTo($a));
+            (item.dim1==null && item.dim2==null)?(""):($("<br /><span class='small'></span>").text(item.dim1+","+item.dim2).appendTo($a));
+            (item.PI==null)?(""):($("<br /><span class='small'></span>").text("Indent:"+item.PI+",").appendTo($a));
+
+            return $("<li></li>").append($a).appendTo(ul);
+        }
+    });
+
+    @*$( "#acPurchaseIndents" ).autocomplete({
+        change: function( event, ui ) {
+            if (ui.item== null || ui.item.value == undefined) {
+                $("#acPurchaseIndents").val("");
+                $('#PurchaseIndentLineId').val("");
+            }
+
+
+            if($("#acPurchaseIndents").val()=="")
+            {
+                $('#PurchaseIndentLineId').val("");
+            }
+
+            if($('#PurchaseIndentLineId').val()!="")
+            {
+                $.ajax({
+                    cache: false,
+                    type: "POST",
+                    url: "@(Url.Action("GetIndentDetail"))",
+                    data: { IndentId: $("#PurchaseIndentLineId").val() },
+                    success: function (data) {
+                        $('#Qty').val(data.Qty);
+                        $('#IndentBalanceQty').val(data.Qty);
+                        //$('#DealQty').val(data.DealQty);
+                        $('#DealUnitId').val(data.DealUnitId);
+                        $('#UnitId').val(data.UnitId);
+                        $('#UnitConversionMultiplier').val(data.UnitConversionMultiplier);
+                        //$('#Rate').val(data.Rate);
+                        //$('#Amount').val(data.Amount);
+                        $('#Specification').val(data.Specification);
+                        //$('#LotNo').val(data.LotNo);
+                        (data.Dimension1Id==null)?(1==1):($("#Dimension1Id").select2("data", {id: data.Dimension1Id, text: data.Dimension1Name}))
+
+                        if(data.Dimension2Id!=null)
+                        {
+                            $("#Dimension2Id").select2("data", {id: data.Dimension2Id, text: data.Dimension2Name});
+                        }
+                        LockFields();
+                        ChargeCalculation();
+
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        alert('Failed to retrieve product details.' + thrownError);
+                    }
+                });
+            }
+            else if($('#PurchaseIndentLineId').val()=="")
+            {
+                $('#Qty').val(0);
+                $('#Rate').val(0);
+                $('#IndentBalanceQty').val(0);
+                $('#Amount').val(0);
+                $('#LotNo').val("");
+                $('#DealQty').val(0);
+                $('#DealUnitId').val("");
+                $('#UnitConversionMultiplier').val(0);
+                $('#Specification').val("");
+                $("#Dimension1Id").select2("val","");
+                $("#Dimension2Id").select2("val","");
+                UnLockFields();
+            }
+        }
+    });*@
+
+
+
+
+
+    @*$(function() {
+        $("#acPurchaseIndents").autocomplete({
+            source: function(request,response){
+                $.ajax({
+                    cache: false,
+                    type: "POST",
+                    url: "@(Url.Action("GetPendingIndents"))",
+                    data: { ProductId: $("#ProductId").val(),PurchaseQuotationHeaderId:$("#PurchaseQuotationHeaderId",".modal-body").val() },
+                    success: function (data) {
+
+                        var cachearray = data.error ? [] : $.map(data, function(m) {
+                            return {
+                                //value: m.DocNo,
+                                //key: m.PurchaseIndentLineId,
+                                value: m.ProductName,
+                                key: m.ProductId,
+                                dim1: m.Dimension1Name,
+                                dim2:m.Dimension2Name,
+                                indent: m.DocNo,
+                                indentkey: m.PurchaseIndentLineId,
+
+                            };
+                        });
+                        response(cachearray);
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        alert('Failed to retrieve Pending Indents.' + thrownError);
+                    }
+
+                });
+
+
+            },
+            appendTo : $("#myModalContent"),
+            select: function(event, ui) {
+                // prevent autocomplete from updating the textbox
+                // navigate to the selected item's url
+                if($("#acPurchaseIndents").val()=="")
+                {
+                    $('#PurchaseIndentLineId').val("");
+                }
+                else
+                {
+                    $("#PurchaseIndentLineId").val(ui.item.indentkey);
+                    $("#ProductId").val(ui.item.key);
+                }
+
+            },
+
+        }).data("ui-autocomplete")._renderItem = function(ul, item) {
+            var $a = $("<a></a>");
+            $("<strong></strong>").text(item.value).appendTo($a);
+            $("<br />").appendTo($a);
+            (item.dim1==null)?(""):($("<span class='small'></span>").text(item.dim1+",").appendTo($a));
+
+            (item.dim2==null)?(""):($("<span class='small'></span>").text(item.dim2).appendTo($a));
+
+            return $("<li></li>").append($a).appendTo(ul);
+        }
+    });
+
+    $("#acPurchaseIndents").bind("focus",function(){
+        $(this).keydown();
+    })*@
+
+
+
+    $(function(){
+
+        $("#DealQty,#Rate,#Amount,#Qty,#UnitConversionMultiplier").keyup(Calculation);
+        $("#DealUnitId").change(GetUnitConversionMultiplier);
+
+
+        function GetUnitConversionMultiplier() {
+
+            if ($("#UnitId").val() == $("#DealUnitId").val()) {
+                $("#UnitConversionMultiplier").val(1);
+                Calculation.call();
+            }
+            else {
+                $.ajax({
+                    cache: false,
+                    type: "POST",
+                    url: "@(Url.Action("GetUnitConversionDetailJson"))",
+                    data: { ProductId: $("#ProductId").val(), UnitId: $("#UnitId").val(), DealUnitId: $("#DealUnitId").val(),PurchaseQuotationHeaderId: $("#PurchaseQuotationHeaderId",".modal-body").val()},
+
+                    success: function (data) {
+                        $("#UnitConversionMultiplier").val(data[0].Value);
+                        Calculation.call();
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        alert('Failed to retrieve Unit conversion details.' + thrownError);
+                    }
+                });
+            }
+        }
+
+        @*$('#ProductId').change(function(){
+
+            if ($("#ProductId").val()) {
+                $.ajax({
+                    cache: false,
+                    type: "POST",
+                    url: "@(Url.Action("GetProductDetailJson"))",
+                    data: { ProductId: $("#ProductId").val()},
+                    success: function (data) {
+                        $("#Rate").val(data.StandardCost);
+                        $("#UnitId").val(data.UnitId);
+                        $("#DealUnitId").val(data.UnitId);
+                        $("#UnitName").val(data.UnitName);
+                        $("#Specification").val(data.ProductSpecification);
+
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        alert('Failed to retrieve product details.' + thrownError);
+                    }
+                });
+            }
+
+        })*@
+
+        function Calculation() {
+            ValidateMinQty();
+            var TempAmount = 0;
+            var DiscountAmount = 0;
+            var TempRate = 0;
+
+            if ($('#UnitConversionMultiplier').val() != 0) {
+                $('#DealQty').val(($('#Qty').val() * $('#UnitConversionMultiplier').val()).toFixed(2))
+            }
+
+            //$('#Amount').val(($('#DealQty').val() * $('#Rate').val()).toFixed(2));
+
+            TempAmount = ($('#DealQty').val() * $('#Rate').val())
+
+            if ($('#CalculateDiscountOnRate').val() != 0 &&  $('#CalculateDiscountOnRate').val() != null) {
+                TempRate = $('#Rate').val() - ($('#Rate').val() * $('#DiscountPer').val() / 100)
+                $('#Amount').val(($('#DealQty').val() * TempRate).toFixed(2));
+            }
+            else{
+                DiscountAmount = TempAmount * $('#DiscountPer').val() / 100;
+                $('#Amount').val((TempAmount - DiscountAmount).toFixed(2));
+            }
+
+
+            ChargeCalculation();
+        }
+
+
+        function ValidateMinQty(){
+            if($('#PurchaseIndentLineId').val())
+            {
+                if(($('#IndentBalanceQty').val()-$('#Qty').val())<0)
+                {
+                    $('#modform').find('#submit').attr('disabled', 'disabled');
+                    if (!$('#modform').find('.modal-body #errormsg').length) {
+                        $('#modform').find('.modal-body').prepend("<div class='alert alert-danger'><span id=errormsg >Qty should not exceed Indent qty</span></div>")
+                    }
+                }
+                else
+                {
+                    $('#modform').find('#submit:disabled').removeAttr('disabled');
+                    if ($('#modform').find('.modal-body #errormsg').length) {
+                        $('#modform').find('#errormsg').parent().remove();
+                    }
+                }
+            }
+        };
+
+    })
+
+
+</script>

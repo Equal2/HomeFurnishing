@@ -1,0 +1,171 @@
+﻿@{
+    ViewBag.Title = "Review Excess JobOrders";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<link href="~/Content/DataTables/css/jquery.dataTables.min.css" rel="stylesheet" />
+<link href="~/Content/DataTables/css/dataTables.tableTools.min.css" rel="stylesheet" />
+
+<script src="~/Scripts/DataTables/jquery.dataTables.min.js"></script>
+<script type="text/javascript" src="~/Scripts/DataTables/fnFilterClear.js"></script>
+<script src="~/Scripts/DataTables/dataTables.tableTools.js"></script>
+<script src="~/Scripts/DataTables/dataTables.scroller.js"></script>
+
+<style type="text/css">
+    .DTHidden {
+        display: none;
+    }
+
+    .TextRight {
+        text-align: right;
+    }
+
+    .dataTables_scroll {
+        font-size: 13px !important;
+        line-height: 1;
+    }
+
+    table.dataTable tbody td {
+        padding: 2px 10px;
+    }
+</style>
+@*<input type="button" id="button" />*@
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3>
+            <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-list black"></span> Review Excess Qty</span>           
+        </h3>
+        <hr style="margin-top:0px;margin-bottom:0px" />
+    </div>
+
+
+
+    <div class="panel-info tab" style="padding-left:5px;padding-top:20px">        
+        <table id="example" class="display" cellspacing="0" width="100%">
+            <thead>
+                <tr>
+                    <th>DocNo</th>
+                    <th>Date</th>
+                    <th>Party Name</th>
+                    <th>Product</th>
+                    <th>Dim1</th>
+                    <th>Dim2</th>
+                    <th>PlanQty</th>
+                    <th>Rec</th>
+                    <th>Excess</th>
+                    <th>Review</th>
+                    <th>ProdOrderLineId</th>
+                </tr>
+            </thead>
+            <tfoot>
+                <tr>
+                    <th></th>
+                    <th colspan="5" style="text-align:left"></th>
+                    <th colspan="4" style="text-align:right"></th>
+                    <th></th>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+</div>
+
+
+<script type="text/javascript">
+    $(document).ready(function () {
+
+        var PageLoadFirst = true;
+        var Url = "/ExcessJobOrderReview/PendingJobOrdersToReview/" + '@ViewBag.id';
+
+        var Dim1Visible = '@ViewBag.Dim1Visible';
+        var Dim2Visible = '@ViewBag.Dim2Visible';
+
+        $('#example').dataTable({
+            "ajax": Url,
+            "scrollY": "300px",
+            "scrollCollapse": true,
+            "paging": false,
+            scroller:true,
+            "columns": [
+                { "data": "DocNo", "width": "12%" },
+                { "data": "DocDate", "width": "10%" },
+                { "data": "PartyName", "width": "13%" },
+                { "data": "ProductName", "width": "11%" },
+                { "data": "Dimension1Name", "width": "11%", "searchable":  Dim1Visible=="True" ? true : false, className:  Dim1Visible=="True" ? "" : "DTHidden" },
+                { "data": "Dimension2Name", "width": "11%", "searchable": Dim2Visible == "True" ? true : false, className: Dim2Visible == "True" ? "" : "DTHidden" },
+                { "data": "PlanQty", "width": "8%", className: "TextRight", },
+                { "data": "JobOrderQty", "width": "8%", className: "TextRight", },
+                { "data": "ExcessQty", "width": "8%", className: "TextRight", },
+                { "data": "Approved", "width": "8%", "render": function (data, type, row) { return '<input style="width:100%;text-align:right"  type="checkbox" name="Qty' + row.ProdOrderLineId + '" id="Qty' + row.ProdOrderLineId + '" />'; }, },
+                { "data": "ProdOrderLineId" },
+            ],
+            "columnDefs": [
+    { "targets": 10, "searchable": false, className: "DTHidden", },
+            ],
+            "dom": 'T<"clear">lfrtip',
+            TableTools: {
+                "sRowSelect": "os",               
+            },
+            "tableTools": {
+            "sSwfPath": "../../Content/DataTables/swf/copy_csv_xls_pdf.swf"
+            },
+
+        });
+
+     
+        
+        $(document).on('change', 'td > input:checkbox', function () {
+
+            var CheckBox = this;
+
+            $(this).prop('disabled', true);
+           
+                var table = $('#example').dataTable();
+                var td = $(this).closest('td').get(0);
+                var pos = table.fnGetData(table.fnGetPosition(td)[0]); // Im not familiar with the plugin so the extra $() might be overkill
+                if ($(this).is(":checked")) {                    
+                    $.ajax({
+                        url: '/ExcessJobOrderReview/Approve',
+                        type: "POST",
+                        data: { LineId: pos.ProdOrderLineId },
+                        success: function (result) {
+                            if (result.Success == true) {                                
+                                $(CheckBox).removeAttr('disabled');
+                            }
+                            else if (!result.Success) {                               
+                                $(CheckBox).removeAttr('disabled');
+                                alert('Something went wrong');
+                            }
+                        },
+                        error: function () {
+                            $(CheckBox).removeAttr('disabled');                            
+                        },
+                    });
+                }
+                else {
+                   
+                    $.ajax({
+                        url: '/ExcessJobOrderReview/DisApprove',
+                        type: "POST",
+                        data: { LineId: pos.ProdOrderLineId },
+                        success: function (result) {
+                            if (result.Success == true) {
+                                $(CheckBox).removeAttr('disabled');                                
+                            }
+                            else if (!result.Success) {
+                                
+                                $(CheckBox).removeAttr('disabled');
+                                alert('Something went wrong');
+                            }
+                        },
+                        error: function () {
+                            $(CheckBox).removeAttr('disabled');                          
+                        },
+                    });
+                }
+                return true;
+
+        })    
+
+    }); 
+
+</script>

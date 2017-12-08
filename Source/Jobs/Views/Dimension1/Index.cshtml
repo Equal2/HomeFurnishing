@@ -1,0 +1,81 @@
+﻿@model IEnumerable<Model.Models.Dimension1>
+@using GridMvc.Html; 
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<!-- modal placeholder-->
+<div id='myModal' class='modal fade in'>
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div id='myModalContent'></div>
+        </div>
+    </div>
+</div>
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3>
+            <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-list black"></span> List</span>
+        </h3>
+        <hr style="margin-top:0px;margin-bottom:0px" />
+
+        <div class="panel-info">
+                 <div class="btn-group">
+                @Html.ActionLink(" ", "Create", "Dimension1", new { id = @ViewBag.id }, new { @class = "cbtn btn-circle glyphicon glyphicon-plus toolbar", @title = "Add New", @data_toggle = "tooltip" })
+                @Html.ActionLink(" ", "Print", "Dimension1", null, new { @class = "cbtn btn-circle glyphicon glyphicon-print toolbar", @title = "Print", @data_toggle = "tooltip" })
+                @Html.ActionLink(" ", "Delete", "Dimension1", null, new { @class = "cbtn btn-circle glyphicon glyphicon-trash toolbar", @title = "Delete", @data_toggle = "tooltip", @id = "DeleteRecord", @data_modalDelete = "" })
+            </div>
+            <div class="btn-group">
+                <a class="cbtn btn-circle glyphicon glyphicon-option-horizontal dropdown-toggle" aria-expanded="false" style="padding-top: 6px;padding-bottom: 6px;" href="#" data-toggle="dropdown" id="dropdownMenu1">
+                </a>
+                <ul class="dropdown-menu pull-right" aria-labelledby="dropdownMenu1">
+                    <li><a href="@Url.Action("ProductTypeIndex", "Dimension1", new { @id = @ViewBag.id })"><span class="glyphicon glyphicon-list"> </span>&nbsp;&nbsp;List</a></li>
+                    <li role="separator" class="divider"></li>
+                    <li><a href="@Url.Action("Report", "Dimension1", new { @ViewBag.id })"><span class="glyphicon glyphicon-stats"> </span>&nbsp;&nbsp;Report</a></li>
+                </ul>
+            </div>
+        </div>
+
+    </div>
+    <div class="panel-info" style="padding-left:5px;padding-top:2px">
+        @Html.Grid(Model).Columns(columns =>
+   {
+       columns.Add(foo => foo.Dimension1Id, true);
+       columns.Add(foo => foo.Dimension1Name).Sortable(true).Titled("Name").Filterable(true);
+       columns.Add(foo => foo.Description).Sortable(true).Titled("Description").Filterable(true);
+       columns.Add(m => m.IsActive).Sortable(true).Titled("Is Active").Filterable(true);
+       columns.Add(true).RenderValueAs(m => "<a href='/Dimension1/Edit/" + m.Dimension1Id + "' hidden class='RecEditurl'></a><a href='/Dimension1/Delete/" + m.Dimension1Id + "' hidden class='RecDelurl'></a>");
+   }).WithPaging(25).EmptyText("No records found.")
+    </div>
+</div>
+
+<script type="text/javascript">
+
+    $('table.grid-table td').dblclick(function () {
+        var $this = $(this);
+        var row = $this.closest("tr");
+        var editid = row.find('[data-name="Dimension1Id"]').text();
+        var url = '@Url.Action("Edit", "Dimension1")' + "/" + editid;
+        window.location.href = url;
+
+    });
+
+    //$('a#deleterecord').click(function (e) {
+       
+    //    var tes = deletevalidation();
+    //    if (!tes) {
+    //        e.stopimmediatepropagation();
+    //        return false;
+    //    }
+    //    var editiiid = $('table.grid-table .grid-row.grid-row-selected').find('[data-name="dimension1id"]').text();
+
+
+    //    var url = '/dimension1/delete/' + editiiid;
+    //    $(this).attr('href', url);
+       
+    //});
+    //$('#myModal').on('shown.bs.modal', function () {
+    //    $("#Reason").focus();
+    //});
+
+</script>

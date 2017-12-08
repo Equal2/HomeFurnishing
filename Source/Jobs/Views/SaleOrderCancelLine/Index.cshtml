@@ -1,0 +1,45 @@
+﻿@model IQueryable<Model.ViewModels.SaleOrderCancelLineViewModel>
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@*<span style="font-family: Calibri,sans-serif,Verdana;font-size:large">
+    @if (HttpContext.Current.User.Identity.IsAuthenticated)
+    {
+        @Html.ActionLink("Create New", "Create", new { Id = ViewBag.SaleOrderCancelHeaderId })<span> &nbsp |</span>
+        @Html.ActionLink("Back to List", "Index", "SaleOrderCancelHeader")
+    }
+    
+</span>*@
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h4>
+            <span style="font-family: Calibri,sans-serif,Verdana">Sale Order Cancel Line(CancelNo:@ViewBag.CancelNo).</span>
+        </h4>
+        <hr style="margin-top:0px;margin-bottom:0px" />
+        <div class="panel-info">
+            <span style="font-family: Calibri,sans-serif,Verdana;font-size:large;">
+                <u> @Html.ActionLink("Create", "Create", new { Id = @ViewBag.SaleOrderCancelHeaderId }, new { @class = "modal-link" })</u>&nbsp;|
+            </span>
+            <span style="font-family: Calibri,sans-serif,Verdana;font-size:large;">
+                <u> @Html.ActionLink("Back to List", "Index", "SaleOrderCancelHeader", null, new { @class = "modal-link" })</u>
+            </span>
+
+        </div>
+    </div>
+    <div class="panel-info" style="padding-left:5px;padding-top:2px">
+        @Html.Grid(Model).Columns(columns =>
+           {
+               columns.Add(m => m.SaleOrderCancelLineId, true);
+               columns.Add(m=>m.DocNo).Titled("Sale Order No.");
+               columns.Add(m => m.BuyerName).Titled("Buyer");
+               columns.Add(m=>m.ProductName).Titled("Product");
+               columns.Add(m => m.Qty).Titled("Cancel Qty");
+               columns.Add(m => m.LineRemark).Titled("Remark");
+               columns.Add().Sanitized(false).Encoded(false).RenderValueAs(m => @Html.ActionLink(" ", "Edit", "SaleOrderCancelLine", new { id = m.SaleOrderCancelLineId }, new { @class = "rowEditBlue" })).SetWidth(20);
+               columns.Add().Sanitized(false).Encoded(false).RenderValueAs(m => @Html.ActionLink(" ", "Delete", "SaleOrderCancelLine", new { id = m.SaleOrderCancelLineId }, new { @class = "rowDeleteBlue" })).SetWidth(20);
+           }).WithPaging(25).EmptyText("No records found.")
+    </div>
+</div>

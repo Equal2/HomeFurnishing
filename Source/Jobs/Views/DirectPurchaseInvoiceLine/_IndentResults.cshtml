@@ -1,0 +1,174 @@
+﻿@model Model.ViewModel.PurchaseInvoiceMasterDetailModel
+@using Core.Common
+
+<div class="modal-content">
+    <div class="modal-header" style="border-bottom: 1px solid #8E8888">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"> <span class="glyphicon glyphicon-remove"></span></button>
+        <h3>
+            <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-file black"></span> Indents & Quantities</span>
+        </h3>
+    </div>
+    <div>
+        @using (Html.BeginForm("_ResultsPost", "DirectPurchaseInvoiceLine", FormMethod.Post, new { enctype = "multipart/form-data", id = "modform" }))
+        {
+            @Html.ValidationLog((string)TempData["CSEXCL"])
+            @Html.AntiForgeryToken()
+
+            <div class="form-horizontal modal-body">
+
+                <div style="padding-right:15px">
+                    <div class="row">
+                        <div class="form-horizontal">
+                            @Html.ValidationSummary(true, "", new { @class = "alert alert-danger" })
+
+                            <div class="panel panel-default" id="grid">
+                                <div class="panel-heading headrow" style="background-image: -webkit-linear-gradient(top, #428bca 0%, #428bca 100%);color:white">
+                                    <div class="row grid-head">
+                                        <div class="col-xs-1 text-left">
+                                            Srl.
+                                        </div>
+                                        <div class="col-xs-11">
+                                            <div class="row">
+                                                @*ProductInfo*@
+                                                <div class="col-sm-4">
+                                                    Product
+
+                                                </div>
+                                                <div class="col-sm-2">
+                                                    Indent No
+                                                </div>
+                                                @*Qty*@
+                                                <div class="col-sm-2 text-right">
+                                                    Indent Qty
+                                                </div>
+                                                <div class="col-sm-2 text-right" style="padding-right:30px">
+                                                    Qty
+                                                </div>                                                
+                                                <div class="col-sm-2 text-right" style="padding-right:30px">
+                                                    Rate
+                                                </div>
+                                            </div>
+                                        </div>
+                                      
+                                    </div>
+
+                                </div>
+                                <div class="panel-info" id="gbody" style="max-height:250px;overflow-y:scroll">
+                                    @for (int i = 0; i < Model.PurchaseInvoiceLineViewModel.Count(); i++)
+                                    {
+                                        @Html.HiddenFor(m => Model.PurchaseInvoiceLineViewModel[i].ProductId)
+                                        @Html.HiddenFor(m => Model.PurchaseInvoiceLineViewModel[i].DealUnitId)
+                                        @Html.HiddenFor(m => Model.PurchaseInvoiceLineViewModel[i].ProductName)
+                                        @Html.HiddenFor(m => Model.PurchaseInvoiceLineViewModel[i].Specification)
+                                        @Html.HiddenFor(m => Model.PurchaseInvoiceLineViewModel[i].UnitConversionMultiplier)
+                                        @Html.HiddenFor(m => Model.PurchaseInvoiceLineViewModel[i].Dimension1Name)
+                                        @Html.HiddenFor(m => Model.PurchaseInvoiceLineViewModel[i].Dimension2Name)
+                                        @Html.HiddenFor(m => Model.PurchaseInvoiceLineViewModel[i].PurchaseIndentLineId)
+                                        @Html.HiddenFor(m => Model.PurchaseInvoiceLineViewModel[i].PurchaseInvoiceHeaderId)
+                                        @Html.HiddenFor(m => Model.PurchaseInvoiceLineViewModel[i].PurchaseIndentHeaderDocNo)
+                                        @Html.HiddenFor(m => Model.PurchaseInvoiceLineViewModel[i].IndentBalQty)
+                                        @Html.HiddenFor(m => Model.PurchaseInvoiceLineViewModel[i].UnitId)
+                                        <div class='row crow grid-body' style='margin-left:0px;margin-right:0px'>
+                                            <div class='col-xs-1 row-index'>
+                                                @(i + 1)
+                                                <input type='hidden' class='id' value="@Model.PurchaseInvoiceLineViewModel[i].PurchaseInvoiceHeaderId" />
+                                            </div>
+                                            <div class='col-xs-11'>
+                                                <div class='row'>
+                                                    <div class='col-sm-4'>
+                                                        <strong>@Model.PurchaseInvoiceLineViewModel[i].ProductName</strong>
+                                                        <br />
+                                                        @Model.PurchaseInvoiceLineViewModel[i].Specification
+                                                        @{
+                                        var Dim1 = (string.IsNullOrEmpty(Model.PurchaseInvoiceLineViewModel[i].Dimension1Name)) ? "" : Model.PurchaseInvoiceLineViewModel[i].Dimension1Name + ",";
+                                        var Dim2 = (string.IsNullOrEmpty(Model.PurchaseInvoiceLineViewModel[i].Dimension2Name)) ? "" : Model.PurchaseInvoiceLineViewModel[i].Dimension2Name;
+                                                        }
+                                                        <p>@Dim1 @Dim2</p>
+                                                        <div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-2 text-center">
+                                                        @Model.PurchaseInvoiceLineViewModel[i].PurchaseIndentHeaderDocNo
+                                                    </div>
+                                                    <div class='col-sm-2 text-right'>                                                        
+                                                       @string.Format("{" + "0:0.".PadRight(@Model.PurchaseInvoiceLineViewModel[i].unitDecimalPlaces + 4, '0') + "}", Model.PurchaseInvoiceLineViewModel[i].IndentBalQty)<br />
+                                                        <div>
+                                                            <small>@Model.PurchaseInvoiceLineViewModel[i].UnitId</small>
+                                                        </div>                                                        
+                                                    </div>
+                                                    <div class="col-md-2 text-right">
+                                                        @Html.TextBoxFor(m => Model.PurchaseInvoiceLineViewModel[i].Qty, new { @class = "form-control text-right" })
+                                                        @Html.ValidationMessageFor(m => Model.PurchaseInvoiceLineViewModel[i].Qty, "", new { @class = "text-danger" })
+                                                    </div>
+                                                    <div class='col-sm-2 text-right'>
+                                                        @Html.TextBoxFor(m => Model.PurchaseInvoiceLineViewModel[i].Rate, new { @class = "form-control text-right" })
+                                                        @Html.ValidationMessageFor(m => Model.PurchaseInvoiceLineViewModel[i].Rate, "", new { @class = "text-danger" })
+                                                    </div>                                                                                                       
+                                                </div>
+                                            </div>
+                                           
+                                        </div>
+                                        <hr style='margin-top:0px;margin-bottom:0px' />
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer " style="padding: 19px 20px 0 20px; border-top:1px solid #8E8888">
+                    <button class="btn custom" name="Command:Edit" type="submit" id="submit"><h2 style="margin:0px" title="Proceed"><span class="glyphicon glyphicon-floppy-disk black black"></span> </h2></button>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@{if(ViewBag.UnitConversionException!=null){
+  
+  if(ViewBag.UnitConversionException)
+  {
+      <script type="text/javascript">
+
+          $(function () {
+              $('button:submit','#modform').attr('disabled', 'disabled');
+          })
+
+      </script>
+  }
+  
+  
+  }}
+
+<script type="text/javascript">
+
+    var IsSaved = false;
+    var ValidationCount = 0;
+
+    $('#modform').bind('submit', function (event) {
+
+        if (!IsSaved) {
+            if (!ValidateData()) {
+                return false;
+            }
+            IsSaved = true;
+            $('button:submit').attr('disabled', 'disabled');
+            return IsSaved;
+        }
+        else {
+            return false;
+        }
+
+
+    });
+
+    function ValidateData() {
+        var ValidationMessage = "";
+
+        //Client Side Validaion.....
+
+        return (ValidationMessage == "");
+
+    }
+
+
+</script>

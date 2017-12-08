@@ -1,0 +1,312 @@
+﻿@model Model.ViewModel.JobOrderHeaderViewModel
+@using Core.Common
+@{
+    ViewBag.Title = "Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!-- modal placeholder-->
+<div id='myModal' class='modal fade in'>
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div id='myModalContent'></div>
+        </div>
+    </div>
+</div>
+
+
+@using (Html.BeginForm("Post", "DyeingOrderWizard", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(m => m.SiteId)
+    @Html.HiddenFor(m => m.Status)
+    @Html.HiddenFor(m => m.DivisionId)
+    @Html.HiddenFor(m => m.JobOrderHeaderId)
+    @Html.HiddenFor(m => m.DocTypeId)
+    @Html.HiddenFor(m => m.CreatedDate)
+    @Html.HiddenFor(m => m.JobOrderSettings.ProcessId)
+
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 style="border-bottom:0px solid #e1dada;padding-bottom:0px;">
+                <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"> <span class="glyphicon glyphicon-file black"></span> Dyeing Order Details</span>
+                <input type="submit" value="Save" class="btn btn-primary right" id="submit" style="width: 90px; background-color: #2980b9" />
+            </h3>
+            <hr style="margin-top:0px;margin-bottom:0px" />
+        </div>
+
+
+        <div class="panel-info" style="padding-left:15px">
+            <div class="form-horizontal">
+                @Html.ValidationSummary(true)
+                <div class="row">
+                    <h4 class="col-md-12 black">
+                        <span class="glyphicon glyphicon-align-justify"></span>
+                        1.Job Order Details
+                    </h4>
+                    <div>
+                        <div class="row">
+
+                            <div class="col-md-6">
+                                <div class="form-group" style="margin-top:15px">
+                                    @Html.LabelFor(model => model.DocDate, "Order Date", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.DocDate, "{0:dd/MMMM/yyyy}", new { @class = "datepickerWithNFD form-control col-xs-6 required" })
+                                        @Html.ValidationMessageFor(model => model.DocDate, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <div class="col-md-6">
+                                <div class="form-group" style="margin-top:15px">
+                                    @Html.LabelFor(model => model.DocNo, "Order No", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.DocNo, null, new { @class = "form-control col-xs-6 required" })
+                                        @Html.ValidationMessageFor(m => m.DocNo, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.DueDate, "Due Date", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.DueDate, "{0:dd/MMMM/yyyy}", new { @class = "datepicker form-control col-xs-6 required" })
+                                        @Html.ValidationMessageFor(model => model.DueDate, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.ProcessId, "Process", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.ProcessId, new { @class = "form-control col-xs-6 required", @readonly = true })
+                                        @Html.ValidationMessageFor(m => m.ProcessId, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.JobWorkerId, "Job Worker", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.JobWorkerId, new { @class = "form-control col-xs-6 required" })
+                                        @Html.ValidationMessageFor(model => model.JobWorkerId, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <div class="col-md-6" style='display:@(Model.JobOrderSettings.isVisibleMachine?"":"none")'>
+                                <div class="form-group">
+                                    @Html.HiddenFor(m => m.JobOrderSettings.isMandatoryMachine)
+                                    @Html.HiddenFor(m => m.JobOrderSettings.isVisibleMachine)
+                                    @Html.LabelFor(model => model.MachineId, "Machine", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @if (Model.JobOrderSettings.isMandatoryMachine)
+                                        {
+                                            @Html.TextBoxFor(m => m.MachineId, new { @class = "form-control col-xs-6 required" })
+                                        }
+                                        else
+                                        {
+                                            @Html.TextBoxFor(m => m.MachineId, new { @class = "form-control col-xs-6" })
+                                        }
+
+                                        @Html.ValidationMessageFor(m => m.MachineId, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.BillToPartyId, "Billing A/C", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextAreaFor(m => m.BillToPartyId, new { @class = "form-control col-xs-6 required" })
+                                        @Html.ValidationMessageFor(m => m.BillToPartyId, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.OrderById, "Order By", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.OrderById, new { @class = "form-control col-xs-6" })
+                                        @Html.ValidationMessageFor(m => m.OrderById, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6" style='display:@(Model.JobOrderSettings.isPostedInStock?"":"none")'>
+                                @Html.HiddenFor(m => m.JobOrderSettings.isPostedInStock)
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.GodownId, "Godown", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextAreaFor(m => m.GodownId, new { @class = "form-control col-xs-6" })
+                                        @Html.ValidationMessageFor(m => m.GodownId, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+
+
+                            <div class="col-md-6" style='display:@(Model.JobOrderSettings.isVisibleCostCenter?"":"none")'>
+                                @Html.HiddenFor(m => m.JobOrderSettings.isVisibleCostCenter)
+                                <div class="form-group">
+                                    @Html.HiddenFor(m => m.JobOrderSettings.isMandatoryCostCenter)
+                                    @Html.LabelFor(model => model.CostCenterId, "Cost Center", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @if (Model.JobOrderSettings.isMandatoryCostCenter)
+                                        {
+                                            @Html.TextBoxFor(m => m.CostCenterId, new { @class = "form-control col-xs-6 required" })
+                                        }
+                                        else
+                                        {
+                                            @Html.TextBoxFor(m => m.CostCenterId, new { @class = "form-control col-xs-6" })
+                                        }
+
+                                        @Html.ValidationMessageFor(m => m.CostCenterId, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.CreditDays, "Credit Days", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextBoxFor(m => m.CreditDays, new { @class = "form-control col-xs-6" })
+                                        @Html.ValidationMessageFor(m => m.CreditDays, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.UnitConversionForId, "Unit Conversion For", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.DropDownListFor(m => m.UnitConversionForId, new SelectList(ViewBag.UnitConvForList as System.Collections.IEnumerable, "UnitConversionForId", "UnitConversionForName"), new { @class = "form-control height" })
+                                        @Html.ValidationMessageFor(m => m.UnitConversionForId, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.TermsAndConditions, "Terms & Conditions", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextAreaFor(m => m.TermsAndConditions, new { @class = "form-control col-xs-6" })
+                                        @Html.ValidationMessageFor(m => m.TermsAndConditions, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.Remark, "Remark", new { @class = "control-label col-xs-4" })
+                                    <div class="col-xs-6">
+                                        @Html.TextAreaFor(m => m.Remark, new { @class = "form-control col-xs-6" })
+                                        @Html.ValidationMessageFor(m => m.Remark, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+
+
+                @if (Model.PerkViewModel != null && Model.PerkViewModel.Count > 0)
+                {
+                    <hr />
+                    <div class="row">
+                        <h4 class="col-md-12 black" style="margin-top:15px">
+                            <span class="glyphicon glyphicon-share"></span>
+                            2.Perks
+                        </h4>
+                    </div>
+
+                    <div style="padding-right:15px">
+
+
+
+
+
+
+
+
+
+
+                        @for (int i = 0; i < Model.PerkViewModel.Count; i++)
+                        {
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <h4 style="color:#342c26;padding-left:20px" class="caption">@Model.PerkViewModel[i].PerkName :</h4>
+                                </div>
+
+                                <div class="col-md-4" style="display: @(  (@Model.PerkViewModel[i].BaseDescription == null || @Model.PerkViewModel[i].BaseDescription == "") ? "none" : "")">
+                                    <div class="form-group">
+                                        @Html.LabelFor(model => @Model.PerkViewModel[i].BaseDescription, @Model.PerkViewModel[i].BaseDescription, new { @class = "control-label col-xs-8" })
+                                        <div class="col-xs-4">
+                                            @Html.TextBoxFor(m => m.PerkViewModel[i].Base, new { @class = "form-control col-xs-3" })
+                                            @Html.ValidationMessageFor(m => m.PerkViewModel[i].Base, "", new { @class = "text-danger" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4" style="display: @(  (@Model.PerkViewModel[i].WorthDescription == null || @Model.PerkViewModel[i].WorthDescription == "") ? "none" : "")">
+                                    <div class="form-group">
+                                        @Html.LabelFor(model => @Model.PerkViewModel[i].WorthDescription, @Model.PerkViewModel[i].WorthDescription, new { @class = "control-label col-xs-8" })
+                                        <div class="col-xs-4">
+                                            @Html.TextBoxFor(m => m.PerkViewModel[i].Worth, new { @class = "form-control col-xs-3" })
+                                            @Html.ValidationMessageFor(m => m.PerkViewModel[i].Worth, "", new { @class = "text-danger" })
+                                        </div>
+                                    </div>
+                                </div>
+                                @Html.HiddenFor(m => @Model.PerkViewModel[i].CostConversionMultiplier)
+                                @Html.HiddenFor(m => @Model.PerkViewModel[i].PerkName)
+                                @Html.HiddenFor(m => @Model.PerkViewModel[i].BaseDescription)
+                                @Html.HiddenFor(m => @Model.PerkViewModel[i].Base)
+                                @Html.HiddenFor(m => @Model.PerkViewModel[i].WorthDescription)
+                                @Html.HiddenFor(m => @Model.PerkViewModel[i].Worth)
+                                @Html.HiddenFor(m => @Model.PerkViewModel[i].JobOrderPerkId)
+                                @Html.HiddenFor(m => @Model.PerkViewModel[i].JobOrderHeaderId)
+                                @Html.HiddenFor(m => @Model.PerkViewModel[i].PerkId)
+                            </div>
+
+                        }
+
+                    </div>
+                }
+
+            </div>
+        </div>
+    </div>
+}
+
+    <script type="text/javascript">     
+
+        $(document).ready(function () {
+
+            CustomSelectFunction($("#ProcessId"), '/ComboHelpList/GetProcess', '/ComboHelpList/SetSingleProcess', ' ', false, 1);
+            //CustomSelectFunction($("#JobWorkerId"), '/ComboHelpList/GetJobWorkers', '/ComboHelpList/SetSingleJobWorker', ' ', false, 1);
+            CustomSelectFunction($("#JobWorkerId"), '/ComboHelpList/GetJobWorkersWithProcess', '/ComboHelpList/SetSinglePerson', ' ', false, 1, $('#ProcessId').val());
+            CustomSelectFunction($("#MachineId"), '/ComboHelpList/GetMachine', '/ComboHelpList/SetSingleMachine', ' ', false, 1);
+            CustomSelectFunction($("#BillToPartyId"), '/ComboHelpList/GetJobWorkers', '/ComboHelpList/SetSingleJobWorker', ' ', false, 1);
+            CustomSelectFunction($("#OrderById"), '/ComboHelpList/GetEmployeeWithProcess', '/ComboHelpList/SetSingleEmployee', ' ', false, 1, $('#ProcessId').val());
+            CustomSelectFunction($("#GodownId"), '/ComboHelpList/GetGodown', '/ComboHelpList/SetSingleGodown', ' ', false, 1);
+            CustomSelectFunction($("#CostCenterId"), '/ComboHelpList/GetCostCenter', '/ComboHelpList/SetSingleCostCenter', ' ', false, 1);
+
+            $('#JobWorkerId').change(function () {
+
+                var cid = $("#JobWorkerId").val();
+                var cdata = $('#JobWorkerId').select2('data').text;
+                $("#BillToPartyId").select2('data', { id: cid, text: cdata });
+
+            });
+
+        });
+
+    </script>

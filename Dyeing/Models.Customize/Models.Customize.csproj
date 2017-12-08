@@ -1,0 +1,118 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{D5D3B387-51F8-4DF6-9CC3-805B480853A2}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Models.Customize</RootNamespace>
+    <AssemblyName>Models.Customize</AssemblyName>
+    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="DataBaseViews\JobOrderBalance.cs" />
+    <Compile Include="DataBaseViews\ViewRecipeBalanceForSubRecipe.cs" />
+    <Compile Include="DataBaseViews\ProdOrderBalance.cs" />
+    <Compile Include="DataBaseViews\_Menu.cs" />
+    <Compile Include="DataBaseViews\_ReportHeader.cs" />
+    <Compile Include="DataBaseViews\_ReportLine.cs" />
+    <Compile Include="Models\JobReceiveHeaderExtended.cs" />
+    <Compile Include="Models\JobReceiveHeader.cs" />
+    <Compile Include="Models\JobReceiveLine.cs" />
+    <Compile Include="Models\JobReceiveLineStatus.cs" />
+    <Compile Include="Models\JobReceiveSetting.cs" />
+    <Compile Include="Models\ProdOrderHeaderStatus.cs" />
+    <Compile Include="Models\StockLineExtended.cs" />
+    <Compile Include="Models\PerkDocumentType.cs" />
+    <Compile Include="Models\ProdOrderLineStatus.cs" />
+    <Compile Include="ViewModels\DyeingViewModel.cs" />
+    <Compile Include="ViewModels\SubRecipeViewModel.cs" />
+    <Compile Include="ViewModels\RecipeViewModel.cs" />
+    <Compile Include="ViewModels\JobWorkerViewModel.cs" />
+    <Compile Include="ViewModels\PerkDocumentTypeViewModel.cs" />
+    <Compile Include="ViewModels\ProdOrderViewModel.cs" />
+    <Compile Include="Models\JobOrderBom.cs" />
+    <Compile Include="Models\JobOrderHeader.cs" />
+    <Compile Include="Models\JobOrderHeaderCharge.cs" />
+    <Compile Include="Models\JobOrderHeaderExtended.cs" />
+    <Compile Include="Models\JobOrderHeaderStatus.cs" />
+    <Compile Include="Models\JobOrderLine.cs" />
+    <Compile Include="Models\JobOrderLineCharge.cs" />
+    <Compile Include="Models\JobOrderLineExtended.cs" />
+    <Compile Include="Models\JobOrderLineRefData.cs" />
+    <Compile Include="Models\JobOrderLineStatus.cs" />
+    <Compile Include="Models\JobOrderPerk.cs" />
+    <Compile Include="Models\JobOrderSettings.cs" />
+    <Compile Include="Models\JobWorker.cs" />
+    <Compile Include="Models\Perk.cs" />
+    <Compile Include="Models\ProdOrderHeader.cs" />
+    <Compile Include="Models\ProdOrderLine.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ViewModels\JobOrderBomViewModel.cs" />
+    <Compile Include="ViewModels\JobOrderSettingsViewModel.cs" />
+    <Compile Include="ViewModels\JobOrderViewModel.cs" />
+    <Compile Include="ViewModels\PerkViewModel.cs" />
+    <Compile Include="ViewModels\RecipeLineViewModel.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Modules\Basic Setup\Models.BasicSetup\Models.BasicSetup.csproj">
+      <Project>{e7b6f2dd-5845-431d-b065-7ca2c51c698a}</Project>
+      <Name>Models.BasicSetup</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Modules\Infrastructure\Infrastructure.csproj">
+      <Project>{5a880c5b-c73d-4715-a6e6-70a7dc484695}</Project>
+      <Name>Infrastructure</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

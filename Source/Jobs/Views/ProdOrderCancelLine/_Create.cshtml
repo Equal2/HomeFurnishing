@@ -1,0 +1,467 @@
+﻿@model Model.ViewModel.ProdOrderCancelLineViewModel
+@using Core.Common
+
+<style type="text/css">
+    .ui-autocomplete {
+        max-height: 250px;
+        overflow-y: auto;
+        /* prevent horizontal scrollbar */
+        overflow-x: hidden;
+    }
+</style>
+
+
+
+
+<div class="modal-content">
+    <div class="modal-header" style="border-bottom: 1px solid #8E8888">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"> <span class="glyphicon glyphicon-remove"></span></button>
+        <h3>
+            <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-file black"></span> Products</span>
+        </h3>
+    </div>
+    <div>
+        @using (Html.BeginForm("_CreatePost", "ProdOrderCancelLine", FormMethod.Post, new { enctype = "multipart/form-data", id = "modform" }))
+        {
+            @Html.ValidationLog((string)TempData["CSEXCL"])
+            <div class="form-horizontal modal-body">
+
+                @Html.AntiForgeryToken()
+
+                @Html.HiddenFor(model => model.ProdOrderCancelHeaderId)
+                @Html.HiddenFor(m => m.ProdOrderCancelLineId)
+                @Html.HiddenFor(m => m.ProdOrderLineId)
+                @Html.HiddenFor(m => m.ProductId)
+                @Html.HiddenFor(m => m.BalanceQty)
+                @Html.HiddenFor(m => m.DivisionId)
+
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                <div class="row">
+                    @if (Model.ProdOrderCancelLineId <= 0)
+                    {
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.ProductId, "Product", new { @class = "control-label col-md-4 col-sm-2" })
+                                <div class="col-md-7 col-sm-10">
+                                    @Html.TextBox("     ", "", new { @class = "form-control", @id = "autocompleteorder" })
+                                    @Html.ValidationMessageFor(model => model.ProductId, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.ProdOrderNo, "Prod Order", new { @class = "control-label col-md-4 col-sm-2 " })
+                                <div class="col-md-7 col-sm-10">
+                                    @Html.TextBoxFor(model => model.ProdOrderNo, new { @class = "form-control col-xs-7 required", @readonly = "true" })
+                                    @Html.ValidationMessageFor(model => model.ProdOrderNo, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+
+                        @Html.HiddenFor(m => m.ProductId)
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.ProductId, "Product", new { @class = "control-label col-md-4 col-sm-2 " })
+                                <div class="col-md-7 col-sm-10">
+                                    @Html.TextBoxFor(model => model.ProductName, new { @class = "form-control col-xs-7 required", @readonly = "true" })
+                                    @Html.ValidationMessageFor(model => model.ProductName, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.ProdOrderNo, "Prod Order", new { @class = "control-label col-md-4 col-sm-2" })
+                                <div class="col-md-7 col-sm-10">
+                                    @Html.TextBoxFor(model => model.ProdOrderNo, new { @class = "form-control col-xs-7 required", @readonly = "true" })
+                                    @Html.ValidationMessageFor(model => model.ProdOrderNo, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+                        </div>
+                    }
+
+
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Qty, "Cancel Qty", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(model => model.Qty, new { @class = "form-control col-xs-7" })
+                                @Html.ValidationMessageFor(model => model.Qty, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer " style="padding: 19px 20px 0 20px; border-top:1px solid #8E8888">
+                    @if (ViewBag.LineMode == "Edit" || ViewBag.LineMode == "Create")
+                    {<button class="btn custom left" name="Command:Edit" type="submit" id="submit"><h2 style="margin:0px"><span class="glyphicon glyphicon-floppy-disk black"></span> </h2></button>
+                    }
+                    @if (ViewBag.LineMode == "Delete")
+                    {
+                        <button class="btn custom" name="Command:Delete" id="delete" type="submit"><h2 style="margin:0px"><span class="glyphicon glyphicon-trash black"></span> </h2></button>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+
+<script type="text/javascript">
+
+
+    $(document).ready(function () {
+
+        var id=@Model.ProdOrderCancelLineId;
+
+        $('#delete','.modal-content').click(function (e) {
+            if(id>0)
+            {
+                var url = '/ProdOrderCancelLine/DeletePost';
+                $('form#modform').attr('action',url);
+                return;
+            }
+            else
+            {
+                return false;
+            }
+        })
+
+
+        var IsSaved=false;
+        var ValidationCount=0;
+
+        $('#modform').bind('submit',function(event){
+
+            if(!IsSaved)
+            {
+                if(!ValidateData())
+                {
+                    return false;
+                }
+                IsSaved=true;
+                $('button:submit').attr('disabled','disabled');
+                return IsSaved;
+            }
+            else
+            {
+                return false;
+            }
+
+
+        });
+
+        function ValidateData() {
+            var ValidationMessage = "";
+
+            //Client Side Validaion.....
+
+            return  (ValidationMessage=="");
+
+        }
+
+
+        $('#Qty').keyup(function () {
+            if (( parseFloat( $('#BalanceQty').val() ) - parseFloat( $('#Qty').val()) ) < 0) {
+                $('#submit', '.modal-body').attr('disabled', 'disabled');
+                if ($(this).closest('div.col-xs-7').find('span#cerror').length == 0) {
+                    $(this).parents('.col-xs-7').append("<span class='text-danger' id='cerror'>Qty exceeding BalQty</span>")
+                }
+            }
+            else {
+                $('#submit', '.modal-body').removeAttr('disabled');
+                if ($(this).closest('div.col-xs-7').find('span#cerror').length > 0) {
+                    $(this).parents('.col-xs-7').find('span#cerror').remove();
+                }
+            }
+        })
+
+    });
+
+</script>
+
+@if (Model.ProdOrderCancelLineId <= 0)
+{
+    @*<script type="text/javascript">
+
+        $(function() {
+            $("#acprodorder").autocomplete({
+                source: function(request,response){
+                    var matcher = new RegExp( $.ui.autocomplete.escapeRegex( request.term ), "i" );
+                    $.ajax({
+                        cache: false,
+                        type: "POST",
+                        url: "@(Url.Action("GetPendingOrders"))",
+                        data: { ProductId: $("#ProductId").val() },
+                    success: function (data) {
+
+                        var cachearray = data.error ? [] : $.map(data, function(m) {
+                            return {
+                                value: m.ProdOrderDocNo,
+                                key: m.ProdOrderLineId,
+                                MDocNo: m.MaterialPlanDocNo,
+                                //dim2:m.Dimension2Name,
+
+                            };
+                        });
+                        response(cachearray);
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        alert('Failed to retrieve Pending Orders.' + thrownError);
+                    }
+
+                });
+
+
+        },
+            appendTo : $("#myModalContent"),
+        select: function(event, ui) {
+            // prevent autocomplete from updating the textbox
+            // navigate to the selected item's url
+            if($("#acprodorder").val()=="")
+            {
+                $('#ProdOrderLineId').val("");
+            }
+            else
+                $("#ProdOrderLineId").val(ui.item.key);
+
+        },
+
+        }).data("ui-autocomplete")._renderItem = function(ul, item) {
+            var $a = $("<a></a>");
+            $("<strong></strong>").text(item.value).appendTo($a);
+            $("<br />").appendTo($a);
+
+            (item.MDocNo==null)?(""):($("<span class='small'></span>").text(item.MDocNo).appendTo($a));
+
+            //(item.dim2==null)?(""):($("<span class='small'></span>").text(item.dim2).appendTo($a));
+
+            return $("<li></li>").append($a).appendTo(ul);
+        }
+        });
+
+            $("#acprodorder").bind("focus",function(){
+            $(this).keydown();
+        })
+
+
+
+            $( "#acprodorder" ).autocomplete({
+            change: function( event, ui ) {
+
+                if (ui.item== null || ui.item.value == undefined) {
+                    $("#acprodorder").val("");
+                    $('#ProdOrderLineId').val("");
+                }
+
+
+                if($("#acprodorder").val()=="")
+                {
+                    $('#ProdOrderLineId').val("");
+                }
+
+                if($('#ProdOrderLineId').val()!="")
+                {
+                    $.ajax({
+                        cache: false,
+                        type: "POST",
+                        url: "@(Url.Action("GetBalQtyForProdOrderLineJson"))",
+                        data: { ProdOrderLineId: $("#ProdOrderLineId").val() },
+                    success: function (data) {
+                        $('#Qty').val(data);
+                        MinQty=data;
+                        //$('#Specification').val(data.Specification);
+                        //(data.Dimension1Id==null)?(1==1):($("#Dimension1Id").select2("data", {id: data.Dimension1Id, text: data.Dimension1Name}))
+                        //(data.Dimension2Id==null)?(1==1):($("#Dimension2Id").select2("data", {id: data.Dimension2Id, text: data.Dimension2Name}))
+                        //$("#Dimension1Id").attr('readonly','true');
+                        //$("#Dimension2Id").attr('readonly','true');
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        alert('Failed to retrieve product details.' + thrownError);
+                    }
+                });
+            }
+                else if($('#ProdOrderLineId').val()=="")
+        {
+            $('#Qty').val(0);
+            //$("#Dimension1Id").removeAttr('readonly');
+            //$("#Dimension2Id").removeAttr('readonly');
+            //$('#Specification').val("");
+            //$("#Dimension1Id").select2("val", "");
+            //$("#Dimension2Id").select2("val", "");
+        }
+        }
+        });
+
+
+            $('#Qty').keyup(function(){
+
+                if(($(this).val()>MinQty) && ( parseInt($('#ProdOrderLineId').val())>0))
+                {
+                    $('#submit','.modal-body').attr('disabled','disabled');
+                    if(!$(this).parent().find('#errormessage').length)
+                    {
+                        $(this).parent().append('<span id="errormessage" class="text-danger">Qty Exceeding Bal Qty</span>');}
+                }
+                else
+                {
+                    $('#submit','.modal-body').removeAttr('disabled');
+                    if($(this).parent().find('#errormessage').length)
+                    {
+                        $(this).parent().find('#errormessage').remove();}
+                }
+
+
+            });
+
+
+        </script>*@
+}
+
+
+
+
+@if (Model.ProdOrderCancelLineId <= 0)
+{
+    <script type="text/javascript">
+
+        $( "#autocompleteorder" ).focusout( function( ) {
+            if (!$(this).val()) {
+                $("#autocompleteorder").val("");
+                $('#ProductId').val("");
+            }
+
+
+            if($("#autocompleteorder").val()=="")
+            {
+                $('#ProdOrderLineId').val("");
+            }
+
+            if($('#ProdOrderLineId').val() && $('#ProdOrderLineId').val()!=0)
+            {
+                $.ajax({
+                    cache: false,
+                    type: "POST",
+                    url: "@(Url.Action("GetOrderDetail"))",
+                    data: { ProdOrderLineId: $("#ProdOrderLineId").val() },
+                    success: function (data) {
+
+                        $('#ProdOrderLineId').val(data.ProdOrderLineId);
+                        $('#ProdOrderNo').val(data.ProdOrderDocNo);
+                        $('#ProductId').val(data.ProductId);
+                        $('#Qty').val(data.BalanceQty);
+                        $('#BalanceQty').val(data.BalanceQty);
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        alert('Failed to retrieve Order details.' + thrownError);
+                    }
+                });
+            }
+            else if($('#ProductId').val()=="")
+            {
+                $('#ProdOrderLineId').val('');
+                $('#ProdOrderNo').val('');
+                $('#Qty').val(0);
+                $('#BalanceQty').val(0);
+            }
+        }
+        );
+
+
+
+
+
+        $(function() {
+            $("#autocompleteorder").autocomplete({
+                delay: 500,
+                minLength: 3,
+                source: function(request,response){
+                    $.ajax({
+                        cache: false,
+                        type: "POST",
+                        url: "@(Url.Action("GetPendingProdOrders"))",
+                        data: { HeaderId:$("#ProdOrderCancelHeaderId").val(),term:request.term,Limit:20 },
+
+                        success: function (data) {
+                            if(data.length>0){
+                                var cachearray = data.error ? [] : $.map(data, function(m) {
+
+                                    return {
+                                        value: m.ProductName,
+                                        key: m.ProdOrderLineId,
+                                        dim1: m.Dimension1Name,
+                                        dim2:m.Dimension2Name,
+                                        prod:m.ProdOrderDocNo,
+                                        bal:m.BalanceQty,
+                                    };
+                                });
+                                response(cachearray);
+                            }
+                            else
+                            {
+                                var dimensions = { width: 10};
+                                var cachearray=$.map(dimensions,function(value,key){
+                                    return{
+                                        value:"No Record Found!",
+                                        key:null
+                                    }
+                                })
+                                response(cachearray);
+                            }
+                        },
+                        error: function (xhr, ajaxOptions, thrownError) {
+                            $('.ui-autocomplete-loading').removeClass("ui-autocomplete-loading");
+                            alert('Failed to retrieve Pending Production Orders.' + thrownError);
+                        }
+
+                    });
+
+
+                    //}
+
+                },
+                appendTo : $("#myModalContent"),
+                select: function(event, ui) {
+                    // prevent autocomplete from updating the textbox
+                    // navigate to the selected item's url
+                    if($("#autocompleteorder").val()=="")
+                    {
+                        $('#ProdOrderLineId').val("");
+                    }
+                    else
+                        $("#ProdOrderLineId").val(ui.item.key);
+
+                },
+
+            }).data("ui-autocomplete")._renderItem = function(ul, item) {
+                var $a = $("<a></a>");
+                $("<strong></strong>").text(item.value).appendTo($a);
+                (item.bal==null)?(""):($("<span class='small'></span>").text(" (Bal:"+item.bal+") ").appendTo($a));
+                (item.prod==null)?(""):($("<br /><span class='small'></span>").text(item.prod).appendTo($a));
+                $("<br />").appendTo($a);
+                (item.dim1==null)?(""):($("<span class='small'></span>").text(item.dim1+",").appendTo($a));
+                (item.dim2==null)?(""):($("<span class='small'></span>").text(item.dim2).appendTo($a));
+
+
+
+                return $("<li></li>").append($a).appendTo(ul);
+            }
+        });
+
+        //$("#autocompleteorder").on("focus",function(){
+        //    $(this).keydown();
+        //})
+
+
+    </script>
+}

@@ -1,0 +1,104 @@
+﻿@model List<Model.ViewModel.ActiivtyLogViewModel>
+
+
+<style type="text/css">
+    p {
+        margin: 0px;
+    }
+
+    h4 {
+        font-weight: normal !important;
+    }
+
+    .HistoryLog {
+        font-size: 12px;
+        padding-left: 1em;
+    }
+
+        .HistoryLog table td, .HistoryLog table th {
+            height: 23px;
+            padding: 5px;
+        }
+
+        .HistoryLog table th {
+            background-color: #428bca;
+            color: white;
+            text-align: center;
+        }
+
+    .Tab {
+        padding-left: 4em;
+    }
+</style>
+
+<div class="modal-content">
+    <div class="modal-header" style="border-bottom: 1px solid #8E8888">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"> <span class="glyphicon glyphicon-remove"></span></button>
+        <h3>
+            <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-file black"></span> Record History</span>
+            <span id="ariaExpanded" style="font-size:14px;font-weight:bold">  </span>
+        </h3>
+    </div>
+    <div style="padding:8px">
+
+        <div class="panel-group" id="accordion" style="max-height:430px;overflow-y:scroll">
+            @{
+                int RecCount = Model.GroupBy(m => m.DocId).Count();
+            }
+            @{int i = 0;}
+            @foreach (var item in Model.GroupBy(m => m.DocId))
+            {
+                <div class="panel panel-default">
+                    <div class="panel-heading" style="background-image: linear-gradient(to bottom,#FFFFFF 0,#FDFDFD 100%)">
+                        <h4 class="panel-title" style="text-align:center">
+                            <a href="#@item.Max(m => m.ActivityLogId)" data-toggle="collapse" data-parent="#accordion"> @( (item.Where(m => m.DocNo != null).Any() ? item.Max(m => m.DocNo) : "")) @( (item.Where(m => m.DocDate != null).Any() ? (", " + item.Where(m => m.DocDate != null).FirstOrDefault().DocDate.Value.ToString("dd/MMM/yyyy")) : "")) </a>
+                        </h4>
+                    </div>
+                    <div id="@item.Max(m => m.ActivityLogId)" class="panel-collapse  @(RecCount > 1 ? "collapse" : "collapse in" ) groupedDoc">
+                        <div class="panel-body">
+
+                            @foreach (var gl in item)
+                            {
+                                string UID = "uId_" + i++.ToString();
+
+                                <div class="row" style="padding:10px">
+                                    <div class="block" style="width:3%"></div>
+                                    <div class="block" style="width:10%;min-width:60px">
+                                        @CustomHelpers.RenderUserImage(gl.CreatedBy)
+                                    </div>
+                                    <div class="block @(gl.DocLineId.HasValue && gl.DocLineId.Value > 0 ? "Tab" : "") " style="width:80%">
+
+                                        @if (!string.IsNullOrEmpty(gl.Modifications))
+                                        {
+                                            <p style="font-weight:bold">@gl.CreatedBy  <a href="#" data-target="#@UID" aria-expanded="true" aria-controls="@UID" data-toggle="collapse"> @gl.ActivityTypeName </a> @(gl.DocLineId.HasValue && gl.DocLineId.Value > 0 ? " Line " : "")  on @string.Format("{0:dd MMM, yyyy HH:mm}", @gl.CreatedDate.Value)</p>
+                                            if (!string.IsNullOrEmpty(gl.UserRemark))
+                                            {<p class="HistoryLog"> User Remark: @gl.UserRemark </p>}
+                                            <div id="@UID" class="panel-collapse collapse HistoryLog" role="tabpanel" aria-labelledby="headingOne">
+                                                <div class=""> @Html.FormatXmlString(gl.Modifications,gl.ActivityType) </div>                                               
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <p style="font-weight:bold">@gl.CreatedBy  @gl.ActivityTypeName @(gl.DocLineId.HasValue && gl.DocLineId.Value > 0 ? " Line " : "")  on @string.Format("{0:dd MMM, yyyy HH:mm}", @gl.CreatedDate.Value)</p>
+                                            if (!string.IsNullOrEmpty(gl.UserRemark))
+                                            {<p class="HistoryLog"> User Remark: @gl.UserRemark </p>}
+                                        }
+                                    </div>
+                                </div>
+                                <hr style="margin:0px 0 0px 0" />
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $('#accordion').on('shown.bs.collapse', function (e) {
+
+        if ($(e.target).hasClass('groupedDoc'))
+            $('.modal-content').find('span#ariaExpanded').text("(" + $('#accordion').find("[href='#" + $(e.target).attr('id') + "']").text() + ")");
+    })
+</script>

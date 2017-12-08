@@ -1,0 +1,61 @@
+﻿@model Presentation.ViewModels.ProductTypeViewModel
+
+@{
+    ViewBag.Title = "Edit";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+
+
+@using (Html.BeginForm("SampleTypeSelection", "ProductSample", FormMethod.Post))
+{
+    <div class="panel panel-default" style="padding:15px">
+        <div class="panel panel-heading">
+            <h4>Please select Product Type</h4>
+        </div>
+
+        <div class="panel panel-info" style="padding:15px">
+            <p>
+                <div class="form-horizontal">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+
+                                <div class="col-md-1">
+                                    @Html.LabelFor(model => model.ProductTypeName, new { @class = "control-label" }):
+                                </div>
+                                <div class="col-md-3">
+                                    @Html.DropDownListFor(x => x.ProductTypeId, new SelectList(Model.ProductTypes, "ProductTypeId", "ProductTypeName"), "Select Product Type", new { style = "width: 250px;height:25px" }) 
+                                    @Html.ValidationMessageFor(model => model.ProductTypeId)
+                                </div>
+                                <div class="col-md-5" style="align-content:flex-start">
+                                    
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <div class="col-md-1">
+
+                                </div>
+                                <div class="col-md-6">
+                                    <input type="submit" value="Submit" class="btn btn-primary" /> | 
+                                    @Html.ActionLink("Back to List", "Index",null, new { @class = "btn btn-primary" })
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </p>
+        </div>
+    </div>
+<div>
+   
+</div>
+}
+
+

@@ -1,0 +1,219 @@
+﻿@{
+    ViewBag.Title = "Column hide/show demo";
+}
+<div id="StudentTableContainer">
+</div>
+<script type="text/javascript">
+
+    $(document).ready(function () {
+
+        $('#StudentTableContainer').jtable({
+            tableId: 'MyDemoTable',
+            title: 'Student List',
+            paging: true,
+            sorting: true,
+            columnResizable: true, //Actually, no need to set true since it's default.
+            columnSelectable: true, //Actually, no need to set true since it's default.
+            saveUserPreferences: true, //Actually, no need to set true since it's default.
+            defaultSorting: 'Name ASC',
+            actions: {
+                listAction: '@Url.Action("StudentList")',
+                deleteAction: '@Url.Action("DeleteStudent")',
+                updateAction: '@Url.Action("UpdateStudent")',
+                createAction: '@Url.Action("CreateStudent")'
+            },
+            fields: {
+                StudentId: {
+                    key: true,
+                    create: false,
+                    edit: false,
+                    title: 'Id',
+                    width: '5%',
+                    sorting: false,
+                    list: false
+                },
+                Name: {
+                    title: 'Name',
+                    width: '20%',
+                    visibility: 'fixed' //This column always will be shown
+                },
+                EmailAddress: {
+                    title: 'Email address',
+                    width: '20%',
+                    list: true,
+                    columnResizable: false
+                },
+                Password: {
+                    title: 'User Password',
+                    type: 'password',
+                    list: false
+                },
+                Gender: {
+                    title: 'Gender',
+                    width: '13%',
+                    options: { 'M': 'Male', 'F': 'Female' },
+                    list: true,
+                    visibility: 'hidden' //Hide this column as default
+                },
+                CityId: {
+                    title: 'City',
+                    width: '12%',
+                    options: '@Url.Action("GetCityOptions")',
+                    list: false
+                },
+                BirthDate: {
+                    title: 'Birth date',
+                    width: '30%',
+                    type: 'date',
+                    displayFormat: 'yy-mm-dd'
+                },
+                Education: {
+                    title: 'Education',
+                    list: false,
+                    type: 'radiobutton',
+                    options: { '1': 'Primary school', '2': 'High school', '3': 'University' }
+                },
+                About: {
+                    title: 'About this person',
+                    type: 'textarea',
+                    list: false
+                },
+                IsActive: {
+                    title: 'Status',
+                    width: '12%',
+                    type: 'checkbox',
+                    values: { 'false': 'Passive', 'true': 'Active' },
+                    defaultValue: 'true',
+                    list: false
+                },
+                RecordDate: {
+                    title: 'Record date',
+                    width: '30%',
+                    type: 'date',
+                    displayFormat: 'yy-mm-dd',
+                    create: false,
+                    edit: false,
+                    sorting: false //This column is not sortable!
+                }
+            }
+        });
+
+        //Load student list from server
+        $('#StudentTableContainer').jtable('load');
+
+    });
+
+</script>
+<br />
+<hr />
+<h3>
+    HTML code</h3>
+<pre class="brush:html">&lt;div id=&quot;StudentTableContainer&quot;&gt;&lt;/div&gt;</pre>
+<h3>
+    Javascript code</h3>
+<pre class="brush:js; highlight: [10,11,12,33,51]">&lt;script type=&quot;text/javascript&quot;&gt;
+
+    $(document).ready(function () {
+
+        $(&#39;#StudentTableContainer&#39;).jtable({
+            tableId: &#39;MyDemoTable&#39;,
+            title: &#39;Student List&#39;,
+            paging: true,
+            sorting: true,
+            columnResizable: true, //Actually, no need to set true since it&#39;s default
+            columnSelectable: true, //Actually, no need to set true since it&#39;s default
+            saveUserPreferences: true, //Actually, no need to set true since it&#39;s default
+            defaultSorting: &#39;Name ASC&#39;,
+            actions: {
+                listAction: &#39;/Demo/StudentList&#39;,
+                deleteAction: &#39;/Demo/DeleteStudent&#39;,
+                updateAction: &#39;/Demo/UpdateStudent&#39;,
+                createAction: &#39;/Demo/CreateStudent&#39;
+            },
+            fields: {
+                StudentId: {
+                    key: true,
+                    create: false,
+                    edit: false,
+                    title: &#39;Id&#39;,
+                    width: &#39;5%&#39;,
+                    sorting: false,
+                    list: false
+                },
+                Name: {
+                    title: &#39;Name&#39;,
+                    width: &#39;20%&#39;,
+                    visibility: &#39;fixed&#39; //This column always will be shown
+                },
+                EmailAddress: {
+                    title: &#39;Email address&#39;,
+                    width: &#39;20%&#39;,
+                    list: true,
+                    columnResizable: false //This column can not be resized
+                },
+                Password: {
+                    title: &#39;User Password&#39;,
+                    type: &#39;password&#39;,
+                    list: false
+                },
+                Gender: {
+                    title: &#39;Gender&#39;,
+                    width: &#39;13%&#39;,
+                    options: { &#39;M&#39;: &#39;Male&#39;, &#39;F&#39;: &#39;Female&#39; },
+                    list: true,
+                    visibility: &#39;hidden&#39; //Hide this column as default
+                },
+                CityId: {
+                    title: &#39;City&#39;,
+                    width: &#39;12%&#39;,
+                    options: &#39;/Demo/GetCityOptions&#39;
+                    list: false
+                },
+                BirthDate: {
+                    title: &#39;Birth date&#39;,
+                    width: &#39;30%&#39;,
+                    type: &#39;date&#39;,
+                    displayFormat: &#39;yy-mm-dd&#39;
+                },
+                Education: {
+                    title: &#39;Education&#39;,
+                    list: false,
+                    type: &#39;radiobutton&#39;,
+                    options: { &#39;1&#39;: &#39;Primary school&#39;, &#39;2&#39;: &#39;High school&#39;, &#39;3&#39;: &#39;University&#39; }
+                },
+                About: {
+                    title: &#39;About this person&#39;,
+                    type: &#39;textarea&#39;,
+                    list: false
+                },
+                IsActive: {
+                    title: &#39;Status&#39;,
+                    width: &#39;12%&#39;,
+                    type: &#39;checkbox&#39;,
+                    values: { &#39;false&#39;: &#39;Passive&#39;, &#39;true&#39;: &#39;Active&#39; },
+                    defaultValue: &#39;true&#39;,
+                    list: false
+                },
+                RecordDate: {
+                    title: &#39;Record date&#39;,
+                    width: &#39;30%&#39;,
+                    type: &#39;date&#39;,
+                    displayFormat: &#39;yy-mm-dd&#39;,
+                    create: false,
+                    edit: false,
+                    sorting: false //This column is not sortable!
+                }
+            }
+        });
+
+        //Load student list from server
+        $(&#39;#StudentTableContainer&#39;).jtable(&#39;load&#39;);
+
+    });
+
+&lt;/script&gt;</pre>
+<h3>
+    Server side code</h3>
+@Html.Partial("_PagedAndSortedServerSideCodes")
+
+<p>Right click the table header to select columns. Column hide/show is enabled as default.</p>

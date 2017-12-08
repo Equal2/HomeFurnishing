@@ -1,0 +1,213 @@
+﻿@model IQueryable<Model.ViewModel.PurchaseOrderAmendmentHeaderViewModel>
+@using Core.Common
+@using GridMvc.Html;
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@helper RenderActionColumn(Model.ViewModel.PurchaseOrderAmendmentHeaderViewModel s)
+{
+    if (s.Status == (int)StatusConstants.Drafted || s.Status == (int)StatusConstants.Modified)
+    {
+        @Html.ActionLink(" ", "Submit", "PurchaseOrderAmendmentHeader", new { id = s.PurchaseOrderAmendmentHeaderId, IndexType = ViewBag.IndexStatus }, new { @class = "glyphicon glyphicon-floppy-open", @title = "Submit", @data_toggle = "tooltip" })
+    }
+    if (s.Status == (int)StatusConstants.Submitted)
+    {
+        <p class="Badge_Cont">
+            <a class="glyphicon glyphicon-thumbs-up" data-toggle="tooltip" href="/PurchaseOrderAmendmentHeader/Review/@s.PurchaseOrderAmendmentHeaderId?IndexType=@(ViewBag.IndexStatus)" title="Review"> </a>
+            <span class="IndexBadges label @(s.Reviewed==true ? "label-success" : "label-danger")">@s.ReviewCount</span>
+        </p>
+    }
+}
+@helper RenderStatus(Model.ViewModel.PurchaseOrderAmendmentHeaderViewModel s)
+{
+    if (s.Status == (int)StatusConstants.Submitted)
+    {
+        @Html.Raw("Submitted");
+    }
+    else if (s.Status == (int)StatusConstants.Approved)
+    {
+        @Html.Raw("Approved")
+    }
+    else if (s.Status == (int)StatusConstants.Drafted)
+    {
+        @Html.Raw("Drafted")}
+    else if (s.Status == (int)StatusConstants.Modified)
+    {
+        @Html.Raw("Modified")
+    }
+    else if (s.Status == (int)StatusConstants.ModificationSubmitted)
+    {
+        @Html.Raw("Modification Submitted")
+    }
+}
+@helper RenderCheckBox()
+{
+    <input type="checkbox" />    
+}
+@helper RenderUserImage(string Name)
+{
+    string Defaultdomain = (System.Configuration.ConfigurationManager.AppSettings["ProfilePic"]);
+    string ImgSrc = Defaultdomain + Name + ".jpg";
+    <div>
+        <img src="@ImgSrc" class="img-circle UserIndexImage" title="@Name" />
+    </div>
+}
+<!-- modal placeholder-->
+<div id='myModal' class='modal fade in'>
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div id='myModalContent'></div>
+        </div>
+    </div>
+</div>
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3>
+            <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-list black"></span> @ViewBag.Name List</span>
+        </h3>
+        <hr style="margin-top:0px;margin-bottom:0px" />
+        <input type="hidden" class="DocType_Id" value="@ViewBag.id">
+        <div class="panel-info">
+            <h4 style="padding:5px 0 0 0;margin:0px">
+                @Html.ActionLink(" ", " ", " ", null, new { @class = "glyphicon glyphicon-refresh toolbar", @title = "Refresh Page", @data_toggle = "tooltip", @id = "RefreshPage" })
+                @Html.ActionLink(" ", "Create", "PurchaseOrderAmendmentHeader", new { @id = @ViewBag.id }, new { @class = "glyphicon glyphicon-plus toolbar", @title = "Add New", @data_toggle = "tooltip" })
+                @Html.ActionLink(" ", "GeneratePrints", "PurchaseOrderAmendmentHeader", null, new { @class = "glyphicon glyphicon-print toolbar", @title = "Print", @data_toggle = "tooltip", @id = "PrintRecordI", target = "_blank" })
+                @Html.ActionLink(" ", "Remove", "PurchaseOrderAmendmentHeader", null, new { @class = "glyphicon glyphicon-trash toolbar", @title = "Delete", @data_toggle = "tooltip", @id = "DeleteRecord", @data_modal = "" })
+                @Html.ActionLink(" ", "Report", "PurchaseOrderAmendmentHeader", new { @id = @ViewBag.id }, new { @class = "glyphicon glyphicon-stats toolbar right", @title = "Report", @data_toggle = "tooltip", target = "_blank" })
+                @Html.ActionLink(" ", "", "", null, new { @class = "glyphicon glyphicon-export toolbar right", @title = "Export", @data_toggle = "tooltip" })
+                @Html.ActionLink(" ", "CreatePurchaseOrderAmendment", "PurchaseOrderSettings", new { @id = @ViewBag.id }, new { @class = "glyphicon glyphicon-cog toolbar right", @title = "Default Settings", @data_toggle = "tooltip" })
+                @Html.ActionLink(" ", "Index", "PurchaseOrderAmendmentHeader", new { @id = @ViewBag.id }, new { @class = "glyphicon glyphicon-import toolbar right", @title = "Import", @data_toggle = "tooltip" })
+            </h4>
+        </div>
+        <hr style="margin-top: 5px; margin-bottom: 5px; border-top: 1px solid #706f6f; " />
+
+        <h4 id="StatusFilter" style="height:20px">
+            <button type="button" class="btn btn-primary toolbar right" id="All" style="border-color: #fff">                  All                  </button>
+            <button type="button" class="btn btn-primary right" id="PTS" style="border-color: #fff">Pending to Submit <span class='badge'>@(ViewBag.PendingToSubmit != 0 ? ViewBag.PendingToSubmit : "")</span> </button>
+            <button type="button" class="btn btn-primary right" id="PTR" style="border-color: #fff">Pending to Review <span class="badge">@(ViewBag.PendingToReview != 0 ? ViewBag.PendingToReview : "")</span></button>
+        </h4>
+    </div>
+    <div class="panel-info" style="padding-left:5px;padding-top:2px">
+        @Html.Grid(Model).Columns(columns =>
+           {
+               columns.Add(foo => foo.PurchaseOrderAmendmentHeaderId, true).Css("Header_Id");
+               columns.Add(m => m.Status, true);
+               columns.Add().Encoded(false).Sanitized(false).SetWidth("5%").RenderValueAs(m => RenderCheckBox());
+               columns.Add(foo => foo.DocDate).Sortable(true).Titled("Amendment Date").Format("{0:dd/MMM/yyyy}").Filterable(true);
+               columns.Add(foo => foo.DocNo).Titled("Amendment No").Sortable(true).Filterable(true);
+               columns.Add(m => m.SupplierName).Titled("PurchaseWorker").Sortable(true).Filterable(true);
+               columns.Add(m => m.Remark).Titled("Remark").Sortable(true).Filterable(true);
+               columns.Add().Titled("Status").RenderValueAs(m => RenderStatus(m));
+               columns.Add().Titled("").Encoded(false).Sanitized(false).RenderValueAs(m => RenderUserImage(m.ModifiedBy)).Titled("User").SetWidth("5%").Css("UserImageIndex");
+               columns.Add().Sanitized(false).Encoded(false).RenderValueAs(m => RenderActionColumn(m)).SetWidth(20).Css("icon-Cus-Size");
+           }).WithPaging(25).EmptyText("No records found.")
+
+    </div>
+</div>
+<script type="text/javascript">
+
+    var RecStatus = '@ViewBag.IndexStatus';
+
+    $('table.grid-table td').dblclick(function () {
+        var $this = $(this);
+        var row = $this.closest("tr");
+        var editid = row.find('[data-name="PurchaseOrderAmendmentHeaderId"]').text();
+        var Status = row.find('[data-name="Status"]').text();
+        if (editid == 0) {
+            e.stopImmediatePropagation();
+            return false;
+        }
+        var url;
+        if (Status == StatusContstantsEnum.Drafted) {
+            url = '@Url.Action("Modify","PurchaseOrderAmendmentHeader")' + "/" + editid + "?IndexType=" + RecStatus;
+        }
+        else if (Status == StatusContstantsEnum.Submitted || Status == StatusContstantsEnum.Modified) {
+            url = '@Url.Action("ModifyAfter_Submit", "PurchaseOrderAmendmentHeader")' + "/" + editid + "?IndexType=" + RecStatus;
+        }
+        else
+            url = '@Url.Action("DetailInformation", "PurchaseOrderAmendmentHeader")' + "/" + editid;
+
+        window.location.href = url;
+    });
+
+    //To focus on the first element on modal load
+    $('#myModal').on('shown.bs.modal', function () {
+        $("#Reason").focus();
+    });
+
+    $('a#DeleteRecord').click(function (e) {
+
+        var tes = DeleteValidation();
+        if (!tes) {
+            e.stopImmediatePropagation();
+            return false;
+        }
+        var editiiid = $('table.grid-table .grid-row.grid-row-selected').find('[data-name="PurchaseOrderAmendmentHeaderId"]').text();
+
+
+        var Status = $('table.grid-table .grid-row.grid-row-selected').find('[data-name="Status"]').text();
+        var url;
+        if (Status == StatusContstantsEnum.Drafted) {
+            url = '@Url.Action("Delete", "PurchaseOrderAmendmentHeader")' + "/" + editiiid;
+        }
+        else if (Status == StatusContstantsEnum.Submitted || Status == StatusContstantsEnum.Modified || Status == StatusContstantsEnum.ModificationSubmitted) {
+            url = '@Url.Action("DeleteAfter_Submit", "PurchaseOrderAmendmentHeader")' + "/" + editiiid;
+        }
+        else if (Status == StatusContstantsEnum.Approved) {
+            url = '@Url.Action("DeleteAfter_Approve", "PurchaseOrderAmendmentHeader")' + "/" + editiiid;
+        }
+        $(this).attr('href', url);
+        return;
+    })
+
+</script>
+@if (ViewBag.IndexStatus != null)
+{
+    if (ViewBag.IndexStatus == "All")
+    {
+        <script type="text/javascript">
+            $("#StatusFilter > button#All").focus();
+        </script>
+    }
+    else if (ViewBag.IndexStatus == "PTR")
+    {
+        <script type="text/javascript">
+            $("#StatusFilter > button#PTR").focus();
+        </script>
+    }
+    else if (ViewBag.IndexStatus == "PTS")
+    {
+        <script type="text/javascript">
+            $("#StatusFilter > button#PTS").focus();
+        </script>
+    }
+}
+
+
+<script type="text/javascript">
+
+    var DocId = '@ViewBag.id';
+    var AURL = '@Url.Action("Index", "PurchaseOrderAmendmentHeader", new { id=ViewBag.id})';
+    var PTRurl = '@Url.Action("Index_PendingToReview", "PurchaseOrderAmendmentHeader", new { id = ViewBag.id })';
+    var PTSurl = '@Url.Action("Index_PendingToSubmit", "PurchaseOrderAmendmentHeader", new { id = ViewBag.id })';
+    $(document).on("click", "#StatusFilter > button", function () {
+        var t = $(this);
+        var Id = t.attr("id");
+        var URL = window.location.href;
+        if (Id == "All") {
+            window.location.href = AURL;
+        }
+        else if (Id == "PTS") {
+            window.location.href = PTSurl;
+        }
+        else if (Id == "PTR") {
+            window.location.href = PTRurl;
+        }
+
+    })
+
+
+</script>

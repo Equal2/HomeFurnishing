@@ -1,0 +1,450 @@
+﻿@{
+    ViewBag.Title = "Weaving Order Wizard";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<link href="~/Content/DataTables/css/jquery.dataTables.min.css" rel="stylesheet" />
+
+<script src="~/Scripts/DataTables/jquery.dataTables.min.js"></script>
+@*<script src="~/Scripts/DataTables/dataTables.scroller.js"></script>*@
+<script src="~/Scripts/DataTables/dataTables.scroller.min.js"></script>
+
+<style type="text/css">
+    .DTHidden {
+        display: none;
+    }
+
+    .TextRight {
+        text-align: right;
+    }
+
+    .dataTables_scroll {
+        font-size: 13px !important;
+        line-height: 1;
+    }
+
+    table.dataTable tbody td {
+        padding: 2px 10px;
+    }
+</style>
+
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" style="font-size:13px">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="exampleModalLabel">Summary</h4>
+            </div>
+            <div class="modal-body" id="SelectedSummary">
+                <div class="row" style="margin-left:0px;margin-right:0px;margin-bottom:7px">
+                    <div class='row-index block' style='width:5%'>  <strong>Sr</strong>  </div>
+                    <div class='block' style='width:93%'>
+
+                        <div class='block' style='width:30%'>
+                            <strong>Design</strong>
+                        </div>
+                        <div class='block' style='width:20%'>
+                            <strong>Quality</strong>
+                        </div>
+                        <div class='block' style='width:20%'>
+                            <strong>Order</strong>
+                        </div>
+                        <div class='block text-right' style='width:10%'>
+                            <strong>Qty</strong>
+                        </div>
+                        <div class='block text-right' style='width:10%'>
+                            <strong>Rate</strong>
+                        </div>
+                        <div class='block text-right' style='width:10%'>
+                            <strong>Inc</strong>
+                        </div>
+                        <div class='block text-right' style='width:10%'>
+                            <strong>Loss</strong>
+                        </div>
+                    </div>
+                </div>
+                <div id="SummaryContent" style="max-height:350px;overflow-y:scroll">
+
+                </div>
+            </div>
+            <div class="modal-footer" id="Total">
+                <div class="row" style="margin-left:0px;margin-right:0px">
+                    <div class='row-index block' style='width:5%'></div>
+                    <div class='block' style='width:92%'>
+
+                        <div class='block' style='width:30%'>
+                            <strong>Total</strong>
+                        </div>
+
+                        <div class='block' style='width:20%'>
+                        </div>
+                        <div class='block' style='width:20%'>
+                        </div>
+                        <div class='block' style='width:10%'>
+                            <strong id="QtyTotal"></strong>
+                        </div>
+                        <div class='block' style='width:20%'>
+                            Amt:<strong id="AmtTotal"></strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@*<input type="button" id="button" />*@
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3>
+            <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-list black"></span> Weaving Plan List</span>
+            @Html.ActionLink(" ", "ConfirmProdOrderList", "WeavingOrderWizard", null, new { @class = "glyphicon glyphicon-hand-right toolbar right", @title = "Proceed", @data_toggle = "tooltip", @id = "Proceed" })
+            <a href="#" class="glyphicon glyphicon-shopping-cart toolbar right" id="CartSum"></a>
+        </h3>
+        <hr style="margin-top:0px;margin-bottom:0px" />
+    </div>
+
+
+
+    <div class="panel-info tab" style="padding-left:5px;padding-top:20px">
+        <input type="checkbox" id="TestCheck" name="checl" /> <span>Select</span>
+        <table id="example" class="display" cellspacing="0" width="100%">
+            <thead style="background: #428bca;color:white">
+                <tr>
+                    <th>OrderNo</th>
+                    <th>OrderDate</th>
+                    <th>DueDate</th>
+                    <th>Buyer</th>
+                    <th>Quality</th>
+                    <th>Design</th>
+                    <th>Size</th>
+                    <th>Colour</th>
+                    <th>Qty(PCS)</th>
+                    <th>Rate</th>
+                    <th>Inc.</th>
+                    <th>Area<br />Sq.Yard</th>                               
+                    <th>ProdOrderLineId</th>
+                    <th>ReferenceDocTypeId</th>
+                    <th>ReferenceDocLineId</th>
+                    <th>AreaPerPc</th>
+                    <th>BalanceQty</th>
+                    <th>Loss</th>   
+                </tr>
+            </thead>
+            <tfoot>
+                <tr>
+                    <th></th>
+                    <th colspan="6" style="text-align:left"></th>
+                    <th colspan="6" style="text-align:right"></th>
+                    <th></th>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+</div>
+
+
+<script type="text/javascript">
+    $(document).ready(function () {
+
+        var PageLoadFirst = true;
+        var Url = "/WeavingOrderWizard/PendingProdOrders/" + '@ViewBag.id';
+        $('#example').dataTable({
+            ajax: Url,
+            scrollY: "300px",
+            scrollCollapse: true,
+            scroller: true,
+            columns: [
+                { "data": "DocNo", "width": "10%" },
+                { "data": "Date", "width": "10%" },
+                { "data": "DueDate", "width": "10%" },
+                { "data": "BuyerName", "width": "8%" },
+                { "data": "Quality", "width": "11%" },
+                { "data": "DesignName", "width": "11%" },
+                { "data": "Size", "width": "11%" },
+                { "data": "Colour", "width": "11%" },
+                { "data": "Qty", "width": "5%", className: "TextRight", },
+                { "data": "Rate", "width": "5%", className: "TextRight", },
+                { "data": "Incentive", "width": "5%", className: "TextRight", },
+                { "data": "Area", "width": "6%", className: "TextRight", },                
+                { "data": "ProdOrderLineId" },
+                { "data": "RefDocTypeId" },
+                { "data": "RefDocLineId" },
+                { "data": "AreaPerPc" },
+                { "data": "BalanceQty" },
+                { "data": "Loss", "width": "2%", className: "TextRight", },
+                
+            ],
+            columnDefs: [
+    { "targets": 12, "searchable": false, className: "DTHidden", }, { "targets": 8, "render": function (data, type, row) { return '<input style="width:100%;text-align:right" class="Qty"  type="text" name="Qty' + row.ProdOrderLineId + '" id="Qty' + row.ProdOrderLineId + '" value="' + data + '"/>'; }, },
+    { "targets": 13, "searchable": false, className: "DTHidden", }, { "targets": 9, "render": function (data, type, row) { return '<input style="width:100%;text-align:right"  type="text" name="Rate' + row.ProdOrderLineId + '" id="Rate' + row.ProdOrderLineId + '" value="' + data + '"/>'; }, },
+    { "targets": 14, "searchable": false, className: "DTHidden", }, { "targets": 10, "render": function (data, type, row) { return '<input style="width:100%;text-align:right"  type="text" name="Inc' + row.ProdOrderLineId + '" id="Inc' + row.ProdOrderLineId + '" value="' + data + '"/>'; }, },
+    { "targets": 15, "searchable": false, className: "DTHidden", }, { "targets": 16, "searchable": false, className: "DTHidden", },
+            ],
+            dom: 'T<"clear">lfrti',
+            TableTools: {
+                "sRowSelect": "os",
+                "aButtons": [
+                "select_all", "select_none"
+                ]
+            },
+            tableTools: {
+                "sSwfPath": "../../Content/DataTables/swf/copy_csv_xls_pdf.swf"
+            }
+
+
+        });
+
+        $('#example tbody').on('click', 'tr', function (e) {
+            if (e.target.nodeName == "INPUT") {
+
+            }
+            else {
+                $(this).toggleClass('selected');
+
+                if (PageLoadFirst) {
+                    CaclTotal();
+                    PageLoadFirst = false;
+                }
+
+                if ($(this).hasClass('selected') && !$('#TestCheck').is(':checked')) {
+                    $('#TestCheck').prop("checked", true);
+                }
+
+                CalculateSelectedTotal();
+            }
+        });
+
+        var id = @ViewBag.id;
+        $('a#Proceed').click(function () {
+
+            var arr = [];
+
+            var table = $("#example").DataTable();
+            var test = table.rows('.selected').data();
+            var List = "";
+            var test34 = table.$('input, select').serialize();
+            $.each(test, function (index, value) {
+                arr.push({ ProdOrderLineId: value.ProdOrderLineId, Qty: value.Qty, BalanceQty: value.BalanceQty, RefDocTypeId: value.RefDocTypeId, RefDocLineId: value.RefDocLineId, DesignName: value.DesignName, Size: value.Size, Colour: value.Colour, Rate: value.Rate, Incentive: value.Incentive, Loss: value.Loss });
+            })
+
+            //alert($(this).attr('href'));
+
+            $.ajax({
+                url: $(this).attr('href'),
+                type: "POST",
+                data: { Selected: arr, id: id },
+                success: function (result) {
+                    if (result.Success == true) {
+                        UpdateDataTable(result);
+                    } else if (result.Success == "URL") {
+                        window.location.href = result.Data;
+                    }
+                    else if (!result.Success) {
+                        alert('Something went wrong');
+                    }
+                    else { }
+                },
+            });
+
+            return false;
+
+        });
+
+        function UpdateDataTable(data) {
+            var table = $('#example').DataTable();
+
+            table.clear().draw();
+
+            table.rows.add(data.Data).draw();
+
+            $('#example').dataTable().fnFilterClear();
+
+            $('tfoot > tr > th:first').html('');
+
+            UpdateActionLink();
+
+        }
+
+        function UpdateActionLink() {
+            $('a#Proceed').attr('href', '/DyeingOrderWizard/ConfirmProdOrderList');
+        }
+
+        $(document).on('change', 'td > input', function () {
+            var table = $('#example').dataTable();
+            var td = $(this).closest('td').get(0);
+            var pos = table.fnGetPosition(td); // Im not familiar with the plugin so the extra $() might be overkill
+
+            if ($(this).is('.Qty') && table.fnGetData(pos[0]).BalanceQty < $(this).val()) {
+                $(this).val(table.fnGetData(pos[0]).BalanceQty).select();
+            }
+            else {
+                table.fnUpdate(parseFloat($(this).val()), pos[0], pos[1], false);
+                $('#example').DataTable().draw(false);
+                CalculateSelectedTotal();
+            }
+        })
+
+
+        function CaclTotal() {
+            var table = $('#example').DataTable();
+
+            var intVal = function (i) {
+                return typeof i === 'string' ?
+                    i.replace(/[\$,]/g, '') * 1 :
+                    typeof i === 'number' ?
+                    i : 0;
+            };
+
+            // Total over all pages
+            total = table
+                .column(7)
+                .data()
+                .reduce(function (a, b) {
+                    return intVal(a) + intVal(b);
+                }, 0);
+
+            totalArea = table
+               .column(8)
+               .data()
+               .reduce(function (a, b) {
+                   return intVal(a) + intVal(b);
+               }, 0);
+
+            $(table.column(5).footer()).html(
+                       'Total: ' + total.toFixed(0) + ' Pcs, ' + totalArea.toFixed(3) + ' Sq.yard'
+                 );
+
+
+        }
+
+    });
+
+
+    $('#TestCheck').change(function () {
+
+        var table = $('#example').dataTable();
+        var $LRow;
+
+
+        if ($(this).is(':checked')) {
+            var Rows = table.$('tr', { "filter": "applied" })
+            $.each(Rows, function (index, value) {
+
+                $(this).addClass('selected');
+                $LRow = this;
+            })
+            CalculateSelectedTotal();
+        }
+        else {
+            var Rows = table.$('tr.selected')
+            $.each(Rows, function (index, value) {
+
+                $(this).removeClass('selected');
+                $LRow = this;
+
+            })
+            CalculateSelectedTotal();
+        }
+
+    })
+
+
+    function CalculateSelectedTotal() {
+        var table = $('#example').DataTable();
+
+        function CheckTotal() {
+            var Qty = 0;
+            $.each(table.rows('.selected').data(), function (index, value) {
+                Qty += parseFloat(value.Qty);
+            })
+            return Qty.toFixed(0);
+        }
+        function CheckTotalArea() {
+            var Qty = 0;
+            $.each(table.rows('.selected').data(), function (index, value) {
+                Qty += parseFloat(value.Area);
+            })
+            return Qty.toFixed(3);
+        }
+
+        $(table.column(1).footer()).html(
+                'Selected:' + CheckTotal() + ' Pcs, ' + CheckTotalArea() + ' Sq.yards'
+           );
+
+
+
+    }
+
+
+
+    function ResetTotal() {
+        var table = $('#example').DataTable();
+        $(table.column(1).footer()).html(
+                    'Selected:' + 0 + ' Pcs '
+               );
+    }
+
+    $('#CartSum').click(function () {
+        GenerateSummaryString();
+        $('#exampleModal').modal('toggle');
+    })
+
+
+    function GenerateSummaryString() {
+        var Summary = "";
+        Summary += "<div class='row' style='margin:0px'>"
+
+        var table = $("#example").DataTable();
+        var test = table.rows('.selected').data();
+        var List = "";
+        var srno = 1;
+        var test34 = table.$('input, select').serialize();
+        var QtyTotal = 0;
+        var AmtTotal = 0;
+        $.each(test, function (index, value) {
+
+            Summary += " <div class='row crow grid-body' style='margin:0px;padding:0px'>"
+                + "      <div class='row-index block'  style='width:5%'>" + srno + "</div>"
+                + "          <div class='block'  style='width:95%'>"
+                + "                  <div class='block' style='width:30%'>" + (value.DesignName == null ? " " : "<strong>" + value.DesignName + "</strong>")
+                + "                  <div>" + value.Size + "</div>"
+                + "                  <div>" + value.Colour + "</div>"
+                + "                  </div>"
+                + "                  <div class='block' style='width:20%'>" + (value.Quality == null ? " " : "<strong>" + value.Quality + "</strong>")
+                + "                  </div>"
+                + "                  <div class='block'  style='width:20%'>" + (value.DocNo == null ? " " : "<span title='Dim1' class='' style='font-weight:bold'>" + value.DocNo) + "</span>"
+                + "                    <div> " + value.Date + " </div>"
+                + "                   </div>"
+                + "                  <div class='block text-right'  style='width:10%'>" + (value.Qty == null ? " " : value.Qty) + ""
+                + "                   </div>"
+                + "                  <div class='block text-right'  style='width:10%'>" + (value.Rate == null ? " " : value.Rate) + ""
+                + "                   </div>"
+                + "                  <div class='block text-right'  style='width:10%'>" + (value.Incentive == null ? " " : value.Incentive) + ""
+                + "                   </div>"
+                + "                  <div class='block text-right'  style='width:10%'>" + (value.Loss == null ? " " : value.Loss) + ""
+                + "                   </div>"
+                + "          </div>"
+                + "  </div>"
+                + "<hr style='margin-top:0px;margin-bottom:0px'/>";
+            srno++;
+            QtyTotal += parseFloat(value.Qty);
+            AmtTotal += parseFloat(value.Qty) * parseFloat(value.AreaPerPc) * (parseFloat(value.Rate) + parseFloat(value.Incentive));
+            //arr.push({ ProdOrderLineId: value.ProdOrderLineId, Qty: value.Qty, BalanceQty: value.Qty, RefDocTypeId: value.RefDocTypeId, RefDocLineId: value.RefDocLineId, DesignName: value.DesignName, Size: value.Size, Rate: value.Rate, Incentive: value.Incentive });
+        });
+        Summary += "</div>"
+
+        $('#SummaryContent').html(Summary);
+        $('#QtyTotal').html(QtyTotal);
+        $('#AmtTotal').html(AmtTotal.toFixed(2));
+    }
+
+
+    $('#CartSum').on('hidden.bs.modal', function (e) {
+        $('#SummaryContent').html("");
+        $('#QtyTotal').html(0);
+        $('#AmtTotal').html(0);
+    })
+
+</script>

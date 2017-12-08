@@ -1,0 +1,99 @@
+﻿@model IEnumerable<Model.ViewModel.HeaderChargeViewModel>
+
+@{
+    int count = 0;
+}
+
+@if(Request.Browser.IsMobileDevice)
+{
+    
+    <div>
+    <div class='panel-heading headrow'>
+        <div class='row grid-head'>
+            <div class='col-xs-12'>
+                <div class='row'>
+                    <div class='col-sm-6 col-xs-4'>Charge</div>
+                    <div class='col-sm-3 col-xs-4 text-right'>Rate</div>
+                    <div class='col-sm-3 col-xs-4 text-right'>Amount</div>
+                </div>
+            </div>
+            <div>
+            </div>
+        </div>
+    </div>
+    <div class='panel-info' id='gbodycharges'>
+        @foreach (var item in Model)
+        {
+            <div class='row crow grid-body' style='margin-left:0px;margin-right:0px'>
+                <div class='col-xs-12'>
+                    <div class='row'>
+                        <div class='col-sm-6 col-xs-4'> <strong>@(item.ChargeName == null ? " " : item.ChargeName)</strong> </div>
+                        <div class='col-sm-3 col-xs-4 text-right'>
+                            @(item.Rate == null ? " " : Math.Round(item.Rate.Value, 2).ToString())
+                        </div>
+                        <div class='col-sm-3 col-xs-4 text-right'>
+                            @(item.Amount == null ? " " : Math.Round(item.Amount.Value, 2).ToString())
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <a edit='' href='@(ViewBag.EditUrl +"?Id=" + item.HeaderTableId + "&HeaderTable=" + ViewBag.HeaderTable + "&LineTable=" + ViewBag.LineTable)'></a>
+                </div>
+            </div>
+            <hr style='margin-top:0px;margin-bottom:0px' />
+        }
+    </div>
+</div>   
+    
+}
+else
+{
+ 
+    <div style='min-width:700px;'>
+    <div class='panel-heading headrow'>
+        <div class='row grid-head'>
+            <div class='col-xs-1 text-left'>Srl.</div>
+            <div class='col-xs-11'>
+                <div class='row'>
+                    <div class='col-xs-4'>Charge</div>
+                    <div class='col-xs-3'>Calculate On</div>
+                    <div class='col-xs-2'>Add/Deduct</div>
+                    <div class='col-xs-1 text-right'>Rate</div>
+                    <div class='col-xs-2 text-right'>Amount</div>
+                </div>
+            </div>
+            <div>
+            </div>
+        </div>
+    </div>
+    <div class='panel-info' id='gbodycharges'>
+        @foreach (var item in Model)
+        {
+            <div class='row crow grid-body' style='margin-left:0px;margin-right:0px'>
+                <div class='col-xs-1 row-index'>
+                    @(++count)
+                    <input type='hidden' class='id' value='@item.HeaderTableId' />
+                </div>
+                <div class='col-xs-11'>
+                    <div class='row'>
+                        <div class='col-xs-4'> <strong>@(item.ChargeName == null ? " " : item.ChargeName )</strong> </div>
+                        <div class='col-xs-3'> @(item.CalculateOnName == null ? " " : item.CalculateOnName) </div>
+                        <div class='col-xs-2'> @item.AddDeductName </div>
+                        <div class='col-xs-1 text-right'>
+                            @(item.Rate == null ? " " : Math.Round(item.Rate.Value, 2).ToString())
+                        </div>
+                        <div class='col-xs-2 text-right'>
+                            @(item.Amount == null ? " " : Math.Round(item.Amount.Value, 2).ToString())
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <a edit='' href='@(ViewBag.EditUrl +"?Id=" + item.HeaderTableId + "&HeaderTable=" + ViewBag.HeaderTable + "&LineTable=" + ViewBag.LineTable)'></a>
+                </div>
+            </div>
+            <hr style='margin-top:0px;margin-bottom:0px' />
+        }
+    </div>
+</div>   
+    
+}

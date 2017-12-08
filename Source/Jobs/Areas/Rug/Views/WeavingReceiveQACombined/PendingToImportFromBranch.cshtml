@@ -1,0 +1,94 @@
+﻿@using Core.Common;
+@using Model.ViewModel;
+@using GridMvc.Html;
+@model IQueryable<Web.PendingWeavingReceives>
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    string ControllerName = (string)ViewContext.RouteData.Values["controller"];
+    string IndexStatus = (string)ViewBag.IndexStatus;
+}
+
+<!-- modal placeholder-->
+<div id='myModal' class='modal fade in'>
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div id='myModalContent'></div>
+        </div>
+    </div>
+</div>
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3>
+            <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-list black"></span> @ViewBag.Name Pending To Import From Branch</span>
+        </h3>
+        <hr style="margin-top:0px;margin-bottom:0px" />
+        <input type="hidden" class="DocType_Id" value="@ViewBag.id">
+        <div class="panel-info">
+            <div class="btn-group">
+                @*@Html.ActionLink(" ", "Create", "WeavingReceiveQACombined", new { @id = @ViewBag.id }, new { @class = "cbtn btn-circle glyphicon glyphicon-plus toolbar", @title = "Add New", @data_toggle = "tooltip" })*@
+                @*@Html.ActionLink(" ", "GetHistory", "LogHistory", null, new { @class = "glyphicon glyphicon-user toolbar", @title = "History", @data_toggle = "tooltip", @id = "DocHistoryI" })*@
+                @Html.ActionLink(" ", "ImportRecords", "WeavingReceiveQACombined", null, new { @class = "cbtn btn-circle glyphicon glyphicon glyphicon-import", @title = "Import From Branch", @data_toggle = "tooltip", @id = "ImportFromBranch" })
+                @Html.ActionLink(" ", "Index", "WeavingReceiveQACombined", new { id = @ViewBag.id }, new { @class = "cbtn btn-circle glyphicon glyphicon-list", @title = "List", @data_toggle = "tooltip" })
+            </div>
+            @*<div class="btn-group">
+                <a class="cbtn btn-circle glyphicon glyphicon-option-horizontal dropdown-toggle" aria-expanded="false" style="padding-top: 6px;padding-bottom: 6px;" href="#" data-toggle="dropdown" id="dropdownMenu1">
+                </a>
+                <ul class="dropdown-menu pull-right" aria-labelledby="dropdownMenu1">
+                    <li><a href="@Url.Action("Wizard", "WeavingReceiveQACombined", new { @id = @ViewBag.id })"><span class="glyphicon glyphicon-random" onclick="$('#')"> </span> Wizard</a></li>
+                    <li><a href="@Url.Action("Import", "WeavingReceiveQACombined", new { @id = @ViewBag.id })"><span class="glyphicon glyphicon-import"> </span> Import</a></li>
+                    <li><a href="@Url.Action("Create", "WeavingReceiveQACombined", new { @id = @ViewBag.id })"><span class="glyphicon glyphicon-cog"> </span> Settings</a></li>
+                    <li role="separator" class="divider"></li>
+                    <li><a href="@Url.Action("Report", "WeavingReceiveQACombined", new { @ViewBag.id })"><span class="glyphicon glyphicon-stats"> </span> Report</a></li>
+                </ul>
+            </div>*@
+            @*<div class="btn-group right">
+                 @CustomHelpers.RenderIconStatusFilters(ViewBag.PendingToSubmit, ViewBag.PendingToReview, ControllerName, ViewBag.id, ViewBag.IndexStatus)
+            </div>*@
+        </div>
+        @*<hr style="margin-top: 5px; margin-bottom: 5px; border-top: 1px solid #706f6f; " />
+
+    @CustomHelpers.RenderStatusFilters(ViewBag.PendingToSubmit, ViewBag.PendingToReview, ControllerName, ViewBag.id, ViewBag.IndexStatus)*@
+    </div>
+
+    <div class="panel-info" style="padding-left:5px;padding-top:2px">
+
+        @Html.Grid(Model).Columns(columns =>
+           {
+               columns.Add(m => m.JobReceiveHeaderId, true).Css("Header_Id");
+               columns.Add().Encoded(false).Sanitized(false).SetWidth("5%").RenderValueAs(m => CustomHelpers.RenderCheckBox());
+               columns.Add(foo => foo.DocDate).Sortable(true).Titled("Receipt Date").Format("{0:dd/MMM/yyyy}").Filterable(true);
+               columns.Add(m => m.DocNo).Sortable(true).Titled("Receipt No.").Filterable(true).Sortable(true);
+               columns.Add(foo => foo.JobWorkerName).Sortable(true).Titled("Party").Filterable(true);
+           }).WithPaging(25).EmptyText("No records found.").Sortable().Filterable().WithMultipleFilters()
+    </div>
+</div>
+
+
+<script type="text/javascript">
+    $(document).on("click", "a#ImportFromBranch", function (e) {
+
+        var DocTypeId = $('.DocType_Id').val();
+        var Ids = GetMultiSelectRecordIds();
+
+        $.ajax({
+            url: $(this).attr('href'),
+            data: { Ids: Ids, DocTypeId: DocTypeId },
+            success: function (data) {
+                if (data.success == "Success") {
+                    //window.location.reload();
+                    var url = '@Url.Action("Index", "WeavingReceiveQACombined")' + "/" + DocTypeId
+                    window.location.href = url;
+                }
+                else {
+                    alertify.error(message = data.data, wait = '0')
+                }
+            }
+        });
+
+        return false;
+
+    });
+</script>

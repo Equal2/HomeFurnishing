@@ -1,0 +1,440 @@
+﻿
+
+
+
+
+
+
+
+
+
+
+.DDWidth {
+    width: 170px;
+}
+
+.CurveBorder {
+    border-radius: 5px !important;
+    width: 8em;
+    height: 3em;
+}
+
+.height {
+    height: 34px !important;
+}
+
+.select2-container {
+    max-width: inherit !important;
+}
+
+.borderradii {
+    border-radius: 4px !important;
+}
+
+
+.Alert {
+    border-color: #c0392b !important;
+    -webkit-box-shadow: 1px 1px 8px 0px rgba(237,7,7,1) !important;
+    -moz-box-shadow: 1px 1px 8px 0px rgba(237,7,7,1) !important;
+    box-shadow: 1px 1px 8px 0px rgba(237,7,7,1) !important;
+}
+
+.Success {
+    -webkit-box-shadow: 1px 1px 8px 0px rgba(72,173,57,1) !important;
+    -moz-box-shadow: 1px 1px 8px 0px rgba(72,173,57,1) !important;
+    box-shadow: 1px 1px 8px 0px rgba(72,173,57,1) !important;
+}
+
+select,
+input, textarea {
+    -webkit-border-radius: 4px !important;
+    -moz-border-radius: 4px !important;
+    border-radius: 4px !important;
+}
+
+.modal-dialog {
+    right: auto !important;
+    left: auto !important;
+}
+
+button.custom,
+input.custom,
+select.custom,
+textarea.custom {
+    font-family: "Noto Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.42857143;
+    color: #333;
+    background-color: #fff;
+}
+
+.CustomCss {
+    font-family: "Noto Sans", "Helvetica Neue", Helvetica, Arial, sans-serif !important;
+    font-size: 14px !important;
+    line-height: 1.42857143 !important;
+    color: #333 !important;
+    background-color: #fff !important;
+    border-color: #606264 !important;
+    padding: 5px 10px 5px 10px !important;
+}
+
+.block {
+    position: relative;
+    min-height: 1px;
+    padding-right: 10px;
+    padding-left: 10px;
+    float: left;
+}
+
+label {
+    font-family: Tahoma !important;
+    font-size: 15px !important;
+    line-height: 1.42857143 !important;
+    color: #333 !important;
+    text-align: right !important;
+}
+
+select {
+    height: 30px !important;
+}
+
+label, h4 {
+    font-weight: bold !important;
+}
+
+.ui-autocomplete-loading {
+    background: white url( '../../Images/ajax-loader%20(2).gif' ) right center no-repeat !important;
+}
+
+.has-error {
+    /*color: #c0392b !important;*/
+    border-color: #c0392b !important;
+    /*-webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075) ! important;
+        box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075)! important;*/
+}
+
+label.has-error {
+    color: #c0392b !important;
+}
+
+.has-error:focus {
+    border-color: #962d22 !important;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 6px #df7c72 !important;
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 6px #df7c72 !important;
+}
+
+.grid-header-title > a, .grid-header-title > span {
+    color: white !important;
+}
+
+span.black, h4.black {
+    color: black !important;
+}
+
+.modal-content {
+    border-radius: 10px !important;
+}
+
+.ctable thead tr th {
+    color: white;
+}
+
+.ctable.table-hover > tbody > tr:hover > td {
+    background-color: rgb(137, 135, 135);
+    color: white;
+}
+
+.ctable.table-hover > tbody > tr:hover > a {
+    color: white;
+}
+
+a.toolbar {
+    color: #888;
+    padding-left: 2px;
+    padding-right: 2px;
+}
+
+.right {
+    float: right;
+}
+
+.left {
+    float: left;
+}
+
+.icon-Cus-Size {
+    padding-top: 3px !important;
+    padding-bottom: 0px !important;
+    font-size: 1.8em;
+}
+
+body {
+    padding-top: 50px;
+}
+
+body {
+    font-family: Tahoma;
+    font-size: 15px;
+    background: rgba(236, 236, 236, 0.21);
+}
+
+    body > .navbar {
+        font-family: 'Lato', Calibri, Arial, sans-serif;
+    }
+
+.DateSunday {
+    background-color: orange;
+    color: black;
+}
+
+.BookMarked {
+    color: #428bca !important;
+}
+
+.Assigned {
+    color: red !important;
+}
+
+.crow {
+    min-height: 30px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+.headrow {
+    min-height: 40px;
+    font-weight: bold;
+}
+
+.row-index {
+    text-align: left;
+}
+
+#grid #gbody .grid-body:hover {
+    background: #b2cefa !important;
+    color: white;
+}
+
+.progress-bar, .progress {
+    border-radius: 10px !important;
+}
+
+.tfooter {
+    min-height: 40px;
+}
+
+.mytextbox-50 {
+    float: left;
+    width: 50%;
+}
+
+.progress {
+    position: relative;
+}
+
+    .progress span {
+        position: absolute;
+        left: 0;
+        width: 100%;
+        text-align: center;
+        z-index: 2;
+        font-size: 0.8em;
+    }
+
+.Wrapper {
+    overflow: hidden;
+    margin: 10px;
+}
+
+.Box {
+    float: left;
+    position: relative;
+    width: 182px;
+    padding-bottom: 182px;
+}
+
+.InnerContent {
+    border-radius: 7px;
+    background-color: #ffffff;
+    color: #2980b9;
+    position: absolute;
+    border: 1px solid #808080;
+    left: 10px;
+    top: 10px;
+    bottom: 10px;
+    right: 10px;
+    text-align: center;
+    overflow: hidden;
+}
+
+    .InnerContent .titleBox {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: #333;
+        color: #FFF;
+        padding: 5px;
+        text-align: center;
+        font-size: 13.5px;
+        -webkit-transition: all 0.3s ease-out;
+        -moz-transition: all 0.3s ease-out;
+        -o-transition: all 0.3s ease-out;
+        transition: all 0.3s ease-out;
+    }
+
+    .InnerContent div {
+        width: 100%;
+    }
+
+        .InnerContent div span {
+            font-size: 3em;
+        }
+
+
+.AInfo {
+    font-size: 12px;
+    font-family: Calibri;
+}
+
+
+.form-control.multiple-modal {
+    height: 25px;
+    font-size: 14px;
+}
+
+
+.modal-content.Custom-modal {
+    font-size: 14px;
+    line-height: 1.1;
+}
+
+    .modal-content.Custom-modal .modal-header {
+        padding-top: 0px;
+        padding-bottom: 0px;
+    }
+
+    .modal-content.Custom-modal .panel-heading.headrow {
+        padding-top: 5px;
+        padding-bottom: 5px;
+    }
+
+    .modal-content.Custom-modal .form-horizontal.modal-body {
+        padding-top: 5px;
+    }
+
+    .modal-content.Custom-modal .select2-container .select2-choice {
+        height: 27px;
+    }
+
+    .modal-content.Custom-modal .select2-container {
+        font-size: 12px;
+    }
+
+.SelectedLine {
+    background-color: rgb(137, 135, 135);
+}
+
+.VAlign {
+    vertical-align: inherit !important;
+}
+
+.UserIndexImage {
+    height: 30px;
+    width: 30px;
+}
+
+img.UserIndexImage {
+    height: 35px;
+    width: 35px;
+    /*background-image: url("/Images/DefaultUser.png");*/
+}
+
+.grid-cell.UserImageIndex {
+    padding-top: 3px !important;
+    padding-bottom: 3px !important;
+}
+
+.grid-cell.UserImageIndex {
+    padding-top: 3px !important;
+    padding-bottom: 3px !important;
+}
+
+.Badge_Cont {
+    position: relative;
+    margin: 0px;
+}
+
+.IndexBadges {
+    position: absolute;
+    top: -3px;
+    left: 20px;
+    text-align: center;
+    font-size: 10px;
+    padding: 2px 3px;
+    border-radius: 6px;
+    /*box-shadow: 0 0 6px #0C0C0C;*/
+}
+
+table.grid-table .ui-selecting {
+    background: #b2cefa !important;
+}
+
+.panel-heading.headrow {
+    background-image: -webkit-linear-gradient(top, #428bca 0%, #428bca 100%) !important;
+    background-image: -moz-linear-gradient(top, #428bca 0%, #428bca 100%) !important;
+    color: white !important;
+}
+
+
+
+.Loading {
+  -webkit-animation: spin 1s infinite linear;
+  -moz-animation: spin 1s infinite linear;
+  -o-animation: spin 1s infinite linear;
+  animation: spin 1s infinite linear;
+}
+@-moz-keyframes spin {
+  0% {
+    -moz-transform: rotate(0deg);
+  }
+  100% {
+    -moz-transform: rotate(359deg);
+  }
+}
+@-webkit-keyframes spin {
+  0% {
+    -webkit-transform: rotate(0deg);
+  }
+  100% {
+    -webkit-transform: rotate(359deg);
+  }
+}
+@-o-keyframes spin {
+  0% {
+    -o-transform: rotate(0deg);
+  }
+  100% {
+    -o-transform: rotate(359deg);
+  }
+}
+@keyframes spin {
+  0% {
+    -webkit-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+  100% {
+    -webkit-transform: rotate(359deg);
+    transform: rotate(359deg);
+  }
+}
+
+
+/* For Removing Arrows from <input type='number'/>*/
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}

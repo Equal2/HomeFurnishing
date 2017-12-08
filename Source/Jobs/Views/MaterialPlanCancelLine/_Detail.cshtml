@@ -1,0 +1,159 @@
+﻿@model IEnumerable<Model.ViewModel.MaterialPlanLineViewModel>
+@using Core.Common
+
+<style type="text/css">
+    #gbody-modal {
+        height: 250px;
+        overflow-y: scroll;
+        width: 100%;
+    }
+
+    tbody td {
+        padding: 2px 2px 2px 2px;
+    }
+
+    .textRight {
+        text-align: right;
+    }
+
+    .pull-middle {
+        display: inline-block;
+        vertical-align: middle;
+        float: none;
+    }
+</style>
+
+<div class="modal-content">
+    <div class="modal-header" style="border-bottom: 1px solid #8E8888">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"> <span class="glyphicon glyphicon-remove"></span></button>
+        <h3>
+            <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-file black"></span> Detail</span>
+        </h3>
+    </div>
+    <div>
+        @{
+            int unitDecimalPlaces = 0;
+        }
+        <div class="form-horizontal modal-body" style="padding-top:0px">
+            @Html.ValidationSummary(true)
+
+            <div style="padding-right:15px">
+                <div class="row">
+
+                    <div class="form-horizontal">
+
+                        <div class="panel panel-default" id="grid">
+                            <div class="panel-heading headrow" style="background-image: -webkit-linear-gradient(top, #428bca 0%, #428bca 100%);color:white">
+                                <div class="row grid-head">
+                                    <div class="block text-left" style="width:5%">
+                                        Srl.
+                                    </div>
+                                    <div class="block" style="width:92%">
+                                        <div class="row">
+                                            @*ProductInfo*@
+                                            <div class="block" style="width:20%">
+                                                Product Name
+                                            </div>
+                                            <div class="block" style="width: 20%">
+                                                Dimension1
+                                            </div>
+
+                                            <div class="block" style="width: 20%">
+                                                Dimension2
+                                            </div>
+                                            <div class="block" style="width: 20%">
+                                                Specification
+                                            </div>
+                                            <div class="block text-right" style="width: 20%">
+                                                Qty
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="panel-info" id="gbody-modal">
+                                @{
+                                    decimal RequiredQty = 0;
+                                    decimal StockPlanQty = 0;
+                                    decimal ProdPlanQty = 0;
+                                    decimal PurchPlanQty = 0;
+                                    int i = 0;
+                                }
+                                @foreach (var tem in Model)
+                                {
+                                    <div class='row crow grid-body' style='margin-left:0px;margin-right:0px'>
+                                        <div class='block row-index' style='width:5%'>
+                                            @{
+                                    //if (unitDecimalPlaces < Model[i].unitDecimalPlaces)
+                                    //{
+                                    //    unitDecimalPlaces = Model[i].unitDecimalPlaces ?? 0;
+                                    //}
+                                            }
+                                            @{i++;}
+                                            @i
+                                        </div>
+                                        <div class='block pull-middle' style='width:94%'>
+
+                                            <div class='row'>
+
+                                                <div class='block' style='width:20%'>
+                                                    <strong> @tem.ProductName</strong>
+                                                </div>
+
+                                                <div class='block' style='width: 20%'>
+                                                    @tem.Dimension1Name
+                                                </div>
+
+                                                <div class='block' style='width: 20%'>
+                                                    @tem.Dimension2Name
+                                                </div>
+
+                                                <div class='block' style='width: 20%'>
+                                                    @tem.Specification
+                                                </div>
+                                                <div class='block text-right' style='width: 20%'>
+                                                    @tem.ProdPlanQty
+                                                </div>
+                                                @{ProdPlanQty += tem.ProdPlanQty;}
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+                                    <hr style='margin-top:0px;margin-bottom:0px' />
+                                }
+
+                            </div>
+                        </div>
+
+
+
+
+                        <div class="row grid-head" style="margin-left:0px;margin-right:0px">
+                                <div class="block text-left" style="width:5%">
+
+                                </div>
+                                <div class="block" style="width:92%">
+                                    <div class="row">
+                                        <div class="block" style="width:20%">
+                                            <strong>Total</strong>
+                                        </div>
+                                        <div class="block" style="width:20%">
+                                        </div>
+                                        <div class="block" style="width:20%">
+                                        </div>
+                                        <div class="block" style="width:20%">
+                                        </div>
+                                        <div class="block text-right" style="width:20%">
+                                            @ProdPlanQty
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

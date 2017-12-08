@@ -1,0 +1,87 @@
+﻿@model Model.Models.Supplier
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@*@ViewBag.ProductTypeId*@
+
+@*<h2>Index</h2>
+    <h4>Product Supplier</h4>*@
+
+<span style="font-family: Calibri,sans-serif,Verdana;font-size:large">
+    @*@Html.ActionLink("Create New", "Create", new { Id = @ViewBag.ProductId })|@Html.ActionLink("Back to List", "Index", "Product", new { Id = @ViewBag.ProductTypeId }, null)*@
+    
+</span>
+@*<p>
+    @Html.ActionLink("Create New", "Create", new { Id = @ViewBag.ProductId })
+    @Html.ActionLink("Back to List", "Index", "Product", new { Id = @ViewBag.ProductTypeId }, null)
+</p>*@
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h4>
+            <span style="font-family: Calibri,sans-serif,Verdana">Product Supplier Details.</span>
+        </h4>
+
+    </div>
+    <div class="panel-info" style="padding-left:5px;padding-top:2px">
+       
+        <dl class="dl-horizontal">
+            <dt>
+                @Html.DisplayNameFor(m=>m.Name)
+            </dt>
+            <dd>
+                @Html.DisplayFor(m=>m.Name)
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(m=>m.Email)
+            </dt>
+            <dd>
+                @Html.DisplayFor(m=>m.Email)
+            </dd>
+            <dt>
+                @Html.DisplayNameFor(m=>m.Phone)
+            </dt>
+            <dd>
+                @Html.DisplayFor(m=>m.Phone)
+            </dd>
+            <dt>
+                @Html.DisplayNameFor(m=>m.Mobile)
+            </dt>
+            <dd>
+                @Html.DisplayFor(m=>m.Mobile)
+            </dd>
+            <dt>
+                @Html.DisplayNameFor(m => m.CreatedBy)
+            </dt>
+            <dd>
+                @Html.DisplayFor(m => m.CreatedBy)
+            </dd>
+            <dt>
+                @Html.DisplayNameFor(m => m.CreatedDate)
+            </dt>
+            <dd>
+                @Html.DisplayFor(m => m.CreatedDate)
+            </dd>
+            <dt>
+                @Html.DisplayNameFor(m => m.ModifiedBy)
+            </dt>
+            <dd>
+                @Html.DisplayFor(m => m.ModifiedBy)
+            </dd>
+            <dt>
+                @Html.DisplayNameFor(m => m.ModifiedDate)
+            </dt>
+            <dd>
+                @Html.DisplayFor(m => m.ModifiedDate)
+            </dd>
+        </dl>
+        <span style="font-family: Calibri,sans-serif,Verdana;font-size:large">
+            @Html.ActionLink("BackToList","SupplierList","Person")
+
+        </span>
+
+    </div>
+</div>

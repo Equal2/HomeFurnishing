@@ -1,0 +1,239 @@
+﻿@model Model.ViewModel.ProductBuyerViewModel
+
+@{
+    ViewBag.Title = "Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@using (Html.BeginForm("Post", "ProductBuyer", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+     @Html.HiddenFor(model => model.ProductBuyerId)
+    @Html.HiddenFor(m=>m.ProductId)
+    <div class="panel panel-default">
+
+        <div class="panel-heading">
+
+            <h3>
+                <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-file black"></span> Product Buyer -@ViewBag.Name</span>
+                <input type="submit" value="Save" class="btn btn-primary right" id="submit" style="width: 90px; background-color: #2980b9" />
+            </h3>
+            <hr style="margin-top:0px;margin-bottom:0px" />
+            
+            <div class="panel-info">
+                
+                <div class="btn-group">
+                    @Html.ActionLink(" ", "Create", "ProductBuyer", new { ProductId = @ViewBag.Id }, new { @class = "cbtn btn-circle glyphicon glyphicon-plus toolbar", @title = "Add New", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "PrevPage", "ProductBuyer", new { id = @Model.ProductBuyerId, ProductId = @ViewBag.Id }, new { @class = "cbtn btn-circle glyphicon glyphicon-arrow-left toolbar", @title = "Prev Record", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "NextPage", "ProductBuyer", new { id = @Model.ProductBuyerId, ProductId = @ViewBag.Id }, new { @class = "cbtn btn-circle glyphicon glyphicon-arrow-right toolbar", @title = "Next Record", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "Index", "ProductBuyer", new { id = @ViewBag.Id }, new { @class = "cbtn btn-circle glyphicon glyphicon-list", @title = "List", @data_toggle = "tooltip" })
+                 </div>
+                <div class="btn-group">
+                    <a class="cbtn btn-circle glyphicon glyphicon-option-horizontal dropdown-toggle" aria-expanded="false" style="padding-top: 6px;padding-bottom: 6px;" href="#" data-toggle="dropdown" id="dropdownMenu1">
+                    </a>
+                    <ul class="dropdown-menu pull-right" aria-labelledby="dropdownMenu1">
+                       
+                        <li><a href="@Url.Action("Email", "ProductBuyer")"><span class="glyphicon glyphicon-envelope"> </span> Email</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="@Url.Action("Report", "ProductBuyer")"><span class="glyphicon glyphicon-th"> </span> Report</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>        
+        <div class="panel-info" style="padding-left:15px">
+
+            <div class="form-horizontal">
+                
+                @Html.ValidationSummary(true)
+
+                <div>
+                    <div class="col-md-6">
+                        <div class="form-group" style="margin-top:15px">
+                            @Html.LabelFor(model => model.BuyerId, "Buyer", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(m => m.BuyerId, new { @class = "form-control col-xs-6" })
+                                @Html.ValidationMessageFor(m => m.BuyerId, null, new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group" style="margin-top:15px">
+                            @Html.LabelFor(model => model.BuyerSku, "Buyer Product Name", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(m => m.BuyerSku, new { @class = "form-control col-xs-6" })
+                                @Html.ValidationMessageFor(m => m.BuyerSku, null, new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.BuyerProductCode, "Buyer Product Code", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(m => m.BuyerProductCode, new { @class = "form-control col-xs-6" })
+                                @Html.ValidationMessageFor(m => m.BuyerProductCode, null, new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.BuyerUpcCode, "Buyer Upc Code", new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(m => m.BuyerUpcCode, new { @class = "form-control col-xs-6" })
+                                @Html.ValidationMessageFor(m => m.BuyerUpcCode, null, new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+
+                <div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.BuyerSpecification, (Model.ProductBuyerSettings.BuyerSpecificationDisplayName != "" ? Model.ProductBuyerSettings.BuyerSpecificationDisplayName : "Specification"), new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(m => m.BuyerSpecification, new { @class = "form-control col-xs-6" })
+                                @Html.ValidationMessageFor(m => m.BuyerSpecification, null, new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                   
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.BuyerSpecification1, (Model.ProductBuyerSettings.BuyerSpecification1DisplayName != "" ? Model.ProductBuyerSettings.BuyerSpecification1DisplayName : "Specification-1"), new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(m => m.BuyerSpecification1, new { @class = "form-control col-xs-6" })
+                                @Html.ValidationMessageFor(m => m.BuyerSpecification1, null, new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.BuyerSpecification2, (Model.ProductBuyerSettings.BuyerSpecification2DisplayName != "" ? Model.ProductBuyerSettings.BuyerSpecification2DisplayName : "Specification-2"), new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(m => m.BuyerSpecification2, new { @class = "form-control col-xs-6" })
+                                @Html.ValidationMessageFor(m => m.BuyerSpecification2, null, new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                  
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.BuyerSpecification3, (Model.ProductBuyerSettings.BuyerSpecification3DisplayName != "" ? Model.ProductBuyerSettings.BuyerSpecification3DisplayName : "Specification-3"), new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(m => m.BuyerSpecification3, new { @class = "form-control col-xs-6" })
+                                @Html.ValidationMessageFor(m => m.BuyerSpecification3, null, new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.BuyerSpecification4, (Model.ProductBuyerSettings.BuyerSpecification4DisplayName != "" ? Model.ProductBuyerSettings.BuyerSpecification4DisplayName : "Specification-4"), new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(m => m.BuyerSpecification4, new { @class = "form-control col-xs-6" })
+                                @Html.ValidationMessageFor(m => m.BuyerSpecification4, null, new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.BuyerSpecification5, (Model.ProductBuyerSettings.BuyerSpecification5DisplayName != "" ? Model.ProductBuyerSettings.BuyerSpecification5DisplayName : "Specification-5"), new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(m => m.BuyerSpecification5, new { @class = "form-control col-xs-6" })
+                                @Html.ValidationMessageFor(m => m.BuyerSpecification5, null, new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.BuyerSpecification6, (Model.ProductBuyerSettings.BuyerSpecification6DisplayName != "" ? Model.ProductBuyerSettings.BuyerSpecification6DisplayName : "Specification-6"), new { @class = "control-label col-md-4 col-sm-2" })
+                            <div class="col-md-7 col-sm-10">
+                                @Html.TextBoxFor(m => m.BuyerSpecification6, new { @class = "form-control col-xs-6" })
+                                @Html.ValidationMessageFor(m => m.BuyerSpecification6, null, new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row"></div>
+            </div>
+        </div>
+    </div>
+}
+<script type="text/javascript">
+
+    $(function(){
+        CustomSelectFunction($("#BuyerId"), '/ComboHelpList/GetBuyers', '/ComboHelpList/SetSingleBuyer', ' ', false, 1);
+        //CustomSelectFunction($("#SaleToBuyerId"), '/SaleEnquiryProductMapping/GetCustomPerson', '/ComboHelpList/SetSinglePerson', ' ', false, 1);
+    })
+
+    var IsSaved=false;
+    var ValidationCount=0;
+
+    $('form').submit(function(event){
+    
+        if(!IsSaved)
+        {
+            if(!ValidateData())
+            {
+                return false;
+            }
+            IsSaved=true;
+            return IsSaved;
+        }
+        else
+        {
+            return false;
+        }
+
+
+    });
+
+
+    function ValidateData() {        
+        var DocId=@Model.ProductBuyerId;
+        var TempValue;
+        var ValidationMessage="";
+
+
+
+        //Checking for dulicate key value
+        if(DocId<=0)
+        {
+            TempValue= $('#BuyerId').DuplicateCheckForCreate({ name: 'ProductBuyer', value: $('#BuyerId').val(), doctype: 0 });
+            if (TempValue){ ValidationMessage=$('#ProductBuyerName').val() + " already exist <br />";}
+        }
+        else
+        {
+            test = $('#BuyerId').DuplicateCheckForEdit({ name: 'ProductBuyer', value: $('#BuyerId').val(), doctype: 0,headerId:DocId });
+            if (TempValue) {ValidationMessage+=$('#ProductBuyerName').val() + " already exist <br />";}
+        }
+        if(TempValue)
+        {
+            if($('#validationerrormsg').length==0){
+            $('.panel-info').filter(':last').before('<div class="alert alert-danger" role="alert" id="validationerrormsg">'+ValidationMessage+'</div>');}
+        else
+            {
+                $('#validationerrormsg').html(ValidationMessage);
+        }
+        }
+        return  (ValidationMessage=="");
+
+    }
+
+
+</script>
+

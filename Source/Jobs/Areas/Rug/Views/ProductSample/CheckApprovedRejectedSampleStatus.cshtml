@@ -1,0 +1,179 @@
+﻿@*@model IEnumerable<Model.Models.ProductSample>*@
+@model IEnumerable<Presentation.ViewModels.ProductSampleViewModel>
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<script src="~/Scripts/jquery.fancybox.js"></script>
+<link href="~/Content/jquery.fancybox.css" rel="stylesheet" />
+@helper RenderImage(Presentation.ViewModels.ProductSampleViewModel h)
+{
+    byte[] photo = h.ProductPicture;
+
+    string imageSrc = null;
+    if (photo != null)
+    {
+        MemoryStream ms = new MemoryStream();
+        ms.Write(photo, 0, photo.Length); // strip out 78 byte OLE header (don't need to do this for normal images)
+        string imageBase64 = Convert.ToBase64String(ms.ToArray());
+        imageSrc = string.Format("data:image/gif;base64,{0}", imageBase64);
+    }
+    <a class="fancybox" rel="gallery1" href="@imageSrc" title="@h.SampleName">
+        <img src="@imageSrc" alt="" style="max-height:100px;max-width:100px" />
+    </a>
+}
+@helper RenderActionColumn(bool isApproved, bool isModificationRequired, int productsamplId, int productSamplePhotoApprovalId, DateTime? shipmentDate)
+{
+    
+    if (isModificationRequired)
+    {
+        @Html.ActionLink("Edit", "EditReviewedSample", "ProductSample", new { id = productsamplId }, null);
+    }
+    else if (isApproved && shipmentDate != null)
+    {
+        <text>Ship Date :<b> @shipmentDate.Value.ToString("dd-MMM-yyyy")</b> </text>
+    }
+    else if (isApproved && (shipmentDate == null ))
+    {
+        @Html.ActionLink("Send PhysicalSample", "SendPhysicalSample", "ProductSample", new { pspaId = productSamplePhotoApprovalId }, null);
+    }
+}
+
+@helper CustomRenderingOfColumn(bool isApproved, bool isModificationRequired)
+{
+    if (isApproved)
+    {
+        <text>Yes</text>
+    }
+    else if (isModificationRequired)
+    {
+        <text>Need Update</text>
+    }
+    else if (!isModificationRequired && !isApproved)
+    {
+        <text>Sample has been rejected. Please check the remark.</text>
+    }
+}
+
+@helper ApprovalStatus(Presentation.ViewModels.ProductSampleViewModel status)
+    {
+        if(!status.IsApproved&&!status.IsApproved&&!status.IsModificationRequired)
+         {
+            <text>Rejected</text>
+         }
+         else if(status.IsModificationRequired)
+        {
+             <text> </text>
+        }
+        else if (status.ProductSampleApproval == null)
+        {
+            <text>Pending</text>
+        }
+        else if(status.ProductSampleApproval.IsApproved==true)
+        {
+            <text>Sample Approved</text>
+        }
+        else
+        {
+            <text>Physical Sample Rejected</text>
+        }
+}
+
+<span style="font-family: Calibri,sans-serif,Verdana;font-size:large">
+    @Html.ActionLink("Create New", "SampleTypeSelection")
+
+</span>
+
+<div class="panel panel-default" style="padding:5px">
+
+    <div class="panel panel-heading">
+
+        <h4>
+            <span style="font-family: Calibri,sans-serif,Verdana">Product Sample Status</span>
+        </h4>
+
+    </div>
+
+    @*<div class="panel panel-info" style="padding:5px">
+
+            <p>
+                @Html.ActionLink("Create New", "Create", new { Id = @ViewBag.ProductTypeId })
+
+            </p>
+        </div>*@
+
+    <div class="panel panel-info" style="padding:15px">
+
+        <div class="form-horizontal">
+            <div class="form-group">
+
+                @Html.Grid(Model).Columns(columns =>
+           {
+               columns.Add(foo => foo.ProductSampleId).Titled("ApplicationNo.").Sortable(true).Filterable(true);
+               columns.Add(foo => foo.ProductSamplePhotoApprovalId, true);
+               columns.Add(foo => foo.SampleName).Sortable(true).Titled("SampleName").Filterable(true).Css("modal-link");
+               columns.Add(foo => foo.SampleDescription).Titled("Description").Sortable(true).Filterable(true);
+               columns.Add(foo => foo.EmailDate).Titled("Email Date").Format("{0:dd/MMM/yyyy}");
+               //  columns.Add(foo => foo.Employee.Name).Titled("Contected Employee").SetWidth(30);
+
+               //columns.Add().Encoded(false).Sanitized(false).Titled("SamplePicture").RenderValueAs(ad => @<img class="thumb" src="data:image;base64,@System.Convert.ToBase64String(ad.ProductPicture)" height="100" width="100" alt="PicTemp" />); 
+               columns.Add().Sanitized(false).Encoded(false).RenderValueAs(m => RenderImage(m)).SetWidth(100).Titled("Product<br/> Picture");
+               columns.Add(foo => foo.ResponseDate).Sortable(true).Titled("Response<br/>Date").Filterable(true).Css("modal-link").Format("{0:dd/MMM/yyyy}");
+               columns.Add(foo => foo.Remark).Titled("Remark").Sortable(true).Filterable(true);
+               columns.Add(foo => foo.IsApproved).Titled("Photo<br/>Approval?").RenderValueAs(o => CustomRenderingOfColumn(o.IsApproved, o.IsModificationRequired)).SetWidth(50);
+
+               columns.Add().Encoded(false).Sanitized(false).RenderValueAs(d => @Html.ActionLink("ViewImages", "FullImageView", new { id = d.ProductSampleId, redirect = "CheckApprovedRejectedSampleStatus" }, new { @class = "viewDialog" })).SetWidth(50);
+               columns.Add().Encoded(false).Sanitized(false).RenderValueAs(d => RenderActionColumn(d.IsApproved, d.IsModificationRequired, d.ProductSampleId, d.ProductSamplePhotoApprovalId, d.ShipmentDate));
+               columns.Add().Titled("Physical<br/>Sample").RenderValueAs(m => ApprovalStatus(m));
+
+           }).WithPaging(25).EmptyText("No records found.")
+
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+<div id="dialog-ViewImage" style="display: none">
+</div>
+
+@*<script type="text/javascript">
+        $(document).ready(function () {
+            $(".viewDialog").bind("click", function (e) {
+                var url = $(this).attr('href');
+                $("#dialog-ViewImage").dialog({
+                    title: 'Sample',
+                    autoOpen: false,
+                    resizable: false,
+                    height: 700,
+                    width: 500,
+                    show: { effect: 'drop', direction: "up" },
+                    modal: true,
+                    draggable: true,
+                    open: function (event, ui) {
+                        $(this).load(url);
+                    },
+                    close: function (event, ui) {
+                        $(this).dialog('close');
+                    }
+                });
+                $("#dialog-ViewImage").dialog('open');
+                return false;
+            });
+        });
+
+    </script>*@
+<script type="text/javascript">
+    $(document).ready(function () {
+        $(".fancybox").fancybox({
+            helpers: {
+                overlay: {
+                    css: {
+                        'background': 'rgba(58, 42, 45, 0.95)'
+                    }
+                }
+            }
+        });
+    });
+</script>

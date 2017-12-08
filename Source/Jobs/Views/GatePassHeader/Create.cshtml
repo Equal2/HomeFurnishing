@@ -1,0 +1,416 @@
+﻿@model Model.ViewModel.GatePassHeaderViewModel
+@using Core.Common
+@{
+    ViewBag.Title = "Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!-- modal placeholder-->
+<div id='myModal' class='modal fade in'>
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div id='myModalContent'></div>
+        </div>
+    </div>
+</div>
+
+@using (Html.BeginForm("Post", "GatePassHeader", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(m => m.SiteId)
+    @Html.HiddenFor(m => m.Status)
+    @Html.HiddenFor(m => m.DivisionId)
+    @Html.HiddenFor(m => m.GatePassHeaderId)
+    @Html.HiddenFor(m => m.DocTypeId)  
+    @Html.HiddenFor(m => m.CreatedDate)
+    <div class="panel panel-default">
+        <div class="panel-heading">
+
+            @CustomHelpers.RenderResHeaderInfo(ViewBag.transactionType, (int?)ViewBag.PendingToSubmit, (int?)ViewBag.PendingToReview, ViewBag.Name)
+            <hr style="margin-top: 5px; margin-bottom: 5px; border-top: 1px solid #d8d5d5" />
+            @{
+    string EditAction = "";
+    if (Model.Status == (int)StatusConstants.Drafted || Model.Status == (int)StatusConstants.Import)
+    {
+        EditAction = "Modify";
+    }
+    else if ((Model.Status == (int)StatusConstants.Submitted || Model.Status == (int)StatusConstants.Modified))
+    {
+        EditAction = "ModifyAfter_Submit";
+    }
+    else
+    {
+        EditAction = "DetailInformation";
+    }
+            }
+
+            <div class="panel-info">
+                <div class="btn-group">
+                    @Html.ActionLink(" ", "Create", "GatePassHeader", new { @id = @ViewBag.id }, new { @class = "cbtn btn-circle glyphicon glyphicon-plus", @title = "Add New", @data_toggle = "tooltip", target = "_blank" })
+                    @Html.ActionLink(" ", EditAction, "GatePassHeader", new { @id = Model.GatePassHeaderId, IndexType = ViewBag.IndexStatus }, new { @class = "cbtn btn-circle glyphicon glyphicon-edit", @title = "Edit", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "GeneratePrints", "GatePassHeader", new { Ids = Model.GatePassHeaderId, DocTypeId = Model.DocTypeId }, new { @class = "cbtn btn-circle glyphicon glyphicon-print", @title = "Print", @data_toggle = "tooltip", @id = "PrintRecordC", target = "_blank" })
+                    @Html.ActionLink(" ", "PrevPage", "GatePassHeader", new { DocId = @Model.GatePassHeaderId, DocTypeId = Model.DocTypeId }, new { @class = "cbtn btn-circle glyphicon glyphicon-arrow-left", @title = "Prev Record", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "NextPage", "GatePassHeader", new { DocId = @Model.GatePassHeaderId, DocTypeId = Model.DocTypeId }, new { @class = "cbtn btn-circle glyphicon glyphicon-arrow-right", @title = "Next Record", @data_toggle = "tooltip" })
+                    @Html.ActionLink(" ", "Index", "GatePassHeader", new { id = ViewBag.id, IndexType = ViewBag.IndexStatus }, new { @class = "cbtn btn-circle glyphicon glyphicon-list", @title = "List", @data_toggle = "tooltip" })
+                </div>
+                <div class="btn-group">
+                    <a class="cbtn btn-circle glyphicon glyphicon-option-horizontal dropdown-toggle" aria-expanded="false" style="padding-top: 6px;padding-bottom: 6px;" href="#" data-toggle="dropdown" id="dropdownMenu1">
+                    </a>
+                    <ul class="dropdown-menu pull-right" aria-labelledby="dropdownMenu1">
+                        <li><a id="DocHistory" data-modal="" href="@Url.Action("GetHistory", "LogHistory", new { Ids = Model.GatePassHeaderId, DocTypeId = Model.DocTypeId })"><span class="glyphicon glyphicon-user"> </span> History</a></li>
+                        <li><a href="@Url.Action("Email", "GatePassHeader")"><span class="glyphicon glyphicon-envelope"> </span> Email</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="@Url.Action("Report", "GatePassHeader")"><span class="glyphicon glyphicon-th"> </span> Report</a></li>
+                    </ul>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="panel-info" style="padding-left:15px">
+
+            <div class="form-horizontal">
+
+                @Html.ValidationSummary(true)
+                <div>
+                    @if (Model.ReferenceDocId != null)
+                    {
+                        <div class="alert alert-info" style="text-align:center;">
+                            <strong>Locked : Gate Pass is auto generated from other entry.</strong>
+                        </div>
+                    }
+
+                    <h4 class="col-md-12 black">
+                        <span class="glyphicon glyphicon-align-justify"></span>
+                        1.Gate Pass Details
+                    </h4>
+                  
+                        <div>
+                            <div class="col-md-6">
+                                <div class="form-group" style="margin-top:15px">
+                                    @Html.LabelFor(model => model.DocDate, "Date", new { @class = "control-label col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextBoxFor(m => m.DocDate, "{0:dd/MMMM/yyyy}", new { @class = "datepickerWithNFD form-control required" })
+                                        @Html.ValidationMessageFor(model => model.DocDate, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <div class="col-md-6">
+                                <div class="form-group" style="margin-top:15px">
+                                    @Html.LabelFor(model => model.DocNo, "GatePass No", new { @class = "control-label col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextBoxFor(m => m.DocNo, null, new { @class = "form-control", @readonly = "true" })
+                                        @Html.ValidationMessageFor(m => m.DocNo, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.PersonId, "Job Worker", new { @class = "control-label col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextBoxFor(m => m.PersonId, new { @class = "form-control required" })
+                                        @Html.ValidationMessageFor(model => model.PersonId, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.GodownId, "Godown", new { @class = "control-label col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextBoxFor(m => m.GodownId, new { @class = "form-control required" })
+                                        @Html.ValidationMessageFor(m => m.GodownId, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.OrderById, "Order By", new { @class = "control-label col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextBoxFor(m => m.OrderById, new { @class = "form-control  required" })
+                                        @Html.ValidationMessageFor(m => m.OrderById, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.Remark, "Remark", new { @class = "control-label col-md-4 col-sm-2" })
+                                    <div class="col-md-7 col-sm-10">
+                                        @Html.TextAreaFor(m => m.Remark, new { @class = "form-control" })
+                                        @Html.ValidationMessageFor(m => m.Remark, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+
+                          
+
+                       
+
+
+                        </div>
+
+                  
+                </div>
+
+                <hr />
+
+                <div class="row">
+                    <h4 class="col-md-12 black" style="margin-top:15px">
+                        <span class="glyphicon glyphicon-shopping-cart"></span>
+                        3.Products
+                    </h4>
+                </div>
+
+
+                <div class="panel-info" style="height:40px">
+                    <div class="btn-group" style="padding:5px 0 3px 0;margin:0px;font-weight:bold">
+                        <span class="glyphicon glyphicon-plus-sign"></span>
+                        @{string Action = "";
+                        if (Model.Status == (int)StatusConstants.Drafted || Model.Status == (int)StatusConstants.Import)
+                        { Action = "CreateLine"; }
+                        else if (Model.Status == (int)StatusConstants.Submitted || Model.Status == (int)StatusConstants.Modified)
+                        { Action = "CreateLineAfter_Submit"; }
+                        }
+                       
+                        @Html.ActionLink("Add New Row ", Action, "GatePassLine", new { id = @Model.GatePassHeaderId, IsProdBased = false }, new { data_modal = "", id = "btnCreatePO", @class = "toolbar", @title = "Add New", @data_toggle = "tooltip", @data_detailDisabled = "true" })
+                    </div>
+                 
+                </div>
+
+                <div style="padding-right:15px;">
+
+                    <div class="panel panel-default" id="grid">
+
+                        <div style="min-width: 700px;">
+
+                            <div class="panel-info" id="gbody">
+
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="panel panel-default" id="gridcharges">
+
+                    </div>
+                </div>
+
+         
+
+            </div>
+        </div>
+    </div>
+}
+
+
+@if ((ViewBag.Mode == "Add") || (ViewBag.Mode == "Edit"))
+{
+
+    <script type="text/javascript">
+
+   
+
+        //Reloading the table contents on modal hide
+      $('#myModal').on('hidden.bs.modal', function () {
+            LoadProducts();
+            var id='@Model.GatePassHeaderId';
+        });
+
+        $(document).ready(function(){
+            enableModalTransitions();
+        })
+
+        var IsSaved=false;
+        var ValidationCount=0;
+        @*var CostCenterUnique='@Model.JobOrderSettings.isUniqueCostCenter';*@
+
+        $('form').submit(function(event){
+
+            if(!IsSaved)
+            {
+                //if(!ValidateData() || !ValidateCostCenter())
+                if(!ValidateData())
+                {
+                    return false;
+                }
+                IsSaved=true;
+                return IsSaved;
+            }
+            else
+            {
+                return false;
+            }
+
+
+        });
+
+
+        function ValidateData() {
+            var DocId=@Model.GatePassHeaderId;
+            var TempValue;
+            var ValidationMessage="";
+
+           
+            //if(DocId<=0)
+            //{
+
+                
+                //TempValue= $('#DocNo').DuplicateCheckForCreate({ name: 'GatePassHeaders', value: $('#DocNo').val(), doctype: $('#DocTypeId').val() });
+                //if (TempValue){ ValidationMessage=$('#DocNo').val() + " already exist <br />";}
+           // }
+            //else
+            //{
+               
+                //TempValue = $('#DocNo').DuplicateCheckForEdit({ name: 'GatePassHeaders', value: $('#DocNo').val(), doctype: $('#DocTypeId').val(),headerId:DocId });
+                //if (TempValue) {ValidationMessage+=$('#DocNo').val() + " already exist <br />";}
+           // }
+            if(TempValue)
+            {
+                if($('#validationerrormsg').length==0){
+                    $('.panel-info').filter(':eq(1)').before('<div class="alert alert-danger" role="alert" id="validationerrormsg">'+ValidationMessage+'</div>');}
+                else
+                {
+                    $('#validationerrormsg').html(ValidationMessage);
+                }
+            }
+
+            return  (ValidationMessage=="");
+
+        }
+
+
+
+        function ValidateCostCenter(thisv) {
+            var DocId=@Model.GatePassHeaderId;
+            var TempValue;
+            var ValidationMessage="";
+            if(ValidationMessage)
+            {
+                if($('#csvalidationerrormsg').length==0){
+                    $('.panel-info').filter(':eq(1)').before('<div class="alert alert-danger" role="alert" id="csvalidationerrormsg">'+ValidationMessage+'</div>');}
+                else
+                {
+                    $('#csvalidationerrormsg').html(ValidationMessage);
+                }
+            }
+            else
+            {
+                $('#csvalidationerrormsg').remove();
+            }
+
+            return  (ValidationMessage=="");
+
+        }
+
+
+    </script>
+
+}
+
+
+<script type="text/javascript">
+
+
+    $(document).ready(function () {
+        var id=@Model.GatePassHeaderId;
+        if(id==null||id==0)
+        {
+            $(document).find('a#btnCreateF').removeAttr('href').removeAttr('data-modal');
+            $(document).find('a#btnCreate').removeAttr('href').removeAttr('data-modal');
+            $(document).find('a#btnCreatePO').removeAttr('href').removeAttr('data-modal');
+        }
+        else
+        {
+            $('#GodownId').attr('readonly','true');
+        }
+
+        $(document).ajaxStart(function () {
+            if ($(':submit', 'div.modal-content').length)
+                $(':submit', 'div.modal-content').attr("disabled", 'disabled');
+            return;
+        });
+
+        $(document).ajaxStop(function () {
+            if ($(':submit', 'div.modal-content').length)
+                $(':submit', 'div.modal-content').removeAttr("disabled");
+            return;
+        });
+
+        @*if('@Model.JobOrderSettings.isMandatoryProductUID'=="True")
+            $(document).find('a#btnCreateF').removeAttr('href').removeAttr('data-modal').attr("disabled","disabled");*@
+
+      CustomSelectFunction($("#PersonId"), '/ComboHelpList/GetPerson', '/ComboHelpList/SetSinglePerson', ' ', false, 1);
+      CustomSelectFunction($("#OrderById"), '/ComboHelpList/GetEmployees', '/ComboHelpList/SetSingleEmployee', ' ', false, 1);
+      CustomSelectFunction($("#GodownId"), '/ComboHelpList/GetGodown', '/ComboHelpList/SetSingleGodown', ' ', false, 1);
+      
+        //$('#PersonId').select2('focus');
+        //Calling the function to load the table data/ Line information
+        LoadProducts();
+
+        //Adding Hidden Input Fields
+        AddFields();
+        var id=@Model.GatePassHeaderId;
+
+       
+
+    });
+
+
+
+
+
+    
+
+    function LoadProducts() {
+        var groupId=@Model.GatePassHeaderId;
+        var status='@Model.Status';
+        var link="/GatePassLine/_Index/";
+        $.ajax({
+            url: link,
+            type: "GET",
+            data:{id:groupId,status:status},
+            success: function (data) {
+                $("#gbody").html(data);
+            },
+            error: function (result) {
+                alert("Error");
+            }
+        });
+    };
+</script>
+
+
+@if ((ViewBag.Mode != "Add") && (ViewBag.Mode != "Edit"))
+{
+    <script type="text/javascript">
+
+        $(document).ready(function(){
+            DisablePageNavigation();
+        })
+
+    </script>
+}
+
+@if ((Model.Status == (int)ActivityTypeContants.Modified || Model.Status == (int)ActivityTypeContants.Submitted)
+    && (ViewBag.transactionType == "submit" || ViewBag.transactionType == "submitContinue" || ViewBag.transactionType == "review" || ViewBag.transactionType == "ReviewContinue"))
+{
+    <script type="text/javascript">
+        $(document).ready(function(){
+            enableActivityLogReason();
+        })
+    </script>
+}
+@if (ViewBag.transactionType != null && (ViewBag.transactionType == "submitContinue" || ViewBag.transactionType == "ReviewContinue"))
+{
+    <script type="text/javascript">
+        $(document).ready(function(){
+            CreateTrasitionEffect();
+        })
+    </script>
+}
