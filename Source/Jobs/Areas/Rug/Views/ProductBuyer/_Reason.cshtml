@@ -11,7 +11,7 @@
         </h3>
     </div>
     <div>
-        @using (Html.BeginForm("DeleteConfirmed", "ProductBuyer", FormMethod.Post, new { @class = "modal-form", id = "modform" }))
+        @using (Html.BeginForm("DeleteConfirmed", "ProductBuyer", FormMethod.Post, new { @class = "modal-form", id = "modform", data_pageReload = "true" }))
         {
             @Html.AntiForgeryToken()
             @Html.HiddenFor(m=>m.id)

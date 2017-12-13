@@ -1,0 +1,164 @@
+﻿@using System.Text.RegularExpressions
+
+@{
+    ViewBag.Title = "Sale Enquiry Product Mapping";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style type="text/css">
+    .grid {
+        width: 1140px;
+        height: 72vh;
+    }
+
+
+
+
+    .ui-grid-cell {
+        border-style: solid;
+        border-width: thin;
+    }
+
+    .text-right {
+        text-align: right;
+        /*float: right;*/
+    }
+
+
+    .cell-text {
+        font-size: 13px;
+        font-weight: normal;
+    }
+
+    .cell-text-center {
+        font-size: 13px;
+        font-weight: normal;
+        text-align: center;
+    }
+
+    .header-text {
+        font-size: 13px;
+    }
+
+
+    .header-text-center {
+        font-size: 13px;
+        text-align: center;
+    }
+
+    .ui-grid-cell {
+        overflow: visible;
+        z-index: 99999;
+    }
+
+    .ui-grid-cell, ui-select-wrap {
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        -khtml-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+    }
+
+    .ui-select-container {
+        min-width: 150px;
+    }
+</style>
+
+
+
+
+
+
+<html ng-app="SaleEnquiryProductMappingWithGrid">
+<head>
+    <script data-require="jquery@2.1.3" data-semver="2.1.3" src="https://code.jquery.com/jquery-2.1.3.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.13/angular.js"></script>
+    <link data-require="ui-select@0.11.1" data-semver="0.11.1" rel="stylesheet" href="https://cdn.rawgit.com/angular-ui/ui-select/v0.11.2/dist/select.css" />
+    <script data-require="ui-select@0.11.1" data-semver="0.11.1" src="https://cdn.rawgit.com/angular-ui/ui-select/v0.11.2/dist/select.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.8.5/css/selectize.default.css">
+    <script src="https://cdn.rawgit.com/angular-ui/ui-grid.info/v3.0.7/release/3.0.7/ui-grid.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.rawgit.com/angular-ui/ui-grid.info/v3.0.7/release/3.0.7/ui-grid.min.css" type="text/css" />
+
+    <link rel="stylesheet" href="main.css" type="text/css" />
+</head>
+
+<body>
+    <div ng-controller="MainCtrl">
+        @using (Html.BeginForm())
+        {
+            <div class="panel panel-default" style="margin-bottom: 0px; height: 100px">
+
+                <div class="panel-heading">
+                    <h3>
+                        <span style="font-family: Calibri,sans-serif,Verdana;font-weight:bold" class="black"><span class="glyphicon glyphicon-file black"></span> Sale Enquiry Product Mapping</span>
+                    </h3>
+                    <div class="panel-info">
+                        <div class="btn-group">
+                            @Html.ActionLink(" ", " ", " ", null, new { @class = "cbtn btn-circle glyphicon glyphicon-refresh toolbar", @title = "Refresh Page", @data_toggle = "tooltip", @id = "RefreshPage" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+
+
+        <div ui-grid="gridOptions" ui-grid-cellnav ui-grid-resize-columns ui-grid-edit="" class="grid"></div>
+    </div>
+
+    <script type="text/ng-template" id="uiSelect">
+        @*<ui-select-wrap>
+            <ui-select ng-model="MODEL_COL_FIELD" theme="selectize" ng-disabled="disabled" append-to-body="true">
+                <ui-select-match placeholder="Choose...">{{ COL_FIELD }}</ui-select-match>
+                <ui-select-choices repeat="item in col.colDef.editDropdownOptionsArray | filter: $select.search  ">
+                    <span>{{ item }}</span>
+                </ui-select-choices>
+            </ui-select>
+        </ui-select-wrap>*@
+
+
+
+        @*<ui-select-wrap>
+            <ui-select ng-model="MODEL_COL_FIELD" id="ptype" theme="selectize" ng-disabled="disabled" title="Choose Property Type" append-to-body="true">
+                <ui-select-match placeholder="Select a Property Type">{{$select.selected.name}}</ui-select-match>
+                <ui-select-choices repeat="propType.value as propType in col.colDef.propertyTypes track by $index | filter: $select.search">
+                    <div ng-bind-html="propType.value | highlight: $select.search"><span>{{ propType.name }}</span></div>
+                    <span>{{ propType.name }}</span>
+
+                    <span ng-bind-html="propType.name | highlight: $select.search">{{ propType.name }}</span>
+                    <small ng-bind-html="propType.value | highlight: $select.search"></small>
+
+                </ui-select-choices>
+        </ui-select-wrap>*@
+
+
+        @*<ui-select-wrap>
+            <ui-select ng-model="MODEL_COL_FIELD" theme="bootstrap" append-to-body="true">
+                <ui-select-match placeholder="Choose...">{{ $select.selected.orebodyName }}</ui-select-match>
+                <ui-select-choices repeat="item.projectorebody_id as item in col.colDef.editDropdownOptionsArray | filter: $select.search">
+                    <span>{{ item.orebodyName }}</span>
+                </ui-select-choices>
+            </ui-select>
+        </ui-select-wrap>*@
+
+        <ui-select-wrap>
+            <ui-select ng-model="MODEL_COL_FIELD"  theme="bootstrap" append-to-body="true">
+                <ui-select-match placeholder="Choose...">{{ $select.selected.text }}</ui-select-match>
+                <ui-select-choices repeat="item.id as item in col.colDef.editDropdownOptionsArray | filter: $select.search | limitTo: 100">
+                    <span>{{ item.text }}</span>
+                    <br /><span>{{ item.AProp1 }}</span>
+                    <br /><span>{{ item.AProp2 }}</span>
+                    <br /><span>{{ item.TextProp1 }}</span>
+                    <br /><span>{{ item.TextProp2 }}</span>
+                </ui-select-choices>
+            </ui-select>
+        </ui-select-wrap>
+
+    </script>
+
+
+    <script src="~/Scripts/SaleEnquiryProductMappingWithGrid/SaleEnquiryProductMappingWithGrid.js"></script>
+</body>
+
+</html>
+

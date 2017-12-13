@@ -723,6 +723,7 @@
     <Compile Include="Controllers\ProductConsumptionLineController.cs" />
     <Compile Include="Controllers\ProductController.cs" />
     <Compile Include="Controllers\ProductCustomGroupExcelImportController.cs" />
+    <Compile Include="Controllers\SaleEnquiryProductMappingWithGridController.cs" />
     <Compile Include="Controllers\UserRolesNewController.cs" />
     <Compile Include="Controllers\UserController.cs" />
     <Compile Include="Controllers\ProductCustomGroupHeaderController.cs" />
@@ -3182,6 +3183,7 @@
     <Content Include="Scripts\DashboardV2.js" />
     <Content Include="Scripts\DisplayJobInvoiceSummary\DisplayJobInvoiceSummary.js" />
     <Content Include="Scripts\DisplaySaleOrderInventoryStatus\DisplaySaleOrderInventoryStatus.js" />
+    <Content Include="Scripts\SaleEnquiryProductMappingWithGrid\SaleEnquiryProductMappingWithGrid.js" />
     <Content Include="Scripts\RolePermission\RolePermission.js" />
     <Content Include="Scripts\DisplayJobOrderBalance\DisplayJobOrderBalance.js" />
     <Content Include="Scripts\DisplayPaymentAdvice\DisplayPaymentAdvice.js" />
@@ -5257,6 +5259,7 @@
     <Content Include="Views\Shared\PermissionDenied.cshtml" />
     <Content Include="Views\Shared\PermissionDenied_Modal.cshtml" />
     <Content Include="Views\Display_SaleOrderInventoryStatus\Display_SaleOrderInventoryStatus.cshtml" />
+    <Content Include="Views\SaleEnquiryProductMappingWithGrid\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

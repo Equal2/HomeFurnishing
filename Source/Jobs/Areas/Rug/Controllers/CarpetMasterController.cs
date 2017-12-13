@@ -1624,7 +1624,7 @@ namespace Jobs.Areas.Rug.Controllers
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult EditSizePost(CarpetMasterViewModel vm, FormCollection collection)
+        public ActionResult EditSizePost(CarpetMasterViewModel vm, FormCollection collection, bool? IsMultiSave = false)
         {
 
 
@@ -2374,6 +2374,8 @@ namespace Jobs.Areas.Rug.Controllers
                         string message = _exception.HandleException(ex);
                         ModelState.AddModelError("", message);
                         PrepareViewBag(vm);
+                        if ((IsMultiSave ?? false) == true)
+                            throw ex;
                         return PartialView("EditSize", vm);
 
                     }
@@ -3884,7 +3886,21 @@ namespace Jobs.Areas.Rug.Controllers
                 vm.ProductCode = ProductResult.ProductName;
                 vm.ProductName = ProductResult.ProductName;
 
-                EditSizePost(vm, collection);
+                //EditSizePost(vm, collection, true);
+
+                try
+                {
+                    EditSizePost(vm, collection, true);
+                }
+
+                catch (Exception ex)
+                {
+                    string message = _exception.HandleException(ex);
+                    ModelState.AddModelError("", message);
+                    PrepareViewBag(vm);
+                    return PartialView("EditSize", vm);
+                }
+                
             }
             CarpetMasterViewModel temp = new CarpetMasterViewModel();
             temp.ProductCategoryId = vm.ProductCategoryId;

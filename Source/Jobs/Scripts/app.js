@@ -39,7 +39,7 @@ app.controller('MainCtrl', ['$scope', '$log', '$http', 'uiGridConstants', 'uiGri
           exporterMenuPdf: false,
           gridMenuShowHideColumns : true,
           exporterCsvLinkElement: angular.element(document.querySelectorAll(".custom-csv-link-location")),
-          exporterCsvFilename: ($("#ReportTitle").val() != null ? $("#ReportTitle").val() : $("#ReportHeader_ReportName").val()) + '.csv',
+          exporterCsvFilename: (($("#ReportTitle").val() != null && $("#ReportTitle").val()) != "" ? $("#ReportTitle").val() : $("#ReportHeader_ReportName").val()) + '.csv',
           exporterMenuCsv: false,
           gridMenuCustomItems: [{
               title: 'Export Data As CSV',
@@ -256,7 +256,7 @@ app.controller('MainCtrl', ['$scope', '$log', '$http', 'uiGridConstants', 'uiGri
                   doc.setFontSize(15);
                   doc.setFontStyle('bold');
 
-                  var ReportTitle = $("#ReportTitle").val() != null ? $("#ReportTitle").val() : $("#ReportHeader_ReportName").val();
+                  var ReportTitle = ($("#ReportTitle").val() != null && $("#ReportTitle").val()) ? $("#ReportTitle").val() : $("#ReportHeader_ReportName").val();
                   xOffset = (doc.internal.pageSize.width / 2) - (doc.getStringUnitWidth(ReportTitle) * doc.internal.getFontSize() / 2);
 
 

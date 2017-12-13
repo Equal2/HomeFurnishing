@@ -326,10 +326,10 @@
     var IsVisibleColour= '@Model.CarpetSkuSettings.isVisibleColour';
     if (id == 0 && IsVisibleColour == "False")
     {
-        CustomSelectFunction($("#ColourIdList"), '/ComboHelpList/GetColours', '/ComboHelpList/SetSingleColour', ' ', true, 0);
+        CustomSelectFunction($("#ColourIdList"), '/ComboHelpList/GetColours', '/ComboHelpList/SetColours', ' ', true, 0);
     }
     else{
-        CustomSelectFunction($("#ColourId"), '/ComboHelpList/GetColours', '/ComboHelpList/SetSingleColour', ' ', false, 0);
+        CustomSelectFunction($("#ColourId"), '/ComboHelpList/GetColours', '/ComboHelpList/SetColours', ' ', false, 0);
     }
 
 
@@ -346,7 +346,8 @@
 
 
     $("#ColourIdList").change(function(){
-        var url = '/CarpetMaster/EditSizePostWithMultipleColours';
+        //var url = '/CarpetMaster/EditSizePostWithMultipleColours';
+        var url = "@(Url.Action("EditSizePostWithMultipleColours"))";
         $('form#modform').attr('action',url);
     });
 

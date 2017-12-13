@@ -465,6 +465,7 @@ namespace Jobs.Controllers
 
             var CostCenterIds = Temp.Select(m => m.CostCenterId).ToArray();
 
+
             var LedgersForCostCenters = (from p in DbContext.Ledger.AsNoTracking()
                                          join t in DbContext.LedgerHeader on p.LedgerHeaderId equals t.LedgerHeaderId
                                          where CostCenterIds.Contains(p.CostCenterId) && p.LedgerLineId != EventArgs.DocLineId
