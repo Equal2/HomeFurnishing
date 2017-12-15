@@ -7108,6 +7108,24 @@ namespace Jobs.Controllers
             return Json(ProductJson);
         }
 
+        public JsonResult GetLedgerAccounts(string searchTerm, int pageSize, int pageNum)
+        {
+            var Query = cbl.GetLedgerAccount(searchTerm);
+            var temp = Query.Skip(pageSize * (pageNum - 1)).Take(pageSize).ToList();
+
+            var count = Query.Count();
+
+            ComboBoxPagedResult Data = new ComboBoxPagedResult();
+            Data.Results = temp;
+            Data.Total = count;
+
+            return new JsonpResult
+            {
+                Data = Data,
+                JsonRequestBehavior = JsonRequestBehavior.AllowGet
+            };
+        }
+
 
     }
 }

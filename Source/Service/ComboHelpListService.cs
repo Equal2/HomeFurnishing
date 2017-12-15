@@ -179,8 +179,8 @@ namespace Service
         IQueryable<ComboBoxResult> GetSalesTaxGroupParty(string term);
         IQueryable<ComboBoxResult> GetProductHelpListWithProductNatureFilter(int ProductNatureId, string term);
         IQueryable<ComboBoxResult> GetPersonRoles(string term);
-        
-        
+
+        IQueryable<ComboBoxResult> GetLedgerAccount(string term);
         
         IQueryable<ComboBoxResult> GetDeliveryTerms(string term);
         IQueryable<ComboBoxResult> GetAddresses(string term);
@@ -3279,6 +3279,20 @@ namespace Service
             }
 
             return ProductJson;
+        }
+
+        public IQueryable<ComboBoxResult> GetLedgerAccount(string term)
+        {
+            var list = (from D in db.LedgerAccount
+                        where (string.IsNullOrEmpty(term) ? 1 == 1 : (D.LedgerAccountName.ToLower().Contains(term.ToLower())))
+                        orderby D.LedgerAccountName
+                        select new ComboBoxResult
+                        {
+                            id = D.LedgerAccountId.ToString(),
+                            text = D.LedgerAccountName + " [" + D.LedgerAccountSuffix + "]"
+                        }
+              );
+            return list;
         }
 
 

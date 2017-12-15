@@ -407,6 +407,7 @@
     <Compile Include="Areas\Rug\Controllers\PackingSettingsController.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Controllers\LedgerAccountMergingController.cs" />
     <Compile Include="Areas\Rug\Controllers\PersonMerging.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -5260,6 +5261,10 @@
     <Content Include="Views\Shared\PermissionDenied_Modal.cshtml" />
     <Content Include="Views\Display_SaleOrderInventoryStatus\Display_SaleOrderInventoryStatus.cshtml" />
     <Content Include="Views\SaleEnquiryProductMappingWithGrid\Index.cshtml" />
+    <Content Include="Views\LedgerAccountMerging\Error.cshtml" />
+    <Content Include="Views\LedgerAccountMerging\Index.cshtml" />
+    <Content Include="Views\LedgerAccountMerging\SingleMerging.cshtml" />
+    <Content Include="Views\LedgerAccountMerging\Sucess.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
